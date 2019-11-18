@@ -1,0 +1,22 @@
+/*
+@import 'themes/snowwhite/drop-down-menu.css';
+@import 'themes/snowwhite/common.css';
+@import 'themes/snowwhite/footer.css';
+@import 'themes/snowwhite/content.css';
+@import '../../resources/lidl/slider/slider.css';
+*/
+
+@import 'fonts.css';
+
+@import 'dev.css';
+
+
+
+@import '../../lib/lidl/slider/slider.css';
+
+@import 'themes/generic/loader.less';
+
+
+
+@import '../../lib/jquery-ui-1.12.1/jquery-ui.css';
+

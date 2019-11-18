@@ -1,0 +1,140 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.members-section {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .members-section {
+    width: 90%;
+    margin: 0 5%;
+  }
+}
+.members-section .member {
+  flex: 1 1 175px;
+  position: relative;
+  padding: 0;
+  text-align: center;
+  background-color: inherit;
+  color: inherit;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  filter: brightness(100%);
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .members-section .member {
+    flex: 0 0 250px;
+    padding: 0;
+    position: relative;
+  }
+}
+.members-section .member .member-details,
+.members-section .member .details-spacer {
+  height: 0;
+  position: relative;
+  display: none;
+}
+.members-section .member.expanded .member-details {
+  position: absolute;
+  width: 100%;
+}
+@media only screen and (min-width: 75em) {
+  .members-section .member.expanded {
+    flex: 0 0 250px;
+    padding: 0;
+    position: relative;
+    text-align: center;
+  }
+}
+.members-section .member:hover {
+  cursor: pointer;
+}
+.members-section .member:hover .text-container {
+  opacity: 1;
+}
+.members-section .member:hover > .img-container img {
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+  filter: brightness(70%);
+}
+.members-section .member .img-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+@media only screen and (min-width: 75em) {
+  .members-section .member .img-container {
+    width: 100%;
+  }
+}
+.members-section .member .img-container img {
+  width: 100%;
+  display: block;
+  -webkit-transition: 500ms ease;
+  -moz-transition: 500ms ease;
+  -o-transition: 500ms ease;
+  transition: 500ms ease;
+}
+.members-section .member .text-container {
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  float: right;
+  width: auto;
+  max-width: 90%;
+  color: inherit;
+  opacity: 0;
+  display: inline-block;
+  text-align: left;
+  -webkit-transition: 500ms ease;
+  -moz-transition: 500ms ease;
+  -o-transition: 500ms ease;
+  transition: 500ms ease;
+}
+.members-section .member span {
+  display: block;
+  font-variant: small-caps;
+  position: relative;
+  left: -50%;
+  top: -50%;
+}
+.members-section .member .member-role {
+  font-size: 80%;
+  word-wrap: break-word;
+  display: none;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .members-section .member .member-role {
+    display: block;
+  }
+}
+.members-section .member .member-details.collapsed {
+  display: none;
+}
+.members-section .member-spacer {
+  flex: 1 1 150px;
+  position: relative;
+  padding: 0;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .members-section .member-spacer {
+    display: none;
+  }
+}
+/*# sourceMappingURL=team.css.map */

@@ -1,0 +1,38 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel="shortcut icon" type="image/x-icon" href="static/icons/favicon.ico")
+
+    include common_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/login.css')
+
+
+  body
+    include preloader
+    include nav
+    #wrapper
+      section#sec1.sec-middle.content-section.color-generic
+        #content1.sec-content.sec-full-width.sec-nomargin.center-in-container
+          #content1-heading.sec-heading
+            img(src="/static/images/logo/unisams.jpg")
+            .unisams-label
+              span.acc1 uni
+              span.acc2 Sams
+              .clear
+            .clear
+          #login-container.actionbox
+            #login-container-inner.actionbox-inner
+              .actionbox-part.actionbox-label
+                | user login
+              .actionbox-part.actionbox-body
+                form#login-form01.actionbox-form(action='userauth' method='POST')
+                  label(for='login-inp01')
+                  input#login-inp01.actionbox-form-inp(value='name' name="username" type="text")
+                  label(for='login-inp02')
+                  input#login-inp02.actionbox-form-inp(value='password' name="password" type="password")
+                  input#login-submit.actionbox-form-submit(type="submit" value="login")
+
+    //include footer

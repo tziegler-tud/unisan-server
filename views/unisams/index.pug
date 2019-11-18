@@ -1,0 +1,13 @@
+extends layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_index.css')
+    script(src="static/unisams/js/index.js")
+
+
+block content
+    #wrapper
+        section#sec1
+            span logged in as: #{user.username}
+            <br>
+            a.content-link(href="/unisams/logout") logout

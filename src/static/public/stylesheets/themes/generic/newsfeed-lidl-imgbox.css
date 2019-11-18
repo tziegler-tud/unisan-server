@@ -1,0 +1,161 @@
+/*
+
+styling for the lidl imagebox to make it a newsfeed
+
+*/
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.lidl-imagebox.style-newsfeed {
+  position: relative;
+  font-size: 100%;
+  width: 100%;
+  z-index: 1;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container {
+  overflow: hidden;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider {
+  width: 300%;
+  overflow: hidden;
+  display: flex;
+  flex-flow: row wrap;
+  background: #f0f0f0;
+  -webkit-transition: 500ms ease;
+  -moz-transition: 500ms ease;
+  -o-transition: 500ms ease;
+  transition: 500ms ease;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image {
+  flex: 1 1 min-content;
+  display: flex;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image img {
+  width: 100%;
+  display: block;
+  flex: 1 1 40%;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label {
+  flex: 1 1 60%;
+  font-size: 80%;
+  position: relative;
+  background-color: #f0f0f0;
+  color: #00293c;
+  margin-bottom: 1em;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label h4 {
+  margin: 0;
+  font-weight: normal;
+  font-size: 120%;
+}
+@media only screen and (max-width: 50em) {
+  .lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label h4 {
+    position: absolute;
+    top: -3em;
+    left: 20px;
+    padding: 7px;
+    font-size: 140%;
+    background-color: #00293c;
+    color: #f5f5f5;
+  }
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label span {
+  display: block;
+  padding: 20px 20px 0 20px;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label a:not(.lidl-hideDefault) {
+  color: #c31d34;
+  text-decoration: none;
+  font-size: 120%;
+  display: inline-block;
+  margin-left: 1em;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label a:not(.lidl-hideDefault)::before {
+  content: "»";
+  padding-right: .5em;
+  color: #c31d34;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label a:not(.lidl-hideDefault):hover {
+  cursor: pointer;
+  border-bottom: 1px solid #c31d34;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav {
+  font-size: 70%;
+  padding: 5px;
+  background-color: #f0f0f0;
+  color: #00293c;
+  border-top: 1px solid #00293c;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-right {
+  width: 100% !important;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-right .lidl-imagebox-image {
+  width: 70% !important;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-bottom .lidl-imagebox-nav-label {
+  margin-right: auto;
+  margin-left: auto;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-bottom .lidl-imagebox-nav-label .nav-dot {
+  float: left;
+  display: block;
+  margin: .5em;
+  width: .6em;
+  height: .6em;
+  background-color: transparent;
+  border: 1px solid #333;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-bottom .lidl-imagebox-nav-label .nav-dot-active {
+  background-color: #c31d34;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-arrows .nav-arrow {
+  position: absolute;
+  z-index: 10;
+  width: 5%;
+  height: 100%;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-arrows .nav-arrow:hover {
+  cursor: pointer;
+  color: #333;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-arrows .nav-arrow svg {
+  margin: auto 0;
+  width: 100%;
+  height: 50%;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-arrows .nav-arrow.left {
+  top: 50%;
+  left: -5%;
+}
+.lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-arrows .nav-arrow.right {
+  top: 50%;
+  right: -5%;
+}
+.lidl-imagebox.style-newsfeed.navigation-arrows {
+  width: 90%;
+  margin: 0 5%;
+}
+/*
+ no javascript fallback
+  */
+.no-js .lidl-imagebox-container {
+  width: 100%;
+}
+.no-js .lidl-imagebox-image {
+  width: 100%;
+}
+/*# sourceMappingURL=newsfeed-lidl-imgbox.css.map */

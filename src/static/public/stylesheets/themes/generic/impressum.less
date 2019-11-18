@@ -1,0 +1,162 @@
+@import 'color-rules.less';
+@import 'variables.less';
+
+@col: @akzent-color;
+@style1: @akzent-color;
+@style2: #eaa83c;
+
+#sec1 {
+
+  #content1 {
+
+    margin: 0 5%;
+    width: 90%;
+    font-size: 90%;
+
+    @media @desktop, @tablet-landscape {
+      margin: 0 25% 0 25%;
+      width: 50%;
+      font-size: 100%;
+    }
+  }
+
+}
+
+
+.contact-list-container {
+
+
+  margin: 1em 0;
+  color: @content-font-color;
+
+  @media @desktop, @tablet-landscape {
+    margin: 2em 10% 4em 10%;
+    width: 80%;
+  }
+
+  & > span {
+    display: block;
+  }
+
+
+
+  .contact-list {
+
+    list-style: none;
+    margin: 0 0 2em 0;
+    padding: 0;
+
+
+    @media @desktop, @tablet-landscape {
+      margin: 1em 0 0 2em;
+      font-size: 90%;
+    }
+
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    li {
+
+
+      display: block;
+      padding: .5em;
+      border-bottom: 1px solid #333;
+
+      @media @desktop, @tablet-landscape {
+        padding: 1em;
+      }
+
+
+      &.expanding .contact-entry-inner {
+
+        .contact-heading {
+
+          position: relative;
+          display: inline-block;
+
+          &::after {
+            position: absolute;
+            left: 0;
+            bottom: 6px;
+            width: 100%;
+            height: 3px;
+            content: "";
+            background-color: @col;
+
+            .transition(400ms);
+          }
+
+          .style1&::after {
+            background-color: @style1;
+          }
+          .style2&::after {
+            background-color: @style2;
+          }
+
+
+          &:hover {
+            cursor: pointer;
+
+            &::after {
+              width: 100%;
+
+            }
+          }
+
+          span {
+
+            display: block;
+            padding: .5em;
+
+            @media @desktop, @tablet-landscape {
+              padding: 1em;
+            }
+          }
+        }
+
+        .contact-details {
+
+          height: auto;
+          width: 100%;
+          .transition(600ms);
+
+          .contact-container:first-child {
+            padding-top: 2em;
+          }
+
+          span {
+            display: block;
+            margin: 1em;
+          }
+
+          .impressum-link {
+            color: @col4;
+
+            &:hover {
+              cursor: pointer;
+              color: @akzent-color;
+              .transition(300ms);
+            }
+          }
+        }
+      }
+
+
+    }
+  }
+  .bullet-list {
+    margin-left:1em;
+
+    list-style: disc outside none;
+
+    li {
+      border: none;
+      display: list-item;
+
+
+    }
+  }
+
+}

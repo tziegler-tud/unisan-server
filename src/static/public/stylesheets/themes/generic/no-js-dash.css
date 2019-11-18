@@ -1,0 +1,68 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+@keyframes show-dash {
+  from {
+    bottom: -400px;
+  }
+  20% {
+    bottom: 0;
+  }
+  80% {
+    bottom: 0;
+  }
+  to {
+    bottom: -400px;
+  }
+}
+#no-js-dash {
+  z-index: 10;
+  display: none;
+  width: 100%;
+  overflow: hidden;
+  padding: 2em 5em;
+  background-color: #f5f5f5;
+  bottom: -400px;
+  position: fixed;
+  height: auto;
+  animation-name: show-dash;
+  animation-duration: 20s;
+  animation-iteration-count: 1;
+  animation-delay: 1s;
+}
+#no-js-dash #no-js-text {
+  color: #c31d34;
+  font-size: 100%;
+  text-align: center;
+}
+.no-js #no-js-dash {
+  display: block;
+}
+.no-js .infobar {
+  display: none;
+}
+.no-js .floating-button {
+  display: none;
+}
+/* alignment from common.less */
+.no-js .sec-label {
+  top: 0 !important;
+  height: 100vh;
+}
+.no-js .sec-label .active {
+  background-color: inherit;
+  color: inherit;
+}
+/*# sourceMappingURL=no-js-dash.css.map */

@@ -1,0 +1,12 @@
+{
+  "name": "unisan",
+  "version": "1.0.0",
+  "description": "Website project for the student team <<Studentischer Sanitätsdienst der TU Dresden>>",
+  "main": "src/js/init.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "./node_modules/jsdoc/jsdoc.js -c ./.jsdoc.conf.json"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,172 @@
+
+@import 'color-rules.less';
+@import 'variables.less';
+
+.members-section {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+
+  @media @desktop, @tablet-landscape {
+    width: 90%;
+    margin: 0 5%;
+  }
+
+  .member {
+
+    flex:       1 1 175px;
+    position:   relative;
+    padding:    0;
+    text-align: center;
+    //border:  1px solid #fff;
+    background-color: inherit;
+    color:            inherit;
+
+    -webkit-transform:  scale(1);
+    transform:          scale(1);
+
+    filter:             brightness(100%);
+
+
+
+    @media @desktop, @tablet-landscape {
+      flex:       0 0 250px;
+      padding:    0;
+      position:   relative;
+
+    }
+
+      .member-details, .details-spacer {
+        height: 0;
+        position: relative;
+        display: none;
+      }
+
+
+    &.expanded {
+      .member-details {
+        position: absolute;
+        width: 100%;
+
+      }
+
+      .details-spacer {
+
+      }
+
+
+
+      @media @desktop {
+        flex:       0 0 250px;
+        padding:    0;
+        position:   relative;
+        text-align: center;
+      }
+
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:hover .text-container {
+      opacity: 1;
+    }
+    &:hover > .img-container img {
+      -webkit-transform: scale(1.2);
+      transform: scale(1.2);
+      filter: brightness(70%);
+
+    }
+
+    .img-container {
+
+      position: relative;
+
+      width:      100%;
+      overflow: hidden;
+
+
+      @media @desktop {
+        width:    100%;
+
+      }
+
+      img {
+      width:      100%;
+      display:    block;
+      .transition(500ms);
+      }
+    }
+
+    .text-container {
+
+
+      margin:     auto;
+      position:   absolute;
+      top:        50%;
+      left:       50%;
+      float:      right;
+      width:      auto;
+      max-width:  90%;
+      color:      inherit;
+      opacity:    0;
+      display:    inline-block;
+      text-align: left;
+
+      .transition(500ms);
+
+      @media @desktop {
+
+      }
+    }
+
+    span {
+
+      display:      block;
+      font-variant: small-caps;
+      position: relative;
+      left: -50%;
+      top: -50%;
+    }
+
+    .member-name {
+    }
+
+    .member-role {
+      font-size:  80%;
+      word-wrap:  break-word;
+      display: none;
+
+      @media @desktop, @tablet-landscape {
+        display: block;
+      }
+
+    }
+
+    .member-details {
+
+      .details-container {
+
+      }
+    }
+
+    .member-details.collapsed {
+      display: none;
+    }
+  }
+
+  .member-spacer {
+    flex:       1 1 150px;
+    position:   relative;
+    padding:    0;
+
+    @media @desktop, @tablet-landscape {
+      display:none;
+    }
+
+  }
+}
+
+

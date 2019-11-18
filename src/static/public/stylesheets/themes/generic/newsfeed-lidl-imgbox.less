@@ -1,0 +1,215 @@
+/*
+
+styling for the lidl imagebox to make it a newsfeed
+
+*/
+
+@import 'color-rules.less';
+@import 'variables.less';
+
+@bg-color: #f0f0f0;
+@font-color: #00293c;
+
+.lidl-imagebox.style-newsfeed {
+
+  position: relative;
+
+  font-size: 100%;
+  width: 100%;
+  z-index: 1;
+
+  .lidl-imagebox-container {
+
+    overflow: hidden;
+
+    .lidl-imagebox-slider {
+      width: 300%;
+      overflow: hidden;
+      display: flex;
+      flex-flow: row wrap;
+
+      background: @bg-color;
+
+      -webkit-transition: 500ms ease;
+      -moz-transition: 500ms ease;
+      -o-transition: 500ms ease;
+      transition: 500ms ease;
+
+      .lidl-imagebox-image {
+
+        flex: 1 1 min-content;
+        display: flex;
+
+        img {
+          width: 100%;
+          display: block;
+          flex: 1 1 40%;
+        }
+
+        .lidl-imagebox-image-label {
+
+          flex: 1 1 60%;
+
+          font-size: 80%;
+          position: relative;
+          background-color: @bg-color;
+          color: @font-color;
+          margin-bottom: 1em;
+
+          h4 {
+            margin: 0;
+            font-weight: normal;
+            font-size: 120%;
+
+            @media @phone {
+              position: absolute;
+              top: -3em;
+              left: 20px;
+              padding: 7px;
+              font-size: 140%;
+              background-color: @nav-bg-color;
+              color: @nav-font-color;
+            }
+          }
+
+          span {
+            display: block;
+            padding: 20px 20px 0 20px;
+            //font-weight: lighter;
+
+            &.content {
+            }
+
+            &.link {
+            }
+          }
+
+          a {
+
+            &:not(.lidl-hideDefault) {
+
+              color: @akzent-color;
+              text-decoration: none;
+              font-size: 120%;
+              display: inline-block;
+              margin-left: 1em;
+
+
+              &::before {
+
+                content: "»";
+                padding-right: .5em;
+                color: @akzent-color;
+              }
+
+              &:hover {
+                cursor: pointer;
+                border-bottom: 1px solid @akzent-color;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .lidl-imagebox-nav {
+
+    font-size: 70%;
+    padding: 5px;
+    background-color: @bg-color;
+    color: @font-color;
+
+    border-top: 1px solid @font-color;
+
+    &.nav-right {
+      width: 100% !important;
+
+      .lidl-imagebox-image {
+        width: 70% !important;
+      }
+    }
+
+    &.nav-bottom {
+
+      .lidl-imagebox-nav-label {
+
+        margin-right: auto;
+        margin-left: auto;
+
+        .nav-dot {
+
+          float: left;
+          display: block;
+          margin: .5em;
+
+          width: .6em;
+          height: .6em;
+
+          background-color: transparent;
+          border: 1px solid #333;
+          border-radius: 50%;
+
+          cursor: pointer;
+        }
+
+        .nav-dot-active {
+          background-color: @akzent-color;
+        }
+      }
+    }
+
+    &.nav-arrows {
+
+      .nav-arrow {
+
+        position: absolute;
+        z-index:  10;
+        width:    5%;
+        height:   100%;
+
+        &:hover {
+          cursor: pointer;
+          color: #333;
+        }
+
+        svg {
+          margin: auto 0;
+          width:  100%;
+          height: 50%;
+        }
+
+
+        &.left {
+          top:    50%;
+          left:   -5%;
+        }
+
+        &.right {
+
+          top: 50%;
+          right: -5%;
+
+        }
+      }
+    }
+  }
+  &.navigation-arrows {
+    width: 90%;
+    margin: 0 5%;
+
+  }
+}
+
+
+/*
+ no javascript fallback
+  */
+.no-js .lidl-imagebox-container {
+  width: 100%;
+}
+
+.no-js .lidl-imagebox-image {
+  width: 100%;
+}
+

@@ -1,0 +1,127 @@
+.slider-body {
+    position: relative;
+    overflow: hidden;
+
+}
+
+/*.slider-image {
+
+    width: 100%;
+
+    opacity: 0;
+
+    position: absolute;
+    top: 0;
+
+    object-fit: cover;
+
+    -webkit-transition: 500ms ease;
+    -moz-transition: 500ms ease;
+    -o-transition: 500ms ease;
+    transition: 500ms ease;
+
+}*/
+.slider-image {
+
+    width: 100%;
+    opacity: 1;
+
+    position: absolute;
+
+
+
+
+
+
+}
+
+
+
+.blur {
+    opacity: 0 !important;
+}
+
+.blur-active {
+    opacity: 1;
+
+
+}
+
+/*
+Transition Classes
+ */
+
+.sliding {
+    -webkit-transition: transform 500ms ease;
+    -moz-transition: transform 500ms ease;
+    -o-transition: transform 500ms ease;
+    transition: transform 500ms ease;
+
+}
+
+.blurring {
+    -webkit-transition: opacity 500ms ease;
+    -moz-transition: opacity 500ms ease;
+    -o-transition: opacity 500ms ease;
+    transition: opacity 500ms ease;
+
+}
+
+/*
+
+ */
+
+.slider-image > img {
+    width: 100%;
+    object-fit: cover;
+
+}
+
+.current-slide {
+
+}
+
+.slider-nav {
+
+    width: 100%;
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    opacity: 1;
+    z-index: 4;
+
+}
+
+.slider-nav > div {
+    height: 100%;
+    opacity: 0.4;
+
+    position: relative;
+    float: left;
+
+}
+
+.slider-nav .slider-nav-left, .slider-nav-right {
+    width: 4%;
+    display: block;
+}
+
+.slider-nav .slider-nav-label {
+    width: 92%;
+    opacity: 1;
+}
+
+.slider-nav-left > svg , .slider-nav-right > svg {
+    width: 100%;
+    object-fit: contain;
+    position: absolute;
+    left:0;
+    top: 50%;
+}
+
+
+
+

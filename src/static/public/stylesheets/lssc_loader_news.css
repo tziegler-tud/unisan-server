@@ -1,0 +1,68 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.news-article {
+  width: 100%;
+}
+.news-article .news-container {
+  width: 80%;
+  margin: 0 auto;
+  font-size: 80%;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .news-article .news-container {
+    width: 50%;
+    max-width: 750px;
+  }
+}
+.news-article .news-container .news-part {
+  margin-bottom: 2em;
+}
+.news-article .news-container .news-part span {
+  display: block;
+  margin-bottom: 1em;
+}
+.news-article .news-container .news-heading {
+  font-size: 160%;
+}
+.news-article .news-container .news-heading h2 {
+  font-size: 130%;
+  font-weight: normal;
+}
+.news-article .news-container .news-date {
+  font-size: 80%;
+  color: #444;
+}
+.news-article .news-container .news-subheading {
+  font-size: 100%;
+  font-weight: bold;
+}
+.news-article .news-container .news-image img {
+  width: 100%;
+  max-width: 750px;
+  display: block;
+}
+.news-article .news-container .news-author {
+  font-size: 80%;
+  color: #444;
+}
+.news-article .news-container .news-author span {
+  display: block;
+  margin-bottom: 0;
+}
+.news-article .news-container .news-nomargin {
+  margin-bottom: 0;
+}
+/*# sourceMappingURL=lssc_loader_news.css.map */

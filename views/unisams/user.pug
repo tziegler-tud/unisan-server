@@ -1,0 +1,40 @@
+extends layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
+    script(src="/static/unisams/js/user.js")
+    script(src="/static/unisams/js/deleteUser.js")
+
+
+block content
+    #wrapper
+        .container
+            section#sec1
+                #sec-content.subpage-container
+                    #content1-heading.sec-heading.subpage-heading
+                        h3 user management
+                    #content1-text.sec-content
+                        .subpage-content
+                            ul.userlist.itemlist
+                                li.user-entry.noSelect.borderBottom
+                                    .inner
+                                        .item-property username
+                                        .item-property Vorname
+                                        .item-property Nachname
+                                        .item-property Email
+
+                                each user in userList
+                                    li.user-entry
+                                        a.inner(href="user/" + user.username)
+                                            .item-property= user.username
+                                            .item-property= user.firstName
+                                            .item-property= user.lastName
+                                            .item-property= user.email
+                                            .clear
+                        #usermanagment-menu.subpage-menu
+                            #btn01.subpage-menu-btn
+                                a.content-link(href="user/addUser")
+                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus") <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                                    span Mitglied hinzufügen
+
+

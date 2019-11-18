@@ -1,0 +1,99 @@
+#dev_menu {
+    width: 100%;
+
+    background-color: white;
+    color: black;
+
+    padding: 10px 0;
+
+    font-family: Sans;
+    font-size: 90%;
+
+
+    display: none;
+
+
+}
+
+#dev-left {
+
+}
+
+.dev-part > label {
+    padding-left: 30%;
+    display: block;
+    width:60%;
+
+
+}
+
+.dev-part ul {
+    padding-left: 30%;
+
+}
+
+.dev-part li {
+    list-style: none;
+    margin: .35em;
+
+    opacity: 0.6;
+
+    text-decoration: none;
+
+}
+
+.dev-part li label {
+    float: left;
+
+}
+
+.dev-part .t {
+    margin-right: 5px;
+}
+
+
+.dev-part {
+    float: left;
+    width: 50%;
+
+
+}
+
+.show-boundaries {
+    outline: 1px dashed firebrick;
+}
+
+.color-select-group input, .color-select-group label {
+    float: left;
+}
+
+.color-select-pair {
+    width: 100%;
+}
+
+.colorInp {
+    width: 40%;
+}
+
+.colorInpLabel {
+    width: 50%;
+}
+
+.colThumb {
+    float: left;
+    width: 5%;
+    height: 1.5em;
+    border: 1px solid #000000;
+}
+
+.spacerDev {
+    width: 100%;
+    height: 50px;
+}
+
+
+
+
+
+
+

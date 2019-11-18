@@ -1,0 +1,33 @@
+#sec1 #content1 .contact-list {
+  color: #00293c;
+  list-style: none;
+  margin-bottom: 2em;
+  display: flex;
+  flex-flow: row;
+}
+#sec1 #content1 .contact-list li {
+  display: block;
+  flex: 0 1 33%;
+  color: inherit;
+  padding: 2em 0;
+  border: 1px solid #00293c;
+}
+#sec1 #content1 .contact-list li.expanding > span:hover {
+  cursor: pointer;
+}
+#sec1 #content1 .contact-list li.expanding.collapsed > .contact-details {
+  max-height: 0;
+}
+#sec1 #content1 .contact-list li .contact-details {
+  height: auto;
+  max-height: 300px;
+  width: 100%;
+  overflow: hidden;
+  -webkit-transition: 600ms ease;
+  -moz-transition: 600ms ease;
+  -o-transition: 600ms ease;
+  transition: 600ms ease;
+}
+#sec1 #content1 .contact-list li .contact-details .contact-container:first-child {
+  padding-top: 2em;
+}

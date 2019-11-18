@@ -1,0 +1,83 @@
+@import 'variables.less';
+@import 'color-rules.less';
+
+.contact-box {
+  .contact-container {
+    font-size:  80%;
+  }
+}
+
+.contact-container {
+
+  &:first-child {
+    padding-top:      2em;
+  }
+
+  .contact-person {
+    width:            100%;
+    display:          flex;
+    flex-flow:        row wrap;
+    border:           1px solid #AAA;
+
+    .person-part {
+      flex:           0 0 100%;
+      float:          left;
+      position:       relative;
+
+      @media @desktop, @tablet-landscape {
+        flex:           0 0 50%;
+      }
+    }
+
+
+    .person-image {
+
+      max-width: 250px;
+
+      img {
+        width:        100%;
+        display:      block;
+      }
+    }
+
+    .person-details {
+
+      display: flex;
+      flex-flow: column wrap;
+
+      &>.spacer {
+        flex: 1 0 auto;
+      }
+
+      &>.wrapper {
+        flex: 0 0 auto;
+        position:     relative;
+        bottom:       0;
+
+      }
+
+
+      span.details {
+        font-size:    90%;
+
+        &.name {
+          font-weight: bold;
+        }
+
+        &.mail {
+
+          &>a {
+            font-size: 80%;
+            font-weight: bold;
+          }
+        }
+
+      }
+
+    }
+  }
+  span {
+    display:            block;
+    margin:             1em;
+  }
+}

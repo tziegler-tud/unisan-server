@@ -1,0 +1,69 @@
+extends layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/public/stylesheets/lssc_loader_impressum.css')
+    script(src="static/public/js/contact/init.js")
+
+block content
+    #wrapper.content-wrapper
+        section#content-top.header-image
+            img.img-desktop(src='/static/images/team/header.jpg')
+            img.img-mobile(src='/static/images/team/header_mobile.jpg')
+            .header-image-overlay
+                .overlay-title
+                    span Studentischer Sanit&auml;tsdienst der TU Dresden.
+                .overlay-content
+                    span
+                        | Sicher durch den Alltag - Im Ernstfall das Richtige tun. Gemeinsam f&uuml;r ein besseres Leben an der TU Dresden.
+        section#sec1.sec-middle.content-section.color-generic
+            #content1.sec-content.sec-full-width.sec-nomargin
+                #content1-heading.sec-heading
+                    span Datenschutz
+                #list01.contact-list-container.style1
+                    ul#expanding-list01.contact-list
+                        li.contact-entry.expanding
+                            .contact-entry-inner
+                                .contact-heading
+                                    span Benennung der verantwortlichen Stelle
+                                .contact-details.collapsing
+                                    .contact-container
+                                        span Die verantwortliche Stelle f&uuml;r die Datenverarbeitung auf dieser Website ist:
+                                    .contact-container
+                                        span
+                                            | Studentischer Sanit&auml;tsdienst der Technischen Universit&auml;t Dresden
+                                            br
+                                            |                                     c/o Studentenrat der Technischen Universit&auml;t Dresden
+                                            br
+                                            |                                     Helmholtzstr. 10
+                                            br
+                                            |                                     01069 Dresden
+                                    .contact-container
+                                        span
+                                            | Die verantwortliche Stelle entscheidet allein oder gemeinsam mit anderen &uuml;ber die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.B. Namen, Kontaktdaten o. &Auml;.).
+                        li.contact-entry.expanding
+                            .contact-entry-inner
+                                .contact-heading
+                                    span Widerruf Ihrer Einwilligung zur Datenverarbeitung
+                                .contact-details.collapsing
+                                    .contact-container
+                                        span
+                                            | Nur mit Ihrer ausdr&uuml;cklichen Einwilligung sind einige Vorg&auml;nge der Datenverarbeitung m&ouml;glich. Ein Widerruf Ihrer bereits erteilten Einwilligung ist jederzeit m&ouml;glich. F&uuml;r den Widerruf gen&uuml;gt eine formlose Mitteilung per E-Mail. Die Rechtm&auml;&szlig;igkeit der bis zum Widerruf erfolgten Datenverarbeitung bleibt vom Widerruf unber&uuml;hrt.
+                                .contact-heading
+                                    span Recht auf Beschwerde bei der zust&auml;ndigen Aufsichtsbeh&ouml;rde
+                                .contact-details.collapsing
+                                    .contact-container
+                                        span
+                                            | Als Betroffener steht Ihnen im Falle eines datenschutzrechtlichen Versto&szlig;es ein Beschwerderecht bei der zust&auml;ndigen Aufsichtsbeh&ouml;rde zu. Zust&auml;ndige Aufsichtsbeh&ouml;rde bez&uuml;glich datenschutzrechtlicher Fragen ist der Landesdatenschutzbeauftragte des Bundeslandes, in dem sich der Sitz unserer Hochschulgruppe befindet.
+                                .contact-heading
+                                    span Recht auf Daten&uuml;bertragbarkeit
+                                .contact-details.collapsing
+                                    .contact-container
+                                        span
+                                            | Ihnen steht das Recht zu, Daten, die wir auf Grundlage Ihrer Einwilligung oder in Erf&uuml;llung eines Vertrags automatisiert verarbeiten, an sich oder an Dritte aush&auml;ndigen zu lassen. Die Bereitstellung erfolgt in einem maschinenlesbaren Format. Sofern Sie die direkte &Uuml;bertragung der Daten an einen anderen Verantwortlichen verlangen, erfolgt dies nur, soweit es technisch machbar ist.
+                                .contact-heading
+                                    span Recht auf Auskunft, Berichtigung, Sperrung, L&ouml;schung
+                                .contact-details.collapsing
+                                    .contact-container
+                                        span
+                                            | Sie haben jederzeit im Rahmen der geltenden gesetzlichen Bestimmungen das Recht auf unentgeltliche Auskunft &uuml;ber Ihre gespeicherten personenbezogenen Daten, Herkunft der Daten, deren Empf&auml;nger und den Zweck der Datenverarbeitung und ggf. ein Recht auf Berichtigung, Sperrung oder L&ouml;schung dieser Daten. Diesbez&uuml;glich und auch zu weiteren Fragen zum Thema personenbezogene Daten k&ouml;nnen Sie sich jederzeit &uuml;ber die im Impressum aufgef&uuml;hrten Kontaktm&ouml;glichkeiten an uns wenden.
+                .clear

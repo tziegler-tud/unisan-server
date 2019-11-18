@@ -1,0 +1,24 @@
+@import "color-rules.less";
+@import "variables.less";
+
+ul.userlist {
+  li {
+    &:not(.noSelect):hover {
+      background-color: rgba(124,0,26,0.2);
+      cursor: pointer;
+    }
+
+    &.borderBottom {
+      border-bottom: 1px solid #333;
+    }
+
+
+
+    .userDelete {
+      svg {
+        width: 1em;
+      }
+    }
+
+  }
+}

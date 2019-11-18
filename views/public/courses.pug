@@ -1,0 +1,208 @@
+extends layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/public/stylesheets/lssc_loader_kurse.css')
+    script(src="static/public/js/kurse/init.js")
+
+block content
+    #wrapper.content-wrapper
+        section#content-top.header-image
+            img.img-desktop(src='/static/images/kurse/header.jpg')
+            img.img-mobile(src='/static/images/kurse/header_mobile.jpg')
+            .header-image-overlay
+                .overlay-title
+                    span Im Ernstfall das Richtige tun.
+                .overlay-content
+                    span
+                        | Unsere Seminare f&uuml;r Mitarbeiter und Studierende der TU Dresden. Moderne Konzepte zugeschnitten auf Ihre Anspr&uuml;che.
+                .overlay-links
+                    div
+                        a.link-prime(href='#contact') Termin vereinbaren
+                    div
+                        a.link-secondary(href='#contact') Angebot durchst&ouml;bern
+                    .clear
+        section#sec1.sec-middle.content-section.color-generic
+            #content1.sec-content.split-vertically.sec-labeled-left.full-width.full-height
+                .sec-heading.mobile-heading.color-invert
+                    h2 Unsere Seminare
+                #fixedLabel.split-part.sec-content-part.sec-label.color-generic-v3
+                    .sec-label-inner
+                        .sec-heading
+                            h2 Unsere Seminare
+                        ul
+                            li
+                                a(href='#c1') F&uuml;r Mitarbeiter
+                            li
+                                a(href='#c2') F&uuml;r Studenten
+                            li
+                                a(href='#c3') Zertifizierung
+                .split-part.sec-content-part.sec-content-text
+                    #content1-inner.content-inner
+                        #c1.content-inner-part
+                            #content1-heading1.content-heading
+                                h4 F&uuml;r Mitarbeiter
+                            #content1-text.content-text
+                                span.content-text-part
+                                    | Wir bieten Ihnen ein breites Angebot von Schulungen, mit denen Sie und Ihre Kollegen lernen, im Ernstfall richtig Erste Hilfe zu leisten. Speziell auf Lehrst&uuml;hle zugeschnitten und vielfach erprobt, bieten unsere Kurse kurzweilige und topaktuelle Inhalte rund um die Erste Hilfe. Unsere Schulungen sind f&uuml;r Mitarbeiter der TU Dresden immer kostenneutral.
+                                span.content-text-part
+                                    | Sammeln Sie Ideen aus unserem Kursangebot und schreiben Sie uns dann ihre Vorstellungen. Gerne passen wir die Themen und den Zeitrahmen an Ihre W&uuml;nsche an.
+                                a.content-link(href='#sec2') Zu den Kursen
+                        #c2.content-inner-part
+                            #content2-heading.content-heading
+                                h4 F&uuml;r Studenten
+                            #content2-text.content-text
+                                span.content-text-part
+                                    | Eure Hochschulgruppe, Verein, AG, etc... sucht noch nach einem spannenden Thema f&uuml;r den n&auml;chsten Gemeinschaftsabend? Ihr arbeitet in Werkst&auml;tten, mit Starkstrom, Chemikalien?
+                                span
+                                    | Gern bieten wir f&uuml;r eure Gruppe einen Workshop zum Thema Erste Hilfe an. Sucht euch aus dem Kursangebot etwas heraus, oder schreibt uns einfach eure Vorstellungen und Zeitrahmen. Wir stellen dann einen Kurs f&uuml;r euch zusammen.
+                                span
+                                    | F&uuml;r euch als studentische Initiative sind unsere Kurse immer kostenneutral.
+                        #c3.content-inner-part.last
+                            #content3-heading.content-heading
+                                h4 Zertifizierung
+                            #content3-text.content-text
+                                span.content-text-part
+                                    | Um in unseren Kursen ein hohes Ma&szlig; an Flexibilit&auml;t zu gew&auml;hrleisten, folgen wir keinen strengen Vorgaben bez&uuml;glich des Inhaltes. Dadurch ist es uns jedoch leider nicht m&ouml;glich, f&uuml;r die Teilnahme an unseren Kursen eine Zertifizierung auszustellen.
+                                span
+                                    | Falls Sie auf der Suche nach einer Schulung f&uuml;r Betriebliche Ersthelfer oder f&uuml;r den F&uuml;hrerschein sind, wenden Sie sich bitte an den
+                                    a.inline-link.external(href='https://tu-dresden.de/tu-dresden/gesundheitsmanagement') Gesundheitsdienst der TU Dresden.
+                        .clear
+                .clear
+        section#sec2.color-generic-v3-inverse.content-section
+            #content2.sec-content.sec-full-width.sec-nomargin
+                .sec-heading
+                    h2 Unser Seminarangebot
+                #content2-inner
+                    .courses-section
+                        // quick way to display members. TODO: Make this generate dynamically from database
+                        .course
+                            .course-inner
+                                .course-top
+                                    .course-img
+                                        img(src='/static/images/kurse/1.jpg')
+                                    .course-title
+                                        h4 Grundkurs &quot;Wiederbelebung mit AED&quot;
+                                .course-body
+                                    .course-tags
+                                        span.part 10 - 30
+                                        span.time 90 Min
+                                        span.lang De, En
+                                        .clear
+                                    .course-info
+                                        span
+                                            | Die Teilnehmer erfahren, warum die korrekte und schnelle Durchf&uuml;hrung von Ma&szlig;nahmen zur Wiederbelebung so wichtig ist, und wie man die &Uuml;berlebenschancen mittels Einsatz eines AED (Automatischer Externer Defibrillator) signifikant erh&ouml;hen kann.
+                                        span
+                                            | Inhalte:
+                                            ul
+                                                li Notruf, Rechtlicher Rahmen, Besonderheiten an der TUD
+                                                li Pr&uuml;fen von Bewusstsein und Atmung
+                                                li Stabile Seitenlage
+                                                li Durchf&uuml;hrung der Herz-Lungen-Wiederbelebung
+                                                li Anwendung eines AED (automatischer externer Defibrillator)
+                        .course
+                            .course-inner
+                                .course-top
+                                    .course-img
+                                        img(src='/static/images/kurse/2.jpg')
+                                    .course-title
+                                        h4 Trainingskurs &quot;Wiederbelebung mit AED&quot;
+                                .course-body
+                                    .course-tags
+                                        span.part 8 - 20
+                                        span.time 150 Min
+                                        span.lang De, En
+                                        .clear
+                                    .course-info
+                                        span
+                                            | Die Teilnehmer erfahren, warum die korrekte und schnelle Durchf&uuml;hrung von Ma&szlig;nahmen zur Wiederbelebung so wichtig ist, und wie man die &Uuml;berlebenschancen mittels Einsatz eines AED signifikant erh&ouml;hen kann. Dabei &uuml;bt jeder Teilnehmer die Durchf&uuml;hrung von Stabiler Seitenlage und Wiederbelebung mit Anwendung eines AED.
+                                        span
+                                            | Inhalte:
+                                            ul
+                                                li Notruf, Rechtlicher Rahmen, Besonderheiten an der TUD
+                                                li Pr&uuml;fen von Bewusstsein und Atmung
+                                                li Stabile Seitenlage
+                                                li Durchf&uuml;hrung der Herz-Lungen-Wiederbelebung
+                                                li Anwendung eines AED (automatischer externer Defibrillator)
+                                                li Praktische &Uuml;bung der Ma&szlig;nahmen
+                        .course
+                            .course-inner
+                                .course-top
+                                    .course-img
+                                        img(src='/static/images/kurse/3.jpg')
+                                    .course-title
+                                        h4 Trainingskurs &quot;Fit in erster Hilfe&quot;
+                                .course-body
+                                    .course-tags
+                                        span.part 8 - 20
+                                        span.time 300 Min
+                                        span.lang De
+                                        .clear
+                                    .course-info
+                                        span
+                                            | Es werden ausgew&auml;hlte Themen der Ersten Hilfe mit den Teilnehmern besprochen und praktisch trainiert. Der Aufbau ist modular, daher ist die Dauer des Kurses relativ flexibel w&auml;hlbar. Weiterhin kann der Kurs aufgeteilt und an verschiedenen Terminen angeboten werden.
+                                        span
+                                            | Inhalte:
+                                            ul
+                                                li Notruf, Rechtlicher Rahmen, Besonderheiten an der TUD
+                                                li Inhalte des Trainingskurs &quot;Wiederbelebung mit AED&quot;
+                                                li Herzinfarkt, Schlaganfall
+                                                li Kreislaufzusammenbruch, Krampfanfall (Epilepsie)
+                                                li Wundverb&auml;nde, Knochenbr&uuml;che, Verstauchungen
+                                                li Vergiftungen, Verbrennungen
+                                                li Notf&auml;lle mit Kindern
+                        .course
+                            .course-inner
+                                .course-top
+                                    .course-img
+                                        img(src='/static/images/kurse/4.jpg')
+                                    .course-title
+                                        h4 Spezialkurs &quot;Richtig handeln in Notf&auml;llen!&quot;
+                                .course-body
+                                    .course-tags
+                                        span.part 8 - 20
+                                        span.time 240 Min
+                                        span.lang De, En
+                                        .clear
+                                    .course-info
+                                        span
+                                            | In diesem Kurs werden die Teilnehmer an das medizinische Notfallrettungssystem in Deutschland herangef&uuml;hrt. Zielgruppe sind speziell Mitarbeiter aus dem Ausland, die mit den Gegebenheiten in Deutschland nicht vertraut sind.
+                                        span
+                                            | Inhalte:
+                                            ul
+                                                li
+                                                    | Notruf, Wartezeiten, Haftungsanspr&uuml;che, Do&apos;s and Dont&apos;s in medizinischen Notf&auml;llen
+                                                li
+                                                    | Beurteilung von Notfallpatienten: Wie stelle ich fest, dass jemand Hilfe braucht? Wann w&auml;hle ich den Notruf?
+                                                li Inhalte des Trainingskurses &quot;Wiederbelebung mit AED&quot;
+        section#sec3.color-generic-v3.content-section
+            .sec-content.sec-full-width.sec-nomargin
+                #sec3-inner
+                    #sec3-left.split-part.sec-content-part.sec-content-text
+                        #content1-heading.content-heading
+                            h2 Nicht das richtige dabei?
+                        #sec3-text.content-text
+                            span
+                                | Schreibt uns eure Vorstellungen. Jeder Seminar wird individuell vorbereitet, und wir erweitern unser Portfolio mit Vergn&uuml;gen.
+                        a#content1-link1.content-link(href='kontakt.php') Kontakt aufnehmen
+        section#sec4.color-generic.content-section
+            .sec-content.sec-full-width
+                #kontakt
+                    .contact-box.sec-content-part
+                        #content3-heading4.content-heading
+                            h2 Ansprechpartner
+                        .contact-container
+                            .contact-person
+                                .person-part.person-image
+                                    img(src='/static/images/kontakt/2_250.jpg' alt='2.jpg')
+                                .person-part.person-details
+                                    .spacer
+                                    .wrapper
+                                        span.details.name Tom Ziegler
+                                        span.details.role Leiter Ausbildung
+                                        span.details.mail
+                                            | Email:
+                                            a.mail-hidden.itsatrap.text.force-select(href='mailto:me@respam.org' data-prefix='ausbildung') hidden. Are you a bot?
+                                        .send-a-fish
+                                            a.mail-hidden.mailto(data-prefix='ausbildung')
+                                                span.mail-body-hidden
+                                                span.mail-body-collapsing E-Mail senden

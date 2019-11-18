@@ -1,0 +1,28 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+form.userForm {
+  width: 100%;
+}
+form.userForm input.userForm-inp {
+  display: block;
+  border: 1px solid #BBB;
+  background-color: transparent;
+  padding: 5px 1em;
+  border-radius: 0;
+  color: #666;
+  margin-bottom: 1em;
+}
+/*# sourceMappingURL=addUser.css.map */

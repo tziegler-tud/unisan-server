@@ -1,0 +1,58 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    script(src="/static/unisams/js/addUser.js")
+
+
+block content
+    #wrapper
+        .container
+            section#sec1
+
+                #sec-content.subpage-container
+                    #content1-heading.sec-heading.subpage-heading
+                        h3 Neues Mitglied anlegen
+                    #content1-text.sec-content
+                        .subpage-content
+                            form#addUserForm.editUserForm.userinfo-container.userForm(action="/unisams/usermod/create" method='POST')
+                                .userinfo-inner
+                                    .userinfo-section
+                                        .userinfo-sectionheader
+                                            span Allgemeine Daten
+                                        .userinfo-item
+                                            span Username:
+                                            input#userinp-username.userForm-inp(value = "username", name="username" type="text")
+                                        .userinfo-item
+                                            span Passwort:
+                                            input#userinp-password.userForm-inp(value = "Passwort", name="password" type="password")
+                                        .userinfo-item
+                                            span Vorname:
+                                            input#userinp-firstname.userForm-inp(value = "Vorname", name="firstName" type="text")
+                                        .userinfo-item
+                                            span Vorname:
+                                            input#userinp-lastname.userForm-inp(value= "Nachname" name="lastName" type="text")
+                                        .userinfo-item
+                                            span Email:
+                                            input#userinp-email.userForm-inp(value= "Email" name="email" type="text")
+
+                                    .userinfo-section
+                                        .userinfo-sectionheader
+                                            span Rechte und Rollen
+                                        .userinfo-item
+                                            span UniSams login:
+
+                                        .userinfo-item
+                                            span Angezeigt auf Website:
+
+                        #profilemanagment-menu.subpage-menu
+                            #btn01.subpage-menu-btn
+                                a.content-link.style2.float(href="/unisams/user")
+                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-delete") <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                                    span Abbrechen
+                            #btn02.subpage-menu-btn
+                                a#addUserFormSubmit.content-link.float()
+                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-save") <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                    span Speichern
+
+

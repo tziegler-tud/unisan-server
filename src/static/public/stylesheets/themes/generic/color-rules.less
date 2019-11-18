@@ -1,0 +1,81 @@
+//color variables
+
+
+@col1: #00293c;
+@col2: #c31d34;
+@col3: #213e54;//#1E656D;
+@col4: #1e3b48;
+
+//@akzent-color: #df013a;
+@akzent-color: @col2;
+
+@nav-bg-color: @col1;//#062f4f;
+@nav-font-color: #f5f5f5;
+@nav-hover-color: @akzent-color;
+
+@content-bg-color: #f5f5f5;
+@content-font-color: @nav-bg-color;//#062f4f;//#0b0b3b;
+
+@content-bg-color-v2: #f9f9f9;//#fff8ee;//#fbf6ef;
+@content-font-color-v2: @nav-bg-color;//#062f4f;
+
+@content-bg-color-v3: @col3;//#fff8ee;//#fbf6ef;
+@content-font-color-v3: #ffffff;//#062f4f;
+
+@content-bg-color-v4: @col4;
+@content-font-color-v4: #ffffff;
+
+@imageoverlay-font-color: #ffffff;
+@imageoverlay-hightlight-color: @akzent-color;
+
+@infobar-bg-color: @content-bg-color;
+@infobar-font-color: @akzent-color;
+
+@link-bg-color: @akzent-color;
+@link-hover-color: #de243d;
+//rgba values
+
+//path variables
+
+@image-path: '../../images';
+@icon-path: '../../icons';
+
+//mixins
+.transition(@time){
+  -webkit-transition: @time ease;
+  -moz-transition:    @time ease;
+  -o-transition:      @time ease;
+  transition:         @time ease;
+}
+
+.transition (@property,@time) {
+  -webkit-transition: @property @time ease;
+  -moz-transition:    @property @time ease;
+  -o-transition:      @property @time ease;
+  transition:         @property @time ease;
+}
+
+.transition (@property,@time, @animation) {
+  -webkit-transition: @property @time @animation;
+  -moz-transition:    @property @time @animation;
+  -o-transition:      @property @time @animation;
+  transition:         @property @time @animation;
+}
+
+
+.transition (@property,@time, @animation, @delay) {
+  -webkit-transition: @property @time @animation @delay;
+  -moz-transition:    @property @time @animation @delay;
+  -o-transition:      @property @time @animation @delay;
+  transition:         @property @time @animation @delay;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}

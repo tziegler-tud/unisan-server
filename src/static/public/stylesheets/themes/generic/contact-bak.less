@@ -1,0 +1,79 @@
+@import 'color-rules.less';
+@import 'variables.less';
+
+#sec1 {
+
+  #content1 {
+
+    .contact-list {
+
+      color: @content-font-color;
+      list-style: none;
+
+      margin-bottom: 2em;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      li {
+        display: block;
+        padding: 1em;
+
+        //border-bottom: 1px solid #333;
+
+
+
+      &::before {
+        display:        block;
+        width:          1em;
+        height:         1em;
+        margin-bottom:  0.25em;
+        margin-top:     0.25em;
+        margin-right:   auto;
+
+        content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-right"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>');
+
+
+
+        @media @desktop, @tablet-landscape {
+          float:          left;
+          margin-right:   1em;
+          margin-bottom: -.25em;
+          }
+      }
+
+        &.expanding {
+
+          & > span:hover {
+            cursor:pointer;
+          }
+        }
+
+        &.expanding.collapsed > .contact-details {
+
+
+          max-height: 0;
+
+
+        }
+        .contact-details {
+
+          height: auto;
+          max-height: 300px;
+          width: 100%;
+          overflow: hidden;
+          .transition(600ms);
+
+          .contact-container:first-child {
+            padding-top: 2em;
+          }
+        }
+
+      }
+
+
+    }
+
+  }
+}

@@ -1,0 +1,156 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel="shortcut icon" type="image/x-icon" href="static/icons/favicon.ico")
+
+    include common_includes
+    link(rel='stylesheet', href='/static/public/stylesheets/lssc_loader_index.css')
+    script(src="static/public/js/index/index.js")
+    script(src="static/public/js/index/init.js")
+
+
+  body
+    include preloader
+    include nav
+    #wrapper.content-wrapper
+      section#content-top
+        a#top.hidden
+        #teaser-large.teaser-large.split-vertically.split-v2.image-gallery.gallery-border
+          #top-left.split-part.heightOfParent
+            .gallery-inner.border-bottom
+              .image-overlay.text-overlay.content-bottom
+                .text-overlay-inner
+                  a.overlay-title(href='#seidabei') #{__("teaser_join_head")}
+                  span.overlay-content.draw
+                    | #{__("teaser_join_text")}
+              .image-overlay.color-overlay
+              img(src='/static/images/index/index1.jpg' alt='Unsere Gruppe vor dem HSZ')
+          #top-right.split-part.heightOfParent.split-horizontally.split-h2
+            #top-right-top.split-part.widthOfParent
+              .gallery-inner.border-left.border-bottom
+                .image-overlay.text-overlay.content-top
+                  .text-overlay-inner
+                    span.overlay-content.draw
+                      | #{__("teaser_course_text")}
+                    a.overlay-title(href='kurse') #{__("teaser_course_head")}
+                .image-overlay.color-overlay
+                img(src='/static/images/index/index2.jpg' alt='Bild während eines Kurses')
+            #top-right-bottom.split-part.widthOfParent
+              .gallery-inner.border-left.border-bottom
+                .image-overlay.text-overlay.content-top
+                  .text-overlay-inner
+                    span.overlay-content.draw
+                      | #{__("teaser_san_text")}
+                    a.overlay-title(href='san') #{__("teaser_san_head")}
+                .image-overlay.color-overlay
+                img(src='/static/images/index/index3.jpg' alt='Sanitäter läuft auf einer Veranstaltung')
+        #teaser-small.teaser-small
+          #mobile-header
+            .header-content
+              span Studentischer Sanit&auml;tsdienst der TU Dresden.
+          #lidl-imagebox01.lidl-imagebox.style-default
+            #lidl-imagebox01-container.lidl-imagebox-container
+              #lidl-imagebox01-slider.lidl-imagebox-slider
+                .lidl-imagebox-image
+                  img(src='/static/images/slider/slide1.jpg' alt='Unsere Gruppe vor dem HSZ')
+                  .lidl-imagebox-image-label
+                    h4 Sei dabei!
+                    span.content
+                      | Werde Teil unseres Teams! Ob Ersthelfer oder Notfallsanit&auml;ter - bei uns findest du deinen Platz.
+                    span.link
+                      a.lidl-hideDefault.content-link.slim(href='#seidabei') Mehr erfahren
+                .lidl-imagebox-image
+                  img(src='/static/images/slider/slide2.jpg' alt='Bild während eines Kurses')
+                  .lidl-imagebox-image-label
+                    h4 Kurse
+                    span.content
+                      | F&uuml;r Studierende und Mitarbeiter der TU Dresden bieten wir ein breites Spektrum an Seminaren.
+                    span.link
+                      a.lidl-hideDefault.content-link.slim(href='/kurse') Mehr erfahren
+                .lidl-imagebox-image
+                  img(src='/static/images/slider/slide3.jpg' alt='Sanitäter läuft auf einer Veranstaltung')
+                  .lidl-imagebox-image-label
+                    h4 Sanit&auml;tsdienst
+                    span.content
+                      | F&uuml;r Veranstaltungen an der TU Dresden helfen wir Ihnen gern in Fragen rund um die Erste Hilfe.
+                    span.link
+                      a.lidl-hideDefault.content-link.slim(href='sanitaetsdienst.php') Mehr erfahren
+      #content-wrapper
+        #top-spacer
+        section#sec1.color-generic-v2
+          div
+            #content1.sec-content.split-vertically
+              #content1-left.split-part.sec-content-part.sec-content-text
+                #content1-heading.content-heading
+                  h2 Erste Hilfe - zweite Chance?
+                #content1-text.content-text
+                  | Notf&auml;lle passieren jeden Tag. Jeder Mensch hat die Pflicht, Erste Hilfe zu leisten. F&uuml;r Menschen, die unsere Hilfe brauchen, gibt es keinen Zweitversuch.
+                  h3 Bildung rettet Leben.
+                  span
+                    | Erste Hilfe muss selbstverst&auml;ndlich sein. Wir setzen uns daf&uuml;r ein, dass die Gemeinschaft der Mitarbeiter und Studenten der TU Dresden in der Lage ist, in Notsituationen qualifiziert Erste Hilfe leisten zu k&ouml;nnen.
+                    br
+                    | F&uuml;r euch. F&uuml;r uns.
+                a#content1-link2.content-link.light(href='kurse.php') Mehr erfahren
+              #content1-right.split-part.sec-content-part.sec-content-img
+              .clear
+        section#sec2.sec-middle
+          div
+            #content2.sec-content.color-generic-v3-inverse
+              #news.sec-full-width.sec-nomargin
+                .sec-heading.color-invert
+                  h2 Aktuelles
+                #newsfeed.newsfeed
+                  #newsfeed-container.newsfeed-container
+                    .news-item
+                      .news-item-inner
+                        .news-image
+                          img(src='/static/images/news/thumbnails/wu.jpg')
+                        .news-date
+                          | 26.06.2019
+                        .news-heading Sommerfest in der Wundtstra&szlig;e am 26.06.2019
+                        .news-link
+                          a.content-link(href='news/sommerfest-wu.php') Weiterlesen
+                    .news-item
+                      .news-item-inner
+                        .news-image
+                          img(src='/static/images/news/thumbnails/kif.jpg')
+                        .news-date
+                          | 16.06.2019
+                        .news-heading
+                          | KIF 47,0 - die BuFaTa der Informatiker in Dresden
+                        .news-link
+                          a.content-link(href='news/kif-2019.php') Weiterlesen
+                    .news-item
+                      .news-item-inner
+                        .news-image
+                          img(src='/static/images/news/thumbnails/gesundheitstag-2019.jpg')
+                        .news-date
+                          | 20.05.2019
+                        .news-heading
+                          | Tag der Gesundheit am 22.05.2019
+                        .news-link
+                          a.content-link(href='news/gesundheitstag-2019.php') Weiterlesen
+                    .clear
+              .clear
+        section#sec3.color-generic-v4.content-section
+          #seidabei
+            #content3.sec-content.no-padding
+              .sec-full-width.sec-nomargin.sec-flex
+                .sec-heading.absolute.color-invert
+                  h2 Engagement
+                #content3-left.flex-part.flex-bg-img.no-margin.img-fullheight
+                  div
+                #content3-right.flex-part.flex-text.sec-content-text
+                  .space-wrapper
+                    #content3-heading1.content-heading
+                      h2 Komm ins Team
+                    #content3-text1.content-text
+                      span
+                        | Dein Einsatz z&auml;hlt. Werde Teil unseres Teams und gestalte die Zukunft unserer Hochschulgruppe mit. Alles, was du mitbringen musst, ist Engagement.
+                    a#content3-link1.content-link.light.inverse(href='team.php') Jetzt mitmachen
+                .clear
+      include footer
+    include floating_button

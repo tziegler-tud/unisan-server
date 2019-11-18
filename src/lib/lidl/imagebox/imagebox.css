@@ -1,0 +1,61 @@
+
+.lidl-imagebox {
+    width: 100%;
+    position: relative;
+
+}
+
+.lidl-imagebox .lidl-imagebox-container {
+
+    width: 300vw;
+    overflow: hidden;
+
+}
+
+.lidl-imagebox-container .lidl-imagebox-image {
+
+    width: 100vw;
+    float: left;
+
+
+
+}
+
+.lidl-imagebox-container .lidl-imagebox-image .lidl-imagebox-image-label{
+    width: 100%;
+    padding: 20px;
+
+    background-color: #464646;
+    color: #fffcf5;
+
+}
+
+
+.lidl-imagebox-container .lidl-imagebox-image img{
+    width: 100%;
+
+}
+
+.lidl-imagebox .lidl-imagebox-nav {
+    padding: 10px;
+    background-color: 464646;
+    color: #fffcf5;
+}
+
+.lidl-imagebox-nav-label .nav-dot {
+
+    float: left;
+    display: block;
+    margin: 10px;
+
+    width: 10px;
+    height: 10px;
+
+    background-color: #fffcf5;
+    border-radius: 50%;
+    border: 1px solid #ff9900;
+
+}
+
+
+
