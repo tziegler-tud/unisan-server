@@ -15,49 +15,70 @@ module.exports = {
     delete: _delete
 };
 
+/** @typedef {import("../schemes/userScheme").UserScheme} UserScheme */
+
+/**
+ * Gets all users
+ */
 async function getAll() {
-    return await User.find().select('-password');
+    return User.find().select('-password');
 }
 
+/**
+ * Gets a user by its id
+ * @param {number} id The id of the user
+ */
 async function getById(id) {
     return await User.findById(id).select('-password');
 }
 
+/**
+ * Gets a user by its username
+ * @param {string} username The username to search for
+ */
 async function getByUsername(username) {
     return await User.findOne({username: username}).select('-password');
 }
 
+/**
+ * Creates a new user by a given object of the user scheme
+ * @param {UserScheme} userParam The object to save as user
+ */
 async function create(userParam) {
     // validate
-    if (await User.findOne({ username: userParam.username })) {
-        throw 'Username "' + userParam.username + '" is already taken';
-    }
+    if (await User.findOne({ username: userParam.username }))
+        throw new Error(`Username "${userParam.username}" is already taken`);
 
     const user = new User(userParam);
 
+    // @louis: password is not mentioned in the userScheme. Is this correct?
     // hash password
     if (userParam.password) {
         var salt = bcrypt.genSaltSync(10);
-        user.hash = bcrypt.hashSync(userParam.password, salt);
+        user.hash = await bcrypt.hash(userParam.password, salt);
     }
 
     // save user
     await user.save();
 }
 
+/**
+ * Updates an existing user
+ * @param {number} id The id of the existing user
+ * @param {UserScheme} userParam The object to save as user
+ */
 async function update(id, userParam) {
     const user = await User.findById(id);
 
     // validate
-    if (!user) throw 'User not found';
-    if (user.username !== userParam.username && await User.findOne({ username: userParam.username })) {
-        throw 'Username "' + userParam.username + '" is already taken';
-    }
+    if (!user) throw new Error('User not found');
+    if (user.username !== userParam.username && await User.findOne({ username: userParam.username }))
+        throw new Error(`Username "${userParam.username}" is already taken`);
 
     // hash password if it was entered
     if (userParam.password) {
         //TODO: Check if plaintext password is stored
-        userParam.hash = bcrypt.hashSync(userParam.password, 10);
+        userParam.hash = await bcrypt.hash(userParam.password, 10);
     }
 
     // copy userParam properties to user
@@ -66,14 +87,19 @@ async function update(id, userParam) {
     await user.save();
 }
 
+/**
+ * Deletes a property of a given user
+ * @param {number} id The id of the user do manipulate
+ * @param {any} userParams @louis no idea what this object is
+ */
 async function deleteKey(id, userParams) {
     const user = await User.findById(id);
 
     // validate
-    if (!user) throw 'User not found';
+    if (!user) throw new Error('User not found');
 
     // validate input
-    if (!userParams.key) throw 'no key given';
+    if (!userParams.key) throw new Error('no key given');
 
     // check if key exists
     if (!user.get(userParams.key)) {
@@ -97,26 +123,32 @@ async function deleteKey(id, userParams) {
     await user.save();
 }
 
+/**
+ * Updates a property of a user
+ * @param {number} id The id of the user do manipulate
+ * @param {*} userParams @louis no idea what this object is
+ */
 async function updateKey(id, userParams) {
     const user = await User.findById(id);
 
     // validate
-    if (!user) throw 'User not found';
+    if (!user) throw new Error('User not found');
 
     // validate input
-    if (!userParams.key) throw 'no key given';
-    if (!userParams.value) throw 'no value given';
+    if (!userParams.key) throw new Error('no key given');
+    if (!userParams.value) throw new Error('no value given');
 
     //check if array operation
     if(userParams.isArray) {
 
         // in-memory update. get current array content
         // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+        /** @type {any[]} */
         var array = user.get(userParams.key);
-        if(!Array.isArray(array)) throw 'Key marked as array, but ' + typeof(array) + ' was found.';
-        var index = array.map(function(e) { return e._id; }).indexOf(userParams.value.id);
+        if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
+        var index = array.map(e => e._id).indexOf(userParams.value.id);
         if (index > -1) {
-            // updating existing object
+            // updating existing object @louis can you use array[index] = userParams.value ?
             array.splice(index, 1, userParams.value);
         }
         else {
@@ -131,6 +163,10 @@ async function updateKey(id, userParams) {
     await user.save();
 }
 
+/**
+ * Deletes a user
+ * @param {number} id The id of the user to delete
+ */
 async function _delete(id) {
     await User.findByIdAndRemove(id);
 }

@@ -1,50 +1,66 @@
 const express = require('express');
 const router = express.Router();
-const userService = require('/services/userService');
+const userService = require('../../services/userService');
 
 // routes
-router.post('/authenticate', authenticate);
-router.post('/register', register);
-router.get('/', getAll);
-router.get('/current', getCurrent);
-router.get('/:id', getById);
-router.put('/:id', update);
-router.delete('/:id', _delete);
+router.post('/register', async (req, res, next) => {
+    try {
+        await userService.create(req.body);
+        res.send({});
+    } catch(e) {
+        res.status(500).send();
+    }
+});
 
-module.exports = router;
+router.get('/', async (req, res, next) => {
+    try {
+        await userService.getAll();
+        res.send({});
+    } catch(e) {
+        res.status(500).send();
+    }
+});
 
-function register(req, res, next) {
-    userService.create(req.body)
-        .then(() => res.json({}))
-        .catch(err => next(err));
-}
+router.get('/current', async (req, res, next) => {
+    try {
+        const user = await userService.getById(req.user.sub);
+        if (user == null) {
+            res.sendStatus(404);
+        } else {
+            res.send(user);
+        }
+    } catch(e) {
+        res.status(500).send();
+    }
+});
 
-function getAll(req, res, next) {
-    userService.getAll()
-        .then(users => res.json(users))
-        .catch(err => next(err));
-}
+router.get('/:id', async (req, res, next) => {
+    try {
+        const user = await userService.getById(req.params.id);
+        if (user == null) {
+            res.sendStatus(404);
+        } else {
+            res.send(user);
+        }
+    } catch(e) {
+        res.status(500).send();
+    }
+});
 
-function getCurrent(req, res, next) {
-    userService.getById(req.user.sub)
-        .then(user => user ? res.json(user) : res.sendStatus(404))
-        .catch(err => next(err));
-}
+router.put('/:id', async (req, res, next) => {
+    try {
+        await userService.update(req.params.id, req.body);
+        res.send(req.body);
+    } catch(e) {
+        res.status(500).send();
+    }
+});
 
-function getById(req, res, next) {
-    userService.getById(req.params.id)
-        .then(user => user ? res.json(user) : res.sendStatus(404))
-        .catch(err => next(err));
-}
-
-function update(req, res, next) {
-    userService.update(req.params.id, req.body)
-        .then(() => res.json({}))
-        .catch(err => next(err));
-}
-
-function _delete(req, res, next) {
-    userService.delete(req.params.id)
-        .then(() => res.json({}))
-        .catch(err => next(err));
-}
+router.delete('/:id', async (req, res, next) => {
+    try {
+        await userService.delete(req.params.id);
+        res.send();
+    } catch(e) {
+        res.status(500).send();
+    }
+});
