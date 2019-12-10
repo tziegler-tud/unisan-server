@@ -6,15 +6,49 @@
 
 
 ### Purpose
-Text to be added here. 
+Extension of the publicly available website [www.unisan-dresden.de](http://lesscss.org/) with backbone api and frontend for a sophisticated web-based management application.
+
+Planned features include a user management, event mangement, an eLearning area and CMS for the public website.
+#### Current state (10.12.2019):
+- working on user management
+
+#### Planned:
+- calendar and event management
+- web-based CMS for public website
+- eLearning area providing course materials and information
+- user documentation
 
 ### Tech
 
 
-### Dependencies
+#### Dependencies
 
 Our project uses [LESS](http://lesscss.org/) to generate css files.
-This project comes with it's own little "js framework", which essentially emerged during project development. 
+
+##### Backend
+NodeJS version: 8.10.0\
+ES2017
+
+npm modules:
+- passport.js 0.4.0
+- pug 2.0.0
+- check package.json for furtherer dependencies
+
+##### Frontend
+
+ES6 2017
+CSS3
+HTML5
+
+libraries:
+- jQuery
+- jQuery UI
+- hammer.js
+- handlebars.js
+- lidl.js, a targeted framework created solely for this project
+- some more...
+
+All frontend libraries are included in the source files.
 
 ### Usage
 
