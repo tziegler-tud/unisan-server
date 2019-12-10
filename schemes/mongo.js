@@ -15,5 +15,6 @@ mongoose.connect(config.connectionString, opt);
 mongoose.Promise = global.Promise;
 
 module.exports = {
-    User: require('./userScheme')
+    User: require('./userScheme'),
+    Qualifications: require('./qualificationScheme')
 };

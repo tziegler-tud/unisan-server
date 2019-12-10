@@ -1,2 +1,141 @@
 @import "color-rules";
 @import "variables";
+
+@sidebar-width: 20em;
+
+#wrapper {
+  .page-container {
+    .transition(width, 250ms);
+  }
+}
+
+#wrapper.sidebar-active {
+  .sidebar-container {
+    transform: translateX(0);
+
+    .sidebar-top {
+      transform: translateX(0);
+    }
+
+  }
+  .page-container {
+    width: calc(~"100% - @{sidebar-width} - 0.1em");
+    float: left;
+
+
+  }
+}
+
+.sidebar-container {
+  width:    @sidebar-width;
+  height:   calc(~"100vh - @{topnav-height}");
+  transform: translateX(100%);
+  position: absolute;
+  border-left: 1px solid @menu-border-color;
+  background-color: @page-bg-color-v2;
+
+  float: left;
+
+  top:      0;
+  right:    0;
+
+  .transition(transform, 250ms);
+
+  .sidebar {
+
+    height: 100%;
+
+    .sidebar-inner {
+      height: 100%;
+      width: 100%;
+      position: relative;
+
+      .sidebar-top {
+        padding: 0;
+        height: 3em;
+        border-bottom: 1px solid @menu-border-color;
+
+        transform: translateX(-3em);
+
+        .transition(transform, 250ms);
+
+        .sidebar-back-btn {
+          padding: 1em;
+          width: 1em;
+          float: left;
+          border-right: 1px solid @menu-border-color;
+
+          cursor: pointer;
+
+          &:hover {
+            background-color: #fAfAfA;
+          }
+          svg {
+            width: 1em;
+            display: block;
+          }
+
+          &.btn-rotate{
+            transform: rotate(180deg);
+          }
+        }
+
+        .sidebar-title {
+          float: left;
+          padding: 1em;
+          font-size: 90%;
+          color: #333;
+        }
+      }
+
+      .sidebar-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+
+      .sidebar-content {
+        .sidebar-section {
+          padding: 1em;
+
+          &.top-section {
+
+          }
+
+          &.body-section {
+
+          }
+
+          .content-userimg {
+            width: 50%;
+            margin: 0 25%;
+            img {
+              border-radius: 50%;
+              width: 100%;
+            }
+          }
+          .content-title {
+            font-size: 120%;
+            font-weight: bold;
+          }
+          .section-title {
+
+          }
+          .section-content {
+            .content-item {
+              display: block;
+              width: 100%;
+            }
+
+          }
+        }
+      }
+
+    }
+  }
+}
+
+
+.sidebar-user {
+
+}

@@ -74,67 +74,108 @@ block page_includes
 
     script.
         window.exploreUserId = "#{exploreUser.id}";
+        window.activeDockerSection = "usermanagement";
 block content
     #wrapper
-        .container
-            section#sec1
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .userimg-container.sec-heading-img
+                                .userimg
+                                    .userimg-overlay.changeProfilePicture
+                                        .userimg-inner
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                            span Bild ändern
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/" + exploreUser.id + "/" + exploreUser.id + ".jpg")
 
-                #sec-content.subpage-container
-                    #content1-heading.sec-heading.subpage-heading.enlarge
-                        h3=exploreUser.firstName + " " + exploreUser.lastName
-                    #content1-text.sec-content
-                        .subpage-content
-                            .userinfo-container
-                                .userinfo-inner
-                                    .userinfo-section
-                                        .userimg
-                                            .userimg-overlay.changeProfilePicture
-                                                .userimg-inner
-                                                    svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                                                    span Bild ändern
-                                            img#userProfileImage(src="/data/uploads/" + exploreUser.id + "/" + exploreUser.id + ".jpg")
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Allgemeine Daten
-                                        .userinfo-item
-                                            span Username:
-                                            span= exploreUser.username
-                                        .userinfo-item
-                                            span Name:
-                                            span= exploreUser.firstName + " " + exploreUser.lastName
-                                        .userinfo-item
-                                            span Email:
-                                            span= exploreUser.email
+                            .sec-heading-label.userprofile-heading
+                                .userprofile-heading-container
+                                    h3=exploreUser.firstName + " " + exploreUser.lastName
+                                    .userprofile-dropdown.dropdown-menu
+                                        .dropdown-btn
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Rechte und Rollen
-                                        .userinfo-item
-                                            span UniSams login:
-                                            span= exploreUser.loginEnabled
-                                        .userinfo-item
-                                            span Angezeigt auf Website:
-                                            span= exploreUser.isDisplayedOnPublic
+                                            .dropdown-container
+                                                .dropdown-entry
+                                                    a.before-icon.icon-edit(href=refurl + "/editUser") Akte bearbeiten
+                                                .dropdown-entry
+                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
+                                    .clear
+                            .clear
+                        #content1-text.sec-content
+                            .subpage-content
+                                .userinfo-container
+                                    #tabnav-container
+                                        ul
+                                            li
+                                                a(href="#tab-userinfo-general")
+                                                    span Allgemeine Informationen
+                                            li
+                                                a(href="#tab-userinfo-qualification")
+                                                    span Qualifikationen
+                                            li
+                                                a(href="#tab-userinfo-role")
+                                                    span Rechte und Rollen
 
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Weitere Daten
-                                        .userinfo-item
-                                            span Erstellt am:
-                                            span= exploreUser.createdDate
-                        #profilemanagment-menu.subpage-menu
-                            #btn01.subpage-menu-btn
-                                a.content-link.style2.float(href="/unisams/user")
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left") <polyline points="15 18 9 12 15 6"></polyline></svg>
-                                    span Zurück
-                            #btn02.subpage-menu-btn
-                                a.content-link.float(href= refurl + "/editUser")
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit") <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>
-                                    span Bearbeiten
-                            #btn03.subpage-menu-btn
-                                a.content-link.float.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id)
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2") <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                    span Löschen
+                                        #tab-userinfo-general.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Allgemeine Daten
+                                                .userinfo-item
+                                                    span.userinfo-item-label.userinfo-attribute-name Username:
+                                                    span.userinfo-item-label= exploreUser.username
+                                                .userinfo-item
+                                                    span.userinfo-item-label.userinfo-attribute-name Name:
+                                                    span.userinfo-item-label= exploreUser.firstName + " " + exploreUser.lastName
+                                                .userinfo-item
+                                                    span.userinfo-item-label.userinfo-attribute-name Email:
+                                                    span.userinfo-item-label= exploreUser.email
+                                            .userinfo-section
+                                                if exploreUserDocument.generalData
+                                                    each val, key in exploreUserDocument.generalData
+                                                        .userinfo-item
+                                                            span.userinfo-item-label.userinfo-attribute-name= key
+                                                            span.userinfo-item-label= val
+
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span weitere Daten
+                                                if exploreUserDocument.customData
+                                                    each val, key in exploreUserDocument.customData
+                                                        .userinfo-item
+                                                            span.userinfo-item-label.userinfo-attribute-name= key
+                                                            span.userinfo-item-label=val
+
+                                        #tab-userinfo-qualification.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Qualifikationen
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property type
+                                                                .item-property title
+                                                        if exploreUserDocument.qualifications
+                                                            each val in exploreUserDocument.qualifications
+                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualid= val.id)
+                                                                    a.inner()
+                                                                        .item-property= val.qualType
+                                                                        .item-property= val.name
+                                                                        .clear
+
+                                        #tab-userinfo-role.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Rollen
+
+                            #profilemanagment-menu.subpage-menu
+                                #btn01.subpage-menu-btn
+                                    a.content-link.style2.float(href="/unisams/user")
+                                        svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left") <polyline points="15 18 9 12 15 6"></polyline></svg>
+                                        span Zurück
 
 
 

@@ -2,74 +2,239 @@ extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
     script(src="/static/unisams/js/profile.js")
-    script(src="/static/unisams/js/updateUser.js")
-    script(src="/static/unisams/js/deleteUserTest.js")
     script(src="/static/unisams/js/editUser.js")
+    script(src="/static/unisams/js/actions.js")
+    script(src="/static/unisams/js/updateUser.js")
+
+    script(src="/lib/fineUploader/fine-uploader.js")
+    link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script(type="text/template" id="qq-template-manual-trigger")
+        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
+        <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
+        </div>
+        <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+        <span class="qq-upload-drop-area-text-selector"></span>
+        </div>
+        <div class="buttons">
+        <div class="qq-upload-button-selector qq-upload-button">
+        <div>Select files</div>
+        </div>
+        </div>
+        <span class="qq-drop-processing-selector qq-drop-processing">
+        <span>Processing dropped files...</span>
+        <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+        </span>
+        <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
+        <li>
+        <div class="qq-progress-bar-container-selector">
+        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
+        </div>
+        <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
+        <img class="qq-thumbnail-selector" qq-max-size="100" qq-server-scale>
+        <span class="qq-upload-file-selector qq-upload-file"></span>
+        <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
+        <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
+        <span class="qq-upload-size-selector qq-upload-size"></span>
+        <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">Cancel</button>
+        <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">Retry</button>
+        <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">Delete</button>
+        <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
+        </li>
+        </ul>
+
+        <dialog class="qq-alert-dialog-selector">
+        <div class="qq-dialog-message-selector"></div>
+        <div class="qq-dialog-buttons">
+        <button type="button" class="qq-cancel-button-selector">Close</button>
+        </div>
+        </dialog>
+
+        <dialog class="qq-confirm-dialog-selector">
+        <div class="qq-dialog-message-selector"></div>
+        <div class="qq-dialog-buttons">
+        <button type="button" class="qq-cancel-button-selector">No</button>
+        <button type="button" class="qq-ok-button-selector">Yes</button>
+        </div>
+        </dialog>
+
+        <dialog class="qq-prompt-dialog-selector">
+        <div class="qq-dialog-message-selector"></div>
+        <input type="text">
+        <div class="qq-dialog-buttons">
+        <button type="button" class="qq-cancel-button-selector">Cancel</button>
+        <button type="button" class="qq-ok-button-selector">Ok</button>
+        </div>
+        </dialog>
+        </div>
+
+
 
     script.
-        window.exploreUser = "#{exploreUser}";
-
+        window.exploreUserId = "#{exploreUser.id}";
+        window.activeDockerSection = "usermanagement";
 block content
     #wrapper
-        .container
-            section#sec1
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .userimg-container.sec-heading-img
+                                .userimg
+                                    .userimg-overlay.changeProfilePicture
+                                        .userimg-inner
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                            span Bild ändern
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/" + exploreUser.id + "/" + exploreUser.id + ".jpg")
 
-                #sec-content.subpage-container
-                    #content1-heading.sec-heading.subpage-heading.enlarge
-                        h3=exploreUser.firstName + " " + exploreUser.lastName
-                    #content1-text.sec-content
-                        .subpage-content
-                            form#editUserForm.editUserForm.userinfo-container.userForm(action='/unisams/usermod/'+ exploreUser.id method='POST')
-                                .userinfo-inner
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Allgemeine Daten
-                                        .userinfo-item
-                                            span Username:
-                                            input#userinp-username.userForm-inp(value = exploreUser.username, name="username" type="text")
-                                        .userinfo-item
-                                            span Vorname:
-                                            input#userinp-firstname.userForm-inp(value = exploreUser.firstName, name="firstName" type="text")
-                                        .userinfo-item
-                                            span Vorname:
-                                            input#userinp-lastname.userForm-inp(value= exploreUser.lastName name="lastName" type="text")
-                                        .userinfo-item
-                                            span Email:
-                                            input#userinp-email.userForm-inp(value= exploreUser.email name="email" type="text")
+                            .sec-heading-label.userprofile-heading
+                                .userprofile-heading-container
+                                    h3=exploreUser.firstName + " " + exploreUser.lastName
+                                    .userprofile-dropdown.dropdown-menu
+                                        .dropdown-btn
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Rechte und Rollen
-                                        .userinfo-item
-                                            span UniSams login:
-                                            span= exploreUser.loginEnabled
-                                        .userinfo-item
-                                            span Angezeigt auf Website:
-                                            span= exploreUser.isDisplayedOnPublic
+                                            .dropdown-container
+                                                .dropdown-entry
+                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
+                                    .clear
+                                .clear
+                        #content1-text.sec-content
+                            .subpage-content
+                                .userinfo-container
+                                    #tabnav-container
+                                        ul
+                                            li
+                                                a(href="#tab-userinfo-general")
+                                                    span Allgemeine Informationen
+                                            li
+                                                a(href="#tab-userinfo-qualification")
+                                                    span Qualifikationen
+                                            li
+                                                a(href="#tab-userinfo-role")
+                                                    span Rechte und Rollen
 
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Weitere Daten
-                                        .userinfo-item
-                                            span Erstellt am:
-                                            span= exploreUser.createdDate
+                                        #tab-userinfo-general.userinfo-inner
+                                            form.userForm.userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Allgemeine Daten
+                                                .userinfo-item.useredit-item(id="useritem-username")
+                                                    span.userinfo-item-label.userinfo-attribute-name Username:
+                                                    input#userinp-username.userForm-inp(value = exploreUser.username, name="username" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="username", data-attributeval=exploreUser.username, data-dialogtitlearg="username", data-dialogbodyarg=exploreUser.username)
+                                                        span.tooltip.tt-enabled Speichern
+                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="username", data-attributeval=exploreUser.username, data-dialogtitlearg="username", data-dialogbodyarg=exploreUser.username)
+                                                        span.tooltip.tt-enabled Zurücksetzen
+                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                    .clear
+                                                .userinfo-item.useredit-item(id="useritem-firstName")
+                                                    span.userinfo-item-label.userinfo-attribute-name Vorname:
+                                                    input#userinp-firstName.userForm-inp(value = exploreUser.firstName, name="firstName" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="firstName", data-attributeval=exploreUser.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.firstName)
+                                                        span.tooltip.tt-enabled Speichern
+                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="firstName", data-attributeval=exploreUser.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.firstName)
+                                                        span.tooltip.tt-enabled Zurücksetzen
+                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                    .clear
+                                                .userinfo-item.useredit-item(id="useritem-lastName")
+                                                    span.userinfo-item-label.userinfo-attribute-name Nachname:
+                                                    input#userinp-lastName.userForm-inp(value= exploreUser.lastName name="lastName" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="lastName", data-attributeval=exploreUser.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.lastName)
+                                                        span.tooltip.tt-enabled Speichern
+                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="lastName", data-attributeval=exploreUser.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.lastName)
+                                                        span.tooltip.tt-enabled Zurücksetzen
+                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                    .clear
+                                                .userinfo-item.useredit-item(id="useritem-email")
+                                                    span.userinfo-item-label.userinfo-attribute-name Email:
+                                                    input#userinp-email.userForm-inp(value= exploreUser.email name="email" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="email", data-attributeval=exploreUser.email, data-dialogtitlearg="email", data-dialogbodyarg=exploreUser.email)
+                                                        span.tooltip.tt-enabled Speichern
+                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="email", data-attributeval=exploreUser.email, data-dialogtitlearg="email", data-dialogbodyarg=exploreUser.email)
+                                                        span.tooltip.tt-enabled Zurücksetzen
+                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                    .clear
 
-                        #profilemanagment-menu.subpage-menu
-                            #btn01.subpage-menu-btn
-                                a.content-link.style2.float(href="/unisams/user")
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-delete") <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
-                                    span Abbrechen
-                            #btn02.subpage-menu-btn
-                                a#editUserFormSubmit.content-link.float(data-userid = exploreUser.id)
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-save") <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                                    span Speichern
-                            #btn03.subpage-menu-btn
-                                a.content-link.float.userDelete(id="deleteUserButton", data-userid=exploreUser.id)
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2") <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                    span Löschen
+                                            form.userForm.userinfo-section
+                                                if exploreUserDocument.generalData
+                                                    each val, key in exploreUserDocument.generalData
+                                                        .userinfo-item(id="useritem-"+"generalData."+key)
+                                                            span.userinfo-item-label.userinfo-attribute-name= key
+                                                            input.userForm-inp(id="userinp-"+"generalData."+key value=val name=key type="text")
+                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Speichern
+                                                                span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey = "generalData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Zurücksetzen
+                                                                span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey = "generalData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip Löschen
+
+                                            form.userForm.userinfo-section
+                                                .userinfo-sectionheader
+                                                    span weitere Daten
+                                                if exploreUserDocument.customData
+                                                    each val, key in exploreUserDocument.customData
+                                                        .userinfo-item(id="useritem-"+"customData."+key)
+                                                            span.userinfo-item-label.userinfo-attribute-name= key
+                                                            input.userForm-inp(id="userinp-"+"customData."+key value= val name=key type="text")
+                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="customData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Speichern
+                                                                span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="customData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Zurücksetzen
+                                                                span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey ="customData."+ key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip Löschen
+
+                                                .userinfo-item.useredit-item.useredit-addItem
+                                                    .useredit-addItemBtn
+                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                        span Hinzufügen
+                                                        .clear
+
+                                        #tab-userinfo-qualification.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Qualifikationen
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property type
+                                                                .item-property title
+                                                        if exploreUserDocument.qualifications
+                                                            each val in exploreUserDocument.qualifications
+                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualid= val.id)
+                                                                    a.inner()
+                                                                        .item-property= val.qualType
+                                                                        .item-property= val.name
+                                                                        .clear
 
 
+                                            .userinfo-item.useredit-item.useredit-addItem
+                                                .useredit-addQualificationBtn
+                                                    svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                    span Hinzufügen
+                                                    .clear
 
+                                        #tab-userinfo-role.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Rollen
+
+                            #profilemanagment-menu.subpage-menu
+                                #btn01.subpage-menu-btn
+                                    a.content-link.style2.float(href="/unisams/user")
+                                        svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left") <polyline points="15 18 9 12 15 6"></polyline></svg>
+                                        span Zurück
 
 

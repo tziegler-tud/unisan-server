@@ -35,8 +35,6 @@
                 this.ref = document.getElementById(domId);
                 this.isUnique = isUnique;
                 this.state = defaultState;
-                this.init();
-
 
                 /*test ref for validity */
                 try{

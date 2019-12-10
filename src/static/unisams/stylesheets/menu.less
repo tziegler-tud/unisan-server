@@ -1,183 +1,264 @@
-@import './color-rules.less';
-@import './variables.less';
+@publicroute: "../../public/stylesheets";
+@import "color-rules";
+@import "./variables";
+@import "@{publicroute}/themes/generic/color-rules";
 
-.nav {
+.nav-top {
 
-  z-index: 5;
-  font-size: 200%;
-  font-family: "Open Sans", Sans, sans-serif;
-  color: @nav-font-color;
+  color:            @page-font-color;
+  width:            100%;
+  height:           @topnav-height;
+  margin:           0;
+  //box-shadow:       10px 0 5px grey;
+  background-color: @page-bg-color-v2;
+  border-bottom:    1px solid @menu-border-color;
+  position:         relative;
+  z-index:          5;
 
-  .nav-static {
+  font-size:        100%;
 
-    color:            @page-font-color;
+  display: flex;
+  flex-flow: row wrap;
 
-    width:            calc(~"100% - @{docker-width}");
-    height:           @topnav-height;
-    margin:           0 0 0 @docker-width;
-    //box-shadow:       10px 0 5px grey;
-    background-color: @page-bg-color;
-    //border-bottom:    3px solid @col1;
-    position:         fixed;
-    top:              0;
-    left:             0;
-    z-index:          5;
+  @media @desktop,@tablet-landscape {
+  }
 
-    font-size:        100%;
+  .nav-element {
+    font-size: 100%;
+    flex: 1 1 auto;
 
-    display: flex;
-    flex-flow: row wrap;
+    .nav-element-inner {
+      margin: .5em;
+      height: calc(~"100% - 1em");
 
-    @media @desktop,@tablet-landscape {
-      position: fixed;
+      .nav-item {
+        display: flex;
+        height: 100%;
+        float: left;
+        position: relative;
+
+        span, a, svg {
+          align-self: flex-end;
+          display: inline-block;
+          margin-right: .5em;
+        }
+
+        svg {
+          height: 1em;
+        }
+
+      }
+    }
+  }
+
+
+  .nav-image {
+    flex: 0 0 30%;
+    height: 100%;
+
+    a {
+      width: 100%;
+      height: 100%;
+      display: block;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
 
-    .nav-element {
-      font-size: 50%;
-      flex: 1 1 auto;
+    img {
+      float: left;
+      height: 100%;
+    }
+  }
 
-      .nav-element-inner {
-        margin: .5em;
-        height: calc(~"100% - 1em");
+  .label {
+    width: 0;
+    height: 100%;
+    font-size: 75%;
 
-        .nav-item {
-          display: flex;
-          height: 100%;
+    span {
+      float: left;
+      margin: 0;
+
+      &.acc1 {
+        color: #444;
+      }
+
+      &.acc2 {
+        color: @col1;
+      }
+      &.acc3 {
+        color: #444;
+      }
+    }
+  }
+
+  .right {
+    flex: 1 1 auto;
+  }
+
+  .menu-button {
+
+    width: 70px;
+    height: 100%;
+
+    color: inherit;
+
+    position: absolute;
+    right: 10px;
+  }
+}
+
+
+.nav-docker {
+
+  flex: 0 0 @docker-width;
+  position: relative;
+
+  border-right: 1px solid @menu-border-color;
+
+  background-color: @docker-bg-color;
+
+  z-index: 6;
+  color: @docker-font-color;
+
+  .docker-wrapper {
+
+
+
+    width: 100%;
+    height: 100vh;
+
+    .docker-inner {
+      margin: 0;
+      width: 100%;
+
+      .docker-top {
+        border-bottom: 1px solid @menu-border-color;
+        width: 100%;
+        display: flex;
+        flex-flow: row wrap;
+
+        > div:hover {
+          &:hover {
+            background-color: #fAfAfA;
+            cursor: pointer;
+          }
+        }
+        .docker-top-btn {
+          flex: 0 0 @topnav-height;
+          border-right: 1px solid @menu-border-color;
           float: left;
+
+          svg {
+            display: block;
+            height: 33%;
+            margin: 33% 33%;
+          }
+        }
+        .docker-top-label {
+          border-left: none;
+
+          flex: 1 1 auto;
+
+          display: block;
+          float: left;
+
           position: relative;
 
-          span, a, svg {
-            align-self: flex-end;
-            display: inline-block;
-            margin-right: .5em;
-          }
+          .docker-top-label-wrapper {
 
-          svg {
-            height: 1em;
-          }
+            position: absolute;
+            top: 50%;
+            left: 2em;
+            transform: translateY(-50%);
 
-       }
+
+            img {
+              display: block;
+              float: left;
+              width: 1.5em;
+              margin-right: 1em;
+            }
+
+            span {
+              font-size: 120%;
+              display: block;
+              float: left;
+            }
+          }
+        }
       }
-    }
 
+      .docker-element {
+        cursor: pointer;
+        position: relative;
 
-    .nav-image {
-      flex: 0 0 30%;
-      height: 100%;
+        .transition(background-color, 300ms);
 
-      a {
-        width: 100%;
-        height: 100%;
-        display: block;
+        a {
+          padding: 1em 10%;
+          display: block;
+        }
+
+        &:before {
+          content: "";
+          width: 0;
+          height: 100%;
+
+          position: absolute;
+          top: 0;
+          left: 0;
+
+          background-color: @tabs-highlight-color;
+
+          .transition(width, 350ms);
+        }
+
+        &.docker-element-active {
+          &:before {
+            width: 5px;
+          }
+        }
 
         &:hover {
-          cursor: pointer;
-        }
-      }
 
-      img {
-        float: left;
-        height: 100%;
-      }
-    }
+          background-color: @docker-hover-color;
 
-    .label {
-      width: 0;
-      height: 100%;
-      font-size: 75%;
-
-      span {
-        float: left;
-        margin: 0;
-
-        &.acc1 {
-          color: #444;
         }
 
-        &.acc2 {
-          color: @col1;
-        }
-        &.acc3 {
-          color: #444;
-        }
-      }
-    }
+        &#docker-home {
 
-    .right {
-      flex: 1 1 auto;
-    }
-
-    .menu-button {
-
-      width: 70px;
-      height: 100%;
-
-      color: inherit;
-
-      position: absolute;
-      right: 10px;
-    }
-  }
-
-  .nav-docker {
-    height: 100%;
-    width: @docker-width;
-
-    border-right: 1px solid @col1;
-
-    position: fixed;
-    left: 0;
-    top: 0;
-
-    z-index: 6;
-
-    background-color: @page-bg-color;
-    color: @page-font-color;
-
-    .docker-wrapper {
-      .docker-inner {
-        margin: 0;
-
-        .docker-element {
-          cursor: pointer;
-
-          .transition(background-color, 300ms);
+          box-shadow: 0 0 4px grey;
+          margin-bottom: 4px;
 
           a {
-            padding: 33% 33%;
-            width: 33%;
-            display: block;
+            padding: 25% 25%;
+            width: 50%;
           }
-
-          &:hover {
-            background-color: #f5f5f5;
-          }
-
-          &#docker-home {
-
-            box-shadow: 0 0 4px grey;
-            margin-bottom: 4px;
-
-            a {
-              padding: 25% 25%;
-              width: 50%;
-            }
-            img {
-              width: 100%;
-            }
-          }
-
-          svg {
-            color: @col1;
+          img {
             width: 100%;
           }
-
         }
+
+        svg {
+          color: @col1;
+          width: 1em;
+          display: block;
+          margin-right: 1em;
+          float: left;
+        }
+
+        span.docker-element-label {
+          display: block;
+          float: left;
+        }
+
       }
     }
-
-
   }
+
 
 }
 

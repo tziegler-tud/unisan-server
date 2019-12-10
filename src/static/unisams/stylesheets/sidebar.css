@@ -13,4 +13,115 @@
   /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+#wrapper .page-container {
+  -webkit-transition: width 250ms ease;
+  -moz-transition: width 250ms ease;
+  -o-transition: width 250ms ease;
+  transition: width 250ms ease;
+}
+#wrapper.sidebar-active .sidebar-container {
+  transform: translateX(0);
+}
+#wrapper.sidebar-active .sidebar-container .sidebar-top {
+  transform: translateX(0);
+}
+#wrapper.sidebar-active .page-container {
+  width: calc(100% - 20em - 0.1em);
+  float: left;
+}
+.sidebar-container {
+  width: 20em;
+  height: calc(100vh - 5em);
+  transform: translateX(100%);
+  position: absolute;
+  border-left: 1px solid #999;
+  background-color: #f9f9f9;
+  float: left;
+  top: 0;
+  right: 0;
+  -webkit-transition: transform 250ms ease;
+  -moz-transition: transform 250ms ease;
+  -o-transition: transform 250ms ease;
+  transition: transform 250ms ease;
+}
+.sidebar-container .sidebar {
+  height: 100%;
+}
+.sidebar-container .sidebar .sidebar-inner {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-top {
+  padding: 0;
+  height: 3em;
+  border-bottom: 1px solid #999;
+  transform: translateX(-3em);
+  -webkit-transition: transform 250ms ease;
+  -moz-transition: transform 250ms ease;
+  -o-transition: transform 250ms ease;
+  transition: transform 250ms ease;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn {
+  padding: 1em;
+  width: 1em;
+  float: left;
+  border-right: 1px solid #999;
+  cursor: pointer;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn:hover {
+  background-color: #fAfAfA;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn svg {
+  width: 1em;
+  display: block;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn.btn-rotate {
+  transform: rotate(180deg);
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-title {
+  float: left;
+  padding: 1em;
+  font-size: 90%;
+  color: #333;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section {
+  padding: 1em;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-userimg {
+  width: 50%;
+  margin: 0 25%;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-userimg img {
+  border-radius: 50%;
+  width: 100%;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-title {
+  font-size: 120%;
+  font-weight: bold;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .section-content .content-item {
+  display: block;
+  width: 100%;
+}
 /*# sourceMappingURL=sidebar.css.map */

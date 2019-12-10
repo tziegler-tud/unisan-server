@@ -11,9 +11,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     lidl.addDebugCategory(lidl.debugCategory.FULL);
 
-    var waiting = false;
-    }
-);
+    var menu = new common.Menu();
+    menu.init();
+
+    Handlebars.registerHelper('transformDateString', function(dateString) {
+        var myDate = new Date(dateString);
+        var month = (myDate.getMonth()+ 1).toString().length < 2 ? "0"+(myDate.getMonth()+ 1).toString() : (myDate.getMonth()+ 1).toString();
+        var day = myDate.getDate().toString().length < 2 ? "0"+myDate.getDate().toString() : myDate.getDate().toString();
+
+        var date = myDate.getFullYear() + "-" + month + "-" + day;
+        return new Handlebars.SafeString(date);
+    });
+
+});
 
 window.lidlRTO = lidlRTO;
 

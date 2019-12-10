@@ -3,6 +3,7 @@
 @import 'color-rules.less';
 @import 'variables.less';
 @import '@{publicroute}/themes/generic/animations.less';
+@import '@{publicroute}/themes/generic/color-rules.less';
 
 @textHoverColor: @col2;
 
@@ -26,6 +27,8 @@ section {
 a {
     text-decoration:    none;
     color:              inherit;
+
+    outline: 0;
 }
 
 #top {
@@ -34,16 +37,58 @@ a {
     left:       0;
 }
 
+#outer-wrapper {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+#content-wrapper {
+    flex: 1 1 auto;
+}
+
 #wrapper {
     position:   relative;
     font-size:  100%;
-    width:      calc(~"100% - @{docker-width}");
-    margin:     @topnav-height 0 0 @docker-width;
+    width:      100%;
+    margin:     0;
     color:      #333;
+    overflow:   hidden;
 
-    .container {
-        width: 90%;
-        margin: 5em 5%;
+    height:     calc(~"100vh - @{topnav-height}");
+
+
+    .page-container {
+        width: 100%;
+
+        position: relative;
+
+        background-color: @page-bg-color;
+
+        height: 100%;
+        overflow: scroll;
+
+        .page-container-inner {
+            padding: 2em 5%;
+
+            &.full-width {
+                padding-right: 0;
+                padding-left: 0;
+
+            }
+            &.full-height {
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+
+        }
+
+        .sec-horizontal-padding {
+            padding: 0 2em;
+        }
     }
 
 }
@@ -114,8 +159,13 @@ special classes
     width: 100%;
 
     .subpage-heading {
-        font-size: 200%;
-        color: #333;
+
+        padding: 1em;
+
+        .sec-heading-label {
+            font-size: 200%;
+            color: #333;
+        }
     }
 
     .subpage-menu {
@@ -137,7 +187,7 @@ special classes
 ul.itemlist {
     list-style: none;
 
-    @bgCol1: #f5f5f5;
+    @bgCol1: #f5f5fc;
     @bgCol2: #f9f9f9;
 
     display: flex;
@@ -335,6 +385,37 @@ a.inline-link {
     }
 }
 
+/*
+ radio group
+ */
+
+.radiogroup {
+    label {
+
+        &.ui-checkboxradio-label {
+            background-color: transparent;
+            color: #888;
+            border: 1px solid #888;
+
+            &.ui-checkboxradio-checked {
+                color: #333;
+                background-color: #f5f5f5;
+                border: 1px solid @col1;
+            }
+        }
+        svg {
+            display: block;
+            width: 1em;
+            margin-right: .5em;
+            float: left;
+        }
+        span {
+            display: block;
+            float: left;
+
+        }
+    }
+}
 
 /*other things */
 .force-select {
@@ -400,4 +481,225 @@ a.inline-link {
 
         }
     }
+}
+
+/*
+dropdown menu
+ */
+
+.dropdown-menu {
+
+    position: relative;
+    font-size: 90%;
+
+    .dropdown-btn {
+        display: block;
+        cursor: pointer;
+
+    }
+
+    &.dropdown-active {
+        .dropdown-btn {
+            background-color: #f5f5fc;
+        }
+        .dropdown-container {
+            display: block;
+        }
+    }
+
+    .dropdown-container {
+        display: none;
+
+        position: absolute;
+        z-index: 10;
+
+        top: 0;
+        right: 0;
+        transform: translateX(100%);
+
+        background-color: #fff;
+        color: #555;
+
+        border: 1px solid @menu-border-color;
+
+        .dropdown-entry {
+
+            border-top: 1px solid #AAA;
+
+            &:first-of-type {
+                border-top: none;
+            }
+
+            &:hover {
+                background-color: @docker-hover-color;
+            }
+
+            a {
+                cursor: pointer;
+                padding: .5em;
+                display: block;
+                white-space: nowrap;
+            }
+        }
+    }
+}
+
+
+/*
+    icons
+ */
+
+.before-icon {
+    &:before {
+        display:        inline-block;
+        width:          1em;
+        height:         1em;
+        margin-right:   .5ex;
+        margin-left:    .5ex;
+
+    }
+
+    &.icon-edit {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><polygon points="14 2 18 6 7 17 3 17 3 13 14 2"></polygon><line x1="3" y1="22" x2="21" y2="22"></line></svg>');
+        }
+    }
+
+    &.icon-delete {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>');
+        }
+    }
+
+    &.icon-confirm {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>');
+        }
+    }
+    &.icon-reset {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>');
+        }
+    }
+    &.icon-cancel {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>');
+        }
+    }
+}
+
+/*
+ tooltipps
+ */
+
+.has-tooltip {
+    text-decoration:none;
+    position:relative;
+
+    &.disabled {
+        span.tt-enabled {
+            display: none !important;
+        }
+
+        span.tt-disabled {
+            display: block;
+        }
+    }
+
+
+    span {
+        font-size: 80%;
+        opacity: 0;
+        display: block;
+        position: absolute;
+
+        border: 1px solid #AAA;
+        background-color: #fff;
+
+        padding: .5em .3em;
+        z-index: -1;
+        cursor: auto;
+
+        .transition(opacity, 350ms);
+
+        &:before {
+            content: "";
+            display: block;
+            position: absolute;
+
+            top: -.3em;
+            left: .5em;
+
+            height: .5em;
+            width:  .5em;
+
+            background-color: #fff;
+
+            transform: rotate(45deg);
+
+            border-left: 1px solid #AAA;
+            border-top: 1px solid #AAA;
+
+            z-index: -1;
+
+
+        }
+
+        &.tt-enabled {
+            display: block;
+        }
+
+        &.tt-disabled {
+            display: none;
+        }
+
+        svg {
+            width: 1em;
+            margin-right: .5em;
+            float: left;
+        }
+    }
+    &:hover span {
+        opacity: 1;
+        z-index: 12;
+
+        transition-delay: 1s;
+
+        &:before {
+            z-index: 13;
+        }
+    }
+}
+/*
+common form stylings
+ */
+
+input.common-input {
+    display: block;
+    border: 1px solid #BBB;
+    background-color: transparent;
+    padding: 5px 1em;
+    border-radius: 0;
+    color: #999;
+
+    margin-bottom: 1em;
+
+}
+
+.common-submit {
+    display: block;
+    border: 1px solid #555;
+    background-color: transparent;
+    padding: 5px 1em;
+    margin: 0;
+    border-radius: 0;
+    color: #333;
+
+    outline: 0;
+
+    &:hover {
+        cursor: pointer;
+
+    }
+
 }

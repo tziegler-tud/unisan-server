@@ -197,6 +197,10 @@
         return true;
     };
 
+    common.escapeSelector = function(selector){
+            return selector.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
+    };
+
 
 
 

@@ -29,6 +29,8 @@ var apiRouter = require('./routes/api/apiRouter');
 var userRouter = require('./routes/api/usermod');
 var userManagementRouter = require('./routes/api/user');
 var userauthRouter = require('./routes/api/userAuth');
+var settingsRouter = require('./routes/api/settings');
+var qualificationRouter = require('./routes/api/qualification');
 
 var server = express();
 
@@ -87,7 +89,9 @@ server.use('/info/datenschutz', datenschutzRouter);
 server.use('/unisams', apiRouter);
 server.use('/unisams', userauthRouter);
 server.use('/unisams/user', userManagementRouter);
+server.use('/unisams/settings', settingsRouter);
 server.use('/unisams/usermod', userRouter);
+server.use('/unisams/qualification', qualificationRouter);
 
 
 // catch 404 and forward to error handler

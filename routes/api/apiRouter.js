@@ -23,19 +23,14 @@ auth = function(req, res, next){
 
 
 router.get('/', auth, index);
-router.get('/manageUser', auth, manageUser);
-router.get('/profile', auth, profile);
 router.get('/login', login);
 router.get('/user', auth, user);
+router.get('/settings', auth, settings);
 router.post('/userauth', userauth);
 router.post('/logout', auth, userauth);
 
 function index(req, res, next){
     res.render("unisams/index", {title: "uniSams", user: req.user._doc})
-}
-
-function manageUser(req,res,next){
-    res.render("unisams/manageUser", {title: "user managment - uniSams", user: req.user._doc})
 }
 
 function login(req, res, next) {
@@ -46,12 +41,12 @@ function login(req, res, next) {
     }
 }
 
-function profile(req,res,next){
-    res.render("unisams/manageUser", {title: "user managment - uniSams", user: req.user._doc})
+function user(req,res,next){
+    next();
 }
 
 
-function user(req,res,next){
+function settings(req,res,next){
     next();
 }
 

@@ -27,6 +27,8 @@ router.get('/', getAll);
 router.get('/current', getCurrent);
 router.get('/:id', getById);
 router.put('/:id', update);
+router.put('/deleteKey/:id', deleteKey);
+router.put('/updateKey/:id', updateKey);
 router.delete('/:id', _delete);
 
 
@@ -63,6 +65,20 @@ function update(req, res, next) {
   userService.update(req.params.id, req.body)
       .then(() => res.json({}))
       .catch(err => next(err));
+}
+
+function updateKey(req, res, next) {
+    userService.updateKey(req.params.id, req.body)
+        .then(() => res.json({}))
+        .catch(err => next(err));
+}
+
+function deleteKey(req, res, next) {
+    if(!req.body.key){
+    }
+    userService.deleteKey(req.params.id, req.body)
+        .then(() => res.json({}))
+        .catch(err => next(err));
 }
 
 function _delete(req, res, next) {

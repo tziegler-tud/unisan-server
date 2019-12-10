@@ -1,0 +1,91 @@
+@import "color-rules.less";
+@import "variables.less";
+
+@btn: transparent;
+@btnHover: #f9f9ff;
+
+form.userForm {
+  width: 100%;
+
+  input.userForm-inp {
+    display:        block;
+    border:         1px solid #BBB;
+    background-color: transparent;
+    padding:        5px 1em;
+    border-radius:  0;
+    color:          #666;
+
+    margin-bottom:  1em;
+
+    float: left;
+  }
+}
+
+.useredit-item {
+
+}
+
+.useredit-actionBtn {
+  float: left;
+  margin-left: .5em;
+  padding: 5px;
+  cursor: pointer;
+
+  &.disabled {
+    cursor: initial;
+    &:hover {
+      background-color: transparent;
+    }
+
+    &:before {
+      opacity: 0.5;
+    }
+  }
+
+  &:hover {
+    background-color: #f5f5fc;
+  }
+  &:before {
+    width: 1em;
+    display: inline-block;
+  }
+}
+
+.useredit-addItem {
+
+  .useredit-addItemBtn, .useredit-addQualificationBtn {
+
+    width: auto;
+    display: inline-block;
+    border: 1px solid #AAA;
+    padding: .5em .5em;
+    cursor: pointer;
+
+    color: #555;
+    background-color: @btn;
+
+    .transition(background-color, 250ms);
+
+    &:hover {
+      background-color: @btnHover;
+    }
+
+    &.disabled {
+      color: #AAA;
+      cursor: not-allowed;
+    }
+
+    svg {
+      width: 1em;
+      display: block;
+
+      margin-right: .5em;
+      float: left;
+    }
+    span {
+      display: inline-block;
+      float: left;
+      line-height: 1em;
+    }
+  }
+}

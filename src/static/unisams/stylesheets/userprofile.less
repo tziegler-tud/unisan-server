@@ -1,4 +1,144 @@
 @import "color-rules.less";
+@import "variables.less";
+
+
+.subpage-container {
+
+  width: 100%;
+
+  .subpage-heading {
+    font-size: 100%;
+    color: #333;
+
+    display: flex;
+    flex-flow: row wrap;
+
+    .sec-heading-label.userprofile-heading {
+
+      flex: 1 1 auto;
+      position: relative;
+      display: flex;
+      flex-flow: column wrap;
+      justify-content: flex-end;
+
+      .userprofile-heading-container {
+
+        display: flex;
+        flex-flow: row wrap;
+
+        h3 {
+          margin: 0;
+          padding: 0;
+          display: inline-block;
+          flex: 0 0 auto;
+        }
+
+        .userprofile-dropdown {
+
+          flex: 0 0 auto;
+          display: flex;
+          flex-flow: column wrap;
+          justify-content: flex-end;
+
+          margin-left: 1em;
+
+          .dropdown-btn {
+            position: relative;
+
+            svg {
+              margin-bottom: 5px;
+              display: block;
+              width: 1em;
+            }
+          }
+          .dropdown-container {
+            font-size: 50%;
+          }
+        }
+      }
+    }
+
+    .sec-heading-img {
+      flex: 0 0 10em;
+    }
+  }
+}
+
+.userimg-container {
+
+  &.sec-heading-img {
+    font-size: 100%;
+
+    margin-right: 3em;
+
+    .userimg-overlay, img {
+      border-radius: 50%;
+    }
+  }
+
+  .userimg {
+    width: 100%;
+    position: relative;
+
+    cursor: pointer;
+
+    .userimg-overlay {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+
+      font-size: 80%;
+
+      background-color: rgba(60, 60, 60, 0.8);
+      color: #FFF;
+
+      .transition(opacity, 300ms);
+
+      .userimg-inner {
+
+        position: absolute;
+        top: 50%;
+        left: 50%;
+
+        width: 50%;
+        max-width: 8em;
+
+        transform: translate(-50%, -50%);
+
+        text-align: center;
+
+        svg {
+          display: block;
+          width: 2em;
+          margin: 0 auto 1em auto;
+        }
+
+        span {
+
+          display: inline-block;
+
+
+        }
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+
+
+    }
+
+
+    img {
+      display: block;
+      width: 100%;
+
+    }
+  }
+}
 
 .userinfo-container {
 
@@ -11,92 +151,47 @@
 
       display: flex;
       flex-flow: column wrap;
-      max-width: 500px;
 
       margin-bottom: 2em;
 
       .userinfo-sectionheader {
         font-size: 120%;
         margin-bottom: 1em;
-        color: #333;
+        color: #666;
+
+        font-variant: small-caps;
+        letter-spacing: .15em;
       }
 
+      .userinfo-itemList {
 
-      .userimg {
-        width: 50%;
-        position: relative;
-
-        cursor: pointer;
-
-        .userimg-overlay {
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          left: 0;
-          top: 0;
-          opacity: 0;
-
-          font-size: 80%;
-
-          background-color: rgba(60,60,60,0.8);
-          color: #FFF;
-
-          .transition(opacity, 300ms);
-
-          .userimg-inner {
-
-            position: absolute;
-            top: 50%;
-            left: 50%;
-
-            width: 50%;
-            max-width: 8em;
-
-            transform: translate(-50%, -50%);
-
-            text-align: center;
-
-            svg {
-              display: block;
-              width: 2em;
-              margin: 0 auto 1em auto;
-            }
-
-            span {
-
-              display: inline-block;
-
-
-            }
-          }
-
-          &:hover {
-            opacity: 1;
-          }
-
-
-
-        }
-
-
-        img {
-          display: block;
-          width: 100%;
-
-        }
       }
 
       .userinfo-item {
 
         flex: 1 1 auto;
 
-        span {
-          width: 50%;
+        span.userinfo-item-label {
+          width: 100%;
           float: left;
           display: block;
-          &:first-child {
-            width: calc(~"50% - 2em");
+          margin-bottom: .5em;
+
+          @media @desktop, @tablet-landscape {
+            width: auto;
+          }
+
+          &.userinfo-attribute-name {
+
+            width: 100%;
             margin-right: 2em;
+            margin-bottom: 0;
+
+            color: #555;
+
+            @media @desktop, @tablet-landscape {
+              width: 8em;
+            }
           }
         }
       }

@@ -19,8 +19,6 @@
                 /**
                  * Menu.
                  *
-                 * @abstract
-                 *
                  *
                  * @param domId {string} Id of the DOM Element
 

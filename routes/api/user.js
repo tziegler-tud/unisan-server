@@ -57,8 +57,11 @@ router.get("/:username", auth, function(req, res, next) {
             if (user) {
                 res.render("unisams/user/profile", {
                     user: req.user._doc,
+                    generalData: req.user._doc.generalData,
+                    customData: req.user._doc.customData,
                     title: user.username,
                     exploreUser: user,
+                    exploreUserDocument: user._doc,
                     refurl: req.params.username
                 })
             }
@@ -76,6 +79,7 @@ router.get("/:username/editUser", auth, function(req, res, next) {
                     user: req.user._doc,
                     title: user.username,
                     exploreUser: user,
+                    exploreUserDocument: user._doc,
                     refurl: req.params.username
                 })
             }

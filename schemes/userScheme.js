@@ -17,21 +17,11 @@ mongoose.Promise = global.Promise;
 const Schema = mongoose.Schema;
 // create instance of Schema
 var UserSchema = new Schema({
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-        trim: true
-    },
     username: {
         type: String,
         unique: true,
         required: true,
         trim: true
-    },
-    hash: {
-        type: String,
-        required: true,
     },
     firstName: {
         type: String,
@@ -41,13 +31,34 @@ var UserSchema = new Schema({
         type: String,
         required: true
     },
-    phone: {
+    email: {
         type: String,
+        trim: true,
     },
-    qualification: [
+    generalData: {
+
+        memberId: {
+            type: String,
+        },
+
+        phone: {
+            type: String,
+        },
+    },
+
+    customData: {
+
+    },
+    hash: {
+        type: String,
+        required: true,
+    },
+
+    qualifications: [
         {
             name: String,
-            aquiredDate: Date,
+            qualType: String,
+            acquiredDate: Date,
             expireDate: Date,
             trainingDate: Date,
             isValid: Boolean,

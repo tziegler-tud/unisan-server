@@ -21,7 +21,6 @@
             /**
              * NavBar constructor.
              *
-             * @abstract
              * @constructor
              *
              *

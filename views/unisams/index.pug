@@ -4,10 +4,15 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_index.css')
     script(src="static/unisams/js/index.js")
 
+    script.
+        window.activeDockerSection = "dashboard";
+
 
 block content
     #wrapper
-        section#sec1
-            span logged in as: #{user.username}
-            <br>
-            a.content-link(href="/unisams/logout") logout
+        #page-container.page-container
+            #page-container-inner.page-container-inner
+                section#sec1
+                    span logged in as: #{user.username}
+                    <br>
+                    a.content-link(href="/unisams/logout") logout

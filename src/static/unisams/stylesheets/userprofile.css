@@ -13,26 +13,82 @@
   /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
-.userinfo-container {
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.subpage-container {
   width: 100%;
 }
-.userinfo-container .userinfo-inner .userinfo-section {
+.subpage-container .subpage-heading {
+  font-size: 100%;
+  color: #333;
+  display: flex;
+  flex-flow: row wrap;
+}
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading {
+  flex: 1 1 auto;
+  position: relative;
   display: flex;
   flex-flow: column wrap;
-  max-width: 500px;
-  margin-bottom: 2em;
+  justify-content: flex-end;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-sectionheader {
-  font-size: 120%;
-  margin-bottom: 1em;
-  color: #333;
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container {
+  display: flex;
+  flex-flow: row wrap;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg {
-  width: 50%;
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container h3 {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown {
+  flex: 0 0 auto;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: flex-end;
+  margin-left: 1em;
+}
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown .dropdown-btn {
+  position: relative;
+}
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown .dropdown-btn svg {
+  margin-bottom: 5px;
+  display: block;
+  width: 1em;
+}
+.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown .dropdown-container {
+  font-size: 50%;
+}
+.subpage-container .subpage-heading .sec-heading-img {
+  flex: 0 0 10em;
+}
+.userimg-container.sec-heading-img {
+  font-size: 100%;
+  margin-right: 3em;
+}
+.userimg-container.sec-heading-img .userimg-overlay,
+.userimg-container.sec-heading-img img {
+  border-radius: 50%;
+}
+.userimg-container .userimg {
+  width: 100%;
   position: relative;
   cursor: pointer;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg .userimg-overlay {
+.userimg-container .userimg .userimg-overlay {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -47,7 +103,7 @@
   -o-transition: opacity 300ms ease;
   transition: opacity 300ms ease;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg .userimg-overlay .userimg-inner {
+.userimg-container .userimg .userimg-overlay .userimg-inner {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -56,31 +112,59 @@
   transform: translate(-50%, -50%);
   text-align: center;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg .userimg-overlay .userimg-inner svg {
+.userimg-container .userimg .userimg-overlay .userimg-inner svg {
   display: block;
   width: 2em;
   margin: 0 auto 1em auto;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg .userimg-overlay .userimg-inner span {
+.userimg-container .userimg .userimg-overlay .userimg-inner span {
   display: inline-block;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg .userimg-overlay:hover {
+.userimg-container .userimg .userimg-overlay:hover {
   opacity: 1;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userimg img {
+.userimg-container .userimg img {
   display: block;
   width: 100%;
+}
+.userinfo-container {
+  width: 100%;
+}
+.userinfo-container .userinfo-inner .userinfo-section {
+  display: flex;
+  flex-flow: column wrap;
+  margin-bottom: 2em;
+}
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-sectionheader {
+  font-size: 120%;
+  margin-bottom: 1em;
+  color: #666;
+  font-variant: small-caps;
+  letter-spacing: .15em;
 }
 .userinfo-container .userinfo-inner .userinfo-section .userinfo-item {
   flex: 1 1 auto;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span {
-  width: 50%;
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label {
+  width: 100%;
   float: left;
   display: block;
+  margin-bottom: .5em;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span:first-child {
-  width: calc(50% - 2em);
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label {
+    width: auto;
+  }
+}
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name {
+  width: 100%;
   margin-right: 2em;
+  margin-bottom: 0;
+  color: #555;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name {
+    width: 8em;
+  }
 }
 /*# sourceMappingURL=userprofile.css.map */
