@@ -5,13 +5,13 @@ var opt = {
     user: config.username,
     pass: config.pwd,
     auth: {
-        authSource: 'admin'
+        authSource: config.authSource
     },
     useCreateIndex: true,
     useNewUrlParser: true
 };
 
-mongoose.connect(config.connectionString, opt);
+mongoose.connect(config.connectionString,opt);
 mongoose.Promise = global.Promise;
 
 module.exports = {
