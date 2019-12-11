@@ -12,7 +12,7 @@ const upload = require(appRoot + "/config/multer");
 router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, next){
     userService.getById(req.params.id)
         .then(user => {
-            fs.move(appRoot + '/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/${user.id}/${user.id}.jpg`, { overwrite: true }, function (err) {
+            fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/${user.id}/${user.id}.jpg`, { overwrite: true }, function (err) {
                 if (err) return console.error(err);
                 console.log("moved file to user dir: " + user.id);
             });
