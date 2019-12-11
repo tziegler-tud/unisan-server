@@ -54,7 +54,7 @@ async function create(userParam) {
     // @louis: password is not mentioned in the userScheme. Is this correct?
     // hash password
     if (userParam.password) {
-        var salt = bcrypt.genSaltSync(10);
+        const salt = await bcrypt.genSalt(10);
         user.hash = await bcrypt.hash(userParam.password, salt);
     }
 

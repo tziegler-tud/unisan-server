@@ -1,6 +1,8 @@
 const config = require('../config/config.json');
 const mongoose = require('mongoose');
 
+/** @typedef {{ qualType: string, name: string }} QualificationSchema */
+
 var opt = {
     user: config.username,
     pass: config.pwd,

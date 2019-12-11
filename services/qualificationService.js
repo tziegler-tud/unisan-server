@@ -15,48 +15,79 @@ module.exports = {
     delete: _delete
 };
 
+/** @typedef {import("../schemes/qualificationScheme").QualificationSchema} QualificationSchema */
+
+/**
+ * Gets all qualifications from the database
+ */
 async function getAll() {
     return await Qual.find().select('-password');
 }
 
+/**
+ * Gets a qualification by its id
+ * @param {number} id The id of the qualification
+ */
 async function getById(id) {
     return await Qual.findById(id);
 }
 
+/**
+ * Gets qualifications by their type
+ * @param {string} type The type to search for
+ * @returns An array of qualifications (Documents)
+ */
 async function getByType(type) {
     return await Qual.find({qualType: type});
 }
 
+/**
+ * Gets qualifications by their type
+ * @param {string} title The title to search for
+ * @returns An array of qualifications (Documents)
+ */
 async function getByTitle(title) {
     return await Qual.find({title: title});
 }
 
+/**
+ * Creates a new qualification
+ * @param {QualificationSchema} qualParam The object to create the qualification with
+ */
 async function create(qualParam) {
-    // validate
-   // noting to validate yet...
-
+  
+    // create qualification document
     const qual = new Qual(qualParam);
 
-    // save user
+    // save in database
     await qual.save();
 }
 
+/**
+ * Updates an existing qualification
+ * @param {number} id The id of the existing qualification
+ * @param {QualificationSchema} qualParam The object to create the qualification with
+ */
 async function update(id, qualParam) {
     const qual = await Qual.findById(id);
 
     // validate
-    if (!qual) throw 'Qualification not found';
+    if (qual == null) throw new Error('Qualification not found');
 
-    // copy userParam properties to user
+    // copy qualParam properties to qualification document
     Object.assign(qual, qualParam);
-
     await qual.save();
 }
 
+/**
+ * Deletes a qualification
+ * @param {number} id The id of the qualification to delete
+ */
 async function _delete(id) {
     await Qual.findByIdAndRemove(id);
 }
 
+// @louis is this function grouping by type? Need description
 async function getAllByType(){
     return Qual.aggregate([
         {
