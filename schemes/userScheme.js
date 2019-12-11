@@ -1,21 +1,7 @@
-const config = require('../config/config.json');
 const mongoose = require('mongoose');
 
 /** @typedef {{ name: string, qualType: string, acquiredDate: Date, expireDate: Date, trainingDate: Date, isValid: boolean, hasDocument: boolean, documentPath: string }} QualificationObject */
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
-
-var opt = {
-    user: config.username,
-    pass: config.pwd,
-    auth: {
-        authSource: 'admin'
-    },
-    useCreateIndex: true,
-    useNewUrlParser: true
-};
-
-mongoose.connect(config.connectionString, opt);
-mongoose.Promise = global.Promise;
 
 const Schema = mongoose.Schema;
 
