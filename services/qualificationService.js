@@ -1,5 +1,3 @@
-const config = require('../config/config.json');
-const bcrypt = require('bcryptjs');
 const db = require('../schemes/mongo');
 
 const Qual = db.Qualifications;
