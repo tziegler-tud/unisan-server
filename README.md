@@ -9,7 +9,7 @@
 Extension of the publicly available website [www.unisan-dresden.de](http://lesscss.org/) with backbone api and frontend for a sophisticated web-based management application.
 
 Planned features include a user management, event mangement, an eLearning area and CMS for the public website.
-#### Current state (10.12.2019):
+#### Current state (02.02.2020):
 - working on user management
 
 #### Planned:
