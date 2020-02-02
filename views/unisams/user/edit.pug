@@ -213,10 +213,10 @@ block content
                                                                 .item-property title
                                                         if exploreUserDocument.qualifications
                                                             each val in exploreUserDocument.qualifications
-                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualid= val.id)
+                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualificationid= val.id)
                                                                     a.inner()
-                                                                        .item-property= val.qualType
-                                                                        .item-property= val.name
+                                                                        .item-property= val.qualification.qualType
+                                                                        .item-property= val.qualification.name
                                                                         .clear
 
 

@@ -108,18 +108,40 @@ async function deleteKey(id, userParams) {
     }
 
     // check if key is in scheme
-    if(!user.schema.path(userParams.key)===undefined){
+    if(user.schema.path(userParams.key)!==null) {
         // check if trying to delete required key
-        if (user.schema.path(userParams.key).isRequired){
+        if (user.schema.path(userParams.key).isRequired) {
             console.error('Trying to remove required key.');
             return;
-        }
-        else {
-            console.log("removing key which is not specified in scheme. Is this intended?")
+        } else {
+
         }
     }
+    else {
+        console.warn("removing key which is not specified in scheme. Is this intended?")
+    }
 
-    user.set(userParams.key, undefined, {strict: false} );
+    if(userParams.isArray) {
+
+        // in-memory update. get current array content
+        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+        /** @type {any[]} */
+        var array = user.get(userParams.key);
+        if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
+        var index = array.map(e => e._id).indexOf(userParams.value.id);
+        if (index > -1) {
+            // remove existing key from array
+            array.splice(index, 1);
+        }
+        else {
+            // key not found
+            console.error("Key marked as array, but no corresponding array entry was found. Aborting delete operation.")
+        }
+        user.set(userParams.key, array, {strict: false} );
+    }
+    else {
+        user.set(userParams.key, undefined, {strict: false} );
+    }
     await user.save();
 }
 

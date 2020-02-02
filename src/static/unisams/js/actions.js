@@ -26,42 +26,29 @@ common = window.common;
         });
     };
 
-    actions.removeDBKey = function(userid, keyIdentifier){
-        var data = {
-          key: keyIdentifier
-        };
-
-        $.ajax({
-            url: "/unisams/usermod/deleteKey/" + userid,
-            // make put for safety reasons :-)
-            type: 'PUT',
-            dataType: 'json',
-            data: data,
-            success: function(result) {
-                $("#useritem-"+ common.escapeSelector(keyIdentifier)).remove();
-            }
-        });
-    };
-
-    actions.updateDBKey = function(userid, keyIdentifier, value){
+    actions.removeDBKey = function(userid, keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
         var data = {
             key: keyIdentifier,
             value: value
         };
 
+        if(args) for(var k in args) data[k]=args[k];
+
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + userid,
+            url: "/unisams/usermod/deleteKey/" + userid,
             // make put for safety reasons :-)
-            type: 'PUT',
+            type: 'DELETE',
             dataType: 'json',
             data: data,
             success: function(result) {
-
+                callback();
             }
         });
     };
 
-    actions.insertDBKey = function(userid, keyIdentifier, value, args){
+    actions.updateDBKey = function(userid, keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
         var data = {
             key: keyIdentifier,
             value: value
@@ -76,6 +63,28 @@ common = window.common;
             dataType: 'json',
             data: data,
             success: function(result) {
+                callback()
+            }
+        });
+    };
+
+    actions.insertDBKey = function(userid, keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            key: keyIdentifier,
+            value: value
+        };
+
+        if(args) for(var k in args) data[k]=args[k];
+
+        $.ajax({
+            url: "/unisams/usermod/updateKey/" + userid,
+            // make put for safety reasons :-)
+            type: 'PUT',
+            dataType: 'json',
+            data: data,
+            success: function(result) {
+                callback();
                 window.location.reload();
 
             }

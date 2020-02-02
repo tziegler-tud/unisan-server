@@ -11,7 +11,8 @@ var opt = {
     useNewUrlParser: true
 };
 
-mongoose.connect(config.connectionString,opt);
+//mongoose.connect(config.connectionString,opt);  // use this for remote database
+mongoose.connect("mongodb://localhost:27017/unisan-test");  // use this for locale database
 mongoose.Promise = global.Promise;
 
 module.exports = {

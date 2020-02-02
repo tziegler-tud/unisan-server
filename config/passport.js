@@ -6,10 +6,6 @@ const userService = require('../services/userService');
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("password", salt);
 
-const users = [
-    {id: '2f24vvg', name: 'test', hash: hash}
-];
-
 passport.use(new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
@@ -40,7 +36,7 @@ passport.use(new LocalStrategy({
 
 // tell passport how to serialize the user
 passport.serializeUser((user, done) => {
-    console.log('Inside serializeUser callback. User id is save to the session file store here')
+    console.log('Inside serializeUser callback. User id is save to the session file store here');
     done(null, user._doc._id);
 });
 

@@ -25,15 +25,17 @@
                             <label for="qual-type">Typ</label>
                             <select class="common-select" id="qual-type" name="qual-type">
                                 {{#each qualifications.byType}}
-                                    {{#each this}}
-                                        <option>{{@key}}</option>
-                                    {{/each}}
+                                    <option>{{this._id}}</option>
                                 {{/each}}
                             </select>
                         </div>
                         <div class="ak-item ak-qual ak-qual-name">
                             <label for="qual-name">Name</label>
-                            <input class="common-input" id="qual-name" name="qual-name" type="text" value=""/>
+                            <select class="common-select" id="qual-name" name="qual-name">
+                                {{#each qualifications.byType.[0].values}}
+                                    <option id={{this._id}}>{{name}}</option>
+                                {{/each}}
+                            </select>
                         </div>
                         <div class="ak-item ak-qual ak-qual-aquiredDate">
                             <label for="qual-acquiredDate">Abgeschlossen am</label>

@@ -62,7 +62,10 @@ $(document).ready (function () {
         userid: userid,
         callback: {
             onConfirm: function(res){
-                actions.removeDBKey(userid, res.event.target.dataset.attributekey);
+                actions.removeDBKey(userid, res.event.target.dataset.attributekey, {}, function(){
+                    $("#useritem-"+ common.escapeSelector(res.event.target.dataset.attributekey)).remove()
+                }
+            );
             }
         }
     };
@@ -107,8 +110,6 @@ $(document).ready (function () {
         manualUploader.uploadStoredFiles();
     });
 
-    //var addDBKeyDialog = new window.common.DialogContent.AddDBKey("#")
-
     var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
     $(".useredit-addItemBtn").on("click", function(e) {
@@ -134,7 +135,9 @@ $(document).ready (function () {
                         var args = {
                             isArray: true
                         };
-                        actions.insertDBKey(userid, key, value, args);
+                        actions.insertDBKey(userid, key, value, args, function(){
+
+                        });
                     }
                 },
             },
@@ -145,6 +148,7 @@ $(document).ready (function () {
     $(".quallist-entry").on("click", function(e) {
         e.preventDefault();
         var self = this;
+
         addDBKey_sidebar.addContent('UserUpdateQualification', {
                 userid: userid,
                 qualificationId: self.dataset.qualificationid,
@@ -154,7 +158,36 @@ $(document).ready (function () {
                         var args = {
                             isArray: true
                         };
-                        actions.insertDBKey(userid, key, value, args);
+                        actions.insertDBKey(userid, key, value, args, function(){
+
+                        });
+                    },
+                    onDelete: function(userid, value){
+                        var key = "qualifications";
+                        var args = {
+                            isArray: true
+                        };
+
+                        const dialog_content = {
+                            title: "Qualifikation löschen",
+                            message: "Folgende Qualifikation wird gelöscht: " + value.name,
+                            titleArg: "",
+                            messageArg: ""
+                        };
+                        var dialog_token = lidlRTO.objectManager.createNewObjectToken();
+                        const dialog_args = {
+                            userid: userid,
+                            callback: {
+                                onConfirm: function(res){
+                                    actions.removeDBKey(userid,key, value, args,function(){
+                                    });
+                                    lidlRTO.objectManager.removeObject(dialog_token);
+                                }
+                            }
+                        };
+                        const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                        lidlRTO.objectManager.addObject(dialog, dialog_token);
+                        dialog.openDialog();
                     }
                 },
             },

@@ -21,9 +21,19 @@
             <div class="sidebar-section body-section">
                 <div class="section-content">
                     <div class="ak-form">
+                        <div class="ak-item ak-qual ak-qual-type">
+                            <label for="qual-type">Typ</label>
+                            <select class="common-select" id="qual-type" name="qual-type">
+                                {{#each qualifications.byType}}
+                                    <option>{{_id}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
                         <div class="ak-item ak-qual ak-qual-name">
                             <label for="qual-name">Name</label>
-                            <input class="common-input" id="qual-name" name="qual-name" type="text" value="{{qualification.name}}"/>
+                            <select class="common-select" id="qual-name" name="qual-name">
+
+                            </select>
                         </div>
                         <div class="ak-item ak-qual ak-qual-aquiredDate">
                             <label for="qual-acquiredDate">Abgeschlossen am</label>
@@ -43,6 +53,7 @@
         </div>
         <div class="sidebar-bottom">
             <a class="sidebar-confirm content-link">Speichern</a>
+            <a class="sidebar-delete content-link">Eintrag löschen</a>
         </div>
     </div>
 </div>

@@ -77,6 +77,14 @@
         this.isActive = false;
     };
 
+    common.Sidebar.prototype.addErrorMessage = function(msg) {
+        var errorHtml = $("<div/>", {
+            "class": "sidebar-errormsg",
+            text: msg
+        });
+        this.sidebarHTML.prepend(errorHtml);
+    };
+
     var addUserContent = function(self, args){
 
         var userid = args.userid;
@@ -112,37 +120,66 @@
         var userId = args.userid;
         var onConfirm = args.callback.onConfirm;
 
-        var res = {};
+        var res = {qualifications: {}};
 
         getDataFromServer("/unisams/usermod/"+userId,function(context){
             res.exploreUser = context;
-            if (res.qualifications){
+            if (res.qualifications.byType){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/qualification/getAllByType", function(context){
-
-            res.qualifications = context;
+        getDataFromServer("/unisams/qualification/groupByType", function(context){
+            res.qualifications.byType = context;
             if (res.exploreUser){
-                action(res)
+                action(res);
             }
         });
-
         var action = function(context){
             $.get('/static/unisams/js/templates/sidebar-addUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
+                    //helper to find qualification document in groupByType array
+                    var findQualById = function(byTypeArr, id){
+                        var localmatch;
+                        byTypeArr.forEach(function(qual){
+                            var match = qual.values.find(qualEntry => qualEntry._id === id);
+                            if (match != null) {
+                                localmatch = match;
+                            }
+                        });
+                        return localmatch;
+                    };
+                    const id = document.getElementById("qual-name").selectedOptions[0].id;
                     data = {
-                        name: $("#qual-name").val(),
+                        qualification: findQualById(res.qualifications.byType, id),
                         acquiredDate: $("#qual-acquiredDate").val(),
                         expireDate: $("#qual-expireDate").val(),
                         trainingDate: $("#qual-trainingDate").val(),
                     };
                     onConfirm(args.userid, data);
                 }.bind(args));
+                var q = $("#qual-type");
+                q.on("change",function(e){
+                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
+                    var qualNameObject = document.getElementById("qual-name");
+                    // remove existing options
+                    qualNameObject.options.length = 0;
+                    //add available options for selected type
+                    typeData.values.forEach(function (el, index){
+                        const option = document.createElement('option');
+                        option.id = el._id;
+                        option.value = el.name;
+                        option.innerHTML = el.name;
+                        option.defaultSelected = false;
+                        option.selected = false;
+                        qualNameObject.options[index] = option;
+                    });
+
+
+                })
             });
         };
     };
@@ -152,39 +189,111 @@
         var userId = args.userid;
         var qualId = args.qualificationId;
         var onConfirm = args.callback.onConfirm;
+        var onDelete = args.callback.onDelete;
 
-        var res = {};
+        var res = {qualifications: {}};
 
         getDataFromServer("/unisams/usermod/"+userId,function(context){
-          res.exploreUser = context;
-            if (res.qualifications){
+            res.exploreUser = context;
+            res.currentQualification = context.qualifications.find(qual => qual._id === qualId);
+            if (res.qualifications.byType){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/qualification/getAllByTypes", function(context){
-            res.qualifications = context;
+        getDataFromServer("/unisams/qualification/groupByType", function(context){
+            res.qualifications.byType = context;
             if (res.exploreUser){
-                action(res)
+                action(res);
             }
         });
 
-        var action = function(res){
+        var action = function(context){
             $.get('/static/unisams/js/templates/sidebar-updateUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 context.qualification = context.exploreUser.qualifications.find(qual => qual._id === qualId);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
+                    //helper to find qualification document in groupByType array
+
+                    const id = document.getElementById("qual-name").selectedOptions[0].id;
                     data = {
                         id: qualId,
-                        name: $("#qual-name").val(),
+                        qualification: findQualById(res.qualifications.byType, id),
                         acquiredDate: $("#qual-acquiredDate").val(),
                         expireDate: $("#qual-expireDate").val(),
                         trainingDate: $("#qual-trainingDate").val(),
                     };
                     onConfirm(args.userid, data);
                 }.bind(args));
+
+                registerButton (self, ".sidebar-delete", function(){
+                    // delete array entry
+                    data = {
+                        id: qualId,
+                        qualification: findQualById(res.qualifications.byType, id),
+                    };
+                    onDelete(args.userid, data);
+                });
+
+                var findQualById = function(byTypeArr, id){
+                    var localmatch;
+                    byTypeArr.forEach(function(qual){
+                        var match = qual.values.find(qualEntry => qualEntry._id === id);
+                        if (match != null) {
+                            localmatch = match;
+                        }
+                    });
+                    return localmatch;
+                };
+
+                var q = $("#qual-type");
+                // populate selects with current content as default
+                var populateCurrentDefault = function(currentQualification){
+                    // check if data are valid
+                    if (!checkQualificationDataValidity(currentQualification)){
+                        console.warn("trying to read corrupted data");
+                        self.addErrorMessage("trying to read corrupted data!");
+                    }
+                    else {
+                        var typeData = res.qualifications.byType.find(element => element._id === currentQualification.qualification.qualType);
+                        var qualNameObject = document.getElementById("qual-name");
+                        // select current as default
+                        q.children('option').filter(function (i, e) {
+                            return e.text === currentQualification.qualification.qualType
+                        }).attr('selected', 'selected');
+                        //add available options for selected type, with current selected as default
+                        typeData.values.forEach(function (el, index) {
+                            const option = document.createElement('option');
+                            option.id = el._id;
+                            option.value = el.name;
+                            option.innerHTML = el.name;
+                            option.defaultSelected = el.name === currentQualification.qualification.name;
+                            option.selected = false;
+                            qualNameObject.options[index] = option;
+                        });
+                    }
+                };
+                populateCurrentDefault(res.currentQualification);
+                // listener to update names if type changes
+                $(q).on("change",function(e){
+                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
+                    var qualNameObject = document.getElementById("qual-name");
+                    // remove existing options
+                    qualNameObject.options.length = 0;
+                    //add available options for selected type
+                    typeData.values.forEach(function (el, index){
+                        const option = document.createElement('option');
+                        option.id = el._id;
+                        option.value = el.name;
+                        option.innerHTML = el.name;
+                        option.defaultSelected = false;
+                        option.selected = false;
+                        qualNameObject.options[index] = option;
+                    });
+                });
+
             });
         };
     };
@@ -260,6 +369,13 @@
         });
     };
 
+    var registerButton = function(self, selector, action){
+        var args = this;
+        $(selector).on("click", function(args){
+            action();
+        });
+    };
+
     var getDataFromServer  = function(url, callback){
 
         // get qualification data from server
@@ -283,6 +399,21 @@
 
         });
     };
+
+    var checkQualificationDataValidity = function(currentQualification){
+        if(currentQualification == null) {
+            return false;
+        }
+        else {
+            if (currentQualification.qualification.qualType == null || currentQualification.qualification.name == null) {
+                return false;
+            }
+        }
+        return true;
+
+    };
+
+
 
     return common.Sidebar;
 

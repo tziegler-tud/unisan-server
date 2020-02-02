@@ -46,8 +46,16 @@ var UserSchema = new Schema({
 
     qualifications: [
         {
-            name: String,
-            qualType: String,
+            qualification: {
+                qualType: {
+                    type: String,
+
+                },
+                name: {
+                    type: String,
+
+                },
+            },
             acquiredDate: Date,
             expireDate: Date,
             trainingDate: Date,
