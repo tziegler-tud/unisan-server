@@ -60,6 +60,9 @@ a {
 
     height:     calc(~"100vh - @{topnav-height}");
 
+    &.wrapper-full-height {
+        height: 100vh;
+    }
 
     .page-container {
         width: 100%;
@@ -93,29 +96,6 @@ a {
 
 }
 
-.clear {
-    float:      none !important;
-    width:      0 !important;
-    clear:      both;
-}
-
-.noSelect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.noSelect * {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
 
 button {
     outline:    none;
@@ -162,6 +142,12 @@ special classes
 
         padding: 1em;
 
+        h3 {
+            font-weight: lighter;
+            font-size: 200%;
+            color: #333;
+        }
+
         .sec-heading-label {
             font-size: 200%;
             color: #333;
@@ -171,7 +157,7 @@ special classes
     .subpage-menu {
 
         .subpage-menu-btn {
-
+            display: block;
         }
 
     }
@@ -289,10 +275,19 @@ ul.itemlist {
 
             background-color: @link-hover-color;
             cursor:         pointer;
-
-
             .transition(background-color,200ms);
 
+        }
+
+        &.light {
+            background-color:   transparent;
+            color:              @akzent-color;
+            border:             1px solid @akzent-color;
+            &:hover {
+                background-color: @link-hover-color-light;
+                cursor:         pointer;
+                .transition(background-color,200ms);
+            }
         }
     }
 
@@ -304,13 +299,14 @@ ul.itemlist {
         padding:            0.5em 1em;
         margin:             .5em .5em;
 
-        .sweep-to-right(@akzent-color,.5s);
+
 
         &.inverse {
             color: #fff;
             border-color:    #fff;
+        }
+        &:not(.disable-animation, .slim) {
             .sweep-to-right(@akzent-color,.5s);
-
         }
     }
 
@@ -820,4 +816,45 @@ common btn styling
     width: max-content;
     position: relative;
 
+}
+
+/* common helper classes */
+
+.float {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+.force-nomargin {
+    margin: 0 !important;
+}
+.nomargin {
+    margin: 0;
+}
+
+
+.clear {
+    float:      none !important;
+    width:      0 !important;
+    clear:      both;
+}
+
+.noSelect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.noSelect * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
