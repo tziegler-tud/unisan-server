@@ -77,12 +77,23 @@
         this.isActive = false;
     };
 
-    common.Sidebar.prototype.addErrorMessage = function(msg) {
+    common.Sidebar.prototype.addErrorMessage = function(msg, insertFunc) {
+
         var errorHtml = $("<div/>", {
-            "class": "sidebar-errormsg",
-            text: msg
+            "class": "sidebar-errorMsg",
+            text: msg,
         });
-        this.sidebarHTML.prepend(errorHtml);
+        if (insertFunc == null) {
+            this.sidebarHTML.prepend(errorHtml);
+        }
+        else {
+            try {
+                insertFunc(errorHtml)
+            }
+            catch(e) {
+                throw new Error(e)
+            }
+        }
     };
 
     common.Sidebar.prototype.enableOptional = function(selector){
@@ -188,6 +199,8 @@
 
         var res = {qualifications: {}};
 
+        var corrupted = false;
+
         getDataFromServer("/unisams/usermod/"+userId,function(context){
             res.exploreUser = context;
             res.currentQualification = context.qualifications.find(qual => qual._id === qualId);
@@ -210,8 +223,8 @@
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
-                    //helper to find qualification document in groupByType array
 
+                    //helper to find qualification document in groupByType array
                     const id = document.getElementById("qual-name").selectedOptions[0].id;
                     data = {
                         id: qualId,
@@ -224,15 +237,32 @@
                 }.bind(args));
 
                 registerButton (self, ".sidebar-delete", function(){
+
                     // delete array entry
                     data = {
                         id: qualId,
                         qualification: res.currentQualification.qualification,
                     };
+                    if (corrupted) {
+                        data.qualification = {qualType: "error", name: "error"}
+                    }
                     onDelete(args.userid, data);
                 });
 
-                populateCurrentDefault(res.qualifications.byType, res.currentQualification.qualification);
+                if(!populateCurrentDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
+                    console.warn("trying to read corrupted data");
+                    self.addErrorMessage("trying to read corrupted data!",  function(data){
+                        $("#sidebar-inner").before(data);
+                    });
+
+                    $("#qual-type").addClass("select-disabled");
+                    $("#qual-name").addClass("select-disabled");
+
+                    $(".sidebar-confirm").addClass("btn-disabled");
+
+                    corrupted = true;
+
+                }
                 // listener to update names if type changes
                 var q = document.getElementById("qual-type");
                 $(q).on("change",function(e){
@@ -297,7 +327,15 @@
                 });
 
                 // populate selects with current content as default
-                populateCurrentDefault(res.qualifications.byType, res.currentQualification, true);
+                if(!populateCurrentDefault(self, res.qualifications.byType, res.currentQualification, true)){
+                    console.warn("trying to read corrupted data");
+                    self.addErrorMessage("trying to read corrupted data!",  function(data){
+                        $("#sidebar-inner").before(data);
+                    });
+
+                    $("#qual-type").addClass("select-disabled");
+                    $("#qual-name").addClass("select-disabled");
+                }
                 $("#qual-type").prop('disabled', 'disabled').addClass("select-disabled");
                 // listener to update names if type changes
                 var q = document.getElementById("qual-type");
@@ -439,11 +477,10 @@
         return localmatch;
     };
 
-    var populateCurrentDefault = function(byTypeArr, currentQualification, addCreateEntry){
+    var populateCurrentDefault = function(self, byTypeArr, currentQualification, addCreateEntry){
         // check if data are valid
         if (!checkQualificationDataValidity(currentQualification)){
-            console.warn("trying to read corrupted data");
-            self.addErrorMessage("trying to read corrupted data!");
+            return false;
         }
         else {
             var typeData = byTypeArr.find(element => element._id === currentQualification.qualType);
@@ -475,6 +512,7 @@
                 qualNameObject.append(createEntry);
             }
         }
+        return true;
     };
 
     var checkQualificationDataValidity = function(currentQualification){

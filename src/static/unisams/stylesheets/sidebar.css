@@ -60,6 +60,8 @@
   transition: transform 250ms ease;
 }
 .sidebar-container .sidebar {
+  display: flex;
+  flex-flow: column nowrap;
   height: 100%;
 }
 .sidebar-container .sidebar .sidebar-top {
@@ -97,8 +99,8 @@
   color: #333;
 }
 .sidebar-container .sidebar .sidebar-inner {
+  flex: 1 1 auto;
   width: 100%;
-  height: calc(100% - 3em);
   position: relative;
   display: flex;
   flex-flow: column nowrap;
@@ -129,5 +131,19 @@
 .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .section-content .content-item {
   display: block;
   width: 100%;
+}
+.sidebar-errorMsg {
+  display: block;
+  margin: 0 !important;
+  padding: 2em 1em;
+  width: auto;
+  background-color: rgba(255, 0, 26, 0.6);
+}
+.sidebar-errorMsg:before {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: .5em;
+  content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>');
 }
 /*# sourceMappingURL=sidebar.css.map */

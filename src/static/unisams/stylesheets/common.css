@@ -698,6 +698,14 @@ ul.itemlist li .itemDelete svg {
 /*
 common btn styling
 */
+.btn-disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  background-color: #999 !important;
+}
+.btn-disabled:hover {
+  background-color: #999 !important;
+}
 .btn-addItem {
   width: auto;
   display: inline-block;
