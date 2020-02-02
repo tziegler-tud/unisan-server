@@ -674,6 +674,7 @@ dropdown menu
 common form stylings
  */
 
+
 input.common-input {
     display: block;
     border: 1px solid #BBB;
@@ -696,6 +697,16 @@ select.common-select {
 
     margin-bottom: 1em;
 
+    &.select-disabled {
+        background-color: #CCC;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    option {
+        background-color: #fff;
+        color: #555;
+    }
+
 }
 
 .common-submit {
@@ -714,6 +725,18 @@ select.common-select {
 
     }
 
+}
+
+.formElement-optional {
+    max-height: 0;
+    overflow: hidden;
+    .transition(max-height, 1000ms);
+
+
+    &.optional-enabled {
+        max-height: 100vh;
+        .transition(max-height, 2000ms);
+    }
 }
 
 /*
@@ -738,4 +761,54 @@ ul.itemlist {
         }
 
     }
+}
+
+/*
+common btn styling
+*/
+
+.btn-addItem {
+    @btn: transparent;
+    @btnHover: #f9f9ff;
+
+    width: auto;
+    display: inline-block;
+    border: 1px solid #AAA;
+    padding: .5em .5em;
+    cursor: pointer;
+
+    color: #555;
+    background-color: @btn;
+
+    .transition(background-color, 250ms);
+
+    &:hover {
+        background-color: @btnHover;
+    }
+
+    &.disabled {
+        color: #AAA;
+        cursor: not-allowed;
+    }
+
+    svg {
+        width: 1em;
+        display: block;
+
+        margin-right: .5em;
+        float: left;
+    }
+    span {
+        display: inline-block;
+        float: left;
+        line-height: 1em;
+    }
+}
+
+.btn-listExt {
+    background-color: transparent;
+    margin-top: 1em;
+    width: max-content;
+    position: relative;
+
 }

@@ -645,6 +645,15 @@ select.common-select {
   color: #555;
   margin-bottom: 1em;
 }
+select.common-select.select-disabled {
+  background-color: #CCC;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+select.common-select option {
+  background-color: #fff;
+  color: #555;
+}
 .common-submit {
   display: block;
   border: 1px solid #555;
@@ -658,6 +667,21 @@ select.common-select {
 .common-submit:hover {
   cursor: pointer;
 }
+.formElement-optional {
+  max-height: 0;
+  overflow: hidden;
+  -webkit-transition: max-height 1000ms ease;
+  -moz-transition: max-height 1000ms ease;
+  -o-transition: max-height 1000ms ease;
+  transition: max-height 1000ms ease;
+}
+.formElement-optional.optional-enabled {
+  max-height: 100vh;
+  -webkit-transition: max-height 2000ms ease;
+  -moz-transition: max-height 2000ms ease;
+  -o-transition: max-height 2000ms ease;
+  transition: max-height 2000ms ease;
+}
 /*
 common list stylings
  */
@@ -670,5 +694,45 @@ ul.itemlist li.borderBottom {
 }
 ul.itemlist li .itemDelete svg {
   width: 1em;
+}
+/*
+common btn styling
+*/
+.btn-addItem {
+  width: auto;
+  display: inline-block;
+  border: 1px solid #AAA;
+  padding: .5em .5em;
+  cursor: pointer;
+  color: #555;
+  background-color: transparent;
+  -webkit-transition: background-color 250ms ease;
+  -moz-transition: background-color 250ms ease;
+  -o-transition: background-color 250ms ease;
+  transition: background-color 250ms ease;
+}
+.btn-addItem:hover {
+  background-color: #f9f9ff;
+}
+.btn-addItem.disabled {
+  color: #AAA;
+  cursor: not-allowed;
+}
+.btn-addItem svg {
+  width: 1em;
+  display: block;
+  margin-right: .5em;
+  float: left;
+}
+.btn-addItem span {
+  display: inline-block;
+  float: left;
+  line-height: 1em;
+}
+.btn-listExt {
+  background-color: transparent;
+  margin-top: 1em;
+  width: max-content;
+  position: relative;
 }
 /*# sourceMappingURL=common.css.map */

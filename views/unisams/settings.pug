@@ -21,7 +21,6 @@ block content
                             h3 database: qualifications
                         #content1-text.sec-content
                             .subpage-options
-                                #addQualButton.before-icon.icon-edit Hinzufügen
                             .subpage-content
                                 ul.userlist.itemlist
                                     li.user-entry.noSelect.borderBottom
@@ -35,6 +34,11 @@ block content
                                                 .item-property= qual.qualType
                                                 .item-property= qual.name
                                                 .clear
+
+                                    #addQualButton.btn-addItem.btn-listExt
+                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        span Hinzufügen
+                                        .clear
                             #usermanagment-menu.subpage-menu
                                 #btn01.subpage-menu-btn
 

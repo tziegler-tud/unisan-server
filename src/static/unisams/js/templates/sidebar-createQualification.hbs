@@ -21,13 +21,23 @@
             <div class="sidebar-section body-section">
                 <div class="section-content">
                     <div class="ak-form">
-                        <div class="ak-item ak-key">
-                            <label for="key">Typ</label>
-                            <input class="common-input" id="qual-type" name="qual-type" type="text"/>
+                        <div class="ak-item ak-qual ak-qual-type">
+                            <label for="qual-type">Typ</label>
+                            <select class="common-select" id="qual-type" name="qual-type">
+                                {{#each qualifications.byType}}
+                                    <option>{{_id}}</option>
+                                {{/each}}
+                                    <option disabled="disabled">-----------------------</option>
+                                    <option value="enableOptional_custom-type" class="option-createNewEntry">Neu anlegen...</option>
+                            </select>
+                        </div>
+                        <div class="ak-item ak-customType ak-optional formElement-optional">
+                            <label for="custom-type">Neuen Typ anlegen</label>
+                            <input class="common-input" id="custom-type" name="custom-type" type="text"/>
                         </div>
                         <div class="ak-item ak-value">
-                            <label for="value">Bezeichnung</label>
-                            <input class="common-input" id="qual-name" name="qual-name" type="text"/>
+                            <label for="qual-name">Bezeichnung</label>
+                            <input class="common-input" id="qual-name" name="custom-name" type="text"/>
                         </div>
                     </div>
                 </div>

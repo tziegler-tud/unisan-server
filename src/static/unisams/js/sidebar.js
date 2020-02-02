@@ -85,6 +85,14 @@
         this.sidebarHTML.prepend(errorHtml);
     };
 
+    common.Sidebar.prototype.enableOptional = function(selector){
+        $(selector).addClass("optional-enabled");
+    };
+
+    common.Sidebar.prototype.disableOptional = function(selector){
+        $(selector).removeClass("optional-enabled");
+    };
+
     var addUserContent = function(self, args){
 
         var userid = args.userid;
@@ -263,6 +271,7 @@
         });
 
         var action = function(context){
+            var opt = false;
             $.get('/static/unisams/js/templates/sidebar-updateQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
@@ -271,8 +280,13 @@
                     data = {
                         id: qualId,
                         qualType: $("#qual-type").val(),
-                        name: $("#qual-name").val()
                     };
+                    if(opt) {
+                        data.name = $("#custom-name").val();
+                    }
+                    else {
+                        data.name = $("#qual-name").val();
+                    }
                     onConfirm(qualId, data);
                 }.bind(args));
 
@@ -283,7 +297,8 @@
                 });
 
                 // populate selects with current content as default
-                populateCurrentDefault(res.qualifications.byType, res.currentQualification);
+                populateCurrentDefault(res.qualifications.byType, res.currentQualification, true);
+                $("#qual-type").prop('disabled', 'disabled').addClass("select-disabled");
                 // listener to update names if type changes
                 var q = document.getElementById("qual-type");
                 $(q).on("change",function(e){
@@ -301,6 +316,16 @@
                         qualNameObject.options[index] = option;
                     });
                 });
+                $("#qual-name").on("change",function(e) {
+                    if (e.target.value === "enableOptional_custom-name"){
+                        self.enableOptional(".ak-customName");
+                        opt = true;
+                    }
+                    else {
+                        self.disableOptional(".ak-customName");
+                        opt = false;
+                    }
+                });
 
             });
         };
@@ -309,24 +334,44 @@
     var addCreateQualificationContent = function(self, args){
 
         var onConfirm = args.callback.onConfirm;
+        var res = {qualifications: {}};
 
         getDataFromServer("/unisams/qualification/groupByType", function(context){
+            res.qualifications.byType = context;
+            action(res);
 
+        });
+
+        var action = function(context){
+            var opt = false;
             $.get('/static/unisams/js/templates/sidebar-createQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
                     data = {
-                        qualType: $("#qual-type").val(),
                         name:  $("#qual-name").val(),
                     };
+                    if(opt) {
+                        data.qualType = $("#custom-type").val();
+                    }
+                    else {
+                        data.qualType = $("#qual-type").val();
+                    }
                     onConfirm(false, data);
                 }.bind(args));
+                $("#qual-type").on("change",function(e) {
+                    if (e.target.value === "enableOptional_custom-type"){
+                        self.enableOptional(".ak-customType");
+                        opt = true;
+                    }
+                    else {
+                        self.disableOptional(".ak-customType");
+                        opt = false;
+                    }
+                });
             });
-        });
-
-
+        };
     };
 
 
@@ -394,7 +439,7 @@
         return localmatch;
     };
 
-    var populateCurrentDefault = function(byTypeArr, currentQualification){
+    var populateCurrentDefault = function(byTypeArr, currentQualification, addCreateEntry){
         // check if data are valid
         if (!checkQualificationDataValidity(currentQualification)){
             console.warn("trying to read corrupted data");
@@ -417,6 +462,18 @@
                 option.selected = (el.name === currentQualification.name) ? "selected" : "";
                 qualNameObject.options[index] = option;
             });
+            if (addCreateEntry) {
+                var delimiter = document.createElement('option');
+                delimiter.innerHTML = "-----------------------";
+                delimiter.disabled = "disabled";
+                qualNameObject.append(delimiter);
+
+                var createEntry = document.createElement('option');
+                createEntry.innerHTML = "Neu anlegen...";
+                createEntry.value = "enableOptional_custom-name";
+                createEntry.classList.add("option-createNewEntry");
+                qualNameObject.append(createEntry);
+            }
         }
     };
 
