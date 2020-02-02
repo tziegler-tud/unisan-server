@@ -62,14 +62,10 @@
 .sidebar-container .sidebar {
   height: 100%;
 }
-.sidebar-container .sidebar .sidebar-inner {
-  height: 100%;
-  width: 100%;
-  position: relative;
-}
-.sidebar-container .sidebar .sidebar-inner .sidebar-top {
+.sidebar-container .sidebar .sidebar-top {
   padding: 0;
   height: 3em;
+  width: 100%;
   border-bottom: 1px solid #999;
   transform: translateX(-3em);
   -webkit-transition: transform 250ms ease;
@@ -77,33 +73,43 @@
   -o-transition: transform 250ms ease;
   transition: transform 250ms ease;
 }
-.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn {
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn {
   padding: 1em;
   width: 1em;
   float: left;
   border-right: 1px solid #999;
   cursor: pointer;
 }
-.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn:hover {
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn:hover {
   background-color: #fAfAfA;
 }
-.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn svg {
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn svg {
   width: 1em;
   display: block;
 }
-.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-back-btn.btn-rotate {
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn.btn-rotate {
   transform: rotate(180deg);
 }
-.sidebar-container .sidebar .sidebar-inner .sidebar-top .sidebar-title {
+.sidebar-container .sidebar .sidebar-top .sidebar-title {
   float: left;
   padding: 1em;
   font-size: 90%;
   color: #333;
 }
+.sidebar-container .sidebar .sidebar-inner {
+  width: 100%;
+  height: calc(100% - 3em);
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  overflow-y: scroll;
+}
 .sidebar-container .sidebar .sidebar-inner .sidebar-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  position: relative;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content {
+  flex: 1 1 auto;
 }
 .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section {
   padding: 1em;

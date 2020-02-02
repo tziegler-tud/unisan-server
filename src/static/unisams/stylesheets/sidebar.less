@@ -45,56 +45,62 @@
 
     height: 100%;
 
-    .sidebar-inner {
-      height: 100%;
+    .sidebar-top {
+      padding: 0;
+      height: 3em;
       width: 100%;
-      position: relative;
+      border-bottom: 1px solid @menu-border-color;
 
-      .sidebar-top {
-        padding: 0;
-        height: 3em;
-        border-bottom: 1px solid @menu-border-color;
+      transform: translateX(-3em);
 
-        transform: translateX(-3em);
+      .transition(transform, 250ms);
 
-        .transition(transform, 250ms);
+      .sidebar-back-btn {
+        padding: 1em;
+        width: 1em;
+        float: left;
+        border-right: 1px solid @menu-border-color;
 
-        .sidebar-back-btn {
-          padding: 1em;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #fAfAfA;
+        }
+        svg {
           width: 1em;
-          float: left;
-          border-right: 1px solid @menu-border-color;
-
-          cursor: pointer;
-
-          &:hover {
-            background-color: #fAfAfA;
-          }
-          svg {
-            width: 1em;
-            display: block;
-          }
-
-          &.btn-rotate{
-            transform: rotate(180deg);
-          }
+          display: block;
         }
 
-        .sidebar-title {
-          float: left;
-          padding: 1em;
-          font-size: 90%;
-          color: #333;
+        &.btn-rotate{
+          transform: rotate(180deg);
         }
       }
 
+      .sidebar-title {
+        float: left;
+        padding: 1em;
+        font-size: 90%;
+        color: #333;
+      }
+    }
+
+    .sidebar-inner {
+      width: 100%;
+      height: calc(~"100% - 3em");
+      position: relative;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: flex-start;
+
+      overflow-y: scroll;
+
       .sidebar-bottom {
-        position: absolute;
-        bottom: 0;
-        left: 0;
+        position: relative;
       }
 
       .sidebar-content {
+        flex: 1 1 auto;
+
         .sidebar-section {
           padding: 1em;
 

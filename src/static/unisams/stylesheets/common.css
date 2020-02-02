@@ -633,7 +633,16 @@ input.common-input {
   background-color: transparent;
   padding: 5px 1em;
   border-radius: 0;
-  color: #999;
+  color: #555;
+  margin-bottom: 1em;
+}
+select.common-select {
+  display: block;
+  border: 1px solid #BBB;
+  background-color: transparent;
+  padding: 5px 1em;
+  border-radius: 0;
+  color: #555;
   margin-bottom: 1em;
 }
 .common-submit {
