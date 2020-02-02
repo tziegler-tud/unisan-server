@@ -715,3 +715,27 @@ select.common-select {
     }
 
 }
+
+/*
+common list stylings
+ */
+
+ul.itemlist {
+    li {
+        &:not(.noSelect):hover {
+            background-color: rgba(124,0,26,0.2);
+            cursor: pointer;
+        }
+
+        &.borderBottom {
+            border-bottom: 1px solid #333;
+        }
+
+        .itemDelete {
+            svg {
+                width: 1em;
+            }
+        }
+
+    }
+}

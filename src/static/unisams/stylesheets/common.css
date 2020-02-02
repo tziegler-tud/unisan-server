@@ -658,4 +658,17 @@ select.common-select {
 .common-submit:hover {
   cursor: pointer;
 }
+/*
+common list stylings
+ */
+ul.itemlist li:not(.noSelect):hover {
+  background-color: rgba(124, 0, 26, 0.2);
+  cursor: pointer;
+}
+ul.itemlist li.borderBottom {
+  border-bottom: 1px solid #333;
+}
+ul.itemlist li .itemDelete svg {
+  width: 1em;
+}
 /*# sourceMappingURL=common.css.map */

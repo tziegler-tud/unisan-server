@@ -1,5 +1,6 @@
 var lidlRTO = window.lidlRTO;
 var common = window.common;
+var actions = window.actions;
 
 $(document).ready (function () {
 

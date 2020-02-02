@@ -87,41 +87,6 @@ async function _delete(id) {
     await Qual.findByIdAndRemove(id);
 }
 
-// @louis is this function grouping by type? Need description
-// @tom added description.
-/**
- *
- * groups the qualifications by type. returns JSON of scheme {"byType: [{<type>: [{"name": <qualName>},...]},{<type>: [{"name": <qualName>}]}]}
- *
- * @returns {Promise<Aggregate|AggregationCursor>}
- */
-
-//TODO: improve output structure
-
-// async function groupByType(){
-//     return Qual.aggregate([
-//         {
-//             $group: {
-//                 _id: "$qualType",
-//                 obj: {
-//                     $push: {name: "$name"}
-//                 }
-//             }
-//         },
-//         {
-//             $replaceRoot: {
-//                 newRoot: {
-//                     $let: {
-//                         vars: { obj: [ { k: {$substr:["$_id", 0, -1 ]}, v: "$obj" } ] },
-//                         in: { $arrayToObject: "$$obj" }
-//                     }
-//                 }
-//             }
-//         }
-//     ])
-// }
-
-
 /**
  *
  * groups the qualifications by type. returns JSON Array of scheme "[{_id: <qualType>, values: [qual1, qual2, ...]}]}
