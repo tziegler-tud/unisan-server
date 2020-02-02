@@ -232,7 +232,7 @@
                     // delete array entry
                     data = {
                         id: qualId,
-                        qualification: findQualById(res.qualifications.byType, id),
+                        qualification: res.currentQualification.qualification,
                     };
                     onDelete(args.userid, data);
                 });
@@ -269,8 +269,7 @@
                             option.id = el._id;
                             option.value = el.name;
                             option.innerHTML = el.name;
-                            option.defaultSelected = el.name === currentQualification.qualification.name;
-                            option.selected = false;
+                            option.selected = (el.name === currentQualification.qualification.name) ? "selected" : "";
                             qualNameObject.options[index] = option;
                         });
                     }

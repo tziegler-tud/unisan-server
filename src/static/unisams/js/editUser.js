@@ -170,7 +170,7 @@ $(document).ready (function () {
 
                         const dialog_content = {
                             title: "Qualifikation löschen",
-                            message: "Folgende Qualifikation wird gelöscht: " + value.name,
+                            message: "Folgende Qualifikation wird gelöscht: " + value.qualification.name,
                             titleArg: "",
                             messageArg: ""
                         };
@@ -180,6 +180,7 @@ $(document).ready (function () {
                             callback: {
                                 onConfirm: function(res){
                                     actions.removeDBKey(userid,key, value, args,function(){
+                                        $("#qualId" + common.escapeSelector(value.id)).remove();
                                     });
                                     lidlRTO.objectManager.removeObject(dialog_token);
                                 }
