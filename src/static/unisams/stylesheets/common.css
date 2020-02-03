@@ -165,7 +165,7 @@ special classes
   width: 100%;
 }
 .subpage-container .subpage-heading {
-  padding: 1em;
+  padding: 1em 1em 1em 0;
 }
 .subpage-container .subpage-heading h3 {
   font-weight: lighter;
@@ -650,6 +650,9 @@ select.common-select option {
 /*
 common list stylings
  */
+ul.itemlist {
+  font-weight: lighter;
+}
 ul.itemlist li:not(.noSelect):hover {
   background-color: rgba(124, 0, 26, 0.2);
   cursor: pointer;
@@ -714,6 +717,9 @@ common btn styling
 }
 .float-right {
   float: right;
+}
+.nofloat {
+  float: none !important;
 }
 .force-nomargin {
   margin: 0 !important;

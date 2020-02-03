@@ -140,7 +140,7 @@ special classes
 
     .subpage-heading {
 
-        padding: 1em;
+        padding: 1em 1em 1em 0;
 
         h3 {
             font-weight: lighter;
@@ -740,6 +740,8 @@ common list stylings
  */
 
 ul.itemlist {
+
+    font-weight: lighter;
     li {
         &:not(.noSelect):hover {
             background-color: rgba(124,0,26,0.2);
@@ -826,6 +828,10 @@ common btn styling
 
 .float-right {
     float: right;
+}
+
+.nofloat {
+    float: none !important;
 }
 .force-nomargin {
     margin: 0 !important;

@@ -4,9 +4,8 @@ $(function() {
         var data = {
             username:   $('#userinp-username').val(),
             password:   $('#userinp-password').val(),
-            firstName:  $('#userinp-firstname').val(),
-            lastName:   $('#userinp-lastname').val(),
-            email:      $('#userinp-email').val(),
+            firstName:  $('#userinp-firstName').val(),
+            lastName:   $('#userinp-lastName').val(),
         };
         // build a json object or do something with the form, store in data
         $.post('/unisams/usermod/create', data, function(resp) {
