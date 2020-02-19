@@ -4,6 +4,8 @@ const db = require('../schemes/mongo');
 
 const User = db.User;
 
+var fs = require('fs-extra');
+
 module.exports = {
     getAll,
     getById,
@@ -15,7 +17,7 @@ module.exports = {
     delete: _delete
 };
 
-/** @typedef {import("../schemes/userScheme").UserScheme} UserScheme */
+/** @typedef {import("../schemes/userScheme.").UserScheme} UserScheme */
 
 /**
  * Gets all users
@@ -59,7 +61,21 @@ async function create(userParam) {
     }
 
     // save user
-    await user.save();
+    if(await user.save()){
+        fs.mkdir('src/data/uploads/user_images/' + user._id, { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+            else {
+                fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                    if (err) throw err;
+                    console.log('dummy image copied to new user');
+                });
+            }
+        });
+        // copy dummy user image to user directory
+
+    }
 }
 
 /**

@@ -5,7 +5,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
         <div class="sidebar-title">
-            <span>{{exploreUser.username}}  {{currentQualification.qualification.name}}</span>
+            <span>{{exploreUser.username}}</span>
         </div>
     </div>
     <div id="sidebar-inner" class="sidebar-inner">
@@ -24,17 +24,15 @@
                     <div class="ak-form">
                         <div class="ak-item ak-qual ak-qual-type">
                             <label for="qual-type">Typ</label>
-                            <select class="common-select" id="qual-type" name="qual-type">
-                                {{#each qualifications.byType}}
-                                    <option>{{_id}}</option>
-                                {{/each}}
-                            </select>
+                            <span class="common-viewBox" id="qual-type">
+                                {{currentQualification.qualification.qualType}}
+                            </span>
                         </div>
                         <div class="ak-item ak-qual ak-qual-name">
                             <label for="qual-name">Bezeichnung</label>
-                            <select class="common-select" id="qual-name" name="qual-name">
-
-                            </select>
+                            <span class="common-viewBox" id="qual-name">
+                                {{currentQualification.qualification.name}}
+                            </span>
                         </div>
                         <div class="ak-item ak-qual ak-qual-aquiredDate">
                             <label for="qual-acquiredDate">Abgeschlossen am</label>

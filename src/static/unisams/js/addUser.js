@@ -9,7 +9,7 @@ $(function() {
         };
         // build a json object or do something with the form, store in data
         $.post('/unisams/usermod/create', data, function(resp) {
-            location.replace("/unisams/user/" + data.username)
+            location.replace("/unisams/user/" + data.username + "/editUser")
             // do something when it was successful
         });
     });

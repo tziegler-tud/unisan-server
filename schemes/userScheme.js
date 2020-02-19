@@ -82,6 +82,10 @@ var UserSchema = new Schema({
     }
 });
 
+UserSchema.post('save', function(error, doc, next) {
+    throw new Error(error);
+});
+
 
 UserSchema.set('toJSON', { virtuals: true });
 

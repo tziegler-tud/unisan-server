@@ -18,31 +18,39 @@
 
             default:
                 console.warn("Sidebar: no content type given!");
-                addUserContent(self, args);
+                showUserContent(self, args);
                 break;
 
             case "user":
-                addUserContent(self, args);
+                showUserContent(self, args);
+                break;
+
+            case "addUser":
+                showAddUserContent(self,args);
                 break;
 
             case "UserAddDBKey":
-                addInsertDBKeyContent(self, args);
+                showInsertDBKeyContent(self, args);
                 break;
 
             case "UserAddQualification":
-                addInsertUserQualificationContent(self,args);
+                showInsertUserQualificationContent(self,args);
+                break;
+
+            case "UserViewQualification":
+                showViewUserQualificationContent(self, args);
                 break;
 
             case "UserUpdateQualification":
-                addUpdateUserQualificationContent(self,args);
+                showUpdateUserQualificationContent(self,args);
                 break;
 
             case "QualificationCreate":
-                addCreateQualificationContent(self,args);
+                showCreateQualificationContent(self,args);
                 break;
 
             case "QualificationUpdate":
-                addUpdateQualificationContent(self,args);
+                showUpdateQualificationContent(self,args);
                 break;
 
         }
@@ -104,7 +112,7 @@
         $(selector).removeClass("optional-enabled");
     };
 
-    var addUserContent = function(self, args){
+    var showUserContent = function(self, args){
 
         var userid = args.userid;
 
@@ -117,7 +125,16 @@
         })
     };
 
-    var addInsertDBKeyContent = function(self, args){
+    var showAddUserContent = function(self, args){
+        var context = {};
+        $.get('/static/unisams/js/templates/sidebar-addUser.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            self.sidebarHTML.html(template(context));
+            registerBackButton(self,".sidebar-back-btn");
+        });
+    };
+
+    var showInsertDBKeyContent = function(self, args){
 
         var userid = args.userid;
         var onConfirm = args.callback.onConfirm;
@@ -134,7 +151,7 @@
         })
     };
 
-    var addInsertUserQualificationContent = function(self, args){
+    var showInsertUserQualificationContent = function(self, args){
 
         var userId = args.userid;
         var onConfirm = args.callback.onConfirm;
@@ -190,7 +207,42 @@
         };
     };
 
-    var addUpdateUserQualificationContent = function(self, args){
+    var showViewUserQualificationContent = function(self, args){
+
+        var userId = args.userid;
+        var qualId = args.qualificationId;
+
+        var res = {qualifications: {}};
+
+        var corrupted = false;
+
+        getDataFromServer("/unisams/usermod/"+userId,function(context){
+            res.exploreUser = context;
+            res.currentQualification = context.qualifications.find(qual => qual._id === qualId);
+            action(res)
+        });
+
+        var action = function(context){
+            $.get('/static/unisams/js/templates/sidebar-viewUserQualification.hbs', function (data) {
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+                registerBackButton(self,".sidebar-back-btn");
+
+                if(!populateCurrentDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
+                    console.warn("trying to read corrupted data");
+                    self.addErrorMessage("trying to read corrupted data!",  function(data){
+                        $("#sidebar-inner").before(data);
+                    });
+                    $("#qual-type").addClass("viewBox-disabled");
+                    $("#qual-name").addClass("viewBox-disabled");
+                    corrupted = true;
+
+                }
+            });
+        };
+    };
+
+    var showUpdateUserQualificationContent = function(self, args){
 
         var userId = args.userid;
         var qualId = args.qualificationId;
@@ -219,7 +271,6 @@
         var action = function(context){
             $.get('/static/unisams/js/templates/sidebar-updateUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
-                context.qualification = context.exploreUser.qualifications.find(qual => qual._id === qualId);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
@@ -285,7 +336,7 @@
         };
     };
 
-    var addUpdateQualificationContent = function(self, args){
+    var showUpdateQualificationContent = function(self, args){
 
         var qualId = args.qualificationId;
         var onConfirm = args.callback.onConfirm;
@@ -369,7 +420,7 @@
         };
     };
 
-    var addCreateQualificationContent = function(self, args){
+    var showCreateQualificationContent = function(self, args){
 
         var onConfirm = args.callback.onConfirm;
         var res = {qualifications: {}};

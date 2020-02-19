@@ -10,6 +10,4 @@ $(document).ready (function () {
             "ui-tabs-panel": ""
         }
     });
-
-
 });

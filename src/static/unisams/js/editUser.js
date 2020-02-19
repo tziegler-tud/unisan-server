@@ -4,8 +4,6 @@ var actions = window.actions;
 
 $(document).ready (function () {
 
-
-
     const content = {
         title: "Nutzer löschen",
         message: "U sure bro?",
