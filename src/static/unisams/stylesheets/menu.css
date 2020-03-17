@@ -169,7 +169,16 @@
   display: block;
   float: left;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.docker-container-active {
+  border-bottom: 1px solid #AAA;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.docker-container-active .docker-mainElement {
+  border-bottom: 1px solid #AAA;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.docker-container-active .docker-mainElement:before {
+  width: 5px;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element {
   cursor: pointer;
   position: relative;
   -webkit-transition: background-color 300ms ease;
@@ -177,11 +186,11 @@
   -o-transition: background-color 300ms ease;
   transition: background-color 300ms ease;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element a {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element a {
   padding: 1em 10%;
   display: block;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element:before {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element:before {
   content: "";
   width: 0;
   height: 100%;
@@ -194,33 +203,45 @@
   -o-transition: width 350ms ease;
   transition: width 350ms ease;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element.docker-element-active:before {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-element-active:before {
   width: 5px;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element:hover {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element:hover {
   background-color: rgba(124, 0, 26, 0.2);
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element#docker-home {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element#docker-home {
   box-shadow: 0 0 4px grey;
   margin-bottom: 4px;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element#docker-home a {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element#docker-home a {
   padding: 25% 25%;
   width: 50%;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element#docker-home img {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element#docker-home img {
   width: 100%;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element svg {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element svg {
   color: #00293c;
   width: 1em;
   display: block;
   margin-right: 1em;
   float: left;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-element span.docker-element-label {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element span.docker-element-label {
   display: block;
   float: left;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-mainElement {
+  font-size: 100%;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-subElement {
+  font-size: 90%;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-subElement:before {
+  background-color: rgba(32, 59, 125, 0.74);
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-subElement:hover {
+  background-color: rgba(160, 0, 36, 0.1);
 }
 /* color specific options */
 /* no js fallbacks */

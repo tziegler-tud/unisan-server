@@ -1,5 +1,7 @@
 var lidlRTO = window.lidlRTO;
 
+window.dockerArgs = {containerSelector: "docker-inner"};
+
 document.addEventListener("DOMContentLoaded", function(event) {
 
     console.log("js active, removing noscript fallback");
@@ -11,8 +13,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     lidl.addDebugCategory(lidl.debugCategory.FULL);
 
-    var menu = new common.Menu();
-    menu.init();
+    window.Docker = new common.Docker(window.dockerArgs);
 
     Handlebars.registerHelper('transformDateString', function(dateString) {
         var myDate = new Date(dateString);

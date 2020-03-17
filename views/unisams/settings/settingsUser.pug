@@ -1,4 +1,4 @@
-extends layout
+extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
@@ -8,7 +8,8 @@ block page_includes
 
 
     script.
-        window.activeDockerSection = "settings";
+        window.dockerArgs.activeContainer = "settingsContainer";
+        window.dockerArgs.activeElementId = "settingsUser";
 
 
 block content
