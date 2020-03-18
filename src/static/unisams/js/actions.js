@@ -1,6 +1,19 @@
 common = window.common;
 (function (actions,$,undefined) {
 
+    actions.addUser = function(args) {
+        var data = {
+            username: args.username,
+            password: args.password,
+            firstName: args.firstName,
+            lastName: args.lastName
+        };
+        $.post('/unisams/usermod/create', data, function(resp) {
+            location.replace("/unisams/user/" + data.username + "/editUser")
+            // do something when it was successful
+        });
+    };
+
     actions.deleteUser = function(userid) {
 
         // build a json object or do something with the form, store in data

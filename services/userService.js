@@ -62,7 +62,7 @@ async function create(userParam) {
 
     // save user
     if(await user.save()){
-        fs.mkdir('src/data/uploads/user_images/' + user._id, { recursive: true }, (err) => {
+        fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
             if (err) {
                 throw err;
             }

@@ -29,8 +29,14 @@ $(document).ready (function () {
         sidebar.addContent('addUser', {
                 userid: null,
                 callback: {
-                    onConfirm: function(userid, key, value){
-                        actions.insertDBKey(userid, key, value);
+                    onConfirm: function(username, password, firstName, lastName){
+                        let args = {
+                            username: username,
+                            password: password,
+                            firstName: firstName,
+                            lastName: lastName
+                        };
+                        actions.addUser(args);
                     }
                 }
             },
