@@ -7,6 +7,7 @@ block page_includes
     script(src="/static/unisams/js/editUser.js")
     script(src="/static/unisams/js/actions.js")
     script(src="/static/unisams/js/updateUser.js")
+    script(src="/static/unisams/js/transformToNewScheme.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
@@ -93,7 +94,7 @@ block content
 
                             .sec-heading-label.userprofile-heading
                                 .userprofile-heading-container
-                                    h3=exploreUser.firstName + " " + exploreUser.lastName
+                                    h3=exploreUser.generalData.firstName + " " + exploreUser.generalData.lastName
                                     .userprofile-dropdown.dropdown-menu
                                         .dropdown-btn
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
@@ -103,6 +104,8 @@ block content
                                                     a.before-icon.icon-back(id="view" + exploreUser.id, data-userid=exploreUser.id href="/unisams/user/" + exploreUser.username) Bearbeitung beenden
                                                 .dropdown-entry
                                                     a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
+                                                .dropdown-entry
+                                                    a.userTransform(id="deleteOldId" + exploreUser.id, onclick="removeOld('"+exploreUser.id+"')") (dev) remove invalid fields
                                     .clear
                                 .clear
                         #content1-text.sec-content
@@ -123,7 +126,7 @@ block content
                                         #tab-userinfo-general.userinfo-inner
                                             form.userForm.userinfo-section
                                                 .userinfo-sectionheader
-                                                    span Allgemeine Daten
+                                                    span unisams
                                                 .userinfo-item.useredit-item(id="useritem-username")
                                                     span.userinfo-item-label.userinfo-attribute-name Username:
                                                     input#userinp-username.userForm-inp(value = exploreUser.username, name="username" type="text")
@@ -134,50 +137,92 @@ block content
                                                         span.tooltip.tt-enabled Zurücksetzen
                                                         span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
                                                     .clear
-                                                .userinfo-item.useredit-item(id="useritem-firstName")
+
+                                            form.userForm.userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Allgemeine Daten
+                                                .userinfo-item.useredit-item(id="useritem-generalData.firstName")
                                                     span.userinfo-item-label.userinfo-attribute-name Vorname:
-                                                    input#userinp-firstName.userForm-inp(value = exploreUser.firstName, name="firstName" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="firstName", data-attributeval=exploreUser.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.firstName)
+                                                    input.userForm-inp(id="userinp-generalData.firstName" value = exploreUser.generalData.firstName, name="firstName" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData.firstName", data-attributeval=exploreUser.generalData.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.generalData.firstName)
                                                         span.tooltip.tt-enabled Speichern
                                                         span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="firstName", data-attributeval=exploreUser.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.firstName)
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="generalData.firstName", data-attributeval=exploreUser.generalData.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.generalData.firstName)
                                                         span.tooltip.tt-enabled Zurücksetzen
                                                         span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
                                                     .clear
-                                                .userinfo-item.useredit-item(id="useritem-lastName")
+                                                .userinfo-item.useredit-item(id="useritem-generalData.lastName")
                                                     span.userinfo-item-label.userinfo-attribute-name Nachname:
-                                                    input#userinp-lastName.userForm-inp(value= exploreUser.lastName name="lastName" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="lastName", data-attributeval=exploreUser.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.lastName)
+                                                    input.userForm-inp(id="userinp-generalData.lastName" value= exploreUser.generalData.lastName name="lastName" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData.lastName", data-attributeval=exploreUser.generalData.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.generalData.lastName)
                                                         span.tooltip.tt-enabled Speichern
                                                         span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="lastName", data-attributeval=exploreUser.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.lastName)
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="generalData.lastName", data-attributeval=exploreUser.generalData.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.generalData.lastName)
                                                         span.tooltip.tt-enabled Zurücksetzen
                                                         span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
                                                     .clear
-                                                .userinfo-item.useredit-item(id="useritem-email")
-                                                    span.userinfo-item-label.userinfo-attribute-name Email:
-                                                    input#userinp-email.userForm-inp(value= exploreUser.email name="email" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="email", data-attributeval=exploreUser.email, data-dialogtitlearg="email", data-dialogbodyarg=exploreUser.email)
+                                                .userinfo-item.useredit-item(id="useritem-generalData.memberId")
+                                                    span.userinfo-item-label.userinfo-attribute-name Mitgliedsnummer:
+                                                    input.userForm-inp(id="userinp-generalData.memberId" value= exploreUser.generalData.memberId name="memberId" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData.memberId", data-attributeval=exploreUser.generalData.memberId, data-dialogtitlearg="memberId", data-dialogbodyarg=exploreUser.generalData.memberId)
                                                         span.tooltip.tt-enabled Speichern
                                                         span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="email", data-attributeval=exploreUser.email, data-dialogtitlearg="email", data-dialogbodyarg=exploreUser.email)
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="generalData.memberId", data-attributeval=exploreUser.generalData.memberId, data-dialogtitlearg="memberId", data-dialogbodyarg=exploreUser.generalData.memberId)
                                                         span.tooltip.tt-enabled Zurücksetzen
                                                         span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
                                                     .clear
 
                                             form.userForm.userinfo-section
-                                                if exploreUserDocument.generalData
-                                                    each val, key in exploreUserDocument.generalData
-                                                        .userinfo-item(id="useritem-"+"generalData."+key)
+                                                .userinfo-sectionheader
+                                                    span Kontaktdaten
+                                                .userinfo-item.useredit-item(id="useritem-contactData.email")
+                                                    span.userinfo-item-label.userinfo-attribute-name Email:
+                                                    input.userForm-inp(id="userinp-contactData.email" value= exploreUser.contactData.email name="email" type="text")
+                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="contactData.email", data-attributeval=exploreUser.contactData.email, data-dialogtitlearg="email", data-dialogbodyarg=exploreUser.contactData.email)
+                                                        span.tooltip.tt-enabled Speichern
+                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="contactData.email", data-attributeval=exploreUser.contactData.email, data-dialogtitlearg="email", data-dialogbodyarg=exploreUser.contactData.email)
+                                                        span.tooltip.tt-enabled Zurücksetzen
+                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                    .clear
+                                                if exploreUserDocument.contactData.phone
+                                                    if exploreUserDocument.contactData.phone.private
+                                                        .userinfo-item(id="useritem-" + "contactData.phone.private." + key)
                                                             span.userinfo-item-label.userinfo-attribute-name= key
-                                                            input.userForm-inp(id="userinp-"+"generalData."+key value=val name=key type="text")
-                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                            input.userForm-inp(id="userinp-" + "contactData.phone.custom." + key value=val name=key type="text")
+                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
                                                                 span.tooltip.tt-enabled Speichern
                                                                 span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey = "generalData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey = "contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
                                                                 span.tooltip.tt-enabled Zurücksetzen
                                                                 span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
-                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey = "generalData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey = "contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip Löschen
+
+                                                    if exploreUserDocument.contactData.phone.work
+                                                        .userinfo-item(id="useritem-" + "contactData.phone.work." + key)
+                                                            span.userinfo-item-label.userinfo-attribute-name= key
+                                                            input.userForm-inp(id="userinp-" + "contactData.phone.custom." + key value=val name=key type="text")
+                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Speichern
+                                                                span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey = "contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Zurücksetzen
+                                                                span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey = "contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip Löschen
+
+                                                    each val, key in exploreUserDocument.contactData.phone.custom
+                                                        .userinfo-item(id="useritem-" + "contactData.phone.custom." + key)
+                                                            span.userinfo-item-label.userinfo-attribute-name= key
+                                                            input.userForm-inp(id="userinp-" + "contactData.phone.custom." + key value=val name=key type="text")
+                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Speichern
+                                                                span.tooltip.tt-disabled keine Änderungen zum Speichern
+                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey = "contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
+                                                                span.tooltip.tt-enabled Zurücksetzen
+                                                                span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
+                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey = "contactData.phone.custom." + key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
                                                                 span.tooltip Löschen
 
                                             form.userForm.userinfo-section

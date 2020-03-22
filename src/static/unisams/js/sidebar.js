@@ -30,7 +30,7 @@
                 break;
 
             case "UserAddDBKey":
-                showInsertDBKeyContent(self, args);
+                showInsertUserKeyContent(self, args);
                 break;
 
             case "UserAddQualification":
@@ -139,6 +139,7 @@
     };
 
     var showInsertDBKeyContent = function(self, args){
+        // the most generic function, currently not used but left here for future usage
 
         var userid = args.userid;
         var onConfirm = args.callback.onConfirm;
@@ -150,6 +151,31 @@
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
                     onConfirm(args.userid, $("#key").val(), $("#value").val());
+                }.bind(args));
+            });
+        })
+    };
+
+    var showInsertUserKeyContent = function(self, args){
+
+        var userid = args.userid;
+        var onConfirm = args.callback.onConfirm;
+
+        getDataFromServer("/unisams/usermod/"+userid,function(context){
+            $.get('/static/unisams/js/templates/sidebar-addUserKey.hbs', function (data) {
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+                registerBackButton(self,".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function(){
+                    var key = "";
+                    if ($("#userKey-cat").val() === 1) {
+                        //cat 1 corresponds to custom entry, 0 to default.
+                        //custom entries are nested within json object in the db. wrap it to generate correct key
+                        key = "customData."
+                    }
+                    key = key + $("#userKey-key").val();
+                    let val = $("#userKey-value").val();
+                    onConfirm(args.userid, key, val);
                 }.bind(args));
             });
         })

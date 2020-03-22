@@ -13,29 +13,41 @@ var UserSchema = new Schema({
         required: true,
         trim: true
     },
-    firstName: {
-        type: String,
-        required: true
-    },
-    lastName: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        trim: true,
-    },
     generalData: {
-
+        firstName: {
+            type: String,
+            required: true
+        },
+        lastName: {
+            type: String,
+            required: true
+        },
         memberId: {
             type: String,
         },
-
-        phone: {
-            type: String,
-        },
     },
-
+    contactData: {
+        email: {
+            type: String,
+            trim: true,
+        },
+        phone: {
+            private: {
+                type: String,
+            },
+            work: {
+                type: String
+            },
+            custom: {
+                title: {
+                    type: String
+                },
+                number: {
+                    type: String
+                }
+            }
+        }
+    },
     customData: {
 
     },
@@ -43,7 +55,6 @@ var UserSchema = new Schema({
         type: String,
         required: true,
     },
-
     qualifications: [
         {
             qualification: {

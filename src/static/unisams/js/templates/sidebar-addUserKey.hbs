@@ -1,0 +1,49 @@
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>{{username}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="sidebar-title">
+                    <span>Eintrag hinzufügen</span>
+                </div>
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item ak-cat">
+                            <label for="key">Kategorie</label>
+                            <select class="common-select" id="key" name="key" type="text">
+                                <option>Allgemeine Daten</option>
+                                <option>Weitere Daten</option>
+                            </select>
+                        </div>
+                        <div class="ak-item ak-key">
+                            <label for="key">Name</label>
+                            <select class="common-select" id="key" name="key" type="text">
+                                <option>Allgemeine Daten</option>
+                            </select>
+                        </div>
+                        <div class="ak-item ak-value">
+                            <label class="float" for="value">Wert</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip">Aktuell können eigene Werte nur als Text gespeichert werden. Weitere Datentypen sind für die Zukunft geplant.</span></div>
+                            <input class="common-input" id="value" name="value" type="text"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-confirm content-link">Speichern</a>
+        </div>
+    </div>
+</div>

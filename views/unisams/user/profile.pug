@@ -92,7 +92,7 @@ block content
 
                             .sec-heading-label.userprofile-heading
                                 .userprofile-heading-container
-                                    h3=exploreUser.firstName + " " + exploreUser.lastName
+                                    h3=exploreUser.generalData.firstName + " " + exploreUser.generalData.lastName
                                     .userprofile-dropdown.dropdown-menu
                                         .dropdown-btn
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
@@ -123,19 +123,39 @@ block content
                                         #tab-userinfo-general.userinfo-inner
                                             .userinfo-section
                                                 .userinfo-sectionheader
-                                                    span Allgemeine Daten
+                                                    span unisams
                                                 .userinfo-item
                                                     span.userinfo-item-label.userinfo-attribute-name Username:
                                                     span.userinfo-item-label= exploreUser.username
+
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Allgemeine Daten
                                                 .userinfo-item
                                                     span.userinfo-item-label.userinfo-attribute-name Name:
-                                                    span.userinfo-item-label= exploreUser.firstName + " " + exploreUser.lastName
+                                                    span.userinfo-item-label= exploreUser.generalData.firstName + " " + exploreUser.generalData.lastName
+                                                .userinfo-item
+                                                    span.userinfo-item-label.userinfo-attribute-name Mitgliednummer
+                                                    span.userinfo-item-label= exploreUser.generalData.memberId
+
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Kontaktdaten
                                                 .userinfo-item
                                                     span.userinfo-item-label.userinfo-attribute-name Email:
-                                                    span.userinfo-item-label= exploreUser.email
-                                            .userinfo-section
-                                                if exploreUserDocument.generalData
-                                                    each val, key in exploreUserDocument.generalData
+                                                    span.userinfo-item-label= exploreUser.contactData.email
+
+                                                if exploreUserDocument.contactData.phone
+                                                    if exploreUserDocument.contactData.phone.private
+                                                        .userinfo-item
+                                                            span.userinfo-item-label.userinfo-attribute-name Telefon (privat):
+                                                            span.userinfo-item-label= val
+                                                    if exploreUserDocument.contactData.phone.work
+                                                        .userinfo-item
+                                                            span.userinfo-item-label.userinfo-attribute-name Telefon (Arbeit):
+                                                            span.userinfo-item-label= val
+
+                                                    each val, key in exploreUserDocument.contactData.phone.custom
                                                         .userinfo-item
                                                             span.userinfo-item-label.userinfo-attribute-name= key
                                                             span.userinfo-item-label= val

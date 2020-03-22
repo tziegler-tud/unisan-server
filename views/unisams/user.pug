@@ -37,15 +37,13 @@ block content
                                             .item-property username
                                             .item-property Vorname
                                             .item-property Nachname
-                                            .item-property Email
 
                                     each user in userList
                                         li.user-entry(id= "userId"+ user.id data-userid= user.id)
                                             a.inner()
                                                 .item-property= user.username
-                                                .item-property= user.firstName
-                                                .item-property= user.lastName
-                                                .item-property= user.email
+                                                .item-property= user.generalData.firstName
+                                                .item-property= user.generalData.lastName
                                                 .clear
                                     a.useredit-addUserBtn.btn-addItem.btn-listExt(href="user/addUser")
                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>

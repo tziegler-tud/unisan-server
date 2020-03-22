@@ -124,7 +124,7 @@ async function deleteKey(id, userParams) {
     }
 
     // check if key is in scheme
-    if(user.schema.path(userParams.key)!==null) {
+    if(user.schema.path(userParams.key)!==undefined) {
         // check if trying to delete required key
         if (user.schema.path(userParams.key).isRequired) {
             console.error('Trying to remove required key.');

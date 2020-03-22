@@ -5,8 +5,10 @@ common = window.common;
         var data = {
             username: args.username,
             password: args.password,
-            firstName: args.firstName,
-            lastName: args.lastName
+            generalData: {
+                firstName: args.firstName,
+                lastName: args.lastName
+            },
         };
         $.post('/unisams/usermod/create', data, function(resp) {
             location.replace("/unisams/user/" + data.username + "/editUser")
@@ -39,11 +41,10 @@ common = window.common;
         });
     };
 
-    actions.removeDBKey = function(userid, keyIdentifier, value, args, callback){
+    actions.removeDBKey = function(userid, keyIdentifier, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var data = {
             key: keyIdentifier,
-            value: value
         };
 
         if(args) for(var k in args) data[k]=args[k];

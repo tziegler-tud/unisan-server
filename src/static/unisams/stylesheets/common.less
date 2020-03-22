@@ -518,7 +518,13 @@ dropdown menu
         height:         1em;
         margin-right:   .5ex;
         margin-left:    .5ex;
+    }
 
+    &.icon-small {
+        &:before {
+            height: 0.8em;
+            width: 0.8em;
+        }
     }
 
     &.icon-edit {
@@ -553,6 +559,11 @@ dropdown menu
             content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>');
         }
     }
+    &.icon-info {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>');
+        }
+    }
 }
 
 /*
@@ -575,7 +586,7 @@ dropdown menu
 
 
     span.tooltip {
-        font-size: 80%;
+        font-size: 12px;
         opacity: 0;
         display: block;
         position: absolute;
@@ -586,6 +597,7 @@ dropdown menu
         padding: .5em .3em;
         z-index: -1;
         cursor: auto;
+        min-width: 150px;
 
         .transition(opacity, 350ms);
 
@@ -854,10 +866,12 @@ common btn styling
 /* common helper classes */
 
 .float {
+    display: block;
     float: left;
 }
 
 .float-right {
+    display: block;
     float: right;
 }
 
