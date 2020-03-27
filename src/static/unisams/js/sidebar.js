@@ -8,6 +8,8 @@
 
         this.isActive = false;
 
+        var self = this;
+
         return this;
     };
 
@@ -31,6 +33,10 @@
 
             case "UserAddDBKey":
                 showInsertUserKeyContent(self, args);
+                break;
+
+            case "UserUpdateDBKey":
+                showUpdateUserKeyContent(self, args);
                 break;
 
             case "UserAddQualification":
@@ -158,27 +164,123 @@
 
     var showInsertUserKeyContent = function(self, args){
 
-        var userid = args.userid;
+        var userId = args.userid;
         var onConfirm = args.callback.onConfirm;
+        var opt = false;
 
-        getDataFromServer("/unisams/usermod/"+userid,function(context){
+        var res = {dataset: {}};
+
+        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            if (res.dataset.user){
+                action(res)
+            }
+        });
+
+        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+            res.dataset.user = context;
+            if (res.exploreUser){
+                action(res);
+            }
+        });
+
+        var action = function(context) {
             $.get('/static/unisams/js/templates/sidebar-addUserKey.hbs', function (data) {
+
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
-                registerBackButton(self,".sidebar-back-btn");
-                registerConfirmButton(self, ".sidebar-confirm", function(){
-                    var key = "";
-                    if ($("#userKey-cat").val() === 1) {
-                        //cat 1 corresponds to custom entry, 0 to default.
-                        //custom entries are nested within json object in the db. wrap it to generate correct key
-                        key = "customData."
-                    }
-                    key = key + $("#userKey-key").val();
-                    let val = $("#userKey-value").val();
-                    onConfirm(args.userid, key, val);
+
+                var catKey = "";
+                var key = "";
+
+                registerBackButton(self, ".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function () {
+                    var r = document.getElementById("userkey-key");
+                    var key = catKey + "." + r.value;
+                    var funcArgs = {
+                        isArray: r.options[r.selectedIndex].dataset.isarray
+                    };
+                    var val = {
+                        value: document.getElementById("userkey-value").value,
+                        title: "TestTitle",
+                    };
+                    onConfirm(userId, key, val, funcArgs);
                 }.bind(args));
+                var q = document.getElementById("userkey-category");
+                let doc = res.dataset.user.categories;
+                q.addEventListener("change", function(e){
+                    populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                        createNewEntry: true,
+                    });
+                    catKey = q.options[q.selectedIndex].value;
+                });
+                // Apply onchange function initially
+                var event = new Event('change');
+                q.dispatchEvent(event);
             });
-        })
+        };
+    };
+
+    var showUpdateUserKeyContent = function(self, args){
+
+        var userId = args.userid;
+        var keyId = args.keyId;
+        var key = args.key;
+        var catKey = args.catKey;
+        var subKey = args.subKey;
+        var value = args.value;
+        var onConfirm = args.callback.onConfirm;
+        var onDelete = args.callback.onDelete;
+
+        var res = {dataset: {}};
+        var corrupted = false;
+
+        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            if (res.dataset.user){
+                action(res)
+            }
+        });
+
+        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+            res.dataset.user = context;
+            if (res.exploreUser){
+                action(res);
+            }
+        });
+
+        var action = function(context) {
+            $.get('/static/unisams/js/templates/sidebar-updateUserKey.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+
+                registerBackButton(self, ".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function(){
+                    data = {
+                        id: keyId,
+                        value: document.getElementById("userkey-value").value
+                    };
+                    onConfirm(args.userid, key, data);
+                }.bind(args));
+                var q = document.getElementById("userkey-category");
+                var r = document.getElementById("userkey-key");
+                let doc = res.dataset.user.categories;
+                q.addEventListener("change", function(e){
+                    populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                        createNewEntry: true,
+                        selectKey: subKey,
+                        value: value,
+                    });
+                    catKey = q.options[q.selectedIndex].value;
+                });
+                // set current category
+                setCurrentUserKey(q,catKey);
+                // Apply onchange function initially
+                var event = new Event('change');
+                q.dispatchEvent(event);
+            });
+        };
     };
 
     var showInsertUserQualificationContent = function(self, args){
@@ -258,7 +360,7 @@
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
 
-                if(!populateCurrentDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
+                if(!populateCurrentQualificationDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
                     console.warn("trying to read corrupted data");
                     self.addErrorMessage("trying to read corrupted data!",  function(data){
                         $("#sidebar-inner").before(data);
@@ -333,7 +435,7 @@
                     onDelete(args.userid, data);
                 });
 
-                if(!populateCurrentDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
+                if(!populateCurrentQualificationDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
                     console.warn("trying to read corrupted data");
                     self.addErrorMessage("trying to read corrupted data!",  function(data){
                         $("#sidebar-inner").before(data);
@@ -411,7 +513,7 @@
                 });
 
                 // populate selects with current content as default
-                if(!populateCurrentDefault(self, res.qualifications.byType, res.currentQualification, true)){
+                if(!populateCurrentQualificationDefault(self, res.qualifications.byType, res.currentQualification, {addCreateEntry: true})){
                     console.warn("trying to read corrupted data");
                     self.addErrorMessage("trying to read corrupted data!",  function(data){
                         $("#sidebar-inner").before(data);
@@ -561,32 +663,32 @@
         return localmatch;
     };
 
-    var populateCurrentDefault = function(self, byTypeArr, currentQualification, addCreateEntry){
+    var populateCurrentQualificationDefault = function(self, doc, current, args){
+        if (args === undefined) args = {};
+
         // check if data are valid
-        if (!checkQualificationDataValidity(currentQualification)){
+        if (!checkQualificationDataValidity(current)){
             return false;
         }
         else {
-            var typeData = byTypeArr.find(element => element._id === currentQualification.qualType);
+            var typeData = doc.find(element => element._id === current.qualType);
             var qualNameObject = document.getElementById("qual-name");
             var q = document.getElementById("qual-type");
             // select current as default
             $(q).children('option').filter(function (i, e) {
-                return e.text === currentQualification.qualType
-            }).attr('selected', 'selected');
+                return e.text === current.qualType
+            }).attr('selected', true);
             //add available options for selected type, with current selected as default
             typeData.values.forEach(function (el, index) {
                 const option = document.createElement('option');
                 option.id = el._id;
                 option.value = el.name;
                 option.innerHTML = el.name;
-                option.selected = (el.name === currentQualification.name) ? "selected" : "";
+                option.selected = (el.name === current.name);
                 qualNameObject.options[index] = option;
             });
-            if (addCreateEntry) {
-                var delimiter = document.createElement('option');
-                delimiter.innerHTML = "-----------------------";
-                delimiter.disabled = "disabled";
+            if (args.addCreateEntry) {
+                var delimiter = createSelectDelimiter();
                 qualNameObject.append(delimiter);
 
                 var createEntry = document.createElement('option');
@@ -598,6 +700,88 @@
         }
         return true;
     };
+
+
+    /**
+     * user data operations
+     *
+     */
+
+    var populateUserKeys = function(sidebar, doc, compareValue, args){
+        if (args === undefined) args = {};
+
+        //find selected category
+        var current = doc.find(element => element._id === compareValue);
+        getDataFromServer("/unisams/dataset/user/getChildren/" + current._id, function (context) {
+            var userkeyObject = document.getElementById("userkey-key");
+            // remove existing options
+            userkeyObject.options.length = 0;
+            //add available options for selected type
+            context.forEach(function (el, index) {
+                const option = document.createElement('option');
+                option.id = el._id;
+                option.value = el.key;
+                option.innerHTML = el.title;
+                option.dataset.isarray = el.isArray;
+                userkeyObject.options[index] = option;
+            });
+            if (args.addCreateEntry) {
+                // create delimiter
+                const delimiter = createSelectDelimiter();
+                userkeyObject.add(delimiter);
+
+                // add option to create new key
+                const option = document.createElement('option');
+                option.value = "customData";
+                option.innerHTML = "Neu anlegen...";
+                userkeyObject.add(option);
+
+                //detect if this selected
+                userkeyObject.addEventListener("change", function (e) {
+                    if (this.value === "customData") {
+                        sidebar.enableOptional(".ak-customType");
+                    } else {
+                        sidebar.disableOptional(".ak-customType");
+                    }
+                });
+            }
+            if (args.selectKey) {
+                setCurrentUserKey(userkeyObject, args.selectKey);
+            }
+            if (args.value) {
+                var uservalueObject = document.getElementById("userkey-value");
+                uservalueObject.value = args.value;
+            }
+        });
+    };
+
+    var setCurrentUserKey = function(selectElement, key){
+        $(selectElement).children('option').filter(function (i, e) {
+            return e.value === key
+        }).attr('selected', true);
+    };
+
+    /**
+     * ui elements
+     */
+
+    var createSelectDelimiter = function(classes){
+        const delimiter = document.createElement('option');
+        delimiter.innerHTML = "-----------------------";
+        delimiter.disabled = true;
+        return delimiter;
+
+    };
+
+    /**
+     * helpers
+     */
+
+    /**
+     *
+     * @param currentQualification
+     * @returns {boolean}
+     */
 
     var checkQualificationDataValidity = function(currentQualification){
         if(currentQualification == null) {

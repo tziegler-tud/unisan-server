@@ -2,6 +2,10 @@ const config = require('../config/config.json');
 const mongoose = require('mongoose');
 
 mongoose.set('debug', true);
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 
 var opt = {
     user: config.username,
@@ -24,5 +28,6 @@ mongoose.Promise = global.Promise;
 
 module.exports = {
     User: require('./userScheme'),
-    Qualifications: require('./qualificationScheme')
+    Qualifications: require('./qualificationScheme'),
+    UserDataset: require('./userDatasetScheme')
 };

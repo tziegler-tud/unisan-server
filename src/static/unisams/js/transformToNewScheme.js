@@ -18,23 +18,27 @@ function transformUser(userId){
     getDataFromServer("/unisams/usermod/"+userId,function(context){
         user = context;
         //build new object
+        var email = "";
+        Object.keys(user.contactData.email[0]).forEach(function(k){email = email + user.contactData.email[0][k]});
         var data = {
             username: user.username,
-            generalData: {
-                firstName: user.firstName,
-                lastName: user.lastName,
-            },
+            generalData: user.generalData,
             contactData: {
-                email: user.email,
+                email: [{
+                    title: "dienstlich",
+                    value: email,
+                }],
             },
-
         };
-
-        if (context.generalData) {
-            if (user.generalData.memberId) data.generalData.memberId = user.generalData.memberId;
-            if (user.generalData.phone) data.contactData.phone = {private: user.generalData.phone};
+        if (context.phone) {
+            if (context.phone[0].private) {
+                data.contactData.phone = [{
+                    title: "privat",
+                    value: user.contactData.phone[0].private,
+                }]
+            }
         }
-        if (context.customData) data.customData = context.customData;
+        if (context.customData) data.otherData = {customData: context.customData};
 
         $.ajax({
             url: "/unisams/usermod/" + userId,

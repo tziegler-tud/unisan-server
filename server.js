@@ -31,6 +31,7 @@ var userManagementRouter = require('./routes/api/user');
 var userauthRouter = require('./routes/api/userAuth');
 var settingsRouter = require('./routes/api/settings');
 var qualificationRouter = require('./routes/api/qualification');
+var userDatasetRouter = require('./routes/api/userDataset');
 
 var server = express();
 
@@ -92,6 +93,7 @@ server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/settings', settingsRouter);
 server.use('/unisams/usermod', userRouter);
 server.use('/unisams/qualification', qualificationRouter);
+server.use('/unisams/dataset/user', userDatasetRouter);
 
 
 // catch 404 and forward to error handler

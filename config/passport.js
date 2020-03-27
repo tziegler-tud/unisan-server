@@ -43,7 +43,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
     userService.getById(id)
-        .then(user => user ? done(null, user): console.log("failed again."))
+        .then(user => user ? done(null, user): done(null, false))
         .catch(err => console.log(err))
 });
 

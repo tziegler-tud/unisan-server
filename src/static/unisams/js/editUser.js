@@ -15,7 +15,7 @@ $(document).ready (function () {
 
     var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 
-    var args = {
+    var deleteArgs = {
         userid: userid,
         callback: {
             onConfirm: function(){
@@ -25,7 +25,7 @@ $(document).ready (function () {
     };
 
     var token = lidlRTO.objectManager.createNewObjectToken();
-    const dialog01 = new lidl.Dialog(token, ".userDelete", 'confirmDelete', content, args);
+    const dialog01 = new lidl.Dialog(token, ".userDelete", 'confirmDelete', content, deleteArgs);
     lidlRTO.objectManager.addObject(dialog01, token);
 
 
@@ -116,8 +116,8 @@ $(document).ready (function () {
         addDBKey_sidebar.addContent('UserAddDBKey', {
             userid: userid,
             callback: {
-                onConfirm: function(userid, key, value){
-                    actions.insertDBKey(userid, key, value);
+                onConfirm: function(userid, key, value, args){
+                    actions.insertDBKey(userid, key, value, args);
                 }
             }
             },
@@ -209,7 +209,8 @@ $(document).ready (function () {
         var val = btn.element.dataset.attributeval;
         btn.addAction("click",function(){
             var inp = $("#userinp-" + common.escapeSelector(key));
-            actions.updateDBKey(userid, btn.element.dataset.attributekey, inp.val());
+            var value = btn.element.dataset.attributekey;
+            actions.updateDBKey(userid, value, inp.val());
             inp.data("resetVal" ,inp.val());
             inp.trigger("inputReset");
             btn.disable();
@@ -254,4 +255,62 @@ $(document).ready (function () {
         });
         lidlRTO.objectManager.addObject(btn, token);
     });
+
+
+    $(".userkey-entry").on("click", function(e) {
+        e.preventDefault();
+        var self = this;
+
+        addDBKey_sidebar.addContent('UserUpdateDBKey', {
+                userid: userid,
+                keyId: self.dataset.keyid,
+                key: self.dataset.key,
+                catKey: self.dataset.catkey,
+                subKey: self.dataset.subkey,
+                value: self.dataset.value,
+                callback: {
+                    onConfirm: function(userid, key, value) {
+                        var args = {
+                            //isArray: false
+                        };
+                        actions.updateDBKey(userid, key, value, args, function(){
+                            addDBKey_sidebar.hide();
+                            $(e.currentTarget).find(".userkey-entry-value").html(value.value);
+                        });
+                    },
+                    onDelete: function(userid, value){
+                        var key = "qualifications";
+                        var args = {
+                            isArray: true
+                        };
+
+                        const dialog_content = {
+                            title: "Eintrag löschen",
+                            message: "Folgender Eintrag wird gelöscht: " + value.title,
+                            titleArg: "",
+                            messageArg: ""
+                        };
+                        var dialog_token = lidlRTO.objectManager.createNewObjectToken();
+                        const dialog_args = {
+                            userid: userid,
+                            callback: {
+                                onConfirm: function(res){
+                                    actions.removeDBKey(userid,key, value, args,function(){
+                                        $("#userkey" + common.escapeSelector(key)).remove();
+                                    });
+                                    lidlRTO.objectManager.removeObject(dialog_token);
+                                }
+                            }
+                        };
+                        const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                        lidlRTO.objectManager.addObject(dialog, dialog_token);
+                        dialog.openDialog();
+                    }
+                },
+            },
+        );
+        addDBKey_sidebar.show();
+    });
+
+
 });

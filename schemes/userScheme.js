@@ -25,31 +25,38 @@ var UserSchema = new Schema({
         memberId: {
             type: String,
         },
-    },
-    contactData: {
-        email: {
-            type: String,
-            trim: true,
-        },
-        phone: {
-            private: {
-                type: String,
-            },
-            work: {
-                type: String
-            },
-            custom: {
-                title: {
-                    type: String
-                },
-                number: {
-                    type: String
-                }
-            }
+        customData: {
+
         }
     },
-    customData: {
+    contactData: {
+        email: [{
+            title: {
+                type: String,
+            },
+            value: {
+                type: String,
+                trim: true,
+            },
+        }],
+        phone: [
+            {
+                title: {
+                    type: String,
+                },
+                value: {
+                    type: String
+                },
+            }
+            ],
+        customData: {
 
+        }
+    },
+    otherData: {
+        customData: {
+
+        }
     },
     hash: {
         type: String,
@@ -90,7 +97,7 @@ var UserSchema = new Schema({
     createdDate: {
         type: Date,
         default: Date.now
-    }
+    },
 });
 
 UserSchema.post('save', function(error, doc, next) {
