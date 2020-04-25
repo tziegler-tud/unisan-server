@@ -1,14 +1,26 @@
 (function (common,$,undefined) {
 
+    var sidebar;
+
     common.Sidebar = function(parentId, content){
 
         this.sidebarHTML = createHTML(this, content);
         this.parent = $('#'+ parentId);
         this.parent.append(this.sidebarHTML);
 
+
+
         this.isActive = false;
 
+        this.currentState = {
+            activeElement: null,
+
+        };
+
+
         var self = this;
+
+        sidebar = this;
 
         return this;
     };
@@ -264,38 +276,75 @@
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-addUserKey.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-addGeneralDataKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
 
-                var catKey = "";
+                var catKey = args.catKey;
                 var key = "";
 
+                var r = document.getElementById("userkey-key");
+                var q = document.getElementById("userkey-category");
+                var v = document.getElementById("userkey-value");
+                let doc = res.dataset.user.categories;
                 registerBackButton(self, ".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function () {
-                    var r = document.getElementById("userkey-key");
                     var key = catKey + "." + r.value;
                     var funcArgs = {
-                        isArray: r.options[r.selectedIndex].dataset.isarray
+                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                        noIndex: true
                     };
                     var val = {
-                        value: document.getElementById("userkey-value").value,
-                        title: "TestTitle2",
+                        value: v.value,
+                        title: r.options[r.selectedIndex].dataset.title
                     };
+                    if (sidebar.currentState.customEntryActive) {
+                        val = {
+                            value: v.value,
+                            title: document.getElementById("custom-type").value,
+                        };
+                    }
+
+
                     onConfirm(userId, key, val, funcArgs);
                 }.bind(args));
-                var q = document.getElementById("userkey-category");
-                let doc = res.dataset.user.categories;
-                q.addEventListener("change", function(e){
-                    populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
-                        createNewEntry: true,
-                    });
-                    catKey = q.options[q.selectedIndex].value;
+
+                // set current category
+                setCurrentUserKey(q,catKey);
+                // populate
+                populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                    createNewEntry: {
+                        enabled: true,
+                        callback: {
+                            onEnabled: function() {
+                                sidebar.currentState.customEntryActive = true;
+                            },
+                            onDisabled: function() {
+                                sidebar.currentState.customEntryActive = false;
+                            },
+                        }
+                    },
+                    val: ""
                 });
-                // Apply onchange function initially
-                var event = new Event('change');
-                q.dispatchEvent(event);
+
+                if (catKey === undefined) {
+                    catKey = q.options[q.selectedIndex].value;
+                }
+
+                r.addEventListener("change", function(e){
+                    var tmpKey = catKey + "." + r.value;
+                    var val = findExistingValues(context.exploreUser,tmpKey);
+                    if (val !== undefined) {
+                        v.value = val.value;
+                        v.html = val.value;
+                    }
+                    else {
+                        v.value = "";
+                        v.html = "";
+                    }
+                });
+
             });
         };
     };
@@ -415,6 +464,7 @@
         var catKey = args.catKey;
         var subKey = args.subKey;
         var value = args.value;
+        var isCustomEntry = args.isCustomEntry;
         var onConfirm = args.callback.onConfirm;
         var onDelete = args.callback.onDelete;
 
@@ -441,13 +491,30 @@
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
 
+                var q = document.getElementById("userkey-category");
+                var r = document.getElementById("userkey-key");
+                var v = document.getElementById("userkey-value");
+                let doc = res.dataset.user.categories;
+
                 registerBackButton(self, ".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
-                    data = {
-                        id: keyId,
-                        value: document.getElementById("userkey-value").value
+                    var funcArgs = {
+                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                        noIndex: true
                     };
-                    onConfirm(args.userid, key, data);
+                    var val = {
+                        id: keyId,
+                        value: v.value,
+                        title: r.options[r.selectedIndex].dataset.title,
+                    };
+                    if (sidebar.currentState.customEntryActive) {
+                        val = {
+                            id: keyId,
+                            value: v.value,
+                            title: document.getElementById("custom-type").value,
+                        };
+                    }
+                    onConfirm(args.userid, key, val);
                 }.bind(args));
 
                 registerButton (self, ".sidebar-delete", function(){
@@ -461,15 +528,26 @@
                     onDelete(args.userid, key, data);
                 });
 
-
-                var q = document.getElementById("userkey-category");
-                var r = document.getElementById("userkey-key");
-                let doc = res.dataset.user.categories;
                 q.addEventListener("change", function(e){
                     populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
-                        createNewEntry: true,
+                        createNewEntry: {
+                            enabled: true,
+                            callback: {
+                                onEnabled: function() {
+                                    sidebar.currentState.customEntryActive = true;
+                                },
+                                onDisabled: function() {
+                                    sidebar.currentState.customEntryActive = false;
+                                },
+                            }
+                        },
                         filter: {
                             value: subKey
+                        },
+                        isCustomEntry: isCustomEntry,
+                        findExistingEntries: {
+                            doc: context.exploreUser,
+                            key: key,
                         },
                         value: value,
                     });
@@ -575,20 +653,12 @@
         var onDelete = args.callback.onDelete;
 
         var res = {dataset: {}};
+        res.exploreUser = args.user;
         var corrupted = false;
-
-        getDataFromServer("/unisams/usermod/"+ userId,function(context){
-            res.exploreUser = context;
-            if (res.dataset.user){
-                action(res)
-            }
-        });
 
         getDataFromServer("/unisams/dataset/user/getCategories", function(context){
             res.dataset.user = context;
-            if (res.exploreUser){
-                action(res);
-            }
+            action(res);
         });
 
         var action = function(context) {
@@ -1137,7 +1207,9 @@
         //find selected category
         var current = doc.find(element => element._id === compareValue);
         getDataFromServer("/unisams/dataset/user/getChildren/" + current._id, function (context) {
-            var userkeyObject = document.getElementById("userkey-key");
+            let userkeyObject = document.getElementById("userkey-key");
+            let uservalueObject = document.getElementById("userkey-value");
+            let customTypeObject = document.getElementById("custom-type");
             // remove existing options
             userkeyObject.options.length = 0;
             //add available options for selected type
@@ -1152,28 +1224,57 @@
                 userkeyObject.options[index] = option;
             });
             if (args.createNewEntry) {
-                // create delimiter
-                const delimiter = createSelectDelimiter();
-                userkeyObject.add(delimiter);
-
-                // add option to create new key
-                const option = document.createElement('option');
-                option.value = "customData";
-                option.innerHTML = "Neu anlegen...";
-                option.dataset.isarray = "true";
-                userkeyObject.add(option);
-
-                //detect if this selected
-                userkeyObject.addEventListener("change", function (e) {
-                    if (this.value === "customData") {
-                        sidebar.enableOptional(".ak-customType");
-                    } else {
-                        sidebar.disableOptional(".ak-customType");
+                let data = args.createNewEntry;
+                if (typeof(data)!=='object') {
+                    data = {};
+                    data.enabled = true;
+                    data.callback = {
+                        onEnabled: function(){},
+                        onDisabled: function(){}
                     }
-                });
-                // fire "change" event once to catch case where no other options is present
-                var event = new Event('change');
-                userkeyObject.dispatchEvent(event);
+                }
+                if (data.enabled) {
+                    // create delimiter
+                    const delimiter = createSelectDelimiter();
+                    userkeyObject.add(delimiter);
+
+                    // add option to create new key
+                    const option = document.createElement('option');
+                    option.value = "customData";
+                    option.innerHTML = "Neu anlegen...";
+                    option.dataset.isarray = "true";
+                    userkeyObject.add(option);
+
+                    //detect if this selected
+                    userkeyObject.addEventListener("change", function (e) {
+                        if (this.value === "customData") {
+                            sidebar.enableOptional(".ak-customType");
+                            data.callback.onEnabled();
+                        } else {
+                            sidebar.disableOptional(".ak-customType");
+                            data.callback.onDisabled();
+                        }
+                    });
+                    // fire "change" event once to catch case where no other options is present
+                    var event = new Event('change');
+                    userkeyObject.dispatchEvent(event);
+                }
+            }
+
+            if (args.findExistingEntries) {
+                let data = args.findExistingEntries;
+                let val = findExistingValues(data.doc, data.key);
+                if (val !== undefined) {
+                    if (args.isCustomEntry) {
+                        customTypeObject.value = val.title;
+                        customTypeObject.innerHTML = val.title;
+                        val = val.value;
+                    }
+                    uservalueObject.value = val.value;
+                    uservalueObject.innerHTML = val.value;
+                }
+                // handle custom entries
+
             }
             if (args.filter) {
                 var filter = args.filter;
@@ -1185,15 +1286,13 @@
                 $(userkeyObject).children('option').filter(function (i, e) {
                     return e.getAttribute(filter.key) === filter.value;
                 }).attr('selected', true);
+                userkeyObject.dispatchEvent(new Event("change"));
             }
-            var uservalueObject;
 
             if (args.value) {
-                uservalueObject = document.getElementById("userkey-value");
                 uservalueObject.value = args.value;
             }
             if (args.html) {
-                uservalueObject = document.getElementById("userkey-value");
                 uservalueObject.innerHTML = args.html; // clear existing
             }
         });
@@ -1220,6 +1319,16 @@
     /**
      * helpers
      */
+
+    var findExistingValues = function(doc, key) {
+        const val = common.refJSON(doc,key);
+        if (val){
+            // if key refers to array, do not find values.
+            if (Array.isArray(val)) return undefined;
+            else return val;
+        }
+        else return undefined;
+    };
 
     /**
      *

@@ -264,7 +264,9 @@ $(document).ready (function () {
                     key: self.dataset.key,
                     catKey: self.dataset.catkey,
                     subKey: self.dataset.subkey,
+                    combinedKey: self.dataset.combinedkey,
                     value: self.dataset.value,
+                    isCustomEntry: self.dataset.iscustomentry,
                     callback: {
                         onConfirm: function (userid, key, value) {
                             var args = {
@@ -273,7 +275,9 @@ $(document).ready (function () {
                             actions.updateDBKey(userid, key, value, args, function () {
                                 addDBKey_sidebar.hide();
                                 $(e.currentTarget).find(".userkey-entry-value").html(value.value);
+                                $(e.currentTarget).find(".userkey-entry-title").html(value.title);
                                 e.currentTarget.dataset.value = value.value;
+                                e.currentTarget.dataset.title = value.title;
                             });
                         },
                         onDelete: function (userid, key, data) {
@@ -371,18 +375,14 @@ $(document).ready (function () {
             var keyId = self.dataset.keyid;
             var key = self.dataset.key;
 
-            //find key in json
-            function ref(obj, str) {
-                return str.split(".").reduce(function(o, x) { return o[x] }, obj);
-            }
-
-            var field = ref(user, key);
+            var field = common.refJSON(user, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
                     userid: userid,
                     key: key,
                     catKey: self.dataset.catkey,
                     field: field,
+                    user: user,
                     callback: {
                         onConfirm: function (userid, key, value) {
                             var args = {

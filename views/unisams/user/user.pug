@@ -43,8 +43,8 @@ block content
                                         li.user-entry(id= "userId"+ user.id data-userid= user.id)
                                             a.inner()
                                                 .item-property= user.username
-                                                .item-property= user.generalData.firstName
-                                                .item-property= user.generalData.lastName
+                                                .item-property= user.generalData.firstName.value
+                                                .item-property= user.generalData.lastName.value
                                                 .clear
                                         //.icon-reset.before-icon(onclick="transformUser('" + user.id + "')")
                                     a.useredit-addUserBtn.btn-addItem.btn-listExt(href="user/addUser")

@@ -94,7 +94,7 @@ block content
 
                             .sec-heading-label.userprofile-heading
                                 .userprofile-heading-container
-                                    h3=exploreUser.generalData.firstName + " " + exploreUser.generalData.lastName
+                                    h3=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
                                     .userprofile-dropdown.dropdown-menu
                                         .dropdown-btn
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
@@ -132,6 +132,7 @@ block content
                                                 div
                                                     ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
                                                         - var combinedKey = "username"
+                                                        - var title = "Nutzername"
                                                         - var value = exploreUserDocument.username
                                                         li.user-entry.username-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
                                                             a.inner()
@@ -139,6 +140,17 @@ block content
                                                                     span= title
                                                                 .item-property.userkey-entry-value
                                                                     span= value
+                                                                .clear
+                                                        - var combinedKey = "id"
+                                                        - var title = "id"
+                                                        - var value = exploreUser.id
+                                                        li.user-entry.noSelect.cursor-default(id="userkey-" +combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                            a.inner()
+                                                                .item-property.userkey-entry-title
+                                                                    span= title
+                                                                .item-property.userkey-entry-value.has-tooltip.cursor-notAllowed
+                                                                    span= value
+                                                                    span.tooltip Id kann nicht verändert werden.
                                                                 .clear
 
                                             .userinfo-section
@@ -150,18 +162,35 @@ block content
                                                             - var secKey = "generalData"
                                                             - var secVal = exploreUserDocument.generalData
                                                             each val, key in secVal
-                                                                - var title = key
+                                                                - var title = val.title
                                                                 - var combinedKey = secKey + "." + key
-                                                                - var value = val
-                                                                li.user-entry.userkey-entry(id="uuserkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-subkey=key, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                    a.inner()
-                                                                        .item-property.userkey-entry-title
-                                                                            span= title
-                                                                        .item-property.userkey-entry-value
-                                                                            span= value
-                                                                        .clear
+                                                                - var value = val.value
+                                                                if (!Array.isArray(val))
+                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-title=title, data-catkey=secKey, data-subkey=key, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                        a.inner()
+                                                                            .item-property.userkey-entry-title
+                                                                                span= title
+                                                                            .item-property.userkey-entry-value
+                                                                                span= value
+                                                                            .clear
+                                                            if exploreUserDocument.generalData.customData
+                                                                - var subKey = 'customData'
+                                                                - var subsecKey = secKey + '.' + subKey
+                                                                - var subsecVal = exploreUserDocument.generalData.customData
+                                                                each val, key in subsecVal
+                                                                    - var title = val.title
+                                                                    - var combinedKey = subsecKey + "." + key
+                                                                    - var value = val.value
+                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-title=title, data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
+                                                                        a.inner()
+                                                                            .item-property.userkey-entry-title
+                                                                                span= title
+                                                                            .item-property.userkey-entry-value
+                                                                                span= value
+                                                                            .clear
+
                                                 .userinfo-item.useredit-item.useredit-addItem
-                                                    .useredit-addContactItemBtn.btn-addItem(data-catkey=secKey)
+                                                    .useredit-addGeneralItemBtn.btn-addItem(data-catkey=secKey)
                                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                         span Hinzufügen
                                                         .clear
@@ -178,7 +207,7 @@ block content
                                                                 - var title = val.title
                                                                 - var combinedKey = secKey + "." + key
                                                                 - var value = val.value
-                                                                li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=title, data-value=value)
+                                                                li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=title, data-value=value)
                                                                     a.inner()
                                                                         .item-property.userkey-entry-title
                                                                             span= title
@@ -192,30 +221,35 @@ block content
                                                         .clear
 
                                             .userinfo-section
+
                                                 .userinfo-sectionheader
                                                     span weitere Daten
                                                 div
-                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
-                                                        if exploreUserDocument.customData
-                                                            - var secKey = "customData"
-                                                            - var secVal = exploreUserDocument.customData
-                                                            each val, key in exploreUserDocument.customData
-                                                                - var title = val
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val
-                                                                li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                    a.inner()
-                                                                        .item-property.userkey-entry-title
-                                                                            span= title
-                                                                        .item-property.userkey-entry-value
-                                                                            span= value
-                                                                        .clear
+                                                    if exploreUserDocument.otherData
+                                                        - var secKey = "otherData"
+                                                        - var secVal = exploreUserDocument.otherData
+                                                        ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
 
-                                                .userinfo-item.useredit-item.useredit-addItem
-                                                    .useredit-addItemBtn.btn-addItem(data-catkey=secKey)
-                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                                        span Hinzufügen
-                                                        .clear
+                                                            if exploreUserDocument.otherData.customData
+                                                                - var subKey = 'customData'
+                                                                - var subsecKey = secKey + '.' + subKey
+                                                                each val, key in exploreUserDocument.otherData.customData
+                                                                    - var combinedKey = subsecKey + "." + key
+                                                                    - var title = val.title
+                                                                    - var value = val.value
+                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey= subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
+                                                                        a.inner()
+                                                                            .item-property.userkey-entry-title
+                                                                                span= title
+                                                                            .item-property.userkey-entry-value
+                                                                                span= value
+                                                                            .clear
+
+                                                    .userinfo-item.useredit-item.useredit-addItem
+                                                        .useredit-addGeneralItemBtn.btn-addItem(data-catkey=secKey)
+                                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                            span Hinzufügen
+                                                            .clear
 
                                         #tab-userinfo-qualification.userinfo-inner
                                             .userinfo-section
@@ -234,7 +268,7 @@ block content
                                                                 - var title = val
                                                                 - var combinedKey = secKey + "." + key
                                                                 - var value = val
-                                                                li.user-entry.quallist-entry(id= "qualId" + val.id, data-qualificationId=val.id, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                li.user-entry.quallist-entry(id= "qualId" + val.id, data-qualificationId=val.id, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
                                                                     a.inner()
                                                                         .item-property= val.qualification.qualType
                                                                         .item-property= val.qualification.name

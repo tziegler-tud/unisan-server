@@ -23,7 +23,7 @@
                     <div class="ak-form">
                         <div class="ak-item ak-cat">
                             <label for="userkey-category">Kategorie</label>
-                            <select class="common-select" id="userkey-category" name="userkey-category">
+                            <select class="common-select" id="userkey-category" name="userkey-category" disabled>
                                 {{#each dataset.user.categories}}
                                     <option value="{{this.key}}" data-datasetId="{{this._id}}">{{this.title}}</option>
                                 {{/each}}
