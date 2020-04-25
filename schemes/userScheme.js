@@ -14,20 +14,47 @@ var UserSchema = new Schema({
         trim: true
     },
     generalData: {
+        //TODO: create db getter
         firstName: {
-            type: String,
-            required: true
+            title: {
+                type: String,
+                required: true
+            },
+            value: {
+                type: String,
+                required: true
+            },
         },
         lastName: {
-            type: String,
-            required: true
+            title: {
+                type: String,
+                required: true
+            },
+            value: {
+                type: String,
+                required: true
+            },
         },
         memberId: {
-            type: String,
+            title: {
+                type: String,
+                required: true
+            },
+            value: {
+                type: String,
+            },
         },
-        customData: {
+        customData: [
+            {
+                title: {
+                    type: String,
+                },
+                value: {
+                    type: String,
+                }
+            }
 
-        }
+        ],
     },
     contactData: [{
         type: {
@@ -45,9 +72,16 @@ var UserSchema = new Schema({
         },
     }],
 
-    otherData: [{
-
-    }],
+    otherData: {
+        customData: [{
+            title: {
+                type: String,
+            },
+            value: {
+                type: String,
+            }
+        }]
+    },
     hash: {
         type: String,
         required: true,
