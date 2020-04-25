@@ -25,13 +25,24 @@ auth = function(req, res, next){
 };
 
 
+// routes
+
+router.get('/',  auth, getAll);
+router.get('/addUser', auth, addUser);
+router.get('/:username', auth, viewUser);
+router.get('/:username/editUser', auth, editUser);
+
+
+
+module.exports = router;
+
 /* GET home page. */
-router.get('/', auth, function(req, res, next) {
+function getAll(req, res, next) {
     var userList = {};
     userService.getAll()
         .then(users => {
             userList = users;
-            res.render("unisams/user", {title: "user managment - uniSams",
+            res.render("unisams/user/user", {title: "user managment - uniSams",
                 user: req.user._doc,
                 userList: userList
             })
@@ -39,19 +50,16 @@ router.get('/', auth, function(req, res, next) {
         .catch(err => {
             next(err);
         })
-});
+}
 
-router.get('/addUser', auth, function(req, res, next) {
-
+function addUser(req, res, next) {
     res.render("unisams/user/addUser", {
         title: "create user - uniSams",
         user: req.user._doc
     })
+}
 
-});
-
-
-router.get("/:username", auth, function(req, res, next) {
+function viewUser(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
@@ -65,17 +73,31 @@ router.get("/:username", auth, function(req, res, next) {
                     refurl: req.params.username
                 })
             }
-            else res.send("user not found");
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
         })
         .catch(err => next(err));
 
-});
+}
 
-router.get("/:username/editUser", auth, function(req, res, next) {
+
+function editUser(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
-                res.render("unisams/user/edit", {
+                res.render("unisams/user/editUser", {
                     user: req.user._doc,
                     title: user.username,
                     exploreUser: user,
@@ -83,15 +105,22 @@ router.get("/:username/editUser", auth, function(req, res, next) {
                     refurl: req.params.username
                 })
             }
-            else res.send("user not found");
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
         })
         .catch(err => next(err));
-
-});
-
+}
 
 
-
-
-
-module.exports = router;

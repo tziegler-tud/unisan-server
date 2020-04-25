@@ -2,10 +2,10 @@ extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    script(src="/static/unisams/js/userprofile.js")
-    script(src="/static/unisams/js/viewUser.js")
+    script(src="/static/unisams/js/userprofile/userprofile.js")
+    script(src="/static/unisams/js/userprofile/viewUser.js")
+    script(src="/static/unisams/js/userprofile/updateUser.js")
     script(src="/static/unisams/js/actions.js")
-    script(src="/static/unisams/js/updateUser.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
@@ -144,40 +144,42 @@ block content
                                             .userinfo-section
                                                 .userinfo-sectionheader
                                                     span Kontaktdaten
-
-                                                if exploreUserDocument.contactData
-                                                    - var secKey = "contactData"
-                                                    - var secVal = exploreUserDocument.contactData
-                                                    if secVal.email
-                                                        - var subsecKey = secKey + ".email"
-                                                        - var subsecVal = secVal.email
-                                                        each val, key in subsecVal
-                                                            - var title = (val.title ? 'Email ('+val.title + ')' : "")
-                                                            - var combinedKey = subsecKey + "." + key
-                                                            - var value = val.value
-                                                            .userinfo-item
-                                                                span.userinfo-item-label.userinfo-attribute-name= title
-                                                                span.userinfo-item-label= value
-
-                                                if secVal.phone
-                                                    - var subsecKey = secKey + ".phone"
-                                                    - var subsecVal = secVal.phone
-                                                    each val, key in subsecVal
-                                                        - var title = (val.title ? 'Email ('+val.title + ')' : "")
-                                                        - var combinedKey = subsecKey + "." + key
-                                                        - var value = val.value
-                                                        .userinfo-item
-                                                            span.userinfo-item-label.userinfo-attribute-name= val
-                                                            span.userinfo-item-label= value
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
+                                                        if exploreUserDocument.contactData
+                                                            - var secKey = "contactData"
+                                                            - var secVal = exploreUserDocument.contactData
+                                                            each val, key in secVal
+                                                                - var title = (val.title)
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val.value
+                                                                li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
 
                                             .userinfo-section
                                                 .userinfo-sectionheader
                                                     span weitere Daten
-                                                if exploreUserDocument.customData
-                                                    each val, key in exploreUserDocument.customData
-                                                        .userinfo-item
-                                                            span.userinfo-item-label.userinfo-attribute-name= key
-                                                            span.userinfo-item-label=val
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
+                                                        if exploreUserDocument.customData
+                                                            - var secKey = "customData"
+                                                            - var secVal = exploreUserDocument.customData
+                                                            each val, key in exploreUserDocument.customData
+                                                                - var title = val
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val
+                                                                li.user-entry.userkey-entry()
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
 
                                         #tab-userinfo-qualification.userinfo-inner
                                             .userinfo-section
@@ -201,14 +203,3 @@ block content
                                             .userinfo-section
                                                 .userinfo-sectionheader
                                                     span Rollen
-
-                            #profilemanagment-menu.subpage-menu
-                                #btn01.subpage-menu-btn
-                                    a.content-link.style2.float(href="/unisams/user")
-                                        svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left") <polyline points="15 18 9 12 15 6"></polyline></svg>
-                                        span Zurück
-
-
-
-
-

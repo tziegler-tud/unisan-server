@@ -31,12 +31,32 @@
                 showAddUserContent(self,args);
                 break;
 
+            case "UserChangeUsername":
+                showUpdateUsernameContent(self, args);
+                break;
+
             case "UserAddDBKey":
                 showInsertUserKeyContent(self, args);
                 break;
 
+            case "UserAddContactDataKey":
+                showInsertContactDataKeyContent(self, args);
+                break;
+
+            case "UserAddGeneralDataKey":
+                showInsertGeneralDataKeyContent(self, args);
+                break;
+
             case "UserUpdateDBKey":
                 showUpdateUserKeyContent(self, args);
+                break;
+
+            case "UserUpdateContactKey":
+                showUpdateContactDataKeyContent(self, args);
+                break;
+
+            case "UserViewDBKey":
+                showViewUserKeyContent(self, args);
                 break;
 
             case "UserAddQualification":
@@ -123,7 +143,7 @@
         var userid = args.userid;
 
         getDataFromServer("/unisams/usermod/"+userid,function(context){
-            $.get('/static/unisams/js/templates/sidebar-user.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-user.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
@@ -134,7 +154,7 @@
     var showAddUserContent = function(self, args){
         var context = {};
         var onConfirm = args.callback.onConfirm;
-        $.get('/static/unisams/js/templates/sidebar-addUser.hbs', function (data) {
+        $.get('/static/unisams/js/sidebar/templates/sidebar-addUser.hbs', function (data) {
             var template = Handlebars.compile(data);
             self.sidebarHTML.html(template(context));
             registerBackButton(self,".sidebar-back-btn");
@@ -151,7 +171,7 @@
         var onConfirm = args.callback.onConfirm;
 
         getDataFromServer("/unisams/usermod/"+userid,function(context){
-            $.get('/static/unisams/js/templates/sidebar-addDBKey.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-addDBKey.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
@@ -185,7 +205,7 @@
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/templates/sidebar-addUserKey.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-addUserKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
@@ -202,7 +222,7 @@
                     };
                     var val = {
                         value: document.getElementById("userkey-value").value,
-                        title: "TestTitle",
+                        title: "TestTitle2",
                     };
                     onConfirm(userId, key, val, funcArgs);
                 }.bind(args));
@@ -217,6 +237,172 @@
                 // Apply onchange function initially
                 var event = new Event('change');
                 q.dispatchEvent(event);
+            });
+        };
+    };
+
+    var showInsertGeneralDataKeyContent = function(self, args){
+
+        var userId = args.userid;
+        var onConfirm = args.callback.onConfirm;
+        var opt = false;
+
+        var res = {dataset: {}};
+
+        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            if (res.dataset.user){
+                action(res)
+            }
+        });
+
+        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+            res.dataset.user = context;
+            if (res.exploreUser){
+                action(res);
+            }
+        });
+
+        var action = function(context) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-addUserKey.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+
+                var catKey = "";
+                var key = "";
+
+                registerBackButton(self, ".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function () {
+                    var r = document.getElementById("userkey-key");
+                    var key = catKey + "." + r.value;
+                    var funcArgs = {
+                        isArray: r.options[r.selectedIndex].dataset.isarray
+                    };
+                    var val = {
+                        value: document.getElementById("userkey-value").value,
+                        title: "TestTitle2",
+                    };
+                    onConfirm(userId, key, val, funcArgs);
+                }.bind(args));
+                var q = document.getElementById("userkey-category");
+                let doc = res.dataset.user.categories;
+                q.addEventListener("change", function(e){
+                    populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                        createNewEntry: true,
+                    });
+                    catKey = q.options[q.selectedIndex].value;
+                });
+                // Apply onchange function initially
+                var event = new Event('change');
+                q.dispatchEvent(event);
+            });
+        };
+    };
+
+    var showInsertContactDataKeyContent = function(self, args){
+
+        var userId = args.userid;
+        var onConfirm = args.callback.onConfirm;
+        var onDelete = args.callback.onDelete;
+        var catKey = args.catKey;
+        var opt = false;
+
+        var res = {dataset: {}};
+
+        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            if (res.dataset.user){
+                action(res)
+            }
+        });
+
+        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+            res.dataset.user = context;
+            if (res.exploreUser){
+                action(res);
+            }
+        });
+
+        var action = function(context) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-addContactDataKey.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+
+                registerBackButton(self, ".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function () {
+                    var r = document.getElementById("userkey-key");
+                    var key = catKey;
+                    var type = r.value;
+                    var title = r.options[r.selectedIndex].dataset.title;
+                    var funcArgs = {
+                        isArray: true
+                    };
+                    var val = {
+                        value: document.getElementById("userkey-value").value,
+                        title: title,
+                        type: type
+                    };
+                    onConfirm(userId, key, val, funcArgs);
+                }.bind(args));
+
+                registerButton (self, ".sidebar-delete", function(){
+
+                    // delete array entry
+                    data = {
+                        id: qualId,
+                        qualification: res.currentQualification.qualification,
+                    };
+                    if (corrupted) {
+                        data.qualification = {qualType: "error", name: "error"}
+                    }
+                    onDelete(args.userid, data);
+                });
+
+
+                var q = document.getElementById("userkey-category");
+                let doc = res.dataset.user.categories;
+
+                // set current category
+                setCurrentUserKey(q,catKey);
+                // populate
+                populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                    createNewEntry: true,
+                });
+            });
+        };
+    };
+
+    var showUpdateUsernameContent = function(self, args){
+
+        var userId = args.userid;
+        var key = args.key;
+        var value = args.value;
+        var onConfirm = args.callback.onConfirm;
+        var corrupted = false;
+
+        var res = {};
+
+        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            action(res)
+        });
+
+        var action = function(context) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-updateUsername.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+
+                registerBackButton(self, ".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function(){
+                    data = {
+                        value: document.getElementById("userkey-value").value
+                    };
+                    onConfirm(args.userid, key, data.value);
+                }.bind(args));
+
             });
         };
     };
@@ -250,7 +436,7 @@
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/templates/sidebar-updateUserKey.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-updateUserKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
@@ -263,13 +449,28 @@
                     };
                     onConfirm(args.userid, key, data);
                 }.bind(args));
+
+                registerButton (self, ".sidebar-delete", function(){
+
+                    // delete array entry
+                    data = {
+                        title: key
+                    };
+                    if (corrupted) {
+                    }
+                    onDelete(args.userid, key, data);
+                });
+
+
                 var q = document.getElementById("userkey-category");
                 var r = document.getElementById("userkey-key");
                 let doc = res.dataset.user.categories;
                 q.addEventListener("change", function(e){
                     populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
                         createNewEntry: true,
-                        selectKey: subKey,
+                        filter: {
+                            value: subKey
+                        },
                         value: value,
                     });
                     catKey = q.options[q.selectedIndex].value;
@@ -283,9 +484,229 @@
         };
     };
 
+    // var showUpdateContactDataKeyContent = function(self, args){
+    //
+    //     var userId = args.userid;
+    //     var keyId = args.keyId;
+    //     var key = args.key;
+    //     var catKey = args.catKey;
+    //     var value = args.value;
+    //     var title = args.title;
+    //     var type = args.type;
+    //     var onConfirm = args.callback.onConfirm;
+    //     var onDelete = args.callback.onDelete;
+    //
+    //     var res = {dataset: {}};
+    //     var corrupted = false;
+    //
+    //     getDataFromServer("/unisams/usermod/"+ userId,function(context){
+    //         res.exploreUser = context;
+    //         if (res.dataset.user){
+    //             action(res)
+    //         }
+    //     });
+    //
+    //     getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+    //         res.dataset.user = context;
+    //         if (res.exploreUser){
+    //             action(res);
+    //         }
+    //     });
+    //
+    //     var action = function(context) {
+    //         $.get('/static/unisams/js/sidebar/templates/sidebar-updateContactDataKey.hbs', function (data) {
+    //
+    //             var template = Handlebars.compile(data);
+    //             self.sidebarHTML.html(template(context));
+    //
+    //             registerBackButton(self, ".sidebar-back-btn");
+    //             registerConfirmButton(self, ".sidebar-confirm", function(){
+    //                 data = {
+    //                     id: keyId,
+    //                     type: document.getElementById("userkey-key").dataset.type,
+    //                     title: document.getElementById("userkey-key").dataset.title,
+    //                     value: document.getElementById("userkey-value").value
+    //                 };
+    //                 onConfirm(args.userid, key, data);
+    //             }.bind(args));
+    //
+    //             registerButton (self, ".sidebar-delete", function(){
+    //
+    //                 // delete array entry
+    //                 data = {
+    //                     title: key
+    //                 };
+    //                 if (corrupted) {
+    //                 }
+    //                 onDelete(args.userid, key, data);
+    //             });
+    //
+    //
+    //             var q = document.getElementById("userkey-category");
+    //             var r = document.getElementById("userkey-key");
+    //             let doc = res.dataset.user.categories;
+    //             q.addEventListener("change", function(e){
+    //                 populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+    //                     createNewEntry: true,
+    //                     filter: {
+    //                         key: "data-title",
+    //                         value: title
+    //                     },
+    //                     value: value,
+    //                 });
+    //                 catKey = q.options[q.selectedIndex].value;
+    //             });
+    //             // set current category
+    //             setCurrentUserKey(q,catKey);
+    //             // Apply onchange function initially
+    //             var event = new Event('change');
+    //             q.dispatchEvent(event);
+    //         });
+    //     };
+    // };
+
+    var showUpdateContactDataKeyContent = function(self, args){
+
+        var userId = args.userid;
+        var key = args.key;
+        var catKey = args.catKey;
+        var field = args.field;
+        var onConfirm = args.callback.onConfirm;
+        var onDelete = args.callback.onDelete;
+
+        var res = {dataset: {}};
+        var corrupted = false;
+
+        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            if (res.dataset.user){
+                action(res)
+            }
+        });
+
+        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+            res.dataset.user = context;
+            if (res.exploreUser){
+                action(res);
+            }
+        });
+
+        var action = function(context) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-updateContactDataKey.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+
+                registerBackButton(self, ".sidebar-back-btn");
+                registerConfirmButton(self, ".sidebar-confirm", function(){
+                    var r = document.getElementById("userkey-key");
+                    data = {
+                        id: field.id,
+                        type: r.options[r.selectedIndex].dataset.type,
+                        title: r.options[r.selectedIndex].dataset.title,
+                        value: document.getElementById("userkey-value").value
+                    };
+                    onConfirm(args.userid, key, data);
+                }.bind(args));
+
+                registerButton (self, ".sidebar-delete", function(){
+
+                    // delete array entry
+                    data = {
+                        title: key
+                    };
+                    if (corrupted) {
+                    }
+                    onDelete(args.userid, key, data);
+                });
+
+                let [status, msg] = checkDataValidity(field, {value: "string", title: "string", type: "string"});
+                if(status !== 0){
+                    corrupted=true;
+                    console.warn("trying to read corrupted data");
+                    self.addErrorMessage("trying to read corrupted data!\n" + msg,  function(data){
+                        $("#sidebar-inner").before(data);
+                    });
+                }
+                var q = document.getElementById("userkey-category");
+                var r = document.getElementById("userkey-key");
+                let doc = res.dataset.user.categories;
+                q.addEventListener("change", function(e){
+                    populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                        createNewEntry: true,
+                        filter: {
+                            key: "data-title",
+                            value: field.title
+                        },
+                        value: field.value,
+                    });
+                });
+                // set current category
+                setCurrentUserKey(q,catKey);
+                // Apply onchange function initially
+                var event = new Event('change');
+                q.dispatchEvent(event);
+            });
+        };
+    };
+
+    var showViewUserKeyContent = function(self, args){
+
+        var userId = args.userid;
+        var keyId = args.keyId;
+        var key = args.key;
+        var catKey = args.catKey;
+        var subKey = args.subKey;
+        var value = args.value;
+
+        var res = {dataset: {}};
+        var corrupted = false;
+
+        getDataFromServer("/unisams/user/"+ userId,function(context){
+            res.exploreUser = context;
+            if (res.dataset.user){
+                action(res)
+            }
+        });
+
+        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+            res.dataset.user = context;
+            if (res.exploreUser){
+                action(res);
+            }
+        });
+
+        var action = function(context) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-viewUserKey.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                self.sidebarHTML.html(template(context));
+
+                registerBackButton(self, ".sidebar-back-btn");
+                var q = document.getElementById("userkey-category");
+                var r = document.getElementById("userkey-key");
+                var v = document.getElementById("userkey-value");
+                let doc = res.dataset.user.categories;
+                // set current category
+                setCurrentUserKey(q,catKey);
+                // Apply onchange function initially
+                populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
+                    filter: {
+                        value: subKey
+                    },
+                    html: value,
+                    disabled: false,
+                });
+                // disable inputs
+                disableViewBox([q,r]);
+            });
+        };
+    };
+
     var showInsertUserQualificationContent = function(self, args){
 
         var userId = args.userid;
+        var catKey = args.catKey;
         var onConfirm = args.callback.onConfirm;
 
         var res = {qualifications: {}};
@@ -304,19 +725,20 @@
             }
         });
         var action = function(context){
-            $.get('/static/unisams/js/templates/sidebar-addUserQualification.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-addUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
                     const id = document.getElementById("qual-name").selectedOptions[0].id;
+                    var key = catKey;
                     data = {
                         qualification: findQualByIdInTypeArray(res.qualifications.byType, id),
                         acquiredDate: $("#qual-acquiredDate").val(),
                         expireDate: $("#qual-expireDate").val(),
                         trainingDate: $("#qual-trainingDate").val(),
                     };
-                    onConfirm(args.userid, data);
+                    onConfirm(args.userid, key, data);
                 }.bind(args));
                 var q = $("#qual-type");
                 q.on("change",function(e){
@@ -355,7 +777,7 @@
         });
 
         var action = function(context){
-            $.get('/static/unisams/js/templates/sidebar-viewUserQualification.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-viewUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
@@ -380,6 +802,8 @@
     var showUpdateUserQualificationContent = function(self, args){
 
         var userId = args.userid;
+        var key = args.key;
+        var keyId = args.keyId;
         var qualId = args.qualificationId;
         var onConfirm = args.callback.onConfirm;
         var onDelete = args.callback.onDelete;
@@ -404,7 +828,7 @@
         });
 
         var action = function(context){
-            $.get('/static/unisams/js/templates/sidebar-updateUserQualification.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-updateUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
@@ -413,26 +837,26 @@
                     //helper to find qualification document in groupByType array
                     const id = document.getElementById("qual-name").selectedOptions[0].id;
                     data = {
-                        id: qualId,
+                        id: keyId,
                         qualification: findQualByIdInTypeArray(res.qualifications.byType, id),
                         acquiredDate: $("#qual-acquiredDate").val(),
                         expireDate: $("#qual-expireDate").val(),
                         trainingDate: $("#qual-trainingDate").val(),
                     };
-                    onConfirm(args.userid, data);
+                    onConfirm(args.userid, key, data);
                 }.bind(args));
 
                 registerButton (self, ".sidebar-delete", function(){
 
                     // delete array entry
                     data = {
-                        id: qualId,
+                        id: keyId,
                         qualification: res.currentQualification.qualification,
                     };
                     if (corrupted) {
                         data.qualification = {qualType: "error", name: "error"}
                     }
-                    onDelete(args.userid, data);
+                    onDelete(args.userid, key, data);
                 });
 
                 if(!populateCurrentQualificationDefault(self, res.qualifications.byType, res.currentQualification.qualification)){
@@ -488,7 +912,7 @@
 
         var action = function(context){
             var opt = false;
-            $.get('/static/unisams/js/templates/sidebar-updateQualification.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-updateQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
@@ -568,7 +992,7 @@
 
         var action = function(context){
             var opt = false;
-            $.get('/static/unisams/js/templates/sidebar-createQualification.hbs', function (data) {
+            $.get('/static/unisams/js/sidebar/templates/sidebar-createQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
                 registerBackButton(self,".sidebar-back-btn");
@@ -721,11 +1145,13 @@
                 const option = document.createElement('option');
                 option.id = el._id;
                 option.value = el.key;
+                option.dataset.title = el.title;
+                option.dataset.type = el.key;
                 option.innerHTML = el.title;
                 option.dataset.isarray = el.isArray;
                 userkeyObject.options[index] = option;
             });
-            if (args.addCreateEntry) {
+            if (args.createNewEntry) {
                 // create delimiter
                 const delimiter = createSelectDelimiter();
                 userkeyObject.add(delimiter);
@@ -734,6 +1160,7 @@
                 const option = document.createElement('option');
                 option.value = "customData";
                 option.innerHTML = "Neu anlegen...";
+                option.dataset.isarray = "true";
                 userkeyObject.add(option);
 
                 //detect if this selected
@@ -744,13 +1171,30 @@
                         sidebar.disableOptional(".ak-customType");
                     }
                 });
+                // fire "change" event once to catch case where no other options is present
+                var event = new Event('change');
+                userkeyObject.dispatchEvent(event);
             }
-            if (args.selectKey) {
-                setCurrentUserKey(userkeyObject, args.selectKey);
+            if (args.filter) {
+                var filter = args.filter;
+                if (!filter.key) filter.key = "value";
+                if (!filter.value) {
+                    console.error("Missing required field: filter.value.");
+                    return;
+                }
+                $(userkeyObject).children('option').filter(function (i, e) {
+                    return e.getAttribute(filter.key) === filter.value;
+                }).attr('selected', true);
             }
+            var uservalueObject;
+
             if (args.value) {
-                var uservalueObject = document.getElementById("userkey-value");
+                uservalueObject = document.getElementById("userkey-value");
                 uservalueObject.value = args.value;
+            }
+            if (args.html) {
+                uservalueObject = document.getElementById("userkey-value");
+                uservalueObject.innerHTML = args.html; // clear existing
             }
         });
     };
@@ -796,10 +1240,40 @@
 
     };
 
-
-
+    /**
+     *
+     * @param field
+     * @param dataset
+     * @returns {Object}
+     */
+    var checkDataValidity = function(field, dataset){
+        var errorList = [];
+        var status = 0;
+        for (let [key, value] of Object.entries(dataset)){
+            if(typeof(field[key])!==value){
+                status = 1;
+                errorList.push(key);
+            }
+        }
+        if (errorList.length > 0) {
+            var msg = "Failed to read data: " + errorList;
+            return [status, msg];
+        }
+        return [status, ""];
+    };
+    /**
+     * applies 'viewBox-disabled' class to the given elements
+     * @param elements an HTML Element or an array containing HTML Elements
+     */
+    var disableViewBox = function(elements) {
+        var func = function(el) {
+            el.disabled = true;
+            el.classList.add("viewBox-disabled");
+        };
+        if(Array.isArray(elements)){
+            elements.forEach(el=>func(el))
+        }
+        else func(elements)
+    };
     return common.Sidebar;
-
-
-
 }(window.common = window.common || {}, jQuery));

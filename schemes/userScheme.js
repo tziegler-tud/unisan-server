@@ -29,35 +29,25 @@ var UserSchema = new Schema({
 
         }
     },
-    contactData: {
-        email: [{
-            title: {
-                type: String,
-            },
-            value: {
-                type: String,
-                trim: true,
-            },
-        }],
-        phone: [
-            {
-                title: {
-                    type: String,
-                },
-                value: {
-                    type: String
-                },
-            }
-            ],
-        customData: {
+    contactData: [{
+        type: {
+            // email, phone, etc...
+            type: String,
+        },
+        title: {
+            type: String,
+        },
+        annotation: {
+            type: String,
+        },
+        value: {
 
-        }
-    },
-    otherData: {
-        customData: {
+        },
+    }],
 
-        }
-    },
+    otherData: [{
+
+    }],
     hash: {
         type: String,
         required: true,

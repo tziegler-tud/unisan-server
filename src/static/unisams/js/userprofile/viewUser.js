@@ -24,5 +24,24 @@ $(document).ready (function () {
         addDBKey_sidebar.show();
     });
 
+    // $(".userkey-entry").on("click", function(e) {
+    //     e.preventDefault();
+    //     var self = this;
+    //
+    //     addDBKey_sidebar.addContent('UserViewDBKey', {
+    //             userid: userid,
+    //             keyId: self.dataset.keyid,
+    //             key: self.dataset.key,
+    //             catKey: self.dataset.catkey,
+    //             subKey: self.dataset.subkey,
+    //             value: self.dataset.value,
+    //             callback: {
+    //
+    //             },
+    //         },
+    //     );
+    //     addDBKey_sidebar.show();
+    // });
+
 
 });

@@ -8,7 +8,6 @@ var fs = require('fs-extra');
 
 const upload = require(appRoot + "/config/multer");
 
-
 router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, next){
     userService.getById(req.params.id)
         .then(user => {
@@ -28,6 +27,7 @@ router.get('/current', getCurrent);
 router.get('/getByName/:username', getByName);
 router.get('/:id', getById);
 router.put('/:id', update);
+router.post('/getKey/:id', getKey);
 router.put('/updateKey/:id', updateKey);
 router.delete('/deleteKey/:id', deleteKey);
 router.delete('/:id', _delete);
@@ -74,18 +74,29 @@ function update(req, res, next) {
       .catch(err => next(err));
 }
 
+function getKey(req, res, next) {
+    userService.getKey(req.params.id, req.body.key)
+        .then(() => res.json({}))
+        .catch(err => next(err));
+}
+
 function updateKey(req, res, next) {
-    userService.updateKey(req.params.id, req.body)
+    userService.updateKey(req.params.id, req.body.key, req.body.value, req.body.args)
         .then(() => res.json({}))
         .catch(err => next(err));
 }
 
 function deleteKey(req, res, next) {
-    if(!req.body.key){
+    if(req.body.isArray){
+        userService.deleteArrayElement(req.params.id, req.body.key, req.body.args)
+            .then(() => res.json({}))
+            .catch(err => next(err));
     }
-    userService.deleteKey(req.params.id, req.body)
-        .then(() => res.json({}))
-        .catch(err => next(err));
+    else {
+        userService.deleteKey(req.params.id, req.body.key, req.body.args)
+            .then(() => res.json({}))
+            .catch(err => next(err));
+    }
 }
 
 function _delete(req, res, next) {

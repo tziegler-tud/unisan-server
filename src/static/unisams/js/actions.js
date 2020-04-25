@@ -41,20 +41,21 @@ common = window.common;
         });
     };
 
-    actions.removeDBKey = function(userid, keyIdentifier, args, callback){
+    actions.removeDBKey = function(userid, keyIdentifier, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var data = {
             key: keyIdentifier,
+            value: value,
+            isArray: args.isArray
         };
-
-        if(args) for(var k in args) data[k]=args[k];
 
         $.ajax({
             url: "/unisams/usermod/deleteKey/" + userid,
             // make put for safety reasons :-)
             type: 'DELETE',
+            contentType: "application/json; charset=UTF-8",
             dataType: 'json',
-            data: data,
+            data: JSON.stringify(data),
             success: function(result) {
                 callback();
             }
@@ -65,17 +66,16 @@ common = window.common;
         callback = (callback == null) ? function(){} : callback;
         var data = {
             key: keyIdentifier,
-            value: value
+            value: value,
+            args: args,
         };
-
-        if(args) for(var k in args) data[k]=args[k];
-
         $.ajax({
             url: "/unisams/usermod/updateKey/" + userid,
             // make put for safety reasons :-)
             type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
             dataType: 'json',
-            data: data,
+            data: JSON.stringify(data),
             success: function(result) {
                 callback()
             }
@@ -86,17 +86,16 @@ common = window.common;
         callback = (callback == null) ? function(){} : callback;
         var data = {
             key: keyIdentifier,
-            value: value
+            value: value,
+            args: args,
         };
-
-        if(args) for(var k in args) data[k]=args[k];
-
         $.ajax({
             url: "/unisams/usermod/updateKey/" + userid,
             // make put for safety reasons :-)
             type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
             dataType: 'json',
-            data: data,
+            data: JSON.stringify(data),
             success: function(result) {
                 callback();
                 window.location.reload();

@@ -17,28 +17,60 @@ function transformUser(userId){
     var user;
     getDataFromServer("/unisams/usermod/"+userId,function(context){
         user = context;
-        //build new object
-        var email = "";
-        Object.keys(user.contactData.email[0]).forEach(function(k){email = email + user.contactData.email[0][k]});
-        var data = {
-            username: user.username,
-            generalData: user.generalData,
-            contactData: {
-                email: [{
-                    title: "dienstlich",
-                    value: email,
-                }],
-            },
-        };
-        if (context.phone) {
-            if (context.phone[0].private) {
-                data.contactData.phone = [{
-                    title: "privat",
-                    value: user.contactData.phone[0].private,
-                }]
+        var array = [];
+        if(Array.isArray(user.contactData[0].email)) {
+            user.contactData[0].email.forEach(function (ob) {
+                var d = {
+                    type: "email",
+                    title: "Email",
+                    annotation: annotate(ob),
+                    value: ob.value,
+                };
+                array.push(d);
+            });
+        }
+        else {
+            if(user.contactData[0].email) {
+                var ob = user.contactData[0].email;
+                var d = {
+                    type: "email",
+                    title: "Email",
+                    annotation: annotate(ob),
+                    value: ob.value,
+                };
+                array.push(d);
             }
         }
-        if (context.customData) data.otherData = {customData: context.customData};
+        if(Array.isArray(user.contactData[0].phone)){
+            user.contactData[0].phone.forEach(function(ob){
+                var d = {
+                    type: "phone",
+                    title: "Telefon",
+                    annotation: annotate(ob),
+                    value: ob.value,
+                };
+                array.push(d);
+            });
+        }
+        else {
+            if(user.contactData[0].phone) {
+                var ob = user.contactData[0].phone;
+                var d = {
+                    type: "phone",
+                    title: "Telefon",
+                    annotation: annotate(ob),
+                    value: ob.value,
+                };
+                array.push(d);
+            }
+        }
+        function annotate(ob){
+            if (ob.title) return ob.title;
+        }
+        var data = {
+            contactData: array
+        };
+
 
         $.ajax({
             url: "/unisams/usermod/" + userId,

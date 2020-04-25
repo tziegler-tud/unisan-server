@@ -1,0 +1,54 @@
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>{{username}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="sidebar-title">
+                    <span>Eintrag hinzufügen</span>
+                </div>
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item ak-cat">
+                            <label for="userkey-category">Kategorie</label>
+                            <select class="common-select" id="userkey-category" name="userkey-category">
+                                {{#each dataset.user.categories}}
+                                    <option value="{{this.key}}" data-datasetId="{{this._id}}">{{this.title}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="ak-item ak-key">
+                            <label for="userkey-key">Name</label>
+                            <select class="common-select" id="userkey-key" name="userkey-key">
+
+                            </select>
+                        </div>
+                        <div class="ak-item ak-customType ak-optional formElement-optional">
+                            <label for="custom-type">Bezeichnung</label>
+                            <input class="common-input" id="custom-type" name="custom-type" type="text"/>
+                        </div>
+                        <div class="ak-item ak-value">
+                            <label for="userkey-value">Wert</label>
+                            <span class="common-viewBox" id="userkey-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-confirm content-link">Speichern</a>
+        </div>
+    </div>
+</div>

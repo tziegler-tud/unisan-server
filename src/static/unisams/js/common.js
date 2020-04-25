@@ -6,10 +6,6 @@
  *
  */
 
-
-
-
-
 (function (common,$,undefined) {
     var lidl = window.lidl;
     var debug = false;

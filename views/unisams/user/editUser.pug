@@ -3,10 +3,10 @@ extends ../layout
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-    script(src="/static/unisams/js/userprofile.js")
-    script(src="/static/unisams/js/editUser.js")
+    script(src="/static/unisams/js/userprofile/userprofile.js")
+    script(src="/static/unisams/js/userprofile/editUser.js")
+    script(src="/static/unisams/js/userprofile/updateUser.js")
     script(src="/static/unisams/js/actions.js")
-    script(src="/static/unisams/js/updateUser.js")
     script(src="/static/unisams/js/transformToNewScheme.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
@@ -126,53 +126,45 @@ block content
                                                     span Rechte und Rollen
 
                                         #tab-userinfo-general.userinfo-inner
-                                            form.userForm.userinfo-section
+                                            .userinfo-section
                                                 .userinfo-sectionheader
                                                     span unisams
-                                                .userinfo-item.useredit-item(id="useritem-username")
-                                                    span.userinfo-item-label.userinfo-attribute-name Username:
-                                                    input#userinp-username.userForm-inp(value = exploreUser.username, name="username" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="username", data-attributeval=exploreUser.username, data-dialogtitlearg="username", data-dialogbodyarg=exploreUser.username)
-                                                        span.tooltip.tt-enabled Speichern
-                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="username", data-attributeval=exploreUser.username, data-dialogtitlearg="username", data-dialogbodyarg=exploreUser.username)
-                                                        span.tooltip.tt-enabled Zurücksetzen
-                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
-                                                    .clear
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                        - var combinedKey = "username"
+                                                        - var value = exploreUserDocument.username
+                                                        li.user-entry.username-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                            a.inner()
+                                                                .item-property.userkey-entry-title
+                                                                    span= title
+                                                                .item-property.userkey-entry-value
+                                                                    span= value
+                                                                .clear
 
-                                            form.userForm.userinfo-section
+                                            .userinfo-section
                                                 .userinfo-sectionheader
                                                     span Allgemeine Daten
-                                                .userinfo-item.useredit-item(id="useritem-generalData.firstName")
-                                                    span.userinfo-item-label.userinfo-attribute-name Vorname:
-                                                    input.userForm-inp(id="userinp-generalData.firstName" value = exploreUser.generalData.firstName, name="firstName" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData.firstName", data-attributeval=exploreUser.generalData.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.generalData.firstName)
-                                                        span.tooltip.tt-enabled Speichern
-                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="generalData.firstName", data-attributeval=exploreUser.generalData.firstName, data-dialogtitlearg="firstName", data-dialogbodyarg=exploreUser.generalData.firstName)
-                                                        span.tooltip.tt-enabled Zurücksetzen
-                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
-                                                    .clear
-                                                .userinfo-item.useredit-item(id="useritem-generalData.lastName")
-                                                    span.userinfo-item-label.userinfo-attribute-name Nachname:
-                                                    input.userForm-inp(id="userinp-generalData.lastName" value= exploreUser.generalData.lastName name="lastName" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData.lastName", data-attributeval=exploreUser.generalData.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.generalData.lastName)
-                                                        span.tooltip.tt-enabled Speichern
-                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="generalData.lastName", data-attributeval=exploreUser.generalData.lastName, data-dialogtitlearg="lastName", data-dialogbodyarg=exploreUser.generalData.lastName)
-                                                        span.tooltip.tt-enabled Zurücksetzen
-                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
-                                                    .clear
-                                                .userinfo-item.useredit-item(id="useritem-generalData.memberId")
-                                                    span.userinfo-item-label.userinfo-attribute-name Mitgliedsnummer:
-                                                    input.userForm-inp(id="userinp-generalData.memberId" value= exploreUser.generalData.memberId name="memberId" type="text")
-                                                    .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="generalData.memberId", data-attributeval=exploreUser.generalData.memberId, data-dialogtitlearg="memberId", data-dialogbodyarg=exploreUser.generalData.memberId)
-                                                        span.tooltip.tt-enabled Speichern
-                                                        span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                    .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="generalData.memberId", data-attributeval=exploreUser.generalData.memberId, data-dialogtitlearg="memberId", data-dialogbodyarg=exploreUser.generalData.memberId)
-                                                        span.tooltip.tt-enabled Zurücksetzen
-                                                        span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
-                                                    .clear
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                        if exploreUserDocument.generalData
+                                                            - var secKey = "generalData"
+                                                            - var secVal = exploreUserDocument.generalData
+                                                            each val, key in secVal
+                                                                - var title = key
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val
+                                                                li.user-entry.userkey-entry(id="uuserkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-subkey=key, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
+                                                .userinfo-item.useredit-item.useredit-addItem
+                                                    .useredit-addContactItemBtn.btn-addItem(data-catkey=secKey)
+                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                        span Hinzufügen
+                                                        .clear
 
                                             .userinfo-section
                                                 .userinfo-sectionheader
@@ -182,57 +174,45 @@ block content
                                                         if exploreUserDocument.contactData
                                                             - var secKey = "contactData"
                                                             - var secVal = exploreUserDocument.contactData
-                                                            if secVal.email
-                                                                - var subKey = "email"
-                                                                - var subsecKey = secKey + "." + subKey
-                                                                - var subsecVal = secVal.email
-                                                                each val, key in subsecVal
-                                                                    - var title = (val.title ? 'Email ('+val.title + ')' : "Email")
-                                                                    - var combinedKey = subsecKey + "." + key
-                                                                    - var value = val.value
-                                                                    li.user-entry.userkey-entry(id="userinp-" + combinedKey, data-isarray= true, data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title= title
-                                                                            .item-property.userkey-entry-value= value
-                                                                            .clear
+                                                            each val, key in secVal
+                                                                - var title = val.title
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val.value
+                                                                li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=title, data-value=value)
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
+                                                .userinfo-item.useredit-item.useredit-addItem
+                                                    .useredit-addContactItemBtn.btn-addItem(data-catkey=secKey)
+                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                        span Hinzufügen
+                                                        .clear
 
-                                                                    //.userinfo-item(id="useritem-" + combinedKey)
-                                                                    //    span.userinfo-item-label.userinfo-attribute-name=title
-                                                                    //    input.userForm-inp(id="userinp-" + combinedKey, value=value, name=value, data-isArray="true", type="text")
-
-                                                            if secVal.phone
-                                                                - var subKey = "phone"
-                                                                - var subsecKey = secKey + "." + subKey
-                                                                - var subsecVal = secVal.phone
-                                                                each val, key in subsecVal
-                                                                    - var title = (val.title ? 'Telefon ('+val.title + ')' : "Telefon")
-                                                                    - var combinedKey = subsecKey + "." + key
-                                                                    - var value = val.value
-                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title= title
-                                                                            .item-property.userkey-entry-value= value
-                                                                            .clear
-
-                                            form.userForm.userinfo-section
+                                            .userinfo-section
                                                 .userinfo-sectionheader
                                                     span weitere Daten
-                                                if exploreUserDocument.customData
-                                                    each val, key in exploreUserDocument.customData
-                                                        .userinfo-item(id="useritem-"+"customData."+key)
-                                                            span.userinfo-item-label.userinfo-attribute-name= key
-                                                            input.userForm-inp(id="userinp-"+"customData."+key value= val name=key type="text")
-                                                            .useredit-saveItemBtn.useredit-actionBtn.before-icon.icon-confirm.has-tooltip.disabled(data-attributekey ="customData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
-                                                                span.tooltip.tt-enabled Speichern
-                                                                span.tooltip.tt-disabled keine Änderungen zum Speichern
-                                                            .useredit-resetItemBtn.useredit-actionBtn.before-icon.icon-cancel.has-tooltip.disabled(data-attributekey ="customData."+key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
-                                                                span.tooltip.tt-enabled Zurücksetzen
-                                                                span.tooltip.tt-disabled keine Änderungen zum Zurücksetzen
-                                                            .useredit-removeItemBtn.useredit-actionBtn.before-icon.icon-delete.has-tooltip(data-attributekey ="customData."+ key, data-attributeval=val, data-dialogtitlearg=key, data-dialogbodyarg=val)
-                                                                span.tooltip Löschen
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                        if exploreUserDocument.customData
+                                                            - var secKey = "customData"
+                                                            - var secVal = exploreUserDocument.customData
+                                                            each val, key in exploreUserDocument.customData
+                                                                - var title = val
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val
+                                                                li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
 
                                                 .userinfo-item.useredit-item.useredit-addItem
-                                                    .useredit-addItemBtn.btn-addItem
+                                                    .useredit-addItemBtn.btn-addItem(data-catkey=secKey)
                                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                         span Hinzufügen
                                                         .clear
@@ -248,8 +228,13 @@ block content
                                                                 .item-property Typ
                                                                 .item-property Bezeichnung
                                                         if exploreUserDocument.qualifications
-                                                            each val in exploreUserDocument.qualifications
-                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualificationid= val.id)
+                                                            - var secKey = "qualifications"
+                                                            - var secVal = exploreUserDocument.qualifications
+                                                            each val, key in exploreUserDocument.qualifications
+                                                                - var title = val
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val
+                                                                li.user-entry.quallist-entry(id= "qualId" + val.id, data-qualificationId=val.id, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
                                                                     a.inner()
                                                                         .item-property= val.qualification.qualType
                                                                         .item-property= val.qualification.name
@@ -257,7 +242,7 @@ block content
 
 
                                                         .userinfo-item.useredit-item.useredit-addItem
-                                                            .useredit-addQualificationBtn.btn-addItem.btn-listExt
+                                                            .useredit-addQualificationBtn.btn-addItem.btn-listExt(data-catkey=secKey)
                                                                 svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                                 span Hinzufügen
                                                                 .clear

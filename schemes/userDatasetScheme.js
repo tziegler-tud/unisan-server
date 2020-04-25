@@ -11,6 +11,7 @@ var UserDatasetSchema = new Schema({
     },
     key: {
         type: String,
+        required: true,
     },
     isArray: {
         type: Boolean,

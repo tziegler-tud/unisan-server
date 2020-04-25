@@ -706,6 +706,12 @@ select.common-select {
     }
 }
 
+select:disabled{
+    background-color: #CCC;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 .common-submit {
     display: block;
     border: 1px solid #555;
@@ -729,7 +735,6 @@ select.common-select {
     overflow: hidden;
     .transition(max-height, 1000ms);
 
-
     &.optional-enabled {
         max-height: 100vh;
         .transition(max-height, 2000ms);
@@ -742,6 +747,8 @@ common list stylings
 
 ul.itemlist {
     list-style: none;
+    padding-left: 0;
+    margin-left: 0;
 
     @bgCol1: #f5f5fc;
     @bgCol2: #f9f9f9;
@@ -780,7 +787,6 @@ ul.itemlist {
             display: flex;
             padding: .5em 1em;
 
-
             .item-property {
                 position: relative;
                 float: left;
@@ -799,6 +805,27 @@ ul.itemlist {
                 &:hover > &.after {
                     border-bottom-color: @textHoverColor;
                 }
+            }
+        }
+    }
+
+    &.itemlist-style-clean {
+        li {
+            background-color: transparent;
+
+            .inner {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    }
+    &.itemlist-noSelect {
+        li:hover {
+            cursor: default;
+            background-color: transparent;
+
+            span {
+                cursor: text;
             }
         }
     }
