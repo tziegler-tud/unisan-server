@@ -2,7 +2,7 @@
 ## NodeJs app containing both backend and frontend
 ### Author: Tom Ziegler
 #### Contributers: 
-
+github.com/SoulKa
 
 
 ### Purpose
