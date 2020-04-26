@@ -32,7 +32,55 @@ router.get('/', auth, function(req, res, next) {
     qualificationService.getAll()
         .then(quals => {
             qualList = quals;
-            res.render("unisams/settings", {title: "settings - uniSams",
+            res.render("unisams/settings/settings", {title: "settings - uniSams",
+                user: req.user._doc,
+                qualificationList: qualList
+            })
+        })
+        .catch(err => {
+            next(err);
+        })
+});
+
+/* GET database settings page. */
+router.get('/database', auth, function(req, res, next) {
+    var qualList = {};
+    qualificationService.getAll()
+        .then(quals => {
+            qualList = quals;
+            res.render("unisams/settings/settingsDatabase", {title: "database settings - uniSams",
+                user: req.user._doc,
+                qualificationList: qualList
+            })
+        })
+        .catch(err => {
+            next(err);
+        })
+});
+
+/* GET user settings page. */
+router.get('/user', auth, function(req, res, next) {
+    var qualList = {};
+    qualificationService.getAll()
+        .then(quals => {
+            qualList = quals;
+            res.render("unisams/settings/settingsUser", {title: "user settings - uniSams",
+                user: req.user._doc,
+                qualificationList: qualList
+            })
+        })
+        .catch(err => {
+            next(err);
+        })
+});
+
+/* GET user settings page. */
+router.get('/events', auth, function(req, res, next) {
+    var qualList = {};
+    qualificationService.getAll()
+        .then(quals => {
+            qualList = quals;
+            res.render("unisams/settings/settingsEvents", {title: "event settings - uniSams",
                 user: req.user._doc,
                 qualificationList: qualList
             })

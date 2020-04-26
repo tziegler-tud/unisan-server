@@ -54,7 +54,7 @@
 }
 .contact-list-container .contact-list li {
   display: block;
-  padding: .5em;
+  padding: 0.5em;
   border-bottom: 1px solid #333;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
@@ -93,7 +93,7 @@
 }
 .contact-list-container .contact-list li.expanding .contact-entry-inner .contact-heading span {
   display: block;
-  padding: .5em;
+  padding: 0.5em;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   .contact-list-container .contact-list li.expanding .contact-entry-inner .contact-heading span {

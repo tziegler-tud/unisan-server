@@ -36,14 +36,14 @@ passport.use(
 
 // tell passport how to serialize the user
 passport.serializeUser((user, done) => {
-    console.log('Inside serializeUser callback. User id is save to the session file store here')
+    console.log('Inside serializeUser callback. User id is save to the session file store here');
     done(null, user._doc._id);
 });
 
 
 passport.deserializeUser((id, done) => {
     userService.getById(id)
-        .then(user => user ? done(null, user): console.log("failed again."))
+        .then(user => user ? done(null, user): done(null, false))
         .catch(err => console.log(err))
 });
 

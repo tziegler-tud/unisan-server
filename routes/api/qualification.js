@@ -5,9 +5,9 @@ const qualificationService = require('../../services/qualificationService');
 // routes
 router.post('/create', create);
 router.get('/', getAll);
-router.get('/getByName', getByName);
-router.get('/getByType', getByType);
-router.get('/getAllByType', getAllByType);
+router.get('/getByName/:name', getByName);
+router.get('/getByType/:type', getByType);
+router.get('/groupByType', groupByType);
 router.get('/:id', getById);
 router.put('/:id', update);
 router.delete('/:id', _delete);
@@ -38,7 +38,7 @@ function getById(req, res, next) {
 
 function getByType(req, res, next) {
     qualificationService.getByType(req.params.type)
-        .then(quals => quals)
+        .then(quals => res.json(quals))
         .catch(err => next(err));
 }
 
@@ -61,8 +61,8 @@ function _delete(req, res, next) {
 }
 
 
-function getAllByType(req, res, next){
-    qualificationService.getAllByType(req.params.qualType)
-        .then((byType) => res.json({byType}))
+function groupByType(req, res, next){
+    qualificationService.groupByType(req.params.qualType)
+        .then((byType) => res.json(byType))
         .catch(err => next(err));
 }

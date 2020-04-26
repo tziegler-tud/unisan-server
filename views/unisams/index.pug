@@ -5,7 +5,8 @@ block page_includes
     script(src="static/unisams/js/index.js")
 
     script.
-        window.activeDockerSection = "dashboard";
+        window.dockerArgs.activeContainer =  "dashboardContainer";
+        window.dockerArgs.activeElementId = "dashboard";
 
 
 block content

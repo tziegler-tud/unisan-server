@@ -1,9 +1,11 @@
 var lidlRTO = window.lidlRTO;
+var common = window.common;
+var actions = window.qualificationActions;
 
 $(document).ready (function () {
 
 
-    sidebar = new common.Sidebar('wrapper', {title: "Test"});
+    var sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
     // hook qual entries to sidebar.
 
@@ -14,17 +16,41 @@ $(document).ready (function () {
                 qualificationId: this.dataset.qualid,
                 callback: {
                     onConfirm: function(qualId, data){
-                        // build a json object or do something with the form, store in data
-                        $.ajax({
-                            url: '/unisams/qualification/'+qualId,
-                            type: 'PUT',
-                            dataType: 'json',
-                            data: data,
-                            success: function(result) {
-                                window.location.reload();
+                        const keyIdentifier = qualId;
+                        const value = data;
+                        const args = {};
+                        actions.updateDBKey(keyIdentifier, value, args, function(){
+                            window.location.reload();
+                        })
+                    },
+                    onDelete: function(qualId, data){
+                        const key = qualId;
+                        const value = data;
+                        var args = {
+                            isArray: true
+                        };
 
+                        const dialog_content = {
+                            title: "Qualifikation löschen",
+                            message: "Folgende Qualifikation wird gelöscht: " + value.name,
+                            titleArg: "",
+                            messageArg: ""
+                        };
+                        var dialog_token = lidlRTO.objectManager.createNewObjectToken();
+                        const dialog_args = {
+                            callback: {
+                                onConfirm: function(res){
+                                    actions.removeDBKey(key, value, args,function(){
+                                        $("#qualId" + common.escapeSelector(qualId)).remove();
+                                    });
+                                    lidlRTO.objectManager.removeObject(dialog_token);
+                                }
                             }
-                        });
+                        };
+                        const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                        lidlRTO.objectManager.addObject(dialog, dialog_token);
+                        dialog.openDialog();
+
                     }
                 }
             });
@@ -41,11 +67,12 @@ $(document).ready (function () {
         sidebar.addContent("QualificationCreate", {
             callback: {
                 onConfirm: function(qualId, data){
-                    // build a json object or do something with the form, store in data
-                    $.post('/unisams/qualification/create', data, function(resp) {
-                        location.replace("/unisams/settings")
-                        // do something when it was successful
-                    });
+                    const keyIdentifier = qualId;
+                    const value = data;
+                    const args = {};
+                    actions.insertDBKey(keyIdentifier, value, args, function(){
+                        window.location.reload();
+                    })
                 }
             }
         });

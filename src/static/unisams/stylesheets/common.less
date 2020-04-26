@@ -60,6 +60,9 @@ a {
 
     height:     calc(~"100vh - @{topnav-height}");
 
+    &.wrapper-full-height {
+        height: 100vh;
+    }
 
     .page-container {
         width: 100%;
@@ -93,29 +96,6 @@ a {
 
 }
 
-.clear {
-    float:      none !important;
-    width:      0 !important;
-    clear:      both;
-}
-
-.noSelect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.noSelect * {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
 
 button {
     outline:    none;
@@ -160,7 +140,13 @@ special classes
 
     .subpage-heading {
 
-        padding: 1em;
+        padding: 1em 1em 1em 0;
+
+        h3 {
+            font-weight: lighter;
+            font-size: 200%;
+            color: #333;
+        }
 
         .sec-heading-label {
             font-size: 200%;
@@ -171,7 +157,7 @@ special classes
     .subpage-menu {
 
         .subpage-menu-btn {
-
+            display: block;
         }
 
     }
@@ -184,52 +170,7 @@ special classes
 
 /* common styling */
 
-ul.itemlist {
-    list-style: none;
 
-    @bgCol1: #f5f5fc;
-    @bgCol2: #f9f9f9;
-
-    display: flex;
-    flex-flow: column wrap;
-
-    li {
-
-        flex: 1 1 auto;
-
-        background-color: @bgCol1;
-
-        &:nth-child(odd) {
-            background-color: @bgCol2;
-        }
-
-        .inner {
-            display: flex;
-            padding: .5em;
-
-
-            .item-property {
-                position: relative;
-                float: left;
-                margin-left: 1em;
-                flex: 0 0 250px;
-
-                &.after {
-                    content: "";
-                    display: block;
-                    width: 100%;
-                    position: absolute;
-                    bottom: -3px;
-                    left: 0;
-                }
-
-                &:hover > &.after {
-                    border-bottom-color: @textHoverColor;
-                }
-            }
-        }
-    }
-}
 
 .content-link {
 
@@ -289,10 +230,19 @@ ul.itemlist {
 
             background-color: @link-hover-color;
             cursor:         pointer;
-
-
             .transition(background-color,200ms);
 
+        }
+
+        &.light {
+            background-color:   transparent;
+            color:              @akzent-color;
+            border:             1px solid @akzent-color;
+            &:hover {
+                background-color: @link-hover-color-light;
+                cursor:         pointer;
+                .transition(background-color,200ms);
+            }
         }
     }
 
@@ -304,13 +254,14 @@ ul.itemlist {
         padding:            0.5em 1em;
         margin:             .5em .5em;
 
-        .sweep-to-right(@akzent-color,.5s);
+
 
         &.inverse {
             color: #fff;
             border-color:    #fff;
+        }
+        &:not(.disable-animation, .slim) {
             .sweep-to-right(@akzent-color,.5s);
-
         }
     }
 
@@ -517,21 +468,32 @@ dropdown menu
         right: 0;
         transform: translateX(100%);
 
-        background-color: #fff;
+        @localBgColor: #fff;
+        background-color: @localBgColor;
         color: #555;
-
-        border: 1px solid @menu-border-color;
 
         .dropdown-entry {
 
-            border-top: 1px solid #AAA;
+            border: 1px solid @menu-border-color;
 
             &:first-of-type {
-                border-top: none;
+                border-bottom: none;
             }
 
             &:hover {
                 background-color: @docker-hover-color;
+            }
+
+            &.dropdown-entry-disabled {
+                color: #777;
+                background-color: #f5f5fc;
+                &:hover {
+                    background-color: #f5f5fc;
+                }
+
+                a {
+                    cursor: default;
+                }
             }
 
             a {
@@ -556,7 +518,13 @@ dropdown menu
         height:         1em;
         margin-right:   .5ex;
         margin-left:    .5ex;
+    }
 
+    &.icon-small {
+        &:before {
+            height: 0.8em;
+            width: 0.8em;
+        }
     }
 
     &.icon-edit {
@@ -586,6 +554,16 @@ dropdown menu
             content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>');
         }
     }
+    &.icon-back {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>');
+        }
+    }
+    &.icon-info {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>');
+        }
+    }
 }
 
 /*
@@ -597,18 +575,18 @@ dropdown menu
     position:relative;
 
     &.disabled {
-        span.tt-enabled {
+        span.tooltip.tt-enabled {
             display: none !important;
         }
 
-        span.tt-disabled {
+        span.tooltip.tt-disabled {
             display: block;
         }
     }
 
 
-    span {
-        font-size: 80%;
+    span.tooltip {
+        font-size: 12px;
         opacity: 0;
         display: block;
         position: absolute;
@@ -619,6 +597,7 @@ dropdown menu
         padding: .5em .3em;
         z-index: -1;
         cursor: auto;
+        min-width: 150px;
 
         .transition(opacity, 350ms);
 
@@ -663,7 +642,7 @@ dropdown menu
         opacity: 1;
         z-index: 12;
 
-        transition-delay: 1s;
+        transition-delay: .5s;
 
         &:before {
             z-index: 13;
@@ -674,16 +653,63 @@ dropdown menu
 common form stylings
  */
 
+
 input.common-input {
     display: block;
     border: 1px solid #BBB;
     background-color: transparent;
     padding: 5px 1em;
     border-radius: 0;
-    color: #999;
+    color: #555;
 
     margin-bottom: 1em;
 
+}
+
+select.common-select {
+    display: block;
+    border: 1px solid #BBB;
+    background-color: transparent;
+    padding: 5px 1em;
+    border-radius: 0;
+    color: #555;
+
+    margin-bottom: 1em;
+
+    &.select-disabled {
+        background-color: #CCC;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    option {
+        background-color: #fff;
+        color: #555;
+    }
+
+}
+
+.common-viewBox {
+    // text element in style of selects.
+    display: block;
+    border: 1px solid #BBB;
+    background-color: transparent;
+    padding: 5px 1em;
+    border-radius: 0;
+    color: #555;
+
+    margin-bottom: 1em;
+
+    &.viewBox-disabled {
+        background-color: #CCC;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+select:disabled{
+    background-color: #CCC;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .common-submit {
@@ -702,4 +728,227 @@ input.common-input {
 
     }
 
+}
+
+.formElement-optional {
+    max-height: 0;
+    overflow: hidden;
+    .transition(max-height, 1000ms);
+
+    &.optional-enabled {
+        max-height: 100vh;
+        .transition(max-height, 2000ms);
+    }
+}
+
+/*
+common list stylings
+ */
+
+ul.itemlist {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+
+    @bgCol1: #f5f5fc;
+    @bgCol2: #f9f9f9;
+
+    display: flex;
+    flex-flow: column wrap;
+
+    font-weight: lighter;
+
+    li {
+
+        flex: 1 1 auto;
+
+        background-color: @bgCol1;
+
+        &:nth-child(odd) {
+            background-color: @bgCol2;
+        }
+
+        &:not(.noSelect):hover {
+            background-color: rgba(124,0,26,0.2);
+            cursor: pointer;
+        }
+
+        &.borderBottom {
+            border-bottom: 1px solid #333;
+        }
+
+        .itemDelete {
+            svg {
+                width: 1em;
+            }
+        }
+
+        .inner {
+            display: flex;
+            padding: .5em 1em;
+
+            .item-property {
+                position: relative;
+                float: left;
+                margin-left: 10px;
+                flex: 0 0 240px;
+
+                &.after {
+                    content: "";
+                    display: block;
+                    width: 100%;
+                    position: absolute;
+                    bottom: -3px;
+                    left: 0;
+                }
+
+                &:hover > &.after {
+                    border-bottom-color: @textHoverColor;
+                }
+            }
+        }
+    }
+
+    &.itemlist-style-clean {
+        li {
+            background-color: transparent;
+
+            .inner {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    }
+    &.itemlist-noSelect {
+        li:hover {
+            cursor: default;
+            background-color: transparent;
+
+            span {
+                cursor: text;
+            }
+        }
+    }
+}
+
+/*
+common cursor styling
+ */
+
+.cursor-notAllowed {
+    cursor: not-allowed;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+/*
+common btn styling
+*/
+
+.btn-disabled {
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+    background-color: #999 !important;
+    &:hover {
+        background-color: #999 !important;
+    }
+}
+
+.btn-addItem {
+    @btn: transparent;
+    @btnHover: #f9f9ff;
+
+    width: auto;
+    display: inline-block;
+    border: 1px solid #AAA;
+    padding: .5em .5em;
+    cursor: pointer;
+
+    color: #555;
+    background-color: @btn;
+
+    .transition(background-color, 250ms);
+
+    &:hover {
+        background-color: @btnHover;
+    }
+
+    &.disabled {
+        color: #AAA;
+        cursor: not-allowed;
+    }
+
+    svg {
+        width: 1em;
+        display: block;
+
+        margin-right: .5em;
+        float: left;
+    }
+    span {
+        display: inline-block;
+        float: left;
+        line-height: 1em;
+    }
+}
+
+.btn-listExt {
+    background-color: transparent;
+    margin-top: 1em;
+    width: max-content;
+    position: relative;
+
+}
+
+/* common helper classes */
+
+.float {
+    display: block;
+    float: left;
+}
+
+.float-right {
+    display: block;
+    float: right;
+}
+
+.nofloat {
+    float: none !important;
+}
+.force-nomargin {
+    margin: 0 !important;
+}
+.nomargin {
+    margin: 0;
+}
+
+
+.clear {
+    float:      none !important;
+    width:      0 !important;
+    clear:      both;
+}
+
+.noSelect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.noSelect * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

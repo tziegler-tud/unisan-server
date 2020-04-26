@@ -1,0 +1,60 @@
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>{{exploreUser.username}}  {{currentQualification.qualification.name}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="sidebar-title">
+                    <span>Qualifikation verändern</span>
+                </div>
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item ak-qual ak-qual-type">
+                            <label for="qual-type">Typ</label>
+                            <select class="common-select" id="qual-type" name="qual-type">
+                                {{#each qualifications.byType}}
+                                    <option>{{_id}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="ak-item ak-qual ak-qual-name">
+                            <label for="qual-name">Bezeichnung</label>
+                            <select class="common-select" id="qual-name" name="qual-name">
+
+                            </select>
+                        </div>
+                        <div class="ak-item ak-qual ak-qual-aquiredDate">
+                            <label for="qual-acquiredDate">Abgeschlossen am</label>
+                            <input class="common-input" id="qual-acquiredDate" name="qual-acquiredDate" type="date" value="{{transformDateString currentQualification.acquiredDate}}"/>
+                        </div>
+                        <div class="ak-item ak-qual ak-qual-expireDate">
+                            <label for="qual-expireDate">Läuft ab am</label>
+                            <input class="common-input" id="qual-expireDate" name="qual-expireDate" type="date" value="{{transformDateString currentQualification.expireDate}}"/>
+                        </div>
+                        <div class="ak-item ak-qual ak-trainingDate">
+                            <label for="qual-trainingDate">Letzte Fortbildung</label>
+                            <input class="common-input" id="qual-trainingDate" name="qual-trainingDate" type="date" value="{{transformDateString currentQualification.trainingDate}}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-confirm content-link">Speichern</a>
+            <a class="sidebar-delete content-link style2">Eintrag löschen</a>
+        </div>
+    </div>
+</div>

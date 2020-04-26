@@ -1,0 +1,43 @@
+
+<div id="sidebar" class="sidebar sidebar-user">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>{{username}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="content-userimg">
+                    <img src="/data/uploads/user_images/{{id}}/{{id}}.jpg"/>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="section-title content-title">
+                    <span>{{firstName}} {{lastName}}</span>
+                </div>
+                <div class="section-content">
+                    <span class="content-item">{{email}}</span>
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title">
+                    Qualifikationen:
+                </div>
+                <div class="section-content">
+                    <span class="content-item">
+                        {{#each qualifications}}
+                            {{this.qualification.name}}{{#unless @last}},{{/unless}}
+                        {{/each}}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="/unisams/user/{{username}}" class="content-link">Akte öffnen</a>
+        </div>
+    </div>
+</div>

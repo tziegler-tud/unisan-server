@@ -3,6 +3,8 @@ const db = require('../schemes/mongo');
 
 const User = db.User;
 
+var fs = require('fs-extra');
+
 module.exports = {
     getAll,
     getById,
@@ -10,11 +12,13 @@ module.exports = {
     create,
     update,
     deleteKey,
+    deleteArrayElement,
     updateKey,
+    getKey,
     delete: _delete
 };
 
-/** @typedef {import("../schemes/userScheme").UserScheme} UserScheme */
+/** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
 
 /**
  * Gets all users
@@ -58,7 +62,21 @@ async function create(userParam) {
     }
 
     // save user
-    await user.save();
+    if(await user.save()){
+        fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+            else {
+                fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                    if (err) throw err;
+                    console.log('dummy image copied to new user');
+                });
+            }
+        });
+        // copy dummy user image to user directory
+
+    }
 }
 
 /**
@@ -88,76 +106,247 @@ async function update(id, userParam) {
 
 /**
  * Deletes a property of a given user
- * @param {number} id The id of the user do manipulate
- * @param {any} userParams @louis no idea what this object is
+ * @param {number} id The id of the user to manipulate
+ * @param {string} key Key to be deleted
+ * @param {Object} userParams containing additional settings. Valid properties are: {isArray <bool>, noIndex: <bool> (true if key does not contain array element index)}
  */
-async function deleteKey(id, userParams) {
+async function deleteKey(id, key, userParams) {
+    if (userParams === undefined) userParams = {};
+
     const user = await User.findById(id);
 
     // validate
     if (!user) throw new Error('User not found');
 
     // validate input
-    if (!userParams.key) throw new Error('no key given');
+    if (!key) throw new Error('no key given');
 
     // check if key exists
-    if (!user.get(userParams.key)) {
+    if (!user.get(key)) {
         console.warn("Trying to remove invalid key!");
         return;
     }
 
     // check if key is in scheme
-    if(!user.schema.path(userParams.key)===undefined){
+    if(user.schema.path(key)!==undefined) {
         // check if trying to delete required key
-        if (user.schema.path(userParams.key).isRequired){
+        if (user.schema.path(key).isRequired) {
             console.error('Trying to remove required key.');
             return;
-        }
-        else {
-            console.log("removing key which is not specified in scheme. Is this intended?")
+        } else {
+
         }
     }
+    else {
+        console.warn("removing key which is not specified in scheme. Is this intended?")
+    }
 
-    user.set(userParams.key, undefined, {strict: false} );
+    // check if key references array element
+    if (Array.isArray(user.get(key).parentArray())){
+        var msg = "Error: Deleting array elements is no longer provided by this method.";
+        console.error(msg);
+        throw new Error(msg);
+    }
+    else {
+        user.set(key, undefined, {strict: false} );
+    }
     await user.save();
+
+
 }
 
-/**
- * Updates a property of a user
- * @param {number} id The id of the user do manipulate
- * @param {*} userParams @louis no idea what this object is
- */
-async function updateKey(id, userParams) {
+async function deleteArrayElement(id, key, arrayElementDbId, noIndex) {
+
     const user = await User.findById(id);
 
     // validate
     if (!user) throw new Error('User not found');
 
     // validate input
-    if (!userParams.key) throw new Error('no key given');
-    if (!userParams.value) throw new Error('no value given');
+    if (!key) throw new Error('no key given');
+
+    var array;
+    if(noIndex) {
+        //key refers to array.
+        array = user.get(key);
+    }
+    //check if valid index is given. Assume key is of form: key.index
+    else {
+        try {
+            //key refers to array element. We need to find the parent array.
+            array = user.get(key).parentArray();
+            var keyPos = key.lastIndexOf(".");
+            var index = key.substring(keyPos+1);
+            key = key.substring(0,keyPos);
+        }
+        catch(e) {
+            console.warn("Failed to parse key to array element. Aborting delete operation.");
+            throw(e);
+            // we could try to catch other key types here, but we dont want to perform delete operation if something is not as intended. Better safe than sorry.
+        }
+    }
+
+    // check if key exists
+    if (!user.get(key)) {
+        console.warn("Trying to remove invalid key!");
+        return;
+    }
+
+    // check if key is in scheme
+    if(user.schema.path(key)!==undefined) {
+        // check if trying to delete required key
+        if (user.schema.path(key).isRequired) {
+            console.error('Trying to remove required key.');
+            return;
+        } else {
+
+        }
+    }
+    else {
+        console.warn("removing key which is not specified in scheme. Is this intended?")
+    }
+
+    // check if key is array
+    if (!Array.isArray(user.get(key))){
+        const msg = "Error: Key is not referencing an array.";
+        console.error(msg);
+        throw new Error(msg);
+    }
+
+    var updatedArray;
+    // if array is indexed, we use id to remove the element
+    if (arrayElementDbId) {
+        updatedArray = removeById(array);
+    }
+    else {
+        if (!noIndex) {
+            updatedArray = removeByIndex(array);
+        }
+        else {
+            const e = "Failed to delete array element: Wrong parameter settings.";
+            console.error(e);
+            throw new Error(e);
+        }
+        user.set(key, updatedArray, {strict: false} );
+        await user.save();
+    }
+    function removeById(array){
+        // in-memory update. get current array content
+        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+        /** @type {any[]} */
+        if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
+
+        var index = array.map(e => e._id).indexOf(arrayElementDbId);
+        if (index > -1) {
+            // remove existing key from array
+            array.splice(index, 1);
+            return array;
+        }
+        else {
+            //try to remove by index anyway.
+            if(noIndex) {
+                var msg = "Array element Id was not found in array. Aborting.";
+                console.error(msg);
+                throw new Error(msg);
+            }
+            console.warn("Id was not found in array. Trying to remove by index...");
+            return removeByIndex(array);
+        }
+    }
+    // array not indexed, remove by index
+    function removeByIndex(array){
+
+        try {
+            array.splice(index, 1);
+            return array;
+        }
+        catch(e) {
+
+        }
+    }
+}
+
+/**
+ * Retrieves a property of a user
+ * @param {number} id The id of the user do manipulate
+ * @param {string} key key to retrieve
+ */
+async function getKey(id, key) {
+    const user = await User.findById(id);
+
+    // validate
+    if (!user) throw new Error('User not found');
+    // validate input
+    if (!key) throw new Error('no key given');
+
+    return await user.get(key);
+}
+
+
+/**
+ * Updates a property of a user, or inserts a new property if it doesnt exist
+ * If the key is marked as array, the value is expected to be a JSON object of form value = {id: <ObjectId>, yourData..., ...}
+ *
+ * @param {number} id The id of the user do manipulate
+ * @param {string} key the key to update
+ * @param {string} value the new value for the key
+ * @param {Object} userParams containing additional settings. Valid properties are: {isArray: <bool>, noIndex: <bool>}
+ */
+async function updateKey(id, key, value, userParams) {
+    if (!userParams) userParams = {};
+
+    const user = await User.findById(id);
+
+    // validate
+    if (!user) throw new Error('User not found');
+
+    // validate input
+    if (!key) throw new Error('no key given');
+    if (!value) throw new Error('no value given');
 
     //check if array operation
     if(userParams.isArray) {
 
-        // in-memory update. get current array content
+        //get current array content. Usually, key refers to an indexed array element.
+        var array;
+        if (userParams.noIndex) {
+        }
+        else {
+            const keyPos = key.lastIndexOf(".");
+            const i = key.substring(keyPos+1);
+            key = key.substring(0,keyPos);
+        }
+        array = user.get(key);
+        // in-memory update.
         // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
-        /** @type {any[]} */
-        var array = user.get(userParams.key);
-        if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
-        var index = array.map(e => e._id).indexOf(userParams.value.id);
+
+        try {
+            if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
+            //check if array
+            var index = array.map(e => e._id).indexOf(value.id);
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error("Exception:" + e);
+                console.error("Aborting operation to ensure data integrity.");
+                throw e;
+            } else {
+                console.error("Unhandled exception: " + e);
+                throw e;
+            }
+        }
         if (index > -1) {
             // updating existing object @louis can you use array[index] = userParams.value ?
-            array.splice(index, 1, userParams.value);
+            array.splice(index, 1, value);
         }
         else {
             // key not found, creating new entry
-            array.push(userParams.value);
+            array.push(value);
         }
-        user.set(userParams.key, array, {strict: false} );
+        user.set(key, array, {strict: false} );
     }
     else {
-        user.set(userParams.key, userParams.value, {strict: false} );
+        user.set(key, value, {strict: false} );
     }
     await user.save();
 }

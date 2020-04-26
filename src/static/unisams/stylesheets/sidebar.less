@@ -43,58 +43,68 @@
 
   .sidebar {
 
+    display: flex;
+    flex-flow: column nowrap;
+
     height: 100%;
 
-    .sidebar-inner {
-      height: 100%;
+    .sidebar-top {
+      padding: 0;
+      height: 3em;
       width: 100%;
-      position: relative;
+      border-bottom: 1px solid @menu-border-color;
 
-      .sidebar-top {
-        padding: 0;
-        height: 3em;
-        border-bottom: 1px solid @menu-border-color;
+      transform: translateX(-3em);
 
-        transform: translateX(-3em);
+      .transition(transform, 250ms);
 
-        .transition(transform, 250ms);
+      .sidebar-back-btn {
+        padding: 1em;
+        width: 1em;
+        float: left;
+        border-right: 1px solid @menu-border-color;
 
-        .sidebar-back-btn {
-          padding: 1em;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #fAfAfA;
+        }
+        svg {
           width: 1em;
-          float: left;
-          border-right: 1px solid @menu-border-color;
-
-          cursor: pointer;
-
-          &:hover {
-            background-color: #fAfAfA;
-          }
-          svg {
-            width: 1em;
-            display: block;
-          }
-
-          &.btn-rotate{
-            transform: rotate(180deg);
-          }
+          display: block;
         }
 
-        .sidebar-title {
-          float: left;
-          padding: 1em;
-          font-size: 90%;
-          color: #333;
+        &.btn-rotate{
+          transform: rotate(180deg);
         }
       }
 
+      .sidebar-title {
+        float: left;
+        padding: 1em;
+        font-size: 90%;
+        color: #333;
+      }
+    }
+
+    .sidebar-inner {
+      flex: 1 1 auto;
+
+      width: 100%;
+      position: relative;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: flex-start;
+
+      overflow-y: scroll;
+
       .sidebar-bottom {
-        position: absolute;
-        bottom: 0;
-        left: 0;
+        position: relative;
       }
 
       .sidebar-content {
+        flex: 1 1 auto;
+
         .sidebar-section {
           padding: 1em;
 
@@ -138,4 +148,22 @@
 
 .sidebar-user {
 
+}
+
+.sidebar-errorMsg {
+  display: block;
+  margin: 0 !important;
+  padding: 2em 1em;
+  width: auto;
+  background-color: rgba(255,0,26,0.6);
+
+  &:before {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    margin: .5em;
+
+
+    content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>');
+  }
 }

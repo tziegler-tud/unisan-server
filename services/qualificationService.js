@@ -7,7 +7,7 @@ module.exports = {
     getById,
     getByType,
     getByTitle,
-    getAllByType,
+    groupByType,
     create,
     update,
     delete: _delete
@@ -85,24 +85,21 @@ async function _delete(id) {
     await Qual.findByIdAndRemove(id);
 }
 
-// @louis is this function grouping by type? Need description
-async function getAllByType(){
+/**
+ *
+ * groups the qualifications by type. returns JSON Array of scheme "[{_id: <qualType>, values: [qual1, qual2, ...]}]}
+ * where qual1 etc. are qualification documents as stored in qualifications collection
+ *
+ * @returns {Promise<Aggregate|AggregationCursor>}
+ */
+
+async function groupByType(){
     return Qual.aggregate([
         {
             $group: {
                 _id: "$qualType",
-                obj: {
-                    $push: {name: "$name"}
-                }
-            }
-        },
-        {
-            $replaceRoot: {
-                newRoot: {
-                    $let: {
-                        vars: { obj: [ { k: {$substr:["$_id", 0, -1 ]}, v: "$obj" } ] },
-                        in: { $arrayToObject: "$$obj" }
-                    }
+                values: {
+                    $push: "$$ROOT"
                 }
             }
         }

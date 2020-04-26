@@ -1,0 +1,141 @@
+import * as user from "plugins/sidebar-plugin-user";
+import * as qual from "plugins/sidebar-plugin-qual";
+import * as userkey from "plugins/sidebar-plugin-userkey";
+
+(function (sidebar,$,undefined) {
+
+
+    sidebar.Sidebar = function(parentId, content){
+
+        this.sidebarHTML = createHTML(this, content);
+        this.parent = $('#'+ parentId);
+        this.parent.append(this.sidebarHTML);
+
+        this.isActive = false;
+
+        var self = this;
+
+        return this;
+    };
+
+    sidebar.Sidebar.prototype.addContent = function(type, args){
+        var self = this;
+
+        switch(type){
+
+            default:
+                console.warn("Sidebar: no content type given!");
+                user.showUserContent(self, args);
+                break;
+
+            case "user":
+                user.showUserContent(self, args);
+                break;
+
+            case "addUser":
+                user.showAddUserContent(self,args);
+                break;
+
+            case "UserAddDBKey":
+                userkey.showInsertUserKeyContent(self, args);
+                break;
+
+            case "UserUpdateDBKey":
+                userkey.showUpdateUserKeyContent(self, args);
+                break;
+
+            case "UserViewDBKey":
+                userkey.showViewUserKeyContent(self, args);
+                break;
+
+            case "UserAddQualification":
+                qual.showInsertUserQualificationContent(self,args);
+                break;
+
+            case "UserViewQualification":
+                qual.showViewUserQualificationContent(self, args);
+                break;
+
+            case "UserUpdateQualification":
+                qual.showUpdateUserQualificationContent(self,args);
+                break;
+
+            case "QualificationCreate":
+                qual.showCreateQualificationContent(self,args);
+                break;
+
+            case "QualificationUpdate":
+                qual.showUpdateQualificationContent(self,args);
+                break;
+        }
+    };
+
+    sidebar.Sidebar.prototype.toggle = function(){
+
+        if(this.isActive){
+            this.isActive = false;
+            this.sidebarHTML.removeClass("sidebar-active");
+            this.parent.removeClass("sidebar-active");
+        }
+        else {
+            this.isActive = true;
+            this.sidebarHTML.addClass("sidebar-active");
+            this.parent.addClass("sidebar-active");
+        }
+    };
+
+    sidebar.Sidebar.prototype.show = function(){
+        this.sidebarHTML.addClass("sidebar-active");
+        this.parent.addClass("sidebar-active");
+
+        this.isActive = true;
+    };
+
+    sidebar.Sidebar.prototype.hide = function(){
+        this.sidebarHTML.removeClass("sidebar-active");
+        this.parent.removeClass("sidebar-active");
+
+        this.isActive = false;
+    };
+
+    sidebar.Sidebar.prototype.addErrorMessage = function(msg, insertFunc) {
+
+        var errorHtml = $("<div/>", {
+            "class": "sidebar-errorMsg",
+            text: msg,
+        });
+        if (insertFunc == null) {
+            this.sidebarHTML.prepend(errorHtml);
+        }
+        else {
+            try {
+                insertFunc(errorHtml)
+            }
+            catch(e) {
+                throw new Error(e)
+            }
+        }
+    };
+
+    sidebar.Sidebar.prototype.enableOptional = function(selector){
+        $(selector).addClass("optional-enabled");
+    };
+
+    sidebar.Sidebar.prototype.disableOptional = function(selector){
+        $(selector).removeClass("optional-enabled");
+    };
+
+    var createHTML = function(self){
+
+        return $('<div/>', {
+            id: "sidebar-container",
+            class: "sidebar-container",
+
+        });
+    };
+
+    return sidebar.Sidebar;
+
+
+
+}(window.sidebar = window.sidebar || {}, jQuery));

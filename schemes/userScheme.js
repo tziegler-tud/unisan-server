@@ -13,41 +13,91 @@ var UserSchema = new Schema({
         required: true,
         trim: true
     },
-    firstName: {
-        type: String,
-        required: true
-    },
-    lastName: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        trim: true,
-    },
     generalData: {
-
+        //TODO: create db getter
+        firstName: {
+            title: {
+                type: String,
+                required: true
+            },
+            value: {
+                type: String,
+                required: true
+            },
+        },
+        lastName: {
+            title: {
+                type: String,
+                required: true
+            },
+            value: {
+                type: String,
+                required: true
+            },
+        },
         memberId: {
-            type: String,
+            title: {
+                type: String,
+                required: true
+            },
+            value: {
+                type: String,
+            },
         },
+        customData: [
+            {
+                title: {
+                    type: String,
+                },
+                value: {
+                    type: String,
+                }
+            }
 
-        phone: {
-            type: String,
-        },
+        ],
     },
+    contactData: [{
+        type: {
+            // email, phone, etc...
+            type: String,
+        },
+        title: {
+            type: String,
+        },
+        annotation: {
+            type: String,
+        },
+        value: {
 
-    customData: {
+        },
+    }],
 
+    otherData: {
+        customData: [{
+            title: {
+                type: String,
+            },
+            value: {
+                type: String,
+            }
+        }]
     },
     hash: {
         type: String,
         required: true,
     },
-
     qualifications: [
         {
-            name: String,
-            qualType: String,
+            qualification: {
+                qualType: {
+                    type: String,
+
+                },
+                name: {
+                    type: String,
+
+                },
+            },
             acquiredDate: Date,
             expireDate: Date,
             trainingDate: Date,
@@ -71,7 +121,11 @@ var UserSchema = new Schema({
     createdDate: {
         type: Date,
         default: Date.now
-    }
+    },
+});
+
+UserSchema.post('save', function(error, doc, next) {
+    throw new Error(error);
 });
 
 

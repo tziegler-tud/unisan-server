@@ -126,7 +126,6 @@
   .docker-wrapper {
 
 
-
     width: 100%;
     height: 100vh;
 
@@ -146,6 +145,7 @@
             cursor: pointer;
           }
         }
+
         .docker-top-btn {
           flex: 0 0 @topnav-height;
           border-right: 1px solid @menu-border-color;
@@ -157,6 +157,7 @@
             margin: 33% 33%;
           }
         }
+
         .docker-top-label {
           border-left: none;
 
@@ -191,75 +192,132 @@
         }
       }
 
-      .docker-element {
-        cursor: pointer;
-        position: relative;
+      .docker-elementContainer {
 
-        .transition(background-color, 300ms);
+        &.collapsing {
 
-        a {
-          padding: 1em 10%;
-          display: block;
-        }
+          &.expanded  {
+            .docker-mainElement {
+              border-bottom-width: 0 !important;
+            }
+            .docker-subElementContainer {
 
-        &:before {
-          content: "";
-          width: 0;
-          height: 100%;
-
-          position: absolute;
-          top: 0;
-          left: 0;
-
-          background-color: @tabs-highlight-color;
-
-          .transition(width, 350ms);
-        }
-
-        &.docker-element-active {
-          &:before {
-            width: 5px;
+              border-bottom: 1px solid #AAA;
+              height: auto;
+            }
           }
+          .docker-subElementContainer {
+            overflow: hidden;
+            height: 0;
+            background-color: @docker-background-color2;
+
+            .transition(height, 500ms);
+          }
+
         }
 
-        &:hover {
+        &.docker-container-active {
+          .docker-mainElement {
 
-          background-color: @docker-hover-color;
+            &:before {
+              width: 5px;
+            }
+          }
+
+        }
+        .docker-subElementContainer {
 
         }
 
-        &#docker-home {
+        .docker-element {
+          cursor: pointer;
+          position: relative;
 
-          box-shadow: 0 0 4px grey;
-          margin-bottom: 4px;
+          .transition(background-color, 300ms);
 
           a {
-            padding: 25% 25%;
-            width: 50%;
+            padding: 1em 10%;
+            display: block;
           }
-          img {
-            width: 100%;
+
+          &:before {
+            content: "";
+            width: 0;
+            height: 100%;
+
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            background-color: @tabs-highlight-color;
+
+            .transition(width, 350ms);
           }
-        }
 
-        svg {
-          color: @col1;
-          width: 1em;
-          display: block;
-          margin-right: 1em;
-          float: left;
-        }
+          &.docker-element-active {
+            &:before {
+              width: 5px;
+            }
+          }
 
-        span.docker-element-label {
-          display: block;
-          float: left;
+          &:hover {
+
+            background-color: @docker-hover-color;
+
+          }
+
+          &#docker-home {
+
+            box-shadow: 0 0 4px grey;
+            margin-bottom: 4px;
+
+            a {
+              padding: 25% 25%;
+              width: 50%;
+            }
+
+            img {
+              width: 100%;
+            }
+          }
+
+          svg {
+            color: @col1;
+            width: 1em;
+            display: block;
+            margin-right: 1em;
+            float: left;
+          }
+
+          span.docker-element-label {
+            display: block;
+            float: left;
+          }
+
+          &.docker-mainElement {
+            font-size: 100%;
+            border-bottom: 1px solid #AAA;
+          }
+
+          &.docker-subElement {
+            font-size: 90%;
+
+            a {
+              margin-left: 1em;
+            }
+
+            &:before {
+              background-color: @subtabs-highlight-color;
+            }
+            &:hover {
+              background-color: @docker-hover-color2;
+            }
+          }
         }
 
       }
     }
   }
-
-
 }
 
 /* color specific options */

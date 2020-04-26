@@ -61,8 +61,12 @@
                 int = 0;
                 break;
 
-            case 'imageUpload':
+            case 'confirmChange':
                 int = 1;
+                break;
+
+            case 'imageUpload':
+                int = 2;
                 break;
 
             case 'removeDBKey':
@@ -70,7 +74,7 @@
                 break;
 
             case 'addDBKey':
-                int = 2;
+                int = 3;
                 break;
         }
 
@@ -152,6 +156,17 @@
         }
 
         if(self.typeInt === 1){
+            $(htmlLidlDialog).addClass("dialog-confirmChange");
+
+
+            htmlDialogButtons.append(htmlDialogConfirmButton, htmlDialogCancelButton, htmlDialogButtonClear);
+            htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogMessage, htmlDialogButtons));
+            htmlLidlDialog.append(htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
+            $('body').append(htmlLidlDialog);
+            return htmlLidlDialog;
+        }
+
+        if(self.typeInt === 2){
 
             $(htmlLidlDialog).addClass("dialog-uploadImage");
 
@@ -169,7 +184,7 @@
             return htmlLidlDialog;
         }
 
-        if(self.typeInt === 2){
+        if(self.typeInt === 3){
 
             $(htmlLidlDialog).addClass("dialog-addDBKey");
 
@@ -213,6 +228,7 @@
     };
 
     var registerTarget = function(self, selector, target){
+        if (selector == null) return;
         $(selector).each(function(){
             $(this).on("click", function(e){
                 self.event = e;

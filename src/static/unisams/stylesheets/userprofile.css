@@ -53,6 +53,7 @@
   padding: 0;
   display: inline-block;
   flex: 0 0 auto;
+  text-transform: lowercase;
 }
 .subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown {
   flex: 0 0 auto;
@@ -145,25 +146,29 @@
 .userinfo-container .userinfo-inner .userinfo-section .userinfo-item {
   flex: 1 1 auto;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label {
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label,
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label {
   width: 100%;
   float: left;
   display: block;
   margin-bottom: .5em;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
-  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label {
+  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label,
+  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label {
     width: auto;
   }
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name {
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name,
+.userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label.userinfo-attribute-name {
   width: 100%;
   margin-right: 2em;
   margin-bottom: 0;
   color: #555;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
-  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name {
+  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name,
+  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label.userinfo-attribute-name {
     width: 8em;
   }
 }

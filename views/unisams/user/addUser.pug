@@ -2,57 +2,121 @@ extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    script(src="/static/unisams/js/addUser.js")
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
+    script(src="/static/unisams/js/actions.js")
+    script(src="/static/unisams/js/user/addUser.js")
+
+    script(src="/lib/fineUploader/fine-uploader.js")
+    link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script(type="text/template" id="qq-template-manual-trigger")
+        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
+        <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
+        </div>
+        <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+        <span class="qq-upload-drop-area-text-selector"></span>
+        </div>
+        <div class="buttons">
+        <div class="qq-upload-button-selector qq-upload-button">
+        <div>Select files</div>
+        </div>
+        </div>
+        <span class="qq-drop-processing-selector qq-drop-processing">
+        <span>Processing dropped files...</span>
+        <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+        </span>
+        <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
+        <li>
+        <div class="qq-progress-bar-container-selector">
+        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
+        </div>
+        <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
+        <img class="qq-thumbnail-selector" qq-max-size="100" qq-server-scale>
+        <span class="qq-upload-file-selector qq-upload-file"></span>
+        <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
+        <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
+        <span class="qq-upload-size-selector qq-upload-size"></span>
+        <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">Cancel</button>
+        <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">Retry</button>
+        <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">Delete</button>
+        <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
+        </li>
+        </ul>
+
+        <dialog class="qq-alert-dialog-selector">
+        <div class="qq-dialog-message-selector"></div>
+        <div class="qq-dialog-buttons">
+        <button type="button" class="qq-cancel-button-selector">Close</button>
+        </div>
+        </dialog>
+
+        <dialog class="qq-confirm-dialog-selector">
+        <div class="qq-dialog-message-selector"></div>
+        <div class="qq-dialog-buttons">
+        <button type="button" class="qq-cancel-button-selector">No</button>
+        <button type="button" class="qq-ok-button-selector">Yes</button>
+        </div>
+        </dialog>
+
+        <dialog class="qq-prompt-dialog-selector">
+        <div class="qq-dialog-message-selector"></div>
+        <input type="text">
+        <div class="qq-dialog-buttons">
+        <button type="button" class="qq-cancel-button-selector">Cancel</button>
+        <button type="button" class="qq-ok-button-selector">Ok</button>
+        </div>
+        </dialog>
+        </div>
 
 
+
+    script.
+        window.activeDockerSection = "usermanagement";
 block content
     #wrapper
-        .container
-            section#sec1
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-height
+                section#sec1
+                    #sec-content.subpage-container.center-in-container
+                        #content1-heading.sec-heading.subpage-heading.center
+                            h3 Neues Mitglied anlegen
+                        #content1-text.sec-content
+                            .subpage-content.userinfo-container
+                                    .userinfo-inner
+                                        form.userForm.userinfo-section
+                                            .userinfo-sectionheader
+                                            .userinfo-item.useredit-item(id="useritem-username")
+                                                label.userinfo-item-label.userinfo-attribute-name.nofloat(for="userinp-username") Username:
+                                                input#userinp-username.userForm-inp(name="username" type="text")
+                                                .clear
+                                            .userinfo-item.useredit-item(id="useritem-firstName")
+                                                label.userinfo-item-label.userinfo-attribute-name.nofloat(for="userinp-firstName") Vorname:
+                                                input#userinp-firstName.userForm-inp(name="firstName" type="text")
+                                            .userinfo-item.useredit-item(id="useritem-lastName")
+                                                label.userinfo-item-label.userinfo-attribute-name.nofloat(for="userinp-lastName") Nachname:
+                                                input#userinp-lastName.userForm-inp(name="lastName" type="text")
 
-                #sec-content.subpage-container
-                    #content1-heading.sec-heading.subpage-heading
-                        h3 Neues Mitglied anlegen
-                    #content1-text.sec-content
-                        .subpage-content
-                            form#addUserForm.editUserForm.userinfo-container.userForm(action="/unisams/usermod/create" method='POST')
-                                .userinfo-inner
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Allgemeine Daten
-                                        .userinfo-item
-                                            span Username:
-                                            input#userinp-username.userForm-inp(value = "username", name="username" type="text")
-                                        .userinfo-item
-                                            span Passwort:
-                                            input#userinp-password.userForm-inp(value = "Passwort", name="password" type="password")
-                                        .userinfo-item
-                                            span Vorname:
-                                            input#userinp-firstname.userForm-inp(value = "Vorname", name="firstName" type="text")
-                                        .userinfo-item
-                                            span Vorname:
-                                            input#userinp-lastname.userForm-inp(value= "Nachname" name="lastName" type="text")
-                                        .userinfo-item
-                                            span Email:
-                                            input#userinp-email.userForm-inp(value= "Email" name="email" type="text")
+                                        form.userForm.userinfo-section
+                                            .userinfo-item.useredit-item(id="useritem-password")
+                                                label.userinfo-item-label.userinfo-attribute-name.nofloat(for="userinp-password") Passwort:
+                                                input#userinp-password.userForm-inp(name="password" type="password")
+                                            .userinfo-item.useredit-item(id="useritem-passwordCheck")
+                                                label.userinfo-item-label.userinfo-attribute-name.nofloat(for="userinp-passwordCheck") Passwort wiederholen:
+                                                input#userinp-passwordCheck.userForm-inp(name="passwordCheck" type="password")
 
-                                    .userinfo-section
-                                        .userinfo-sectionheader
-                                            span Rechte und Rollen
-                                        .userinfo-item
-                                            span UniSams login:
+                            #profilemanagment-menu.subpage-menu
+                                #btn01.subpage-menu-btn.float
+                                    a.content-link.slim.style2.float(href="/unisams/user")
+                                        svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left") <polyline points="15 18 9 12 15 6"></polyline></svg>
+                                        .clear
+                                    .clear
+                                #addUserFormSubmit.subpage-menu-btn.float
+                                    a.content-link.slim.float
+                                        span Weiter
+                                        svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right") <polyline points="9 18 15 12 9 6"></polyline></svg>
+                                        .clear
+                                    .clear
 
-                                        .userinfo-item
-                                            span Angezeigt auf Website:
-
-                        #profilemanagment-menu.subpage-menu
-                            #btn01.subpage-menu-btn
-                                a.content-link.style2.float(href="/unisams/user")
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-delete") <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
-                                    span Abbrechen
-                            #btn02.subpage-menu-btn
-                                a#addUserFormSubmit.content-link.float()
-                                    svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-save") <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                                    span Speichern
 
 

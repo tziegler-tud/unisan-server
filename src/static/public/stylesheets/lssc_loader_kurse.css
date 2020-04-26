@@ -57,7 +57,7 @@
   font-variant: small-caps;
   display: inline-block;
   margin: 0;
-  padding: .1em;
+  padding: 0.1em;
   background-color: #213e54;
   box-decoration-break: clone;
   box-shadow: 10px 0 0 #213e54, -10px 0 0 #213e54;
@@ -70,7 +70,7 @@
 }
 .course .course-body span {
   display: block;
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 .course .course-tags {
   flex: 0 0 100%;
@@ -79,7 +79,7 @@
 .course .course-tags span {
   position: relative;
   display: block;
-  padding: .25em 0;
+  padding: 0.25em 0;
   width: 27.3%;
   padding-left: 5%;
   float: left;
@@ -107,7 +107,7 @@
   bottom: 0;
   right: 0;
   content: "";
-  height: .5em;
+  height: 0.5em;
   width: 1px;
   display: block;
   background-color: #213e54;
