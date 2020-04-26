@@ -1,5 +1,5 @@
 const config = require('../config/config.json');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
 const UserDataset = db.UserDataset;
