@@ -1,22 +1,66 @@
-(function (common, $, undefined) {
+(function (docker, $, undefined) {
 
-    common.Docker = function(args){
-        if (args !== undefined) {
-            applyArgs(this, args);
-        }
-        this.elementContainer = findElementContainer();
-        initEventHandlers(this);
+    /**
+     * @namespace: docker
+     */
 
+    /**
+     * typedef Constructor arguments
+     * @typedef {Object} dockerArgs
+     * @property {string} containerSelector - dom id matching the wrapper for the docker to be build inside
+     * @property {string} activeContainer - dom id matching the currently active docker container element.
+     * @property {string} activeElementId - dom id matching the currently active docker element.
+     */
+
+
+    /**
+     * Constructor of Docker component.
+     *
+     *
+     * @param dockerArgs {dockerArgs} JSON containing construcion arguments. See typedef.
+     * // construct component from args. Note: dockerArgs is used here as substitute for constructor arguments. Should be improved, or this is gonna be painful to maintain later on.
+     * // TODO: Make argument calls explicit and annotate
+     * @constructor
+     *
+     * @returns Docker
+     */
+
+
+    docker.Docker = function(dockerArgs){
+
+        dockerArgs = applyArgs(dockerArgs);
+        this.dockerArgs = dockerArgs;
+
+        //find docker-container dom element.
+        this.wrapper = document.getElementById(dockerArgs.containerSelector);
+
+        // build templating context
+        let context = {};
+        let self = this;
+        // render template
+        $.get('/static/unisams/js/docker/templates/docker.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            self.wrapper.innerHTML= template(context);
+
+            //initially setup dom elements
+            const container = document.getElementById(dockerArgs.activeContainer);
+            const el = document.getElementById(dockerArgs.activeElementId);
+            if(el) activateElement(container, el);
+
+            this.elementContainer = findElementContainer();
+            initEventHandlers(this);
+        });
+
+        return this;
     };
 
-    var applyArgs = function(self, args){
-        self.args = typeof args !='undefined' ? args : {};
-        self.args.containerSelector = typeof self.args.containerSelector != 'undefined' ? self.args.containerSelector : undefined;
-        self.args.activeContainer = typeof self.args.activeContainer != 'undefined' ? self.args.activeContainer : undefined;
-        self.args.activeElementId = typeof self.args.activeElementId != 'undefined' ? self.args.activeElementId : undefined;
-        const container = document.getElementById(self.args.activeContainer);
-        const el = document.getElementById(self.args.activeElementId);
-        if(el) self.activateElement(container, el)
+    var applyArgs = function(args){
+        args = (args === undefined) ? {}: args;
+        args.containerSelector = args.containerSelector !== undefined ? args.containerSelector : 'docker-wrapper';
+        args.activeContainer = args.activeContainer !== undefined ? args.activeContainer : undefined;
+        args.activeElementId = args.activeElementId !== undefined ? args.activeElementId : undefined;
+
+        return args;
     };
 
     const findElementContainer =  function(){
@@ -102,11 +146,7 @@
         container.classList.add("expanded");
     };
 
-    common.Docker.prototype.applyArgs = function(args){
-        applyArgs(args)
-    };
-
-    common.Docker.prototype.activateElement = function (activeContainer, activeEl) {
+    const activateElement = function (activeContainer, activeEl) {
         activeContainer.classList.add("docker-container-active");
         activeContainer.classList.add("expanded");
 
@@ -117,15 +157,46 @@
         }
     };
 
-    common.Docker.prototype.setActiveElementId = function(domId){
+    docker.Docker.prototype.applyArgs = function(args){
+        applyArgs(args)
+    };
+
+    docker.Docker.prototype.activateElement = function (activeContainer, activeEl) {
+        activateElement(activeContainer, activeEl);
+    };
+
+    docker.Docker.prototype.setActiveElementId = function(domId){
         if (typeof domId != "string") throw new TypeError('argument ’domId’ is not a string');
         this.activeElementId = domId;
     };
 
-    common.Docker.prototype.getActiveElementId = function(){
+    docker.Docker.prototype.getActiveElementId = function(){
         return this.activeElementId;
     };
 
-    return common.Docker();
+    /**
+     * adds a subpage to the docker
+     */
+    docker.Docker.prototype.addDockerSubPage = function(){
+        // testing. lets just render the user subpage
 
-}(window.common = window.common || {}, jQuery));
+        // build context
+        var context = {};
+
+        $.get('/static/unisams/js/docker/templates/subpage-user.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            self.wrapper.innerHTML= template(context);
+
+            //initially setup dom elements
+            const container = document.getElementById(dockerArgs.activeContainer);
+            const el = document.getElementById(dockerArgs.activeElementId);
+            if(el) activateElement(container, el);
+
+            this.elementContainer = findElementContainer();
+            initEventHandlers(this);
+        });
+    };
+
+    return docker;
+
+}(window.docker = window.docker||{}, jQuery, undefined));

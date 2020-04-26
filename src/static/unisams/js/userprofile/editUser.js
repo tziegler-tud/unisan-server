@@ -3,20 +3,13 @@ var common = window.common;
 var actions = window.actions;
 
 $(document).ready (function () {
-    var url = "/unisams/usermod/" + window.exploreUserId;
-    console.log(url);
-    $.ajax({
-        url: url,
-        type: 'GET',
-        cache: false,
-        isModified: false,
-        data: {},
-        success: function (context) {
-        buildPage(context)
-        },
-        error: function(context){
-            alert(context.status);
-        }
+
+    profile.getUser()
+        .then(function(user){
+            buildPage(user)
+        })
+        .catch(function(reason){
+        console.error("Failed to retrieve user data:" + reason)
     });
 
     function buildPage(user) {
