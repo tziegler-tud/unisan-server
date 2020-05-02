@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     lidl.addDebugCategory(lidl.debugCategory.FULL);
 
     window.DockerElement = new docker.Docker(window.dockerArgs);
+    // window.DockerElement.addDockerSubPage();
 
     Handlebars.registerHelper('transformDateString', function(dateString) {
         var myDate = new Date(dateString);

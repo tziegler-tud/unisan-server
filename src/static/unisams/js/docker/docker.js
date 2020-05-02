@@ -179,22 +179,23 @@
      */
     docker.Docker.prototype.addDockerSubPage = function(){
         // testing. lets just render the user subpage
-
+        var self = this;
         // build context
         var context = {};
 
-        $.get('/static/unisams/js/docker/templates/subpage-user.hbs', function (data) {
-            var template = Handlebars.compile(data);
-            self.wrapper.innerHTML= template(context);
-
-            //initially setup dom elements
-            const container = document.getElementById(dockerArgs.activeContainer);
-            const el = document.getElementById(dockerArgs.activeElementId);
-            if(el) activateElement(container, el);
-
-            this.elementContainer = findElementContainer();
-            initEventHandlers(this);
-        });
+        // var wrapper = document.getElementById("docker-content");
+        //
+        // $.get('/static/unisams/js/docker/templates/subpage-user.hbs', function (data) {
+        //     var template = Handlebars.compile(data);
+        //     wrapper.innerHTML= template(context);
+        //
+        //     //initially setup dom elements
+        //     const container = document.getElementById(dockerArgs.activeContainer);
+        //     const el = document.getElementById(dockerArgs.activeElementId);
+        //
+        //     this.elementContainer = findElementContainer();
+        //
+        //});
     };
 
     return docker;

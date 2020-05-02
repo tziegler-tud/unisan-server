@@ -37,14 +37,18 @@
             //push result to all subscribers.
             this.subscribers.resolve.forEach(function(el){
                 el(context);
-            })
+            });
+            this.subscribers.resolve = [];
+            this.subscribers.reject = [];
         },
         reject: function(context){
             this.isActive=false;
             //push result to all subscribers.
             this.subscribers.reject.forEach(function(el){
                 el(context);
-            })
+            });
+            this.subscribers.resolve = [];
+            this.subscribers.reject = [];
         },
     };
 
