@@ -51,7 +51,10 @@ var UserSchema = new Schema({
                 },
                 value: {
                     type: String,
-                }
+                },
+                type: {
+                    type: String,
+                },
             }
 
         ],

@@ -368,6 +368,7 @@ $(document).ready (function () {
             var keyId = self.dataset.keyid;
             var key = self.dataset.key;
 
+
             var field = common.refJSON(user, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
@@ -376,11 +377,9 @@ $(document).ready (function () {
                     catKey: self.dataset.catkey,
                     field: field,
                     user: user,
+                    type: self.dataset.type,
                     callback: {
-                        onConfirm: function (userid, key, value) {
-                            var args = {
-                                //isArray: false
-                            };
+                        onConfirm: function (userid, key, value, args) {
                             actions.updateDBKey(userid, key, value, args, function () {
                                 addDBKey_sidebar.hide();
                                 $(e.currentTarget).find(".userkey-entry-value").html(value.value);

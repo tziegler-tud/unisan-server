@@ -209,7 +209,7 @@ block content
                                                                 - var title = val.title
                                                                 - var combinedKey = secKey + "." + key
                                                                 - var value = val.value
-                                                                li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=title, data-value=value)
+                                                                li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=title, data-value=value, data-type=val.type)
                                                                     a.inner()
                                                                         .item-property.userkey-entry-title
                                                                             span= title
