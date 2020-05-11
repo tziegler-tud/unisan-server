@@ -1,0 +1,149 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+#wrapper .page-container {
+  -webkit-transition: width 250ms ease;
+  -moz-transition: width 250ms ease;
+  -o-transition: width 250ms ease;
+  transition: width 250ms ease;
+}
+#wrapper.sidebar-active .sidebar-container {
+  transform: translateX(0);
+}
+#wrapper.sidebar-active .sidebar-container .sidebar-top {
+  transform: translateX(0);
+}
+#wrapper.sidebar-active .page-container {
+  width: calc(100% - 20em - 0.1em);
+  float: left;
+}
+.sidebar-container {
+  width: 20em;
+  height: calc(100vh - 5em);
+  transform: translateX(100%);
+  position: absolute;
+  border-left: 1px solid #999;
+  background-color: #f9f9f9;
+  float: left;
+  top: 0;
+  right: 0;
+  -webkit-transition: transform 250ms ease;
+  -moz-transition: transform 250ms ease;
+  -o-transition: transform 250ms ease;
+  transition: transform 250ms ease;
+}
+.sidebar-container .sidebar {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+}
+.sidebar-container .sidebar .sidebar-top {
+  padding: 0;
+  height: 3em;
+  width: 100%;
+  border-bottom: 1px solid #999;
+  transform: translateX(-3em);
+  -webkit-transition: transform 250ms ease;
+  -moz-transition: transform 250ms ease;
+  -o-transition: transform 250ms ease;
+  transition: transform 250ms ease;
+}
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn {
+  padding: 1em;
+  width: 1em;
+  float: left;
+  border-right: 1px solid #999;
+  cursor: pointer;
+}
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn:hover {
+  background-color: #fAfAfA;
+}
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn svg {
+  width: 1em;
+  display: block;
+}
+.sidebar-container .sidebar .sidebar-top .sidebar-back-btn.btn-rotate {
+  transform: rotate(180deg);
+}
+.sidebar-container .sidebar .sidebar-top .sidebar-title {
+  float: left;
+  padding: 1em;
+  font-size: 90%;
+  color: #333;
+}
+.sidebar-container .sidebar .sidebar-inner {
+  flex: 1 1 auto;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  overflow-y: scroll;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-bottom {
+  position: relative;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content {
+  flex: 1 1 auto;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section {
+  padding: 1em;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-userimg {
+  width: 50%;
+  margin: 0 25%;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-userimg img {
+  border-radius: 50%;
+  width: 100%;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-title {
+  font-size: 120%;
+  font-weight: bold;
+}
+.sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .section-content .content-item {
+  display: block;
+  width: 100%;
+}
+.sidebar-errorMsg {
+  display: block;
+  margin: 0 !important;
+  padding: 2em 1em;
+  width: auto;
+  background-color: rgba(255, 0, 26, 0.6);
+}
+.sidebar-errorMsg:before {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: .5em;
+  content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>');
+}
+/*# sourceMappingURL=sidebar.css.map */

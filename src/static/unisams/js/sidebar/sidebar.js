@@ -379,20 +379,32 @@
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
 
+                var r = document.getElementById("userkey-key");
+                var q = document.getElementById("userkey-category");
+                var v = document.getElementById("userkey-value");
+
                 registerBackButton(self, ".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function () {
-                    var r = document.getElementById("userkey-key");
                     var key = catKey;
                     var type = r.value;
                     var title = r.options[r.selectedIndex].dataset.title;
+
                     var funcArgs = {
-                        isArray: true
+                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                        noIndex: true
                     };
                     var val = {
-                        value: document.getElementById("userkey-value").value,
-                        title: title,
+                        value: v.value,
+                        title: r.options[r.selectedIndex].dataset.title,
                         type: type
                     };
+                    if (sidebar.currentState.customEntryActive) {
+                        val = {
+                            value: v.value,
+                            title: document.getElementById("custom-type").value,
+                            type: type
+                        };
+                    }
                     onConfirm(userId, key, val, funcArgs);
                 }.bind(args));
 
@@ -409,15 +421,24 @@
                     onDelete(args.userid, data);
                 });
 
-
-                var q = document.getElementById("userkey-category");
                 let doc = res.dataset.user.categories;
 
                 // set current category
                 setCurrentUserKey(q,catKey);
                 // populate
                 populateUserKeys(self, doc, q.options[q.selectedIndex].dataset.datasetid, {
-                    createNewEntry: true,
+                    createNewEntry: {
+                        enabled: true,
+                        callback: {
+                            onEnabled: function() {
+                                sidebar.currentState.customEntryActive = true;
+                            },
+                            onDisabled: function() {
+                                sidebar.currentState.customEntryActive = false;
+                            },
+                        }
+                    },
+                    val: ""
                 });
             });
         };

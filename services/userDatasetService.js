@@ -15,7 +15,7 @@ module.exports = {
     delete: _delete,
 };
 
-/** @typedef {import("../schemes/qualificationScheme").UserDatasetSchema} UserDatasetSchema */
+/** @typedef {import("../schemes/userDatasetScheme.js").UserDatasetSchema} UserDatasetSchema */
 
 /**
  * Gets all qualifications from the database

@@ -525,7 +525,7 @@ Classes
 }
 .newsfeed .newsfeed-container .news-item {
   flex: 0 0 100%;
-  margin: 0.5em 0;
+  margin: .5em 0;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   .newsfeed .newsfeed-container .news-item {
@@ -554,7 +554,7 @@ Classes
   top: 1em;
   left: 0;
   display: block;
-  padding: 0.5em 1em;
+  padding: .5em 1em;
   font-size: 80%;
   font-weight: lighter;
   font-stretch: condensed;
@@ -722,7 +722,7 @@ styling for the lidl imagebox to make it a newsfeed
 }
 .lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label a:not(.lidl-hideDefault)::before {
   content: "»";
-  padding-right: 0.5em;
+  padding-right: .5em;
   color: #c31d34;
 }
 .lidl-imagebox.style-newsfeed .lidl-imagebox-container .lidl-imagebox-slider .lidl-imagebox-image .lidl-imagebox-image-label a:not(.lidl-hideDefault):hover {
@@ -749,9 +749,9 @@ styling for the lidl imagebox to make it a newsfeed
 .lidl-imagebox.style-newsfeed .lidl-imagebox-nav.nav-bottom .lidl-imagebox-nav-label .nav-dot {
   float: left;
   display: block;
-  margin: 0.5em;
-  width: 0.6em;
-  height: 0.6em;
+  margin: .5em;
+  width: .6em;
+  height: .6em;
   background-color: transparent;
   border: 1px solid #333;
   border-radius: 50%;

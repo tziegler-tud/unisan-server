@@ -231,7 +231,7 @@
   }
 }
 .nav #menu .menu-entries ul li a {
-  padding: 1em 0.8em;
+  padding: 1em .8em;
   display: block;
 }
 .nav #menu .menu-entries ul li a:hover {
@@ -498,7 +498,7 @@ button {
   display: inline-block;
   font-size: 100%;
   vertical-align: bottom;
-  padding: 0.6em 0.5em;
+  padding: .6em .5em;
   text-decoration: none;
   border-radius: 10%;
   line-height: 0;
@@ -920,15 +920,15 @@ a.inline-link.external::before {
   width: 1em;
   height: 1em;
   float: left;
-  margin-right: 0.5ex;
-  margin-left: 0.5ex;
+  margin-right: .5ex;
+  margin-left: .5ex;
   content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 127.16653 128.65965"><g stroke="%23c31d34" stroke-width="6" fill="none"><path d="m59.144 3.1302h-56.674v123.23h56.497"/><path d="m26.128 63.335h97.102"/><path d="m86.51 99.881 36.37-36.37-36.194-36.193"/></g></svg>');
 }
 .content-list {
   list-style: square;
 }
 .content-list li {
-  margin-top: 0.5em;
+  margin-top: .5em;
 }
 .content-link {
   color: white;
@@ -965,7 +965,7 @@ a.inline-link.external::before {
   background-color: #c31d34;
   display: inline-block;
   padding: 0.5em 1em;
-  margin: 0.5em 0.5em;
+  margin: .5em .5em;
   -webkit-transition: background-color 100ms ease;
   -moz-transition: background-color 100ms ease;
   -o-transition: background-color 100ms ease;
@@ -988,7 +988,7 @@ a.inline-link.external::before {
   color: #c31d34;
   border: 1px solid #c31d34;
   padding: 0.5em 1em;
-  margin: 0.5em 0.5em;
+  margin: .5em .5em;
   display: inline-block;
   vertical-align: middle;
   -webkit-transform: perspective(1px) translateZ(0);
@@ -1110,9 +1110,9 @@ a.inline-link.external::before {
   width: 1em;
   height: 1em;
   float: left;
-  margin-right: 0.5ex;
-  margin-left: 0.5ex;
-  padding: 1em 0.5em;
+  margin-right: .5ex;
+  margin-left: .5ex;
+  padding: 1em .5em;
   content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>');
 }
 .send-a-fish .mail-body-hidden,
@@ -1563,7 +1563,7 @@ special classes
   outline: 1px solid #2e2e5f;
 }
 #footer-mobile #footer-mobile-container #footer-top .footer-entries ul li a {
-  padding: 1em 0.8em;
+  padding: 1em .8em;
   display: block;
 }
 @media only screen and (min-width: 75em) {
@@ -1573,7 +1573,7 @@ special classes
 }
 @media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   #footer-mobile #footer-mobile-container #footer-top .footer-entries ul li a {
-    padding: 1.5em 0.8em;
+    padding: 1.5em .8em;
   }
 }
 #footer-mobile #footer-mobile-container #footer-top .footer-entries ul li span {
@@ -1704,7 +1704,7 @@ special classes
   display: block;
   float: left;
   width: 2em;
-  padding: 0.5em;
+  padding: .5em;
 }
 #footer-mobile #footer-mobile-container #footer-middle #footer-social #footer-social-container a svg {
   width: 100%;
@@ -1799,7 +1799,7 @@ special classes
   flex: 1 1 29%;
   font-size: 90%;
   min-width: 150px;
-  margin: 0.5em 2%;
+  margin: .5em 2%;
   position: relative;
 }
 @media only screen and (max-width: 25em) {
@@ -1816,7 +1816,7 @@ special classes
   display: block;
   color: #f5f5f5;
   float: left;
-  margin-right: 0.7em;
+  margin-right: .7em;
   position: relative;
   bottom: 0.25em;
 }
@@ -1829,7 +1829,7 @@ special classes
 }
 #footer-mobile #footer-mobile-container .footer-bottom #footer-bottom-inner #footer-location svg {
   width: 1em;
-  margin-right: 0.5em;
+  margin-right: .5em;
 }
 #footer-mobile #footer-mobile-container .footer-bottom #footer-bottom-inner #footer-location span:before {
   content: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>');
@@ -1880,7 +1880,7 @@ special classes
   display: block;
   color: #f5f5f5;
   float: right;
-  margin-left: 0.5em;
+  margin-left: .5em;
   position: relative;
   top: 0.15em;
   content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>');
@@ -1934,7 +1934,7 @@ special classes
 #footer-mobile #footer-mobile-container .footer-bottom #footer-bottom-inner #footer-cp div span {
   display: block;
   float: left;
-  margin-bottom: 0.5em;
+  margin-bottom: .5em;
 }
 #footer-mobile #footer-mobile-container .footer-bottom #footer-bottom-inner #footer-cp div span svg {
   color: #aaaaaa;
