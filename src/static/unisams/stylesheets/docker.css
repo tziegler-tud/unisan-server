@@ -169,11 +169,21 @@
   display: block;
   float: left;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.docker-container-active {
-  border-bottom: 1px solid #AAA;
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.collapsing.expanded .docker-mainElement {
+  border-bottom-width: 0 !important;
 }
-.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.docker-container-active .docker-mainElement {
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.collapsing.expanded .docker-subElementContainer {
   border-bottom: 1px solid #AAA;
+  height: auto;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer.collapsing .docker-subElementContainer {
+  overflow: hidden;
+  height: 0;
+  background-color: #eaeaea;
+  -webkit-transition: height 500ms ease;
+  -moz-transition: height 500ms ease;
+  -o-transition: height 500ms ease;
+  transition: height 500ms ease;
 }
 .nav-docker .docker-wrapper .docker-inner .docker-elementContainer.docker-container-active .docker-mainElement:before {
   width: 5px;
@@ -233,9 +243,13 @@
 }
 .nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-mainElement {
   font-size: 100%;
+  border-bottom: 1px solid #AAA;
 }
 .nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-subElement {
   font-size: 90%;
+}
+.nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-subElement a {
+  margin-left: 1em;
 }
 .nav-docker .docker-wrapper .docker-inner .docker-elementContainer .docker-element.docker-subElement:before {
   background-color: rgba(32, 59, 125, 0.74);
@@ -251,4 +265,4 @@
 .no-js #nav-static {
   display: none;
 }
-/*# sourceMappingURL=menu.css.map */
+/*# sourceMappingURL=docker.css.map */

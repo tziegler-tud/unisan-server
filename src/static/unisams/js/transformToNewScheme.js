@@ -24,19 +24,23 @@ function transformUser(userId){
             generalData: {
                 firstName: {
                     title: "Vorname",
-                    value: user.generalData.firstName,
+                    value: user.firstName,
                 },
                 lastName: {
                     title: "Nachname",
-                    value: user.generalData.lastName,
+                    value: user.lastName,
                 },
                 memberId: {
                     title: "Mitgliedsnummer",
                     value: user.generalData.memberId
                 },
-                customData: user.generalData.customData
-            }
+            },
+            contactData: [],
         };
+
+        if (user.email) {
+            data.contactData.push({type: "email", title: "Email (restore)", value: user.email});
+        }
 
 
         $.ajax({

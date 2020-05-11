@@ -76,6 +76,9 @@
 .subpage-container .subpage-heading .sec-heading-img {
   flex: 0 0 10em;
 }
+.userimg-container {
+  margin-left: 2em;
+}
 .userimg-container.sec-heading-img {
   font-size: 100%;
   margin-right: 3em;

@@ -1,6 +1,6 @@
 var lidlRTO = window.lidlRTO;
 
-window.dockerArgs = {containerSelector: "docker-inner"};
+window.dockerArgs = {containerSelector: "nav-docker"};
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     lidl.addDebugCategory(lidl.debugCategory.FULL);
 
-    window.Docker = new common.Docker(window.dockerArgs);
+    window.DockerElement = new docker.Docker(window.dockerArgs);
+    // window.DockerElement.addDockerSubPage();
 
     Handlebars.registerHelper('transformDateString', function(dateString) {
         var myDate = new Date(dateString);

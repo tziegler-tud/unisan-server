@@ -2,11 +2,11 @@
 ## NodeJs app containing both backend and frontend
 ### Author: Tom Ziegler
 #### Contributers: 
-
+github.com/SoulKa
 
 
 ### Purpose
-Extension of the publicly available website [www.unisan-dresden.de](http://lesscss.org/) with backbone api and frontend for a sophisticated web-based management application.
+Extension of the publicly available website [unisan-dresden.de](https://www.unisan-dresden.de) with backbone api and frontend for a sophisticated web-based management application.
 
 Planned features include a user management, event mangement, an eLearning area and CMS for the public website.
 #### Current state (02.02.2020):

@@ -3,20 +3,13 @@ var common = window.common;
 var actions = window.actions;
 
 $(document).ready (function () {
-    var url = "/unisams/usermod/" + window.exploreUserId;
-    console.log(url);
-    $.ajax({
-        url: url,
-        type: 'GET',
-        cache: false,
-        isModified: false,
-        data: {},
-        success: function (context) {
-        buildPage(context)
-        },
-        error: function(context){
-            alert(context.status);
-        }
+
+    profile.getUser()
+        .then(function(user){
+            buildPage(user)
+        })
+        .catch(function(reason){
+        console.error("Failed to retrieve user data:" + reason)
     });
 
     function buildPage(user) {
@@ -375,6 +368,7 @@ $(document).ready (function () {
             var keyId = self.dataset.keyid;
             var key = self.dataset.key;
 
+
             var field = common.refJSON(user, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
@@ -383,11 +377,9 @@ $(document).ready (function () {
                     catKey: self.dataset.catkey,
                     field: field,
                     user: user,
+                    type: self.dataset.type,
                     callback: {
-                        onConfirm: function (userid, key, value) {
-                            var args = {
-                                //isArray: false
-                            };
+                        onConfirm: function (userid, key, value, args) {
                             actions.updateDBKey(userid, key, value, args, function () {
                                 addDBKey_sidebar.hide();
                                 $(e.currentTarget).find(".userkey-entry-value").html(value.value);
