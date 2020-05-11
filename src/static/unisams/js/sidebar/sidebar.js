@@ -600,7 +600,12 @@
         res.exploreUser = args.user;
         var corrupted = false;
 
-        var isCustomEntry = (type === "customData");
+        var isCustomEntry = false;
+        var filterValue = field.title;
+        if (type === "customData") {
+            isCustomEntry = true;
+            filterValue = "customData";
+        }
 
         getDataFromServer("/unisams/dataset/user/getCategories", function(context){
             res.dataset.user = context;
@@ -674,8 +679,8 @@
                             },
                         },
                         filter: {
-                            key: "data-type",
-                            value: field.type,
+                            key: "data-title",
+                            value: filterValue,
                         },
                         isCustomEntry: isCustomEntry,
                         findExistingEntries: {
@@ -1215,6 +1220,7 @@
                     // add option to create new key
                     const option = document.createElement('option');
                     option.value = "customData";
+                    option.dataset.title = "customData";
                     option.dataset.type = "customData";
                     option.innerHTML = "Neu anlegen...";
                     option.dataset.isarray = "true";
