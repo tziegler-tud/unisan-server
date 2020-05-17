@@ -2,9 +2,20 @@ var lidlRTO = window.lidlRTO;
 var common = window.common;
 var actions = window.actions;
 
+
 $(document).ready (function () {
 
-    profile.getUser()
+    var currentExploredUser;
+    var profile = new window.profile.Profile(window.exploreUserId);
+
+    // create new observer
+    var observer = new lidl.Observer(function(user){
+        currentExploredUser = user;
+    });
+
+    // get user data from user service
+    //subscribe as observer to get notification if user changes on server
+    profile.getUserAndSubscribe(observer)
         .then(function(user){
             buildPage(user)
         })
@@ -12,7 +23,9 @@ $(document).ready (function () {
         console.error("Failed to retrieve user data:" + reason)
     });
 
+
     function buildPage(user) {
+        currentExploredUser = user;
         var userid = window.exploreUserId;
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
@@ -306,61 +319,6 @@ $(document).ready (function () {
             addDBKey_sidebar.show();
         });
 
-        // $(".usercontact-entry").on("click", function(e) {
-        //     e.preventDefault();
-        //     var self = this;
-        //
-        //     addDBKey_sidebar.addContent('UserUpdateContactKey', {
-        //             userid: userid,
-        //             keyId: self.dataset.keyid,
-        //             key: self.dataset.key,
-        //             catKey: self.dataset.catkey,
-        //             title: self.dataset.title,
-        //             subKey: self.dataset.subkey,
-        //             value: self.dataset.value,
-        //             callback: {
-        //                 onConfirm: function(userid, key, value) {
-        //                     var args = {
-        //                         //isArray: false
-        //                     };
-        //                     actions.updateDBKey(userid, key, value, args, function(){
-        //                         addDBKey_sidebar.hide();
-        //                         $(e.currentTarget).find(".userkey-entry-value").html(value.value);
-        //                         e.currentTarget.dataset.value = value.value;
-        //                     });
-        //                 },
-        //                 onDelete: function(userid, key, data){
-        //                     var args = {
-        //                         isArray: true
-        //                     };
-        //
-        //                     const dialog_content = {
-        //                         title: "Eintrag löschen",
-        //                         message: "Folgender Eintrag wird gelöscht: " + data.title,
-        //                         titleArg: "",
-        //                         messageArg: ""
-        //                     };
-        //                     var dialog_token = lidlRTO.objectManager.createNewObjectToken();
-        //                     const dialog_args = {
-        //                         userid: userid,
-        //                         callback: {
-        //                             onConfirm: function(res){
-        //                                 actions.removeDBKey(userid, key, data, args, function(){
-        //                                     $("#userkey-" + common.escapeSelector(key)).remove();
-        //                                 });
-        //                                 lidlRTO.objectManager.removeObject(dialog_token);
-        //                             }
-        //                         }
-        //                     };
-        //                     const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
-        //                     lidlRTO.objectManager.addObject(dialog, dialog_token);
-        //                     dialog.openDialog();
-        //                 }
-        //             },
-        //         },
-        //     );
-        //     addDBKey_sidebar.show();
-        // });
 
         $(".usercontact-entry").on("click", function (e) {
             e.preventDefault();
@@ -369,18 +327,18 @@ $(document).ready (function () {
             var key = self.dataset.key;
 
 
-            var field = common.refJSON(user, key);
+            var field = common.refJSON(currentExploredUser, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
                     userid: userid,
                     key: key,
                     catKey: self.dataset.catkey,
                     field: field,
-                    user: user,
-                    type: self.dataset.type,
+                    user: currentExploredUser,
+                    type: field.type,
                     callback: {
                         onConfirm: function (userid, key, value, args) {
-                            actions.updateDBKey(userid, key, value, args, function () {
+                            profile.updateDBKey(key, value, args, function () {
                                 addDBKey_sidebar.hide();
                                 $(e.currentTarget).find(".userkey-entry-value").html(value.value);
                                 $(e.currentTarget).find(".userkey-entry-title").html(value.title);

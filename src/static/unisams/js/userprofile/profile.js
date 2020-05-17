@@ -5,10 +5,30 @@
 //TODO: move this to own namespace
 
 
-    // find the userid
-    profile.currentViewedUser = {};
-    profile.currentViewedUser.userId = window.exploreUserId;
 
+
+
+    var observers = [];
+
+    /**
+     * Constructor of profile element. Instantiate this for one call of a profile-related request.
+     *
+     * Singleton
+     *
+     * @constructor
+     *
+     */
+
+    profile.Profile = function(userId){
+        // find the userid
+        this.currentViewedUser = {};
+        this.currentViewedUser.userId = userId;
+        return this;
+    };
+
+    profile.init = function(){
+
+    };
 
     /**
      *
@@ -74,9 +94,7 @@
         })
     };
 
-    profile.init = function(){
 
-    };
 
     var subscribeToPendingRequest = function(){
         return new Promise(function(resolve,reject){
@@ -91,19 +109,22 @@
      *
      * Service function to get the user data. Only one api call is done at a time.
      *
+     * @params subscribe {Boolean}
+     * @params obj {Object} subscribing object. Must implement a "update" function
      *
      * @returns {Promise<Object|String>}
      */
-    profile.getUser = function(){
+    profile.Profile.prototype.getUser = function(){
+        var self = this;
         return new Promise(function(resolve, reject){
             let returnUser = function (user) {
-                profile.currentViewedUser.user = user;
-                resolve(profile.currentViewedUser.user);
+                self.currentViewedUser.user = user;
+                resolve(self.currentViewedUser.user);
             };
             let fail = function (reason) {
                 reject(reason);
             };
-          if (profile.currentViewedUser.user === undefined) {
+          if (self.currentViewedUser.user === undefined) {
               // check if request is already pending
               if (pendingUserRequest.isActive) {
                   pendingUserRequest.subscribe()
@@ -115,7 +136,7 @@
                       })
               }
               else {
-                  getUserFromServer(profile.currentViewedUser.userId)
+                  getUserFromServer(self.currentViewedUser.userId)
                       .then(function(context){
                           returnUser(context)
                       })
@@ -125,12 +146,83 @@
               }
           }
           else {
-              resolve(profile.currentViewedUser.user)
+              resolve(self.currentViewedUser.user)
           }
         });
 
     };
 
-return profile
+    /**
+     *
+     * Service function to get the user data. Only one api call is done at a time.
+     * Callee is subscribed as observer to be notified if user data changes
+     *
+     * @params subscribe {Boolean}
+     * @params obj {Object} subscribing object. Must implement a "update" function
+     *
+     * @returns {Promise<Object|String>}
+     */
+
+    profile.Profile.prototype.getUserAndSubscribe = function(observer){
+        observers.push(observer);
+        return this.getUser();
+
+    };
+
+    profile.Profile.prototype.refreshUser = function(){
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            let returnUser = function (user) {
+                self.currentViewedUser.user = user;
+                resolve(self.currentViewedUser.user);
+            };
+            let fail = function (reason) {
+                reject(reason);
+            };
+            getUserFromServer(self.currentViewedUser.userId)
+                .then(function (context) {
+                    returnUser(context)
+                })
+                .catch(function (reason) {
+                    fail(reason)
+                })
+        });
+    };
+
+    profile.Profile.prototype.notifyObservers = function(){
+        this.getUser().then(function(user){
+            observers.forEach(function(ob){
+                ob.update(user)
+            })}
+        ).catch(function(){
+
+        });
+    };
+
+    profile.Profile.prototype.updateDBKey = function(keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
+        var self = this;
+        var data = {
+            key: keyIdentifier,
+            value: value,
+            args: args,
+        };
+        $.ajax({
+            url: "/unisams/usermod/updateKey/" + self.currentViewedUser.userId,
+            // make put for safety reasons :-)
+            type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                self.refreshUser().then(function(){
+                    self.notifyObservers();
+                }).catch(reason => console.error(reason));
+                callback();
+            }
+        });
+    };
+
+return profile;
 
 }(window.profile = window.profile||{}, jQuery));

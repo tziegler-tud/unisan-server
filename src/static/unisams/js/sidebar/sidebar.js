@@ -629,7 +629,7 @@
                     var title = r.options[r.selectedIndex].dataset.title;
 
                     var funcArgs = {
-                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                        isArray: true,
                         noIndex: true,
                     };
                     var val = {
