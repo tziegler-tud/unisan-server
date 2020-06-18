@@ -31,6 +31,8 @@ router.get('/',  auth, getAll);
 router.get('/addUser', auth, addUser);
 router.get('/:username', auth, viewUser);
 router.get('/:username/editUser', auth, editUser);
+router.get('/:username/logs', auth, userLogs);
+router.get('/:username/events', auth, userEvents);
 
 
 
@@ -121,6 +123,73 @@ function editUser(req, res, next) {
             }
         })
         .catch(err => next(err));
+}
+
+function userLogs(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                res.render("unisams/user/logs", {
+                    user: req.user._doc,
+                    generalData: req.user._doc.generalData,
+                    customData: req.user._doc.customData,
+                    title: user.username,
+                    exploreUser: user,
+                    exploreUserDocument: user._doc,
+                    refurl: req.params.username
+                })
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
+
+}
+
+
+function userEvents(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                res.render("unisams/user/events", {
+                    user: req.user._doc,
+                    generalData: req.user._doc.generalData,
+                    customData: req.user._doc.customData,
+                    title: user.username,
+                    exploreUser: user,
+                    exploreUserDocument: user._doc,
+                    refurl: req.params.username
+                })
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
+
 }
 
 

@@ -25,6 +25,8 @@ $(document).ready (function () {
 
 
     function buildPage(user) {
+        window.DockerElement = new docker.Docker(window.dockerArgs);
+        window.DockerElement.addDockerSubPage(user);
         currentExploredUser = user;
         var userid = window.exploreUserId;
 

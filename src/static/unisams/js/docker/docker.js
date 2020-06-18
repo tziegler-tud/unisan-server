@@ -30,6 +30,7 @@
 
         dockerArgs = applyArgs(dockerArgs);
         this.dockerArgs = dockerArgs;
+        this.observers = [];
 
         //find docker-container dom element.
         this.wrapper = document.getElementById(dockerArgs.containerSelector);
@@ -38,7 +39,7 @@
         let context = {};
         let self = this;
         // render template
-        $.get('/static/unisams/js/docker/templates/docker.hbs', function (data) {
+        $.get('/static/unisams/js/docker/templates/docker-container.hbs', function (data) {
             var template = Handlebars.compile(data);
             self.wrapper.innerHTML= template(context);
 
@@ -47,11 +48,25 @@
             const el = document.getElementById(dockerArgs.activeElementId);
             if(el) activateElement(container, el);
 
-            this.elementContainer = findElementContainer();
-            initEventHandlers(this);
-        });
+            self.elementContainer = findElementContainer();
+            initEventHandlers(self);
 
+            //enable subpages
+            self.subpagesEnabled = true;
+            self.ready = true;
+            self.resolveObserver(true);
+        });
         return this;
+    };
+
+    docker.Docker.prototype.resolveObserver = function(payload){
+      this.observers.forEach(function(ob){
+          ob.resolve(payload);
+      })
+    };
+
+    docker.Docker.prototype.addObserver = function(obj){
+      this.observers.push(obj)
     };
 
     var applyArgs = function(args){
@@ -92,7 +107,7 @@
                 //collaps all other expanded containers
                 //never collaps active container
                 for (let el of self.elementContainer){
-                    if(el.id === container.id || !el.classList.contains("expanded") || el.classList.contains("docker-container-active")) continue;
+                    if(el.id === container.id || !el.classList.contains("expanded") || el.classList.contains("docker-container-active") || !el.classList.contains("collapsing")) continue;
                     collapseContainer(el);
                 }
                 // expand container
@@ -100,6 +115,55 @@
             }
 
         })
+    };
+
+    /**
+     *
+     * sets up event handlers for the new subpage without compromising existing ones.
+     *
+     * @param dockerInstance {Docker} the docker instance
+     * @param subpage {HTMLElement} the subpage dom element
+     * @param activate {Boolean} renders the subpage the active container
+     */
+
+    const addSubpageEventHandlers = function(dockerInstance, subpage, activate){
+
+        const self = dockerInstance;
+        //add onclick handlers to docker elements
+        $(subpage).find($(".docker-subElement")).on('click', function(e) {
+            //just follow link, nothing to do here for now
+        });
+
+        // clicks on mainElement shall expand container, second click should follow link
+        $(subpage).find($(".docker-mainElement")).on('click', function(e) {
+            // find container TODO: do not use jquery
+            let container = $(e.currentTarget).parent(".docker-elementContainer")[0];
+
+            // might prove better to use state module pattern if this grows.
+            e.stopPropagation();
+            e.preventDefault();
+            // check if container is expanded
+            if (container.classList.contains("expanded")) {
+                // collaps it.
+                collapseContainer(container);
+            }
+            else {
+                //collaps all other expanded containers
+                //never collaps active container
+                // collaps only containers with class "collapsing"
+                for (let el of self.elementContainer){
+                    if(el.id === container.id || !el.classList.contains("expanded") || el.classList.contains("docker-container-active") || !el.classList.contains("collapsing")) continue;
+                    collapseContainer(el);
+                }
+                // expand container
+                expandContainer(container)
+            }
+
+        })
+        //currently done via hbs template class assignment
+        // if (activate) {
+        //
+        // }
     };
 
     const collapseContainer = function (container) {
@@ -174,29 +238,110 @@
         return this.activeElementId;
     };
 
+    docker.Docker.prototype.notifyWhenReady = function(target){
+        var self = this;
+        return new Promise(function(resolve,reject){
+            if (self.ready){
+                resolve();
+            }
+            else {
+                //wait for docker to build dom
+                //add promise
+                var p = {
+                    resolve: function(){
+                      resolve();
+                    },
+                    reject: function(){
+                        reject();
+                    },
+                }
+                self.addObserver(p);
+            }
+        })
+    };
+
     /**
      * adds a subpage to the docker
      */
-    docker.Docker.prototype.addDockerSubPage = function(){
+    docker.Docker.prototype.addDockerSubPage = function(user){
         // testing. lets just render the user subpage
         var self = this;
         // build context
         var context = {};
 
-        // var wrapper = document.getElementById("docker-content");
-        //
-        // $.get('/static/unisams/js/docker/templates/subpage-user.hbs', function (data) {
-        //     var template = Handlebars.compile(data);
-        //     wrapper.innerHTML= template(context);
-        //
-        //     //initially setup dom elements
-        //     const container = document.getElementById(dockerArgs.activeContainer);
-        //     const el = document.getElementById(dockerArgs.activeElementId);
-        //
-        //     this.elementContainer = findElementContainer();
-        //
-        //});
+        //generate subpageId
+        var id = subpageHandler.generateId();
+
+        var subpage = {
+            id: id,
+            isActive: false,
+        }
+
+        subpageHandler.add(subpage);
+
+
+        $.get('/static/unisams/js/docker/templates/subpage-user.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            appendContent(template)
+        });
+
+        function appendContent(template) {
+        self.notifyWhenReady()
+            .then(function() {
+                var subpageContainer = document.getElementById("docker-subPage-container");
+                context = {
+                    id: id,
+                    exploredUser: user
+                };
+                subpageContainer.innerHTML= template(context);
+                const subpageDom = document.getElementById(id);
+                addSubpageEventHandlers(self, subpageDom, true);
+                subpageHandler.show(id);
+                //initially setup dom elements
+                const container = document.getElementById(dockerArgs.activeContainer);
+                const el = document.getElementById(dockerArgs.activeElementId);
+                if(el) activateElement(container, el);
+            })
+            .catch()
+        }
+
+        return id;
     };
+
+    var subpageHandler = {
+        counter: {
+            value: 0,
+            increase: function(){
+                this.value++;
+                return this.value;
+            }
+        },
+        subpages: [],
+        findById: function(){
+            console.warn("not implemented");
+        },
+        add: function(subpage){
+            this.subpages.push(subpage);
+        },
+        show: function(id){
+            let page = this.findById(id);
+            //add css class to page
+            let dom = document.getElementById(id);
+            dom.classList.add("subpage-active");
+        },
+        hide: function(id){
+            let page = this.findById(id);
+            //add css class to page
+            let dom = document.getElementById(id);
+            dom.classList.remove("subpage-active");
+        },
+        generateId: function(){
+            return "docker-subpage_" + this.counter.increase();
+        }
+
+    }
+
+
 
     return docker;
 

@@ -52,6 +52,9 @@ async function create(userParam) {
     if (await User.findOne({ username: userParam.username }))
         throw new Error(`Username "${userParam.username}" is already taken`);
 
+    if (await User.findOne({ generalData: {memberId: userParam.generalData.memberId }}))
+        throw new Error(`MemberId ` + userParam.generalData.memberId + ` is already taken`);
+
     const user = new User(userParam);
 
     // @louis: password is not mentioned in the userScheme. Is this correct?
@@ -358,3 +361,9 @@ async function updateKey(id, key, value, userParams) {
 async function _delete(id) {
     await User.findByIdAndRemove(id);
 }
+
+/**
+ *  generates a fresh member id
+ *
+ */
+

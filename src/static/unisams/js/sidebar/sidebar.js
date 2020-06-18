@@ -101,17 +101,20 @@
             this.isActive = false;
             this.sidebarHTML.removeClass("sidebar-active");
             this.parent.removeClass("sidebar-active");
+            document.body.classList.remove("noscroll");
         }
         else {
             this.isActive = true;
             this.sidebarHTML.addClass("sidebar-active");
             this.parent.addClass("sidebar-active");
+            document.body.classList.add("noscroll");
         }
     };
 
     common.Sidebar.prototype.show = function(){
         this.sidebarHTML.addClass("sidebar-active");
         this.parent.addClass("sidebar-active");
+        document.body.classList.add("noscroll");
 
         this.isActive = true;
     };
@@ -119,6 +122,7 @@
     common.Sidebar.prototype.hide = function(){
         this.sidebarHTML.removeClass("sidebar-active");
         this.parent.removeClass("sidebar-active");
+        document.body.classList.remove("noscroll");
 
         this.isActive = false;
     };
@@ -171,7 +175,14 @@
             self.sidebarHTML.html(template(context));
             registerBackButton(self,".sidebar-back-btn");
             registerConfirmButton(self, ".sidebar-confirm", function(){
-                onConfirm($("#addUserForm-username").val(), $("#addUserForm-password").val(), $("#addUserForm-firstName").val(), $("#addUserForm-lastName").val());
+                let generalData = {
+                    firstName: $("#addUserForm-firstName").val(),
+                    lastName: $("#addUserForm-lastName").val(),
+                };
+                let memberId = {
+                    setCustom: false,
+                };
+                onConfirm($("#addUserForm-username").val(), $("#addUserForm-password").val(), generalData, memberId);
             }.bind(args));
         });
     };

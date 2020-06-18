@@ -7,6 +7,8 @@
 
   color:            @page-font-color;
   width:            100%;
+  flex:             0 0 100%;
+  order:            2;
   height:           @topnav-height;
   margin:           0;
   //box-shadow:       10px 0 5px grey;
@@ -20,7 +22,8 @@
   display: flex;
   flex-flow: row wrap;
 
-  @media @desktop,@tablet-landscape {
+  @media @desktop, @tablet-landscape {
+    order: 1;
   }
 
   .nav-element {
@@ -113,7 +116,7 @@
 
 .nav-docker {
 
-  flex: 0 0 @docker-width;
+  flex: 0 0 100%;
   position: relative;
 
   border-right: 1px solid @menu-border-color;
@@ -123,11 +126,19 @@
   z-index: 6;
   color: @docker-font-color;
 
+  @media @desktop, @tablet-landscape {
+    flex: 0 0 @docker-width;
+  }
+
   .docker-wrapper {
 
 
     width: 100%;
-    height: 100vh;
+
+
+    @media @desktop, @tablet-landscape {
+      height: 100vh;
+    }
 
     .docker-inner {
       margin: 0;
@@ -192,6 +203,21 @@
         }
       }
 
+      .docker-content {
+        position: relative;
+        .docker-mainPage {
+
+        }
+        .docker-subPage-container {
+          //position: absolute;
+          .docker-subpage {
+            &.subpage-active {
+              display: block;
+            }
+          }
+        }
+      }
+
       .docker-elementContainer {
 
         &.collapsing {
@@ -226,7 +252,7 @@
 
         }
         .docker-subElementContainer {
-
+          background-color: @docker-background-color2;
         }
 
         .docker-element {

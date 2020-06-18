@@ -29,12 +29,14 @@ $(document).ready (function () {
         sidebar.addContent('addUser', {
                 userid: null,
                 callback: {
-                    onConfirm: function(username, password, firstName, lastName){
+                    onConfirm: function(username, password, generalData, memberId){
                         let args = {
-                            username: username,
-                            password: password,
-                            firstName: firstName,
-                            lastName: lastName
+                            data: {
+                                username: username,
+                                password: password,
+                                generalData: generalData,
+                            },
+                            memberId: memberId
                         };
                         actions.addUser(args);
                     }

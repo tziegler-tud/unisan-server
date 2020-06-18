@@ -3,12 +3,19 @@ extends ../layout
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     script(src="/static/unisams/js/userprofile/userprofile.js")
+    script(src="/static/unisams/js/userprofile/profile.js")
     script(src="/static/unisams/js/userprofile/viewUser.js")
     script(src="/static/unisams/js/userprofile/updateUser.js")
+    script(src="/static/unisams/js/userprofile/init.js")
     script(src="/static/unisams/js/actions.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script.
+        window.exploreUserId = "#{exploreUser.id}";
+        window.dockerArgs.activeContainer = "userprofileContainer";
+        window.dockerArgs.activeElementId = "userprofile";
 
     script(type="text/template" id="qq-template-manual-trigger")
         <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -70,11 +77,6 @@ block page_includes
         </dialog>
         </div>
 
-
-
-    script.
-        window.exploreUserId = "#{exploreUser.id}";
-        window.activeDockerSection = "usermanagement";
 block content
     #wrapper
         #page-container.page-container

@@ -2,17 +2,32 @@ common = window.common;
 (function (actions,$,undefined) {
 
     actions.addUser = function(args) {
+        var memberId = {
+            title: "Mitgliedsnummer",
+        }
+        if (args.memberId.setCustom){
+            memberId.value = args.memberId.value;
+        }
         var data = {
-            username: args.username,
-            password: args.password,
+            username: args.data.username,
+            password: args.data.password,
             generalData: {
-                firstName: args.firstName,
-                lastName: args.lastName
+                firstName: {title: "Vorname", value: args.data.generalData.firstName},
+                lastName: {title: "Nachname", value: args.data.generalData.lastName},
+                memberId: memberId,
             },
         };
-        $.post('/unisams/usermod/create', data, function(resp) {
-            location.replace("/unisams/user/" + data.username + "/editUser")
-            // do something when it was successful
+
+        $.ajax({
+            url: "/unisams/usermod/create",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                location.replace("/unisams/user/" + data.username + "/editUser")
+            }
         });
     };
 
