@@ -1,0 +1,123 @@
+@import "color-rules.less";
+@import "variables.less";
+
+form.form {
+  width: 100%;
+
+  input.form-inp {
+    display:        block;
+    border:         1px solid #BBB;
+    background-color: transparent;
+    padding:        5px 1em;
+    border-radius:  0;
+    color:          #666;
+
+    margin-bottom:  1em;
+    width: calc(~"100% - 2em");
+    max-width: 15em;
+
+    float: left;
+
+  }
+  textarea.form-inp {
+    display:        block;
+    border:         1px solid #BBB;
+    background-color: transparent;
+    padding:        5px 1em;
+    border-radius:  0;
+    color:          #666;
+    font-family:    "Open Sans", sans-serif;
+    margin-bottom:  1em;
+
+    width: calc(~"100% - 2em");
+    max-width: 25em;
+    height: 5em;
+    font-size: 90%;
+
+  }
+
+  select.form-select {
+    display: block;
+    border: 1px solid #BBB;
+    background-color: transparent;
+    padding: 5px 1em;
+    border-radius: 0;
+    color: #555;
+    margin-bottom: 1em;
+
+    width: calc(~"100% - 2em");
+    max-width: 15em;
+
+
+    &.select-disabled {
+      background-color: #CCC;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    option {
+      background-color: #fff;
+      color: #555;
+    }
+  }
+  .form-grid {
+    &.v2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .grid-item {
+
+    }
+  }
+  .form-float {
+    .form-item {
+      float: left;
+      margin-right: 1em;
+    }
+  }
+  .form-section {
+
+    display: flex;
+    flex-flow: column wrap;
+
+    margin-bottom: 2em;
+
+    .form-sectionheader {
+      font-size: 120%;
+      margin-bottom: 1em;
+      color: #666;
+
+      font-variant: small-caps;
+      letter-spacing: .15em;
+    }
+  }
+
+  .form-item {
+
+    flex: 1 1 auto;
+
+    span.form-item-label, label.form-item-label {
+      width: 100%;
+      float: left;
+      display: block;
+      margin-bottom: .5em;
+
+      @media @desktop, @tablet-landscape {
+        width: auto;
+      }
+
+      &.form-attribute-name {
+
+        width: 100%;
+        margin-right: 2em;
+        margin-bottom: 0;
+
+        color: #555;
+
+        @media @desktop, @tablet-landscape {
+          width: 8em;
+        }
+      }
+    }
+  }
+}

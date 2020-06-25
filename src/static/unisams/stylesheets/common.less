@@ -946,6 +946,20 @@ common btn styling
     margin: 0;
 }
 
+.desktop {
+    display: initial;
+    @media @phone {
+        display: none !important;
+    }
+}
+
+.mobile {
+    display: initial;
+    @media @desktop, @tablet-landscape {
+        display: none !important;
+    }
+}
+
 
 .clear {
     float:      none !important;

@@ -1,0 +1,57 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
+    script(src="/static/unisams/js/events/eventlist.js")
+    script(src="/static/unisams/js/actions.js")
+
+
+    script.
+        window.dockerArgs.activeContainer =  "eventContainer";
+        window.dockerArgs.activeElementId =  "eventlist";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            h3 event management
+                        #content1-text.sec-content
+                            .subpage-options
+                                .radiogroup
+                                    label(for="userlist01")
+                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list") <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg>
+                                        span Liste
+                                    input#userlist01.radio-item(type="radio", name="userlist-radio")
+                                    label(for="userlist02")
+                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid") <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                        span Gallerie
+                                    input#userlist02.radio-item(type="radio", name="userlist-radio")
+                            .subpage-content
+                                ul.userlist.itemlist
+                                    li.user-entry.noSelect.borderBottom
+                                        .inner
+                                            .item-property Bezeichnung
+                                            .item-property Typ
+                                            .item-property Datum
+
+                                    if eventList
+                                        each ev in eventList
+                                            li.user-entry(id= "eventId"+ ev.id data-eventid= ev.id)
+                                                a.inner()
+                                                    .item-property= ev.title.value
+                                                    .item-property= ev.type.value
+                                                    .item-property= ev.date.startDate
+                                                    .clear
+                                            //.icon-reset.before-icon(onclick="transformUser('" + user.id + "')")
+                                    a.eventlist-addEventBtn.btn-addItem.btn-listExt(href="events/addEvent")
+                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        span Hinzufügen
+                                        .clear
+
+
+
+

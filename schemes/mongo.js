@@ -33,5 +33,6 @@ mongoose.Promise = global.Promise;
 module.exports = {
     User: require('./userScheme'),
     Qualifications: require('./qualificationScheme'),
-    UserDataset: require('./userDatasetScheme')
+    UserDataset: require('./userDatasetScheme'),
+    Event: require('./eventScheme'),
 };
