@@ -43,6 +43,7 @@ var EventSchema = new Schema({
             type: Date,
             default: Date.now,
         },
+
     },
     participants: [
         {
@@ -55,10 +56,42 @@ var EventSchema = new Schema({
     },
 });
 
+EventSchema.virtual('dateRangeString').get(function() {
+    var startDate = this.date.startDate;
+    var endDate = this.date.endDate;
+
+    var dateString;
+
+    function wrapTime(timeString){
+        if(parseInt(timeString) < 10){
+            return "0" + timeString;
+        }
+        else return timeString
+    }
+    // check if startDate and EndDate is the same day
+    if (startDate.getFullYear() === endDate.getFullYear()){
+        if (startDate.getMonth() === endDate.getMonth()){
+            if (startDate.getDate() === endDate.getDate()){
+                //event ends the same day it started. Make output dd.mm.yyyy hh:mm - hh:mm
+                dateString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()) + "." + startDate.getFullYear() + " " + wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes());
+            }
+        }
+    }
+    else {
+        //event ends a different day as it started. Make output dd.mm.yyyy hh:mm - dd.mm.yyyy hh:mm
+        dateString = dateString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()) + "." + startDate.getFullYear() + " " + wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getDate()) + "." + wrapTime(endDate.getMonth()) + "." + startDate.getFullYear() + " "+ wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes());
+    }
+    return dateString;
+});
+
+EventSchema.virtual('dateRangeStringTest').get(function() {
+    return "test";
+});
+
 EventSchema.post('save', function(error, doc, next) {
     throw new Error(error);
 });
 
-EventSchema.set('toJSON', { virtuals: true });
+EventSchema.set('toJSON', { virtuals: true, getters: true });
 
 module.exports = mongoose.model('Event', EventSchema);

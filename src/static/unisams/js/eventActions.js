@@ -3,13 +3,8 @@ common = window.common;
 
     actions.addEvent = function(args) {
 
-        var startDate = new Date();
-        startDate.setDate(args.date);
-        startDate.setTime(args.startTime);
-
-        var endDate = new Date();
-        endDate.setDate(args.date);
-        endDate.setTime(args.endTime);
+        var startDate = parseHTMLInputDate(args.date, args.startTime);
+        var endDate = parseHTMLInputDate(args.date, args.endTime);
 
         var data = {
             title: {
@@ -130,5 +125,27 @@ common = window.common;
             }
         });
     };
+
+    function parseHTMLInputDate(date, time){
+        //date is of form YYYY-MM-DD
+        //TODO: make this more robust
+        var dateYear = date.substr(0,4);
+        var dateMonth = parseInt(date.substr(5,2))-1; //months are 0-based in js date
+        var dateDay = date.substr(8,2);
+
+        //time is of form hh:mm
+        var timeHours = time.substr(0,2);
+        var timeMinutes = time.substr(3,2);
+
+        var d = new Date();
+        d.setFullYear(dateYear);
+        d.setMonth(dateMonth);
+        d.setDate(dateDay);
+        d.setHours(timeHours);
+        d.setMinutes(timeMinutes);
+        d.setSeconds(0);
+
+        return d;
+    }
 
 }(actions = window.actions || {},jQuery));

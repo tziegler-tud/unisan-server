@@ -75,13 +75,13 @@ async function create(eventParam) {
     const event = new Event(eventParam);
 
     // save event
-    if(await Event.save()){
-        fs.mkdir(appRoot + '/src/data/uploads/event_images/' + Event._id.toString(), { recursive: true }, (err) => {
+    if(await event.save()){
+        fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
             if (err) {
                 throw err;
             }
             else {
-                fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ Event._id + '/' + Event._id + '.jpg', { overwrite: true }, (err) => {
+                fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', { overwrite: true }, (err) => {
                     if (err) throw err;
                     console.log('dummy image copied to new event');
                 });

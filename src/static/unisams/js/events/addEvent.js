@@ -17,8 +17,8 @@ $(function() {
             date:  $('#eventinp-date').val(),
             startTime:  $('#eventinp-timeStart').val().replace(regex, ""),
             endTime:  $('#eventinp-timeEnd').val().replace(regex, ""),
-            shortDesc:   $('#eventinp-shortDesc').val(),
-            longDesc:   $('#eventinp-longDesc').val(),
+            shortDesc:   $('#eventinp-shortdesc').val(),
+            longDesc:   $('#eventinp-longdesc').val(),
         };
         actions.addEvent(data);
     });
