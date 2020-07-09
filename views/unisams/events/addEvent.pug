@@ -88,50 +88,52 @@ block content
                         #content1-text.sec-content
                             .subpage-content.userinfo-container
                                     .userinfo-inner
-                                        form.form
-                                            .form-section
-                                                .form-sectionheader
-                                                .form-item.useredit-item(id="eventitem-title")
-                                                    label.form-item-label.form-attribute-name.nofloat(for="eventinp-title") Bezeichnung:
-                                                    input#eventinp-title.form-inp(name="title" type="text")
-                                                    .clear
-                                                .form-item.useredit-item(id="eventitem-type")
-                                                    label.form-item-label.form-attribute-name.nofloat(for="eventinp-type") Art:
-                                                    select#eventinp-type.form-select.common-select(name="type")
-                                                        option.form-option Ausbildungsabend
-                                                        option.form-option Sanitätswachdienst
-                                                        option.form-option Seminar
-                                                        option.form-option Anderes
-                                                    .clear
+                                        form.form.form-paged.pageSlider-container
+                                            .form-page.pageSlider-page
+                                                .form-section
+                                                    .form-sectionheader
+                                                    .form-item.useredit-item(id="eventitem-title")
+                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-title") Bezeichnung:
+                                                        input#eventinp-title.form-inp(name="title" type="text")
+                                                        .clear
+                                                    .form-item.useredit-item(id="eventitem-type")
+                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-type") Art:
+                                                        select#eventinp-type.form-select.common-select(name="type")
+                                                            option.form-option Ausbildungsabend
+                                                            option.form-option Sanitätswachdienst
+                                                            option.form-option Seminar
+                                                            option.form-option Anderes
+                                                        .clear
 
-                                            .form-section
-                                                .form-sectionheader
-                                                    span Datum:
-                                                .form-item.useredit-item(id="eventitem-date")
-                                                    label.form-item-label.form-attribute-name.nofloat(for="eventinp-date") Datum:
-                                                    input#eventinp-date.form-inp(name="date" type="date")
-                                                    .clear
-                                                .form-float
-                                                    .form-item.useredit-item.form-griditem(id="eventitem-timeStart")
-                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-timeStart") von:
-                                                        input#eventinp-timeStart.form-inp.timepicker(name="time" type="time" value="19:00")
+                                                .form-section
+                                                    .form-sectionheader
+                                                        span Datum:
+                                                    .form-item.useredit-item(id="eventitem-date")
+                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-date") Datum:
+                                                        input#eventinp-date.form-inp(name="date" type="date")
                                                         .clear
-                                                    .form-item.useredit-item.form-griditem(id="eventitem-timeEnd")
-                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-timeEnd") bis:
-                                                        input#eventinp-timeEnd.form-inp.timepicker(name="time" type="time" value="21:00")
+                                                    .form-float
+                                                        .form-item.useredit-item.form-griditem(id="eventitem-timeStart")
+                                                            label.form-item-label.form-attribute-name.nofloat(for="eventinp-timeStart") von:
+                                                            input#eventinp-timeStart.form-inp.timepicker(name="time" type="time" value="19:00")
+                                                            .clear
+                                                        .form-item.useredit-item.form-griditem(id="eventitem-timeEnd")
+                                                            label.form-item-label.form-attribute-name.nofloat(for="eventinp-timeEnd") bis:
+                                                            input#eventinp-timeEnd.form-inp.timepicker(name="time" type="time" value="21:00")
+                                                            .clear
                                                         .clear
-                                                    .clear
-                                            .form-section
-                                                .form-sectionheader
-                                                    span Beschreibung:
-                                                .form-item.useredit-item(id="eventitem-shortdesc")
-                                                    label.form-item-label.form-attribute-name.nofloat(for="eventinp-shortdesc") Kurzbeschreibung:
-                                                    input#eventinp-shortdesc.form-inp(name="shortdesc" type="text")
-                                                    .clear
-                                                .form-item.useredit-item(id="useritem-passwordCheck")
-                                                    label.form-item-label.form-attribute-name.nofloat(for="eventinp-longdesc") Ausführliche Beschreibung
-                                                    textarea#eventinp-longdesc.form-inp(name="longdesc")
-                                                    .clear
+                                            .form-page.pageSlider-page
+                                                .form-section
+                                                    .form-sectionheader
+                                                        span Beschreibung:
+                                                    .form-item.useredit-item(id="eventitem-shortdesc")
+                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-shortdesc") Kurzbeschreibung:
+                                                        input#eventinp-shortdesc.form-inp(name="shortdesc" type="text")
+                                                        .clear
+                                                    .form-item.useredit-item(id="useritem-passwordCheck")
+                                                        label.form-item-label.form-attribute-name.nofloat(for="eventinp-longdesc") Ausführliche Beschreibung
+                                                        textarea#eventinp-longdesc.form-inp(name="longdesc")
+                                                        .clear
 
                             #profilemanagment-menu.subpage-menu
                                 #btn01.subpage-menu-btn.float
