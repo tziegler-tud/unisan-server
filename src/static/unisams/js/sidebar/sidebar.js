@@ -1,14 +1,14 @@
 (function (common,$,undefined) {
 
     var sidebar;
+    common.sidebarCounter = 0;
 
-    common.Sidebar = function(parentId, content){
+    common.Sidebar = function(parentId, content, optionalId){
 
-        this.sidebarHTML = createHTML(this, content);
+        common.sidebarCounter++;
+
         this.parent = $('#'+ parentId);
-        this.parent.append(this.sidebarHTML);
-
-
+        this.domId = optionalId === undefined ? "sidebar" + common.sidebarCounter : optionalId;
 
         this.isActive = false;
 
@@ -16,6 +16,9 @@
             activeElement: null,
 
         };
+
+        this.sidebarHTML = createHTML(this, content);
+        this.parent.append(this.sidebarHTML);
 
 
         var self = this;
@@ -1086,7 +1089,7 @@
 
     var registerBackButton = function(self, selector){
 
-      $(selector).each(function(){
+      $(self.sidebarHTML).find($(selector)).each(function(){
           $(this).on("click", function(e){
               self.toggle();
               $(this).toggleClass("btn-rotate");
@@ -1126,7 +1129,7 @@
     var createHTML = function(self){
 
         return $('<div/>', {
-            id: "sidebar-container",
+            id: self.domId,
             class: "sidebar-container",
 
         });

@@ -10,5 +10,6 @@ $(document).ready (function () {
     sidebar.addContent("user", {
         userid: window.userId
     });
+
     sidebar.show();
 });
