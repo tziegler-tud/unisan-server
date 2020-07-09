@@ -10,6 +10,7 @@ $(document).ready (function () {
     $('.event-entry').each(function(){
         $(this).on("click", function(e){
             e.preventDefault();
+            window.location = "/unisams/events/" + this.dataset.eventid;
         })
     });
 

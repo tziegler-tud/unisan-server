@@ -40,11 +40,11 @@ block content
 
                                     if eventList
                                         each ev in eventList
-                                            li.user-entry(id= "eventId"+ ev.id data-eventid= ev.id)
+                                            li.event-entry(id= "eventId"+ ev.id data-eventid= ev.id)
                                                 a.inner()
                                                     .item-property= ev.title.value
                                                     .item-property= ev.type.value
-                                                    .item-property= ev.date.startDate
+                                                    .item-property= ev.dateRangeString
                                                     .clear
                                             //.icon-reset.before-icon(onclick="transformUser('" + user.id + "')")
                                     a.eventlist-addEventBtn.btn-addItem.btn-listExt(href="events/addEvent")

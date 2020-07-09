@@ -60,31 +60,14 @@ function addEvent(req, res, next) {
 
 function viewEvent(req, res, next) {
     eventService.getById(req.params.id)
-        .then(user => {
-            if (user) {
+        .then(ev => {
+            if (ev) {
                 res.render("unisams/events/viewEvent", {
                     user: req.user._doc,
-                    generalData: req.user._doc.generalData,
-                    customData: req.user._doc.customData,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username
+                    title: ev.title.value,
+                    exploreEvent: ev,
+                    exploreEventDocument: ev._doc,
                 })
-            }
-            else {
-                // try if id was given
-                eventService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
             }
         })
         .catch(err => next(err));
