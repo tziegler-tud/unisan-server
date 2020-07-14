@@ -23,6 +23,7 @@ router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, n
 // routes
 router.post('/create', create);
 router.get('/', getAll);
+router.post('/filter', matchAny);
 router.get('/current', getCurrent);
 router.get('/getByName/:username', getByName);
 router.get('/:id', getById);
@@ -97,6 +98,15 @@ function deleteKey(req, res, next) {
             .then(() => res.json({}))
             .catch(err => next(err));
     }
+}
+
+function matchAny(req, res, next){
+    if (req.body.filter === undefined) req.body.filter = "";
+    userService.matchAny(req.body.filter, req.body.args)
+        .then(function(userlist) {
+            res.json(userlist);
+        })
+        .catch(err => next(err));
 }
 
 function _delete(req, res, next) {

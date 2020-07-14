@@ -30,6 +30,7 @@ auth = function(req, res, next){
 // routes
 router.post('/create', create);
 router.get('/', getAll);
+router.post('/filter', matchAny);
 router.get('/:id', getById);
 router.put('/:id', update);
 router.delete('/:id', _delete);
@@ -61,6 +62,15 @@ function getById(req, res, next) {
 function update(req, res, next) {
     eventService.update(req.params.id, req.body)
         .then(() => res.json({}))
+        .catch(err => next(err));
+}
+
+function matchAny(req, res, next){
+    if (req.body.filter === undefined) req.body.filter = "";
+    eventService.matchAny(req.body.filter, req.body.args)
+        .then(function(userlist) {
+            res.json(userlist);
+        })
         .catch(err => next(err));
 }
 

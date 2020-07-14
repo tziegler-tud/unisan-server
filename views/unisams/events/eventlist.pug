@@ -1,7 +1,7 @@
 extends ../layout
 
 block page_includes
-    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/events.css')
     script(src="/static/unisams/js/events/eventlist.js")
     script(src="/static/unisams/js/actions.js")
 
@@ -14,43 +14,33 @@ block page_includes
 block content
     #wrapper
         #page-container.page-container
-            #page-container-inner.page-container-inner
+            #page-container-inner.page-container-inner.full-width
                 section#sec1
                     #sec-content.subpage-container
-                        #content1-heading.sec-heading.subpage-heading
-                            h3 event management
-                        #content1-text.sec-content
-                            .subpage-options
+                        #content1-heading.subpage-topbar
+                            .subpage-options.topbar-element
                                 .radiogroup
-                                    label(for="userlist01")
+                                    label(for="eventlist01")
                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list") <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg>
                                         span Liste
-                                    input#userlist01.radio-item(type="radio", name="userlist-radio")
-                                    label(for="userlist02")
+                                    input#eventlist01.radio-item(type="radio", name="userlist-radio")
+                                    label(for="eventlist02")
                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid") <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                                         span Gallerie
-                                    input#userlist02.radio-item(type="radio", name="userlist-radio")
+                                    input#eventlist02.radio-item(type="radio", name="userlist-radio")
+                            #usersearch.subpage-searchbar.topbar-element
+                        #content1-text.sec-content
                             .subpage-content
-                                ul.userlist.itemlist
-                                    li.user-entry.noSelect.borderBottom
-                                        .inner
-                                            .item-property Bezeichnung
-                                            .item-property Typ
-                                            .item-property Datum
+                                .itemlist-header-container
+                                    ul#eventlist-top.eventlist.itemlist.list-view.border
+                                        li.noSelect.rowHeading
+                                            .inner
+                                                .item-property Bezeichnung
+                                                .item-property Typ
+                                                .item-property Datum
 
-                                    if eventList
-                                        each ev in eventList
-                                            li.event-entry(id= "eventId"+ ev.id data-eventid= ev.id)
-                                                a.inner()
-                                                    .item-property= ev.title.value
-                                                    .item-property= ev.type.value
-                                                    .item-property= ev.dateRangeString
-                                                    .clear
-                                            //.icon-reset.before-icon(onclick="transformUser('" + user.id + "')")
-                                    a.eventlist-addEventBtn.btn-addItem.btn-listExt(href="events/addEvent")
-                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        span Hinzufügen
-                                        .clear
+                                .itemlist-content-container
+                                    #eventlist-container
 
 
 

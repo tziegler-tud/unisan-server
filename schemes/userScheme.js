@@ -21,7 +21,7 @@ var UserSchema = new Schema({
         firstName: {
             title: {
                 type: String,
-                required: true
+                default: "Vorname",
             },
             value: {
                 type: String,
@@ -31,7 +31,7 @@ var UserSchema = new Schema({
         lastName: {
             title: {
                 type: String,
-                required: true
+                default: "Nachname",
             },
             value: {
                 type: String,
@@ -41,10 +41,10 @@ var UserSchema = new Schema({
         memberId: {
             title: {
                 type: String,
-                required: true
+                default: "Mitgliedsnummer",
             },
             value: {
-                type: String,
+                type: Number,
             },
         },
         customData: [

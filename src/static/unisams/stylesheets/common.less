@@ -55,8 +55,8 @@ a {
 
 #content-wrapper {
     flex: 0 0 100%;
-    display: flex;
-    flex-flow: row wrap;
+    //display: flex;
+    //flex-flow: row wrap;
 
     @media @desktop, @tablet-landscape {
         flex: 1 1 auto;
@@ -67,7 +67,7 @@ a {
     position:   relative;
     font-size:  100%;
     width:      100%;
-    flex:       0 0 100%;
+    //flex:       0 0 100%;
     order:      1;
     margin:     0;
     color:      #333;
@@ -75,7 +75,7 @@ a {
 
     @media @desktop, @tablet-landscape {
         order: 2;
-        height:     calc(~"100vh - @{topnav-height}");
+        //height:     calc(~"100vh - @{topnav-height}");
     }
 
     &.wrapper-full-height {
@@ -83,17 +83,17 @@ a {
     }
 
     .page-container {
+        height: 100%;
         width: 100%;
 
         position: relative;
 
         background-color: @page-bg-color;
-
-        height: 100%;
-        overflow: scroll;
+        overflow-Y: auto;
+        overflow-X: hidden;
 
         .page-container-inner {
-            padding: 2em 5%;
+            padding: 0 5%;
 
             &.full-width {
                 padding-right: 0;
@@ -150,41 +150,6 @@ special classes
     }
 }
 
-/* subpage */
-
-.subpage-container {
-
-    width: 100%;
-
-    .subpage-heading {
-
-        padding: 1em 1em 1em 0;
-
-        h3 {
-            font-weight: lighter;
-            font-size: 200%;
-            color: #333;
-        }
-
-        .sec-heading-label {
-            font-size: 200%;
-            color: #333;
-        }
-    }
-
-    .subpage-menu {
-
-        .subpage-menu-btn {
-            display: block;
-        }
-
-    }
-
-    .subpage-content {
-
-    }
-
-}
 
 /* common styling */
 
@@ -763,23 +728,16 @@ select:disabled{
 common list stylings
  */
 
-ul.itemlist {
+ul {
+    margin: 0;
     list-style: none;
-    padding-left: 0;
-    margin-left: 0;
 
-    @bgCol1: #f5f5fc;
+    @bgCol1: #ffffff;
     @bgCol2: #f9f9f9;
-
-    display: flex;
-    flex-flow: column wrap;
-
-    font-weight: lighter;
 
     li {
 
         flex: 1 1 auto;
-
         background-color: @bgCol1;
 
         &:nth-child(odd) {
@@ -787,68 +745,15 @@ ul.itemlist {
         }
 
         &:not(.noSelect):hover {
-            background-color: rgba(124,0,26,0.2);
+            background-color: rgba(124, 0, 26, 0.2);
             cursor: pointer;
         }
 
         &.borderBottom {
-            border-bottom: 1px solid #333;
-        }
-
-        .itemDelete {
-            svg {
-                width: 1em;
-            }
-        }
-
-        .inner {
-            display: flex;
-            padding: .5em 1em;
-
-            .item-property {
-                position: relative;
-                float: left;
-                margin-left: 10px;
-                flex: 0 0 240px;
-
-                &.after {
-                    content: "";
-                    display: block;
-                    width: 100%;
-                    position: absolute;
-                    bottom: -3px;
-                    left: 0;
-                }
-
-                &:hover > &.after {
-                    border-bottom-color: @textHoverColor;
-                }
-            }
-        }
-    }
-
-    &.itemlist-style-clean {
-        li {
-            background-color: transparent;
-
-            .inner {
-                padding-left: 0;
-                padding-right: 0;
-            }
-        }
-    }
-    &.itemlist-noSelect {
-        li:hover {
-            cursor: default;
-            background-color: transparent;
-
-            span {
-                cursor: text;
-            }
+            border-bottom: 1px solid #666;
         }
     }
 }
-
 /*
 common cursor styling
  */
@@ -947,14 +852,14 @@ common btn styling
 }
 
 .desktop {
-    display: initial;
+
     @media @phone {
         display: none !important;
     }
 }
 
 .mobile {
-    display: initial;
+
     @media @desktop, @tablet-landscape {
         display: none !important;
     }
@@ -983,4 +888,12 @@ common btn styling
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
 }

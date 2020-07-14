@@ -10,6 +10,7 @@ module.exports = {
     getById,
     create,
     update,
+    matchAny,
     delete: _delete
 };
 
@@ -108,6 +109,28 @@ async function update(id, eventParam) {
 
     await Event.save();
 }
+
+async function matchAny(matchString, args){
+
+    let eventlist;
+    //matches a given string username, firstname and lastname
+    //if filter is empty, return all results
+    if (matchString.length === 0) {
+        eventlist = Event.find();
+    }
+    else {
+        eventlist = Event.find().or([{'title.value': { $regex: matchString, $options: "-i" }}, {'type.value': { $regex: matchString, $options: "-i" }}])
+
+    }
+    //filter user by given string, using title and type
+
+    if (args.sort) {
+        eventlist = eventlist.sort(args.sort);
+    }
+
+    return eventlist;
+}
+
 
 /**
  * Deletes an event

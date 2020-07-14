@@ -24,6 +24,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
         return new Handlebars.SafeString(date);
     });
 
+    //get viewport height
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    //get height of top navigation and topbar element
+    let navHeight = document.getElementById("nav-top").clientHeight + 1;
+
+    $("#wrapper").css({
+        height: (vh - navHeight) + "px"
+    })
+
 });
 
 window.lidlRTO = lidlRTO;

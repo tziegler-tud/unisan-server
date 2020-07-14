@@ -19,7 +19,7 @@ module.exports = {
  * Gets all qualifications from the database
  */
 async function getAll() {
-    return await Qual.find().select('-password');
+    return await Qual.find().select('-password').sort("qualType");
 }
 
 /**

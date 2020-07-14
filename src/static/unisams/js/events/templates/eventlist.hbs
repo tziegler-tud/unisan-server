@@ -1,0 +1,33 @@
+<!--<ul class="userlist itemlist list-view border">-->
+<!--    <li class="noSelect borderBottom rowHeading">-->
+<!--        <div class="inner">-->
+<!--            <div class="item-property userlist-ch">Name</div>-->
+<!--            <div class="item-property userlist-ch">Mitgliedsnummer</div>-->
+<!--            <div class="item-property userlist-ch">username</div>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--</ul>-->
+
+<ul class="eventlist itemlist list-view border">
+
+    {{#each eventlist}}
+        <li class="event-entry" id='eventId{{this.id}}' data-eventid= {{this.id}}>
+            <a class="inner">
+
+                <div class="item-property item-container name">
+                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>
+                    <span class=" item-container-element">{{this.title.value}}</span>
+<!--                    <div class="clear"></div>-->
+                </div>
+                <div class="item-property item-container type">
+                    <span class="item-container-element">{{this.type.value}}</span>
+                </div>
+                <div class="item-property item-container date">
+                    <span class="item-container-element">{{this.dateRangeString}}</span>
+                </div>
+            </a>
+        </li>
+    {{/each}}
+
+</ul>
+
