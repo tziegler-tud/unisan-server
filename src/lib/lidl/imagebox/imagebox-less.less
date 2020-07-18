@@ -1,10 +1,8 @@
-@import "../../../static/stylesheets/themes/generic/color-rules.less";
-@import "../../../static/stylesheets/themes/generic/variables.less";
+@import "../../../static/public/stylesheets/themes/generic/color-rules.less";
+@import "../../../static/public/stylesheets/themes/generic/variables.less";
 
 @bg-color: #f0f0f0;
 @font-color: #111;
-
-
 
 .lidl-imagebox.style-default {
   font-size: 100%;
@@ -12,13 +10,15 @@
   z-index: 1;
   position: relative;
 
+  padding-bottom:1em;
+
   .lidl-imagebox-container {
 
     overflow: hidden;
 
     .lidl-imagebox-slider {
 
-      width: 300%;
+      width: 400%; //overwritten by js
       overflow: hidden;
       display: flex;
       flex-flow: row wrap;
@@ -39,8 +39,9 @@
         }
 
         .lidl-imagebox-image-label {
-          font-size: 80%;
+          font-size: 90%;
           position: relative;
+          font-weight: lighter;
           background-color: @bg-color;
           color: @font-color;
           margin-bottom: 1em;
@@ -137,7 +138,6 @@
 
           background-color: transparent;
           border: 1px solid #333;
-          border-radius: 50%;
 
           cursor: pointer;
         }
@@ -190,18 +190,16 @@
 }
 
 
-  /*
-   no javascript fallback
-    */
-  .no-js .lidl-imagebox-container {
-    width: 100%;
-  }
+/*
+ no javascript fallback
+  */
+.no-js .lidl-imagebox-container {
+  width: 100%;
+}
 
-  .no-js .lidl-imagebox-image {
-    width: 100%;
-  }
-
-
+.no-js .lidl-imagebox-image {
+  width: 100%;
+}
 
 
 

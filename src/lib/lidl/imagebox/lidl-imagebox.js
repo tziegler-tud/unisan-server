@@ -35,23 +35,26 @@
      *
      * @param imageboxDomId {string} HTML DOM Object Id of the imagebox wrapper div
      * @param token {string} lidl object token
-     * @param optionalStartIndex {int} [0] Index of slide to display on startup.
-     * @param optionalImagePath {string} ['images/imagebox'] Path to draw images from. Defaults to 'images/imagebox'.
-     * @param optionalLayout {int} [0] choose Layout. Defaults to 0.
-     * @param optionalDisableDefaultStyling {boolean} [false] Disable default css styling to apply custom styling. False if unset.
+     * @param args {Object} args
+     * args.startIndex {int} [0] Index of slide to display on startup.
+     * args.imagePath {string} ['images/imagebox'] Path to draw images from. Defaults to 'images/imagebox'.
+     * args.layout {int} [0] choose Layout. Defaults to 0.
+     * args.classes string [default-stlye] css classes to append the container, whitespace-seperated.
      *
      * @class
      * @constructor
      *
      */
 
-    lidl.Imagebox = function (imageboxDomId, token, optionalStartIndex, optionalImagePath, optionalLayout, optionalDisableDefaultStyling) {
+    lidl.Imagebox = function (imageboxDomId, token, args) {
 
+        if (args === undefined) args={};
+        args.startIndex = (args.startIndex === undefined) ? 0 : args.startIndex;
+        args.imagePath = (args.imagePath === undefined) ? 'images/imagebox' : args.imagePath;
+        args.layout = (args.layout === undefined) ? 0 : args.layout;
+        args.classes = (args.classes === undefined) ? "default-style" : args.classes;
 
-        var startIndex = (typeof optionalStartIndex === 'undefined') ? 0 : optionalStartIndex;
-        this.imageDirPath = (typeof optionalImagePath === 'undefined') ? 'images/imagebox' : optionalImagePath;
-        this.layout = (typeof optionalLayout === 'undefined') ? 0 : optionalLayout;
-        this.defaultStyling = (typeof optionalDisableDefaultStyling === 'undefined') ? false : optionalDisableDefaultStyling;
+        this.args = args;
 
         console.log('creating imagebox...');
 
@@ -59,7 +62,7 @@
 
         this.token = token;
 
-        this.currentImageIndex = startIndex;
+        this.currentImageIndex = args.startIndex;
 
         this.images = [];
 
@@ -82,33 +85,39 @@
         });
         console.log("Number of images: " + this.images.length);
 
+        //adjust css
+        let cssWidth = (this.images.length * 100) + "%";
+        $(this.container).css({
+            width: cssWidth,
+        })
 
-        switch(this.layout){
+
+        switch(args.layout){
             default:
 
             case 0:
                 //navigation at bottom
-                this.navigation = this.createNavigationBottom();
+                this.navigation = createNavigationBottom(self);
                 this.container.classList.add("navigation-bottom");
                 this.navigationDotsEnbaled = true;
                 //this.calcDimensions();
                 break;
             case 1:
                 //navigation on right side
-                this.navigation = this.createNavigationSide(0);
+                //this.navigation = createNavigationSide(0);
                 this.parent.classList.add("navigation-right");
                 this.navigationDotsEnbaled = true;
                 break;
             case 2:
                 //navigation on left side
-                this.navigation = this.createNavigationSide(1);
+                //this.navigation = createNavigationSide(1);
                 this.parent.classList.add("navigation-left");
                 this.navigationDotsEnbaled = true;
                 break;
 
             case 3:
                 //navigational arrows
-                this.navigation = this.createNavigationArrows();
+                this.navigation = createNavigationArrows(self);
                 this.parent.classList.add("navigation-arrows");
                 break;
 
@@ -118,16 +127,33 @@
 
         }
 
-        if(!this.defaultStyling){
-            this.parent.classList.add("style-default");
-        }
+        this.parent.classList.add(args.classes);
 
         //this.createNavigationBottom();
-        this.showImage(startIndex);
+        showImage(this, args.startIndex);
         return this;
-
     };
 
+
+
+
+    var showImage = function(self, imgIndex){
+        var img = self.images[imgIndex];
+        if (img === undefined) {
+            throw new RangeError();
+        }
+        else {
+            let imgAmountMultiplier = 100 / self.images.length
+            $(self.container).css({
+                'transform': 'translateX(-'+ imgIndex * imgAmountMultiplier +'%)'
+            });
+
+            if(self.navigationDotsEnbaled){setActiveNavDot(self, self.currentImageIndex, imgIndex);}
+            self.currentImageIndex = parseInt(imgIndex);
+
+            return true;
+        }
+    };
 
     /**
      *
@@ -141,33 +167,7 @@
 
     lidl.Imagebox.prototype.showImage = function (imgIndex) //Index of next image to display
     {
-
-
-        var img = this.images[imgIndex];
-        if (img === undefined) {
-            throw new RangeError();
-        }
-
-
-
-        else {
-            $(this.container).css({
-                'transform': 'translateX(-'+ imgIndex * 33.3 +'%)'
-            });
-
-            if(this.navigationDotsEnbaled){this.setActiveNavDot(this.currentImageIndex, imgIndex);}
-            this.currentImageIndex = parseInt(imgIndex);
-
-            return true;
-        }
-
-
-
-
-
-        return false;
-
-
+        return showImage(this, imgIndex);
     };
 
     /**
@@ -177,12 +177,11 @@
 
     lidl.Imagebox.prototype.nextImage = function(){
         try {
-            this.showImage(this.currentImageIndex+1);
+            showImage(this,this.currentImageIndex+1);
         }
         catch(err) {
-            return;
+            return false;
         }
-
     };
 
     /**
@@ -192,7 +191,7 @@
 
     lidl.Imagebox.prototype.prevImage = function() {
         try {
-            this.showImage(this.currentImageIndex-1);
+            showImage(this,this.currentImageIndex-1);
         }
         catch (err) {
             return;
@@ -206,16 +205,10 @@
      * @param{int} newIndex
      */
 
-    lidl.Imagebox.prototype.setActiveNavDot = function(oldIndex, newIndex) {
+    var setActiveNavDot = function(self, oldIndex, newIndex) {
 
-        document.getElementById(this.token+'ClickMe'+oldIndex).classList.remove('nav-dot-active');
-        document.getElementById(this.token+'ClickMe'+newIndex).classList.add('nav-dot-active');
-
-
-
-
-
-
+        document.getElementById(self.token+'ClickMe'+oldIndex).classList.remove('nav-dot-active');
+        document.getElementById(self.token+'ClickMe'+newIndex).classList.add('nav-dot-active');
     };
 
     /**
@@ -251,26 +244,18 @@
      * creates the navigation dots
      *
      */
-    lidl.Imagebox.prototype.createNavigationBottom = function () {
+    var createNavigationBottom = function (self) {
 
-        $(this.parent).append('<div id="'+this.token+'-nav" class="lidl-imagebox-nav nav-bottom"><div id="'+this.token +'-nav-label" class="lidl-imagebox-nav-label"></div></div>');
+        $(self.parent).append('<div id="'+self.token+'-nav" class="lidl-imagebox-nav nav-bottom"><div id="'+ self.token +'-nav-label" class="lidl-imagebox-nav-label"></div></div>');
 
-        var navLabel = document.getElementById(this.token + '-nav-label');
+        var navLabel = document.getElementById(self.token + '-nav-label');
 
-        var self = this;
-
-        for (var i = 0; i < this.images.length; i++) {
-            $(navLabel).append('<span id="'+this.token+'ClickMe'+i+'" data-imgindex="'+i+'" class="nav-dot"></span>');
-            var dot = document.getElementById(this.token+"ClickMe"+i);
+        for (var i = 0; i < self.images.length; i++) {
+            $(navLabel).append('<span id="'+ self.token+'ClickMe'+i+'" data-imgindex="'+i+'" class="nav-dot"></span>');
+            var dot = document.getElementById(self.token+"ClickMe"+i);
             dot.addEventListener("click", function() {
-
                 self.showImage(this.dataset.imgindex);
-
-
-
-
             }, false);
-
         }
 
         $(navLabel).append('<div class="clear"></div>');
@@ -293,9 +278,7 @@
     }
     */
 
-    lidl.Imagebox.prototype.createNavigationArrows= function () {
-
-        const self = this;
+    var createNavigationArrows= function (self) {
 
         $(this.parent).append('<div id="'+this.token+'-nav" class="lidl-imagebox-nav nav-arrows"><div id="'+this.token +'-nav-label" class="lidl-imagebox-nav-label"></div></div>');
 
@@ -329,7 +312,6 @@
     };
 
     return lidl;
-}
-(lidl = window.lidl || {},jQuery));
+}(lidl = window.lidl || {},jQuery));
 
 

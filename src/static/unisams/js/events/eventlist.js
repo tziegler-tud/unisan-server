@@ -28,7 +28,7 @@ $(document).ready (function () {
             let data = {
                 filter: filter,
                 args: {
-
+                    sort: "date.startDate"
                 }
             };
             //get user list from server
@@ -94,7 +94,7 @@ $(document).ready (function () {
         //set element height
         $(container).css({
             "height": h + "px",
-            "overflow": "auto",
+            "overflow": "scroll",
         });
 
         //get scollbar width

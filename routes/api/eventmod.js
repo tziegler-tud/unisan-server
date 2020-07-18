@@ -4,6 +4,8 @@ var uuid = require('uuid');
 const passport = require('passport');
 const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
+const uploadService = require('../../services/uploadService');
+
 
 var app = express();
 
@@ -12,6 +14,24 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+
+
+var path = require('path');
+var fs = require('fs-extra');
+
+const upload = require(appRoot + "/config/multer");
+
+router.post('/:id/uploadImage', upload.single('image'), function(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/event_images/${event.id}/${event.id}.jpg`, { overwrite: true }, function (err) {
+                if (err) return console.error(err);
+                console.log("moved file to user dir: " + event.id);
+            });
+            res.json({success: true});
+        })
+        .catch(err => next(err));
+});
 
 
 auth = function(req, res, next){
@@ -30,6 +50,11 @@ auth = function(req, res, next){
 // routes
 router.post('/create', create);
 router.get('/', getAll);
+router.post('/addParticipant', addParticipant);
+router.post('/changeParticipant', changeParticipant);
+router.post('/removeParticipant', removeParticipant);
+router.get('/:id/populateParticipants', populateParticipants);
+router.post('/:id/uploadImage', create);
 router.post('/filter', matchAny);
 router.get('/:id', getById);
 router.put('/:id', update);
@@ -72,6 +97,52 @@ function matchAny(req, res, next){
             res.json(userlist);
         })
         .catch(err => next(err));
+}
+
+
+function addParticipant(req, res, next) {
+    let args = {
+        role: req.body.role,
+        overwrite: false
+    };
+    eventService.addParticipant(req.body.id, req.body.userId, args)
+        .then(() => res.json(req.body))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function changeParticipant(req, res, next) {
+    let args = {
+        role: req.body.role,
+        overwrite: true,
+    };
+    eventService.addParticipant(req.body.id, req.body.userId, args)
+        .then(() => res.json(req.body))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function removeParticipant(req, res, next) {
+    let args = {
+
+    };
+    eventService.removeParticipant(req.body.id, req.body.userId, args)
+        .then(() => res.json(req.body))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function populateParticipants(req, res, next) {
+    eventService.populateParticipants(req.params.id)
+        .then(function(event) {
+            res.json(event);
+        })
+        .catch(err => {
+            next(err);
+        })
 }
 
 function _delete(req, res, next) {

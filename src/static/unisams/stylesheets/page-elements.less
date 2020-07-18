@@ -14,8 +14,15 @@
 
     h3 {
       font-weight: lighter;
-      font-size: 200%;
+      font-size: 100%;
       color: #333;
+
+      @media @desktop {
+        font-size: 160%;
+      }
+      @media @tablet-landscape {
+        font-size: 120%;
+      }
     }
 
     .sec-heading-label {

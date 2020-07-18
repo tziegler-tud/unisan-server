@@ -15,10 +15,12 @@
      *
      */
 
-    eventRequest.Event = function(eventId){
-        // find the userid
+    eventRequest.Event = function(eventId, args){
+        // find the event id
         this.currentViewedEvent= {};
-        this.currentViewedEvent.eventId = eventId;
+        this.currentViewedEvent.id = eventId;
+
+        this.args = args;
         return this;
     };
 
@@ -70,7 +72,7 @@
 
     var getEventFromServer = function(eventId){
         pendingUserRequest.isActive = true;
-        let url = "/unisams/eventmod/" + eventId;
+        let url = "/unisams/eventmod/" + eventId + "/populateParticipants";
         return new Promise(function(resolve, reject){
             $.ajax({
                 url: url,
@@ -110,31 +112,31 @@
      *
      * @returns {Promise<Object|String>}
      */
-    eventRequest.Event.prototype.getUser = function(){
+    eventRequest.Event.prototype.getEvent = function(){
         var self = this;
         return new Promise(function(resolve, reject){
-            let returnUser = function (user) {
-                self.currentViewedUser.user = user;
-                resolve(self.currentViewedUser.user);
+            let returnEvent = function (event) {
+                self.currentViewedEvent.event = event;
+                resolve(self.currentViewedEvent.event);
             };
             let fail = function (reason) {
                 reject(reason);
             };
-          if (self.currentViewedUser.user === undefined) {
+          if (self.currentViewedEvent.event === undefined) {
               // check if request is already pending
               if (pendingUserRequest.isActive) {
                   pendingUserRequest.subscribe()
                       .then(function(context){
-                          returnUser(context)
+                          returnEvent(context)
                       })
                       .catch(function(reason){
                           fail(reason)
                       })
               }
               else {
-                  getUserFromServer(self.currentViewedUser.userId)
+                  getEventFromServer(self.currentViewedEvent.id)
                       .then(function(context){
-                          returnUser(context)
+                          returnEvent(context)
                       })
                       .catch(function(reason){
                           fail(reason)
@@ -142,7 +144,7 @@
               }
           }
           else {
-              resolve(self.currentViewedUser.user)
+              resolve(self.currentViewedEvent.event)
           }
         });
 
@@ -159,25 +161,25 @@
      * @returns {Promise<Object|String>}
      */
 
-    eventRequest.Event.prototype.getUserAndSubscribe = function(observer){
+    eventRequest.Event.prototype.getEventAndSubscribe = function(observer){
         observers.push(observer);
-        return this.getUser();
+        return this.getEvent();
 
     };
 
-    eventRequest.Event.prototype.refreshUser = function(){
+    eventRequest.Event.prototype.refreshEvent = function(){
         var self = this;
         return new Promise(function(resolve, reject) {
-            let returnUser = function (user) {
-                self.currentViewedUser.user = user;
-                resolve(self.currentViewedUser.user);
+            let returnEvent = function (event) {
+                self.currentViewedEvent.event = event;
+                resolve(self.currentViewedEvent.event);
             };
             let fail = function (reason) {
                 reject(reason);
             };
-            getEventFromServer(self.currentViewedUser.userId)
+            getEventFromServer(self.currentViewedEvent.id)
                 .then(function (context) {
-                    returnUser(context)
+                    returnEvent(context)
                 })
                 .catch(function (reason) {
                     fail(reason)
@@ -186,16 +188,16 @@
     };
 
     eventRequest.Event.prototype.notifyObservers = function(){
-        this.getUser().then(function(user){
+        this.getEvent().then(function(event){
             observers.forEach(function(ob){
-                ob.update(user)
+                ob.update(event)
             })}
         ).catch(function(){
 
         });
     };
 
-    eventRequest.Event.prototype.updateDBKey = function(keyIdentifier, value, args, callback){
+    eventRequest.Event.prototype.update = function(keyIdentifier, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var self = this;
         var data = {
@@ -204,20 +206,45 @@
             args: args,
         };
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + self.currentViewedUser.userId,
+            url: "/unisams/event/update/" + self.currentViewedEvent.id,
             // make put for safety reasons :-)
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(result) {
-                self.refreshUser().then(function(){
+                self.refreshEvent().then(function(){
                     self.notifyObservers();
                 }).catch(reason => console.error(reason));
                 callback();
             }
         });
     };
+
+    eventRequest.Event.prototype.checkIfUserIsRegistered = function(user){
+        let self = this;
+        let event = self.currentViewedEvent.event;
+        // create array of participants by id
+        try {
+            //check if array contains elements
+            if (event.participants.length > 0) {
+                var index = event.participants.map(e => e.user._id).indexOf(user.id);
+            }
+            //false if no user are registered
+            else return false;
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error("Exception:" + e);
+                console.error("Aborting operation to ensure data integrity.");
+                throw e;
+            } else {
+                console.error("Unhandled exception: " + e);
+                throw e;
+            }
+        }
+        return index > -1;
+    }
 
 return eventRequest;
 

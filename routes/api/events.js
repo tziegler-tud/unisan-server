@@ -30,7 +30,8 @@ auth = function(req, res, next){
 router.get('/',  auth, getAll);
 router.get('/addEvent', auth, addEvent);
 router.get('/:id', auth, viewEvent);
-router.get('/:id/editUser', auth, editEvent);
+router.get('/:id/participants', auth, editParticipants);
+router.get('/:id/edit', auth, editEvent);
 
 
 module.exports = router;
@@ -66,7 +67,7 @@ function viewEvent(req, res, next) {
                     user: req.user._doc,
                     title: ev.title.value,
                     exploreEvent: ev,
-                    exploreEventDocument: ev._doc,
+                    refurl: req.params.id
                 })
             }
         })
@@ -75,29 +76,30 @@ function viewEvent(req, res, next) {
 
 function editEvent(req, res, next) {
     eventService.getById(req.params.id)
-        .then(user => {
-            if (user) {
+        .then(event => {
+            if (event) {
                 res.render("unisams/events/editEvent", {
                     user: req.user._doc,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username
+                    title: event.title.value,
+                    exploreEvent: event,
+                    refurl: req.params.id
                 })
             }
-            else {
-                // try if id was given
-                eventService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
+        })
+        .catch(err => next(err));
+}
+
+function editParticipants(req, res, next) {
+    eventService.getById(req.params.id)
+    eventService.getById(req.params.id)
+        .then(ev => {
+            if (ev) {
+                res.render("unisams/events/participants", {
+                    user: req.user._doc,
+                    title: ev.title.value,
+                    exploreEvent: ev,
+                    exploreEventDocument: ev._doc,
+                })
             }
         })
         .catch(err => next(err));

@@ -11,6 +11,9 @@ module.exports = {
     create,
     update,
     matchAny,
+    populateParticipants,
+    addParticipant,
+    removeParticipant,
     delete: _delete
 };
 
@@ -73,6 +76,12 @@ async function create(eventParam) {
         }
     }
 
+    //has date?
+    if(eventParam.date){
+        if(eventParam.date.startDate === null) eventParam.date.startDate = undefined;
+        if(eventParam.date.endDate === null) eventParam.date.endDate = undefined;
+    }
+
     const event = new Event(eventParam);
 
     // save event
@@ -82,7 +91,7 @@ async function create(eventParam) {
                 throw err;
             }
             else {
-                fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', { overwrite: true }, (err) => {
+                fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', { overwrite: true }, (err) => {
                     if (err) throw err;
                     console.log('dummy image copied to new event');
                 });
@@ -107,7 +116,7 @@ async function update(id, eventParam) {
     // copy eventParam to event
     Object.assign(event, eventParam);
 
-    await Event.save();
+    await event.save();
 }
 
 async function matchAny(matchString, args){
@@ -129,6 +138,109 @@ async function matchAny(matchString, args){
     }
 
     return eventlist;
+}
+
+async function populateParticipants(id) {
+    let event = Event.findById(id).populate({
+        path: 'participants.user',
+        select: 'generalData',
+    });
+    return event;
+}
+
+/**
+ * adds a user to the list of participants
+ * @param id {ObjectId} id of the event
+ * @param userId {ObjectId} id of user to add
+ * @param args {Object} allowed values: [admin, lecturer, participant]
+ * @returns {Promise<void>}
+ */
+async function addParticipant(id, userId, args) {
+    const event = await Event.findById(id);
+    let roles = ["admin", "lecturer", "participant"];
+    let rolesDefault = "participant";
+    let role = args.role;
+
+    // validate
+    if (!event) throw new Error('Event not found');
+    if(!roles.includes(role)) {
+        console.log("invalid role name. setting as default: " + rolesDefault);
+        role = rolesDefault;
+    }
+    let data = {
+        user: userId,
+        role: role,
+    }
+
+    // check if user is already registered as participant
+    try {
+        //check if array
+        var index = event.participants.map(e => e.user._id).indexOf(userId);
+    }
+    catch (e) {
+        if (e instanceof TypeError) {
+            console.error("Exception:" + e);
+            console.error("Aborting operation to ensure data integrity.");
+            throw e;
+        } else {
+            console.error("Unhandled exception: " + e);
+            throw e;
+        }
+    }
+
+    if (index > -1) {
+        // user already registered.
+        if(!args.overwrite){
+            //abort
+            console.log("user " + userId + " already registered for Event "+ event.title.value);
+        }
+        else {
+            //overwrite
+            event.participants.splice(index, 1, data);
+        }
+
+    }
+    else {
+        // push user to participants array
+        event.participants.push(data);
+    }
+
+    await event.save();
+}
+
+async function removeParticipant(id, userId, args) {
+    if (args === undefined) args = {};
+    const event = await Event.findById(id);
+    let role = args.role;
+
+    // validate
+    if (!event) throw new Error('Event not found');
+
+    // check if user is already registered as participant
+    try {
+        //check if array
+        var index = event.participants.map(e => e.user._id).indexOf(userId);
+    }
+    catch (e) {
+        if (e instanceof TypeError) {
+            console.error("Exception:" + e);
+            console.error("Aborting operation to ensure data integrity.");
+            throw e;
+        } else {
+            console.error("Unhandled exception: " + e);
+            throw e;
+        }
+    }
+
+    if (index > -1) {
+        // user found. removing
+        event.participants.splice(index, 1);
+    }
+    else {
+        // user not found. abort
+        throw new Error("user not found");
+    }
+    await event.save();
 }
 
 

@@ -24,10 +24,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
         return new Handlebars.SafeString(date);
     });
 
+    Handlebars.registerHelper('hasRole', function(participant, roleString) {
+        return participant.role === roleString;
+    });
+
+
     //get viewport height
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     //get height of top navigation and topbar element
     let navHeight = document.getElementById("nav-top").clientHeight + 1;
+
+    //get current user
+    var user;
+    var profile = new window.profile.Profile(window.userId);
+
+    // create new observer
+    var observer = new lidl.Observer(function(u){
+        user = u;
+    });
+
+    // get user data from user service
+    //subscribe as observer to get notification if user changes on server
+    profile.getUserAndSubscribe(observer)
+        .then(function(user){
+            window.user = user;
+        })
+        .catch(function(reason){
+            console.error("Failed to retrieve user data:" + reason)
+        });
 
     $("#wrapper").css({
         height: (vh - navHeight) + "px"

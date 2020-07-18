@@ -121,7 +121,7 @@
      *
      * sets up event handlers for the new subpage without compromising existing ones.
      *
-     * @param dockerInstance {Docker} the docker instance
+     * @param dockerInstance {docker} the docker instance
      * @param subpage {HTMLElement} the subpage dom element
      * @param activate {Boolean} renders the subpage the active container
      */
@@ -263,7 +263,7 @@
     /**
      * adds a subpage to the docker
      */
-    docker.Docker.prototype.addDockerSubPage = function(user){
+    docker.Docker.prototype.addDockerSubPage = function(type, data){
         // testing. lets just render the user subpage
         var self = this;
         // build context
@@ -279,20 +279,32 @@
 
         subpageHandler.add(subpage);
 
-
-        $.get('/static/unisams/js/docker/templates/subpage-user.hbs', function (data) {
-            var template = Handlebars.compile(data);
-            appendContent(template)
+        let url;
+        switch(type){
+            case "user":
+                url = '/static/unisams/js/docker/templates/subpage-user.hbs';
+                context = {
+                    id: id,
+                    exploredUser: data,
+                };
+                break;
+            case "event":
+                url = '/static/unisams/js/docker/templates/subpage-event.hbs';
+                context = {
+                    id: id,
+                    exploredEvent: data,
+                };
+                break;
+        }
+        $.get(url, function (data) {
+            let template = Handlebars.compile(data);
+            appendContent(template, context)
         });
 
-        function appendContent(template) {
+        function appendContent(template, context) {
         self.notifyWhenReady()
             .then(function() {
                 var subpageContainer = document.getElementById("docker-subPage-container");
-                context = {
-                    id: id,
-                    exploredUser: user
-                };
                 subpageContainer.innerHTML= template(context);
                 const subpageDom = document.getElementById(id);
                 addSubpageEventHandlers(self, subpageDom, true);

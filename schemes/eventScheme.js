@@ -45,9 +45,28 @@ var EventSchema = new Schema({
         },
 
     },
+    location: {
+        title: {
+            type: String,
+            default: "Adresse",
+        },
+        value: {
+
+        },
+    },
     participants: [
         {
-            type: Schema.Types.ObjectId, ref: 'User'
+            user: {
+                type: Schema.Types.ObjectId, ref: 'User'
+            },
+            role: {
+                type: String,
+                default: "participant"
+            },
+            lastChanged: {
+                type: Date,
+                default: Date.now,
+            }
         }
     ],
     createdDate: {

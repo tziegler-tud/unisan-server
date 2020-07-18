@@ -23,7 +23,7 @@ $(document).ready (function () {
     function buildPage(user) {
 
         window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage(user);
+        window.DockerElement.addDockerSubPage("user", user);
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 

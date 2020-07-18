@@ -3,7 +3,9 @@ var lidlRTO = window.lidlRTO;
 $(document).ready (function () {
 
     var currentExploredEvent;
-    var event = new window.eventRequest.Event(window.exploreEventId);
+    var eventProfile = new window.eventRequest.Event(window.exploreEventId, {
+        populateParticipants: true,
+    });
 
     // create new observer
     var observer = new lidl.Observer(function(event){
@@ -12,57 +14,41 @@ $(document).ready (function () {
 
     // get user data from user service
     //subscribe as observer to get notification if user changes on server
-    profile.getUserAndSubscribe(observer)
-        .then(function(user){
-            buildPage(user)
+    eventProfile.getEventAndSubscribe(observer)
+        .then(function(event){
+            buildPage(event)
         })
         .catch(function(reason){
-            console.error("Failed to retrieve user data:" + reason)
+            console.error("Failed to retrieve event data:" + reason)
         });
 
-    function buildPage(user) {
+    function buildPage(event) {
 
         window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage(user);
+        window.DockerElement.addDockerSubPage("event", event);
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 
-        var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
-
-        $(".quallist-entry").on("click", function(e) {
-            e.preventDefault();
-            var self = this;
-
-            addDBKey_sidebar.addContent('UserViewQualification', {
-                    userid: user.id,
-                    qualificationId: self.dataset.qualificationid,
-                    callback: {
-                        onConfirm: function(){
-                        },
-                    },
+        var sidebar = new common.Sidebar('wrapper', {title: "Test"});
+        // init event sidebar
+        //find if current user is already registered
+        let userIsParticipant = eventProfile.checkIfUserIsRegistered(window.user);
+        sidebar.addContent("eventParticipants", {
+            event: event,
+            user: window.user,
+            isParticipant: userIsParticipant,
+            callback: {
+                onConfirm: function(){
+                    window.actions.events.addParticipant(event.id, window.user.id)
                 },
-            );
-            addDBKey_sidebar.show();
+                onDelete: function(){
+                    window.actions.events.removeParticipant(event.id, window.user.id)
+                }
+            },
         });
+        sidebar.show();
 
-        // $(".userkey-entry").on("click", function(e) {
-        //     e.preventDefault();
-        //     var self = this;
-        //
-        //     addDBKey_sidebar.addContent('UserViewDBKey', {
-        //             userid: userid,
-        //             keyId: self.dataset.keyid,
-        //             key: self.dataset.key,
-        //             catKey: self.dataset.catkey,
-        //             subKey: self.dataset.subkey,
-        //             value: self.dataset.value,
-        //             callback: {
-        //
-        //             },
-        //         },
-        //     );
-        //     addDBKey_sidebar.show();
-        // });
+
 
     }
 });

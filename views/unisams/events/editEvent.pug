@@ -1,23 +1,20 @@
 extends ../layout
 
 block page_includes
-
-    script.
-        window.exploreUserId = "#{exploreUser.id}";
-        window.dockerArgs.activeContainer = "userprofileContainer";
-        window.dockerArgs.activeElementId = "userprofile";
-
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-    script(src="/static/unisams/js/userprofile/profile.js")
-    script(src="/static/unisams/js/userprofile/userprofile.js")
-    script(src="/static/unisams/js/userprofile/editUser.js")
-    script(src="/static/unisams/js/userprofile/updateUser.js")
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
     script(src="/static/unisams/js/actions.js")
-    script(src="/static/unisams/js/transformToNewScheme.js")
+    script(src="/static/unisams/js/eventActions.js")
+
+    script(src="/static/unisams/js/events/editEvent.js")
+    script(src="/static/unisams/js/events/event.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script.
+        window.exploreEventId = "#{exploreEvent.id}";
+        window.dockerArgs.activeContainer = "eventDetailContainer";
+        window.dockerArgs.activeElementId = "eventDetail";
 
     script(type="text/template" id="qq-template-manual-trigger")
         <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -79,7 +76,6 @@ block page_includes
         </dialog>
         </div>
 
-
 block content
     #wrapper
         #page-container.page-container
@@ -88,211 +84,39 @@ block content
                     #sec-content.subpage-container
                         #content1-heading.sec-heading.subpage-heading
                             .userimg-container.sec-heading-img
-                                .userimg
+                                .userimg.hover
                                     .userimg-overlay.changeProfilePicture
                                         .userimg-inner
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                             span Bild ändern
-                                    img#userProfileImage.userProfileImage(src="/data/uploads/user_images/" + exploreUser.id + "/" + exploreUser.id + ".jpg")
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/event_images/" + exploreEvent.id + "/" + exploreEvent.id + ".jpg")
 
-                            .sec-heading-label.userprofile-heading
-                                .userprofile-heading-container
-                                    h3=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
-                                    .userprofile-dropdown.dropdown-menu
+                            .sec-heading-label.eventprofile-heading
+                                .eventprofile-heading-container
+                                    .eventprofile-heading-text
+                                        .eventprofile-heading-type
+                                            span.type=exploreEvent.type.value
+                                        .eventprofile-heading-title
+                                            h3.title=exploreEvent.title.value
+                                        .eventprofile-heading-date
+                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                    .eventprofile-dropdown.dropdown-menu
                                         .dropdown-btn
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 
                                             .dropdown-container
                                                 .dropdown-entry
-                                                    a.before-icon.icon-back(id="view" + exploreUser.id, data-userid=exploreUser.id href="/unisams/user/" + exploreUser.username) Bearbeitung beenden
+                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-eventid=exploreEvent.id href="/unisams/events/" + exploreEvent.id) Bearbeitung beenden
                                                 .dropdown-entry
-                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
-                                                .dropdown-entry
-                                                    a.userTransform(id="transformUser" + exploreUser.id, onclick="transformUser('" + exploreUser.id + "')") (dev) transform to new scheme
-                                                .dropdown-entry
-                                                    a.userTransform(id="deleteOldId" + exploreUser.id, onclick="removeOld('"+exploreUser.id+"')") (dev) remove invalid fields
+                                                    a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-eventid=exploreEvent.id) Event löschen
                                     .clear
-                                .clear
-                        #content1-text.sec-content
+                            .clear
+                        #content1-text.sec-content.border-top
                             .subpage-content
-                                .userinfo-container
-                                    #tabnav-container
-                                        ul
-                                            li
-                                                a(href="#tab-userinfo-general")
-                                                    span Allgemeine Informationen
-                                            li
-                                                a(href="#tab-userinfo-qualification")
-                                                    span Qualifikationen
-                                            li
-                                                a(href="#tab-userinfo-role")
-                                                    span Rechte und Rollen
-
-                                        #tab-userinfo-general.userinfo-inner
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span unisams
-                                                div
-                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
-                                                        - var combinedKey = "username"
-                                                        - var title = "Nutzername"
-                                                        - var value = exploreUserDocument.username
-                                                        li.user-entry.username-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                            a.inner()
-                                                                .item-property.userkey-entry-title
-                                                                    span= title
-                                                                .item-property.userkey-entry-value
-                                                                    span= value
-                                                                .clear
-                                                        - var combinedKey = "id"
-                                                        - var title = "id"
-                                                        - var value = exploreUser.id
-                                                        li.user-entry.noSelect.cursor-default(id="userkey-" +combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                            a.inner()
-                                                                .item-property.userkey-entry-title
-                                                                    span= title
-                                                                .item-property.userkey-entry-value.has-tooltip.cursor-notAllowed
-                                                                    span= value
-                                                                    span.tooltip Id kann nicht verändert werden.
-                                                                .clear
-
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Allgemeine Daten
-                                                div
-                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
-                                                        if exploreUserDocument.generalData
-                                                            - var secKey = "generalData"
-                                                            - var secVal = exploreUserDocument.generalData
-                                                            each val, key in secVal
-                                                                - var title = val.title
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val.value
-                                                                if (!Array.isArray(val))
-                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-title=title, data-catkey=secKey, data-subkey=key, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title
-                                                                                span= title
-                                                                            .item-property.userkey-entry-value
-                                                                                span= value
-                                                                            .clear
-                                                            if exploreUserDocument.generalData.customData
-                                                                - var subKey = 'customData'
-                                                                - var subsecKey = secKey + '.' + subKey
-                                                                - var subsecVal = exploreUserDocument.generalData.customData
-                                                                each val, key in subsecVal
-                                                                    - var title = val.title
-                                                                    - var combinedKey = subsecKey + "." + key
-                                                                    - var value = val.value
-                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-title=title, data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title
-                                                                                span= title
-                                                                            .item-property.userkey-entry-value
-                                                                                span= value
-                                                                            .clear
-
-                                                .userinfo-item.useredit-item.useredit-addItem
-                                                    .useredit-addGeneralItemBtn.btn-addItem(data-catkey=secKey)
-                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                                        span Hinzufügen
-                                                        .clear
-
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Kontaktdaten
-                                                div
-                                                    ul.userlist.itemlist.userinfo-itemList
-                                                        if exploreUserDocument.contactData
-                                                            - var secKey = "contactData"
-                                                            - var secVal = exploreUserDocument.contactData
-                                                            each val, key in secVal
-                                                                - var title = val.title
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val.value
-                                                                li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=title, data-value=value, data-type=val.type)
-                                                                    a.inner()
-                                                                        .item-property.userkey-entry-title
-                                                                            span= title
-                                                                        .item-property.userkey-entry-value
-                                                                            span= value
-                                                                        .clear
-                                                .userinfo-item.useredit-item.useredit-addItem
-                                                    .useredit-addContactItemBtn.btn-addItem(data-catkey=secKey)
-                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                                        span Hinzufügen
-                                                        .clear
-
-                                            .userinfo-section
-
-                                                .userinfo-sectionheader
-                                                    span weitere Daten
-                                                div
-                                                    if exploreUserDocument.otherData
-                                                        - var secKey = "otherData"
-                                                        - var secVal = exploreUserDocument.otherData
-                                                        ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
-
-                                                            if exploreUserDocument.otherData.customData
-                                                                - var subKey = 'customData'
-                                                                - var subsecKey = secKey + '.' + subKey
-                                                                each val, key in exploreUserDocument.otherData.customData
-                                                                    - var combinedKey = subsecKey + "." + key
-                                                                    - var title = val.title
-                                                                    - var value = val.value
-                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey= subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title
-                                                                                span= title
-                                                                            .item-property.userkey-entry-value
-                                                                                span= value
-                                                                            .clear
-
-                                                    .userinfo-item.useredit-item.useredit-addItem
-                                                        .useredit-addGeneralItemBtn.btn-addItem(data-catkey=secKey)
-                                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                                            span Hinzufügen
-                                                            .clear
-
-                                        #tab-userinfo-qualification.userinfo-inner
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Qualifikationen
-                                                div
-                                                    ul.userlist.itemlist.userinfo-itemList
-                                                        li.user-entry.noSelect.borderBottom
-                                                            .inner
-                                                                .item-property Typ
-                                                                .item-property Bezeichnung
-                                                        if exploreUserDocument.qualifications
-                                                            - var secKey = "qualifications"
-                                                            - var secVal = exploreUserDocument.qualifications
-                                                            each val, key in exploreUserDocument.qualifications
-                                                                - var title = val
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val
-                                                                li.user-entry.quallist-entry(id= "qualId" + val.id, data-qualificationId=val.id, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                    a.inner()
-                                                                        .item-property= val.qualification.qualType
-                                                                        .item-property= val.qualification.name
-                                                                        .clear
-
-
-                                                        .userinfo-item.useredit-item.useredit-addItem
-                                                            .useredit-addQualificationBtn.btn-addItem.btn-listExt(data-catkey=secKey)
-                                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                                                span Hinzufügen
-                                                                .clear
-
-                                        #tab-userinfo-role.userinfo-inner
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Rollen
-
-                            #profilemanagment-menu.subpage-menu
-                                #btn01.subpage-menu-btn
-                                    a.content-link.style2.float(href="/unisams/user")
-                                        svg.icon(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left") <polyline points="15 18 9 12 15 6"></polyline></svg>
-                                        span Zurück
-
-
+                                .eventinfo-container
+                                    .eventinfo-inner
+                                        .eventinfo-section
+                                            .eventinfo-sectionheader
+                                                span Beschreibung
+                                            .eventinfo-item
+                                                span=exploreEvent.description.longDesc

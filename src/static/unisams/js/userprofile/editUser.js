@@ -20,13 +20,14 @@ $(document).ready (function () {
             buildPage(user)
         })
         .catch(function(reason){
-        console.error("Failed to retrieve user data:" + reason)
-    });
+            console.error("Failed to retrieve user data:" + reason)
+        });
+
 
 
     function buildPage(user) {
         window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage(user);
+        window.DockerElement.addDockerSubPage("user", user);
         currentExploredUser = user;
         var userid = window.exploreUserId;
 

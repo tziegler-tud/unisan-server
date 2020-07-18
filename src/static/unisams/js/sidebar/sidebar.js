@@ -94,6 +94,15 @@
                 showUpdateQualificationContent(self,args);
                 break;
 
+            /* events */
+            case "eventDetails":
+                showEventDetails(self,args);
+                break;
+
+            case "eventParticipants":
+                showEventParticipants(self,args);
+                break;
+
         }
 
     };
@@ -1083,6 +1092,45 @@
                 });
             });
         };
+    };
+
+    /* events */
+
+    var showEventDetails = function(self, args){
+
+        var event = args.event;
+
+    };
+
+    var showEventParticipants = function(self, args){
+
+        var event = args.event;
+
+        //populate
+        $.get('/static/unisams/js/sidebar/templates/sidebar-eventParticipants.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            self.sidebarHTML.html(template(event));
+            registerBackButton(self,".sidebar-back-btn");
+            // find if current user is registered for event
+            let notRegistered = $("#sidebar-participate-button-notregistered");
+            let registered = $("#sidebar-participate-button-registered");
+            let target;
+            if (args.isParticipant) {
+                notRegistered.addClass("hidden");
+                registered.removeClass("hidden");
+                registered.on("change", function(e){
+                    if (e.target.value === "remove") {
+                        args.callback.onDelete();
+                    }
+                })
+            }
+            else {
+                registerButton(self, notRegistered, function(){
+                    args.callback.onConfirm();
+                });
+            }
+        });
+
     };
 
 

@@ -1,8 +1,12 @@
 extends ../layout
 
 block page_includes
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
     script(src="/static/unisams/js/actions.js")
+    script(src="/static/unisams/js/eventActions.js")
+
+    script(src="/static/unisams/js/events/viewEvent.js")
+    script(src="/static/unisams/js/events/event.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
@@ -81,148 +85,35 @@ block content
                         #content1-heading.sec-heading.subpage-heading
                             .userimg-container.sec-heading-img
                                 .userimg
-                                    .userimg-overlay.changeProfilePicture
-                                        .userimg-inner
-                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                                            span Bild ändern
                                     img#userProfileImage.userProfileImage(src="/data/uploads/event_images/" + exploreEvent.id + "/" + exploreEvent.id + ".jpg")
 
-                            .sec-heading-label.userprofile-heading
-                                .userprofile-heading-container
-                                    h3=exploreEvent.title.value
-                                    .userprofile-dropdown.dropdown-menu
+                            .sec-heading-label.eventprofile-heading
+                                .eventprofile-heading-container
+                                    .eventprofile-heading-text
+                                        .eventprofile-heading-type
+                                            span.type=exploreEvent.type.value
+                                        .eventprofile-heading-title
+                                            h3.title=exploreEvent.title.value
+                                        .eventprofile-heading-date
+                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                    .eventprofile-dropdown.dropdown-menu
                                         .dropdown-btn
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 
                                             .dropdown-container
                                                 .dropdown-entry
-                                                    a.before-icon.icon-edit(href=refurl + "/editUser") Akte bearbeiten
+                                                    a.before-icon.icon-edit(href=refurl + "/edit") Event bearbeiten
                                                 .dropdown-entry.dropdown-entry-disabled.has-tooltip
-                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreEvent.id, data-userid=exploreEvent.id) Mitglied löschen
-                                                    span.tooltip Bearbeitung aktivieren, um Mitglied zu entfernen
+                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
+                                                    span.tooltip Bearbeitung aktivieren, um Event zu entfernen
                                     .clear
                             .clear
-                        #content1-text.sec-content
+                        #content1-text.sec-content.border-top
                             .subpage-content
-                                .userinfo-container
-                                    #tabnav-container
-                                        ul
-                                            li
-                                                a(href="#tab-userinfo-general")
-                                                    span Allgemeine Informationen
-                                            li
-                                                a(href="#tab-userinfo-qualification")
-                                                    span Qualifikationen
-                                            li
-                                                a(href="#tab-userinfo-role")
-                                                    span Rechte und Rollen
-
-                                        #tab-userinfo-general.userinfo-inner
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span unisams
-                                                .userinfo-item
-                                                    span.userinfo-item-label.userinfo-attribute-name Title:
-                                                    span.userinfo-item-label= exploreEvent.title.value
-                                                .userinfo-item
-                                                    span.userinfo-item-label.userinfo-attribute-name id:
-                                                    span.userinfo-item-label= exploreEvent.id
-
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Allgemeine Daten
-                                                div
-                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
-                                                        if exploreEventDocument.generalData
-                                                            - var secKey = "generalData"
-                                                            - var secVal = exploreEventDocument.generalData
-                                                            each val, key in secVal
-                                                                - var title = val.title
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val.value
-                                                                if (!Array.isArray(val))
-                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey=key, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title
-                                                                                span= title
-                                                                            .item-property.userkey-entry-value
-                                                                                span= value
-                                                                            .clear
-                                                            if exploreEventDocument.generalData.customData
-                                                                - var subKey = 'customData'
-                                                                - var subsecKey = secKey + '.' + subKey
-                                                                - var subsecVal = exploreEventDocument.generalData.customData
-                                                                each val, key in subsecVal
-                                                                    - var title = val.title
-                                                                    - var combinedKey = subsecKey + "." + key
-                                                                    - var value = val.value
-                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
-                                                                        a.inner()
-                                                                            .item-property.userkey-entry-title
-                                                                                span= title
-                                                                            .item-property.userkey-entry-value
-                                                                                span= value
-                                                                            .clear
-
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Kontaktdaten
-                                                div
-                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
-                                                        if exploreEventDocument.contactData
-                                                            - var secKey = "contactData"
-                                                            - var secVal = exploreEventDocument.contactData
-                                                            each val, key in secVal
-                                                                - var title = (val.title)
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val.value
-                                                                li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
-                                                                    a.inner()
-                                                                        .item-property.userkey-entry-title
-                                                                            span= title
-                                                                        .item-property.userkey-entry-value
-                                                                            span= value
-                                                                        .clear
-
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span weitere Daten
-                                                div
-                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
-                                                        if exploreEventDocument.customData
-                                                            - var secKey = "customData"
-                                                            - var secVal = exploreEventDocument.customData
-                                                            each val, key in exploreEventDocument.customData
-                                                                - var title = val
-                                                                - var combinedKey = secKey + "." + key
-                                                                - var value = val
-                                                                li.user-entry.userkey-entry()
-                                                                    a.inner()
-                                                                        .item-property.userkey-entry-title
-                                                                            span= title
-                                                                        .item-property.userkey-entry-value
-                                                                            span= value
-                                                                        .clear
-
-                                        #tab-userinfo-qualification.userinfo-inner
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Qualifikationen
-                                                div
-                                                    ul.userlist.itemlist.userinfo-itemList
-                                                        li.user-entry.noSelect.borderBottom
-                                                            .inner
-                                                                .item-property Typ
-                                                                .item-property Bezeichnung
-                                                        if exploreEventDocument.qualifications
-                                                            each val in exploreEventDocument.qualifications
-                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualificationid= val.id)
-                                                                    a.inner()
-                                                                        .item-property= val.qualification.qualType
-                                                                        .item-property= val.qualification.name
-                                                                        .clear
-
-                                        #tab-userinfo-role.userinfo-inner
-                                            .userinfo-section
-                                                .userinfo-sectionheader
-                                                    span Rollen
+                                .eventinfo-container
+                                    .eventinfo-inner
+                                        .eventinfo-section
+                                            .eventinfo-sectionheader
+                                                span Beschreibung
+                                            .eventinfo-item
+                                                span=exploreEvent.description.longDesc

@@ -23,6 +23,47 @@
         // find the userid
         this.currentViewedUser = {};
         this.currentViewedUser.userId = userId;
+        /**
+         *
+         * @type {{resolve: resolve, subscribe: (function(): Promise<Object|String>), subscribers: {resolve: [], reject: []}, reject: reject, isActive: boolean}}
+         */
+        this.pendingUserRequest = {
+            isActive: false,
+            subscribers: {
+                resolve: [],
+                reject: [],
+            },
+            subscribe: function(){
+                // allow subscribing to request while it is pending.
+                let res;
+                let rej;
+                let p = new Promise(function(resolve,reject){
+                    res = resolve;
+                    rej = reject;
+                });
+                this.subscribers.resolve.push(res);
+                this.subscribers.reject.push(rej);
+                return p;
+            },
+            resolve: function(context){
+                this.isActive=false;
+                //push result to all subscribers.
+                this.subscribers.resolve.forEach(function(el){
+                    el(context);
+                });
+                this.subscribers.resolve = [];
+                this.subscribers.reject = [];
+            },
+            reject: function(context){
+                this.isActive=false;
+                //push result to all subscribers.
+                this.subscribers.reject.forEach(function(el){
+                    el(context);
+                });
+                this.subscribers.resolve = [];
+                this.subscribers.reject = [];
+            },
+        };
         return this;
     };
 
@@ -30,50 +71,10 @@
 
     };
 
-    /**
-     *
-     * @type {{resolve: resolve, subscribe: (function(): Promise<Object|String>), subscribers: {resolve: [], reject: []}, reject: reject, isActive: boolean}}
-     */
-    var pendingUserRequest = {
-        isActive: false,
-        subscribers: {
-            resolve: [],
-            reject: [],
-        },
-        subscribe: function(){
-            // allow subscribing to request while it is pending.
-            let res;
-            let rej;
-            let p = new Promise(function(resolve,reject){
-                res = resolve;
-                rej = reject;
-            });
-            this.subscribers.resolve.push(res);
-            this.subscribers.reject.push(rej);
-            return p;
-        },
-        resolve: function(context){
-            this.isActive=false;
-            //push result to all subscribers.
-            this.subscribers.resolve.forEach(function(el){
-                el(context);
-            });
-            this.subscribers.resolve = [];
-            this.subscribers.reject = [];
-        },
-        reject: function(context){
-            this.isActive=false;
-            //push result to all subscribers.
-            this.subscribers.reject.forEach(function(el){
-                el(context);
-            });
-            this.subscribers.resolve = [];
-            this.subscribers.reject = [];
-        },
-    };
 
-    var getUserFromServer = function(userId){
-        pendingUserRequest.isActive = true;
+
+    var getUserFromServer = function(self, userId){
+        self.pendingUserRequest.isActive = true;
         let url = "/unisams/usermod/" + userId;
         return new Promise(function(resolve, reject){
             $.ajax({
@@ -83,11 +84,11 @@
                 isModified: false,
                 data: {},
                 success: function (context) {
-                    pendingUserRequest.resolve(context);
+                    self.pendingUserRequest.resolve(context);
                     resolve(context);
                 },
                 error: function(context){
-                    pendingUserRequest.reject(context.status);
+                    self.pendingUserRequest.reject(context.status);
                     reject(context);
                 }
             });
@@ -96,9 +97,9 @@
 
 
 
-    var subscribeToPendingRequest = function(){
+    var subscribeToPendingRequest = function(self){
         return new Promise(function(resolve,reject){
-            if(!pendingUserRequest) reject("No pending user request.");
+            if(!self.pendingUserRequest) reject("No pending user request.");
             else {
 
             }
@@ -126,8 +127,8 @@
             };
           if (self.currentViewedUser.user === undefined) {
               // check if request is already pending
-              if (pendingUserRequest.isActive) {
-                  pendingUserRequest.subscribe()
+              if (self.pendingUserRequest.isActive) {
+                  self.pendingUserRequest.subscribe()
                       .then(function(context){
                           returnUser(context)
                       })
@@ -136,7 +137,7 @@
                       })
               }
               else {
-                  getUserFromServer(self.currentViewedUser.userId)
+                  getUserFromServer(self, self.currentViewedUser.userId)
                       .then(function(context){
                           returnUser(context)
                       })
@@ -179,7 +180,7 @@
             let fail = function (reason) {
                 reject(reason);
             };
-            getUserFromServer(self.currentViewedUser.userId)
+            getUserFromServer(self, self.currentViewedUser.userId)
                 .then(function (context) {
                     returnUser(context)
                 })
