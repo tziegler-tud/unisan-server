@@ -37,40 +37,47 @@
   display: flex;
   flex-flow: row wrap;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading {
   flex: 1 1 auto;
   position: relative;
   display: flex;
   flex-flow: column wrap;
   justify-content: flex-end;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container {
   display: flex;
   flex-flow: row wrap;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container h3 {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-heading-text .eventprofile-heading-type span {
+  font-size: 70%;
+  font-weight: lighter;
+}
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-heading-text .eventprofile-heading-title h3 {
   margin: 0;
   padding: 0;
   display: inline-block;
   flex: 0 0 auto;
-  text-transform: lowercase;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-heading-text .eventprofile-heading-date span {
+  font-size: 70%;
+  font-weight: lighter;
+}
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-dropdown {
   flex: 0 0 auto;
   display: flex;
   flex-flow: column wrap;
   justify-content: flex-end;
   margin-left: 1em;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown .dropdown-btn {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-dropdown .dropdown-btn {
   position: relative;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown .dropdown-btn svg {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-dropdown .dropdown-btn svg {
   margin-bottom: 5px;
   display: block;
   width: 1em;
 }
-.subpage-container .subpage-heading .sec-heading-label.userprofile-heading .userprofile-heading-container .userprofile-dropdown .dropdown-container {
+.subpage-container .subpage-heading .sec-heading-label.eventprofile-heading .eventprofile-heading-container .eventprofile-dropdown .dropdown-container {
   font-size: 50%;
 }
 .subpage-container .subpage-heading .sec-heading-img {
@@ -133,51 +140,54 @@
   display: block;
   width: 100%;
 }
-.userinfo-container {
+.eventinfo-container {
   width: 100%;
 }
-.userinfo-container .userinfo-inner .userinfo-section {
+.eventinfo-container .eventinfo-inner {
+  margin: 1em;
+}
+.eventinfo-container .eventinfo-inner .eventinfo-section {
   display: flex;
   flex-flow: column wrap;
   margin-bottom: 2em;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-sectionheader {
+.eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-sectionheader {
   font-size: 120%;
   margin-bottom: 1em;
   color: #666;
   font-variant: small-caps;
   letter-spacing: .15em;
 }
-.userinfo-container .userinfo-inner .userinfo-section ul.qualificationList .inner {
+.eventinfo-container .eventinfo-inner .eventinfo-section ul.qualificationList .inner {
   grid-template-columns: 1fr 1fr;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item {
+.eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item {
   flex: 1 1 auto;
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label,
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label {
+.eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item span.eventinfo-item-label,
+.eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item label.eventinfo-item-label {
   width: 100%;
   float: left;
   display: block;
   margin-bottom: .5em;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
-  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label,
-  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label {
+  .eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item span.eventinfo-item-label,
+  .eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item label.eventinfo-item-label {
     width: auto;
   }
 }
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name,
-.userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label.userinfo-attribute-name {
+.eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item span.eventinfo-item-label.eventinfo-attribute-name,
+.eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item label.eventinfo-item-label.eventinfo-attribute-name {
   width: 100%;
   margin-right: 2em;
   margin-bottom: 0;
   color: #555;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
-  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item span.userinfo-item-label.userinfo-attribute-name,
-  .userinfo-container .userinfo-inner .userinfo-section .userinfo-item label.userinfo-item-label.userinfo-attribute-name {
+  .eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item span.eventinfo-item-label.eventinfo-attribute-name,
+  .eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-item label.eventinfo-item-label.eventinfo-attribute-name {
     width: 8em;
   }
 }
-/*# sourceMappingURL=userprofile.css.map */
+/*# sourceMappingURL=viewEvent.css.map */

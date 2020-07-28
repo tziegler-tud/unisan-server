@@ -1133,6 +1133,74 @@
 
     };
 
+    var addEventParticipant = function(self, args){
+
+        var event = args.event;
+        var onConfirm = args.callback.onConfirm;
+
+        //populate
+        $.get('/static/unisams/js/sidebar/templates/sidebar-eventParticipantsAdd.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            self.sidebarHTML.html(template(event));
+            registerBackButton(self,".sidebar-back-btn");
+            registerConfirmButton(self, ".sidebar-confirm", function(){
+                data = {
+                    userid:  $("#sidebar-user-select").val(),
+                    role:  $("#sidebar-role-select").val()
+                };
+                onConfirm(data);
+            }.bind(args));
+
+            //hook user query to input element
+            function displayUserList(filter) {
+                let data = {
+                    filter: filter,
+                    args: {
+                        sort: "generalData.memberId.value",
+                    }};
+                //get user list from server
+                $.ajax({
+                    url: "/unisams/usermod/filter",
+                    type: 'POST',
+                    contentType: "application/json; charset=UTF-8",
+                    dataType: 'json',
+                    data: JSON.stringify(data),
+                    success: function(result) {
+                        handleData.userlist = result;
+                        // render userlist template
+                        $.get('/static/unisams/js/sidebar/plugins/userselect-plugin.hbs', function (data) {
+                            var template = Handlebars.compile(data);
+                            appendContent(template(handleData))
+                        });
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("some error");
+                    }
+                });
+
+                function appendContent(html) {
+                    //append to subpage container #userlist-container
+                    let container = document.getElementById('userselect-container');
+                    container.innerHTML = html;
+
+                    // hook user entries to sidebar.
+                    $('.user-entry').each(function () {
+                        $(this).on("click", function (e) {
+                            e.preventDefault();
+                            sidebar.addContent("user", {
+                                userid: this.dataset.userid
+                            });
+                            sidebar.show();
+                        })
+                    });
+
+                    // click on
+                }
+            }
+        });
+
+    };
+
 
 
     var registerBackButton = function(self, selector){

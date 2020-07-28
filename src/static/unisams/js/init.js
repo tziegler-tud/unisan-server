@@ -29,11 +29,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 
 
-    //get viewport height
-    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-    //get height of top navigation and topbar element
-    let navHeight = document.getElementById("nav-top").clientHeight + 1;
-
     //get current user
     var user;
     var profile = new window.profile.Profile(window.userId);
@@ -53,9 +48,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             console.error("Failed to retrieve user data:" + reason)
         });
 
-    $("#wrapper").css({
-        height: (vh - navHeight) + "px"
-    })
+    adjustWrapper();
 
 });
 
@@ -69,8 +62,18 @@ $(window).on('load',function() {
 });
 
 $(window).on('resize',function(){
-
+    adjustWrapper();
 });
+
+function adjustWrapper(){
+    //get viewport height
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    //get height of top navigation and topbar element
+    let navHeight = document.getElementById("nav-top").clientHeight + 1;
+    $("#wrapper").css({
+        height: (vh - navHeight) + "px"
+    })
+}
 
 
 

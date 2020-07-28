@@ -41,9 +41,6 @@ body #wrapper.sidebar-active {
   overflow: hidden;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
-  body #wrapper.sidebar-active {
-    overflow: auto;
-  }
   body #wrapper.sidebar-active .page-container {
     width: calc(100% - 20em - 0.1em);
     float: left;
@@ -101,6 +98,7 @@ body .sidebar-container .sidebar .sidebar-top {
   transition: transform 250ms ease;
 }
 body .sidebar-container .sidebar .sidebar-top .sidebar-back-btn {
+  background-color: #f9f9f9;
   padding: 1em;
   width: 1em;
   float: left;
@@ -134,6 +132,7 @@ body .sidebar-container .sidebar .sidebar-inner {
 }
 body .sidebar-container .sidebar .sidebar-inner .sidebar-bottom {
   position: relative;
+  margin-bottom: 1em;
 }
 body .sidebar-container .sidebar .sidebar-inner .sidebar-content {
   flex: 1 1 auto;

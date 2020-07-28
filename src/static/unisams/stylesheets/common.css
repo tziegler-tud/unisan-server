@@ -111,8 +111,6 @@ a {
 }
 #content-wrapper {
   flex: 0 0 100%;
-  display: flex;
-  flex-flow: row wrap;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   #content-wrapper {
@@ -123,7 +121,6 @@ a {
   position: relative;
   font-size: 100%;
   width: 100%;
-  flex: 0 0 100%;
   order: 1;
   margin: 0;
   color: #333;
@@ -132,21 +129,21 @@ a {
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   #wrapper {
     order: 2;
-    height: calc(100vh - 5em);
   }
 }
 #wrapper.wrapper-full-height {
   height: 100vh;
 }
 #wrapper .page-container {
+  height: 100%;
   width: 100%;
   position: relative;
   background-color: #fff;
-  height: 100%;
-  overflow: scroll;
+  overflow-Y: auto;
+  overflow-X: hidden;
 }
 #wrapper .page-container .page-container-inner {
-  padding: 2em 5%;
+  padding: 0 5%;
 }
 #wrapper .page-container .page-container-inner.full-width {
   padding-right: 0;
@@ -180,25 +177,6 @@ special classes
 }
 .unisams-label span.acc3 {
   color: #444;
-}
-/* subpage */
-.subpage-container {
-  width: 100%;
-}
-.subpage-container .subpage-heading {
-  padding: 1em 1em 1em 0;
-}
-.subpage-container .subpage-heading h3 {
-  font-weight: lighter;
-  font-size: 200%;
-  color: #333;
-}
-.subpage-container .subpage-heading .sec-heading-label {
-  font-size: 200%;
-  color: #333;
-}
-.subpage-container .subpage-menu .subpage-menu-btn {
-  display: block;
 }
 /* common styling */
 .content-link {
@@ -449,6 +427,9 @@ a.inline-link.external::before {
   content: "" !important;
 }
 /*
+select button
+ */
+/*
 dropdown menu
  */
 .dropdown-menu {
@@ -534,6 +515,9 @@ dropdown menu
 }
 .before-icon.icon-info:before {
   content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>');
+}
+.before-icon.icon-calendar:before {
+  content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
 }
 /*
  tooltipps
@@ -677,65 +661,23 @@ select:disabled {
 /*
 common list stylings
  */
-ul.itemlist {
+ul {
+  margin: 0;
   list-style: none;
-  padding-left: 0;
-  margin-left: 0;
-  display: flex;
-  flex-flow: column wrap;
-  font-weight: lighter;
 }
-ul.itemlist li {
+ul li {
   flex: 1 1 auto;
-  background-color: #f5f5fc;
+  background-color: #ffffff;
 }
-ul.itemlist li:nth-child(odd) {
+ul li:nth-child(odd) {
   background-color: #f9f9f9;
 }
-ul.itemlist li:not(.noSelect):hover {
+ul li:not(.noSelect):hover {
   background-color: rgba(124, 0, 26, 0.2);
   cursor: pointer;
 }
-ul.itemlist li.borderBottom {
-  border-bottom: 1px solid #333;
-}
-ul.itemlist li .itemDelete svg {
-  width: 1em;
-}
-ul.itemlist li .inner {
-  display: flex;
-  padding: .5em 1em;
-}
-ul.itemlist li .inner .item-property {
-  position: relative;
-  float: left;
-  margin-left: 10px;
-  flex: 0 0 240px;
-}
-ul.itemlist li .inner .item-property.after {
-  content: "";
-  display: block;
-  width: 100%;
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-}
-ul.itemlist li .inner .item-property:hover > ul.itemlist li .inner .item-property.after {
-  border-bottom-color: #c31d34;
-}
-ul.itemlist.itemlist-style-clean li {
-  background-color: transparent;
-}
-ul.itemlist.itemlist-style-clean li .inner {
-  padding-left: 0;
-  padding-right: 0;
-}
-ul.itemlist.itemlist-noSelect li:hover {
-  cursor: default;
-  background-color: transparent;
-}
-ul.itemlist.itemlist-noSelect li:hover span {
-  cursor: text;
+ul li.borderBottom {
+  border-bottom: 1px solid #666;
 }
 /*
 common cursor styling
@@ -797,6 +739,13 @@ common btn styling
   width: max-content;
   position: relative;
 }
+/* common border classes */
+.border-top {
+  border-top: 1px solid #AAA;
+}
+.border-bottom {
+  border-bottom: 1px solid #AAA;
+}
 /* common helper classes */
 .float {
   display: block;
@@ -815,16 +764,10 @@ common btn styling
 .nomargin {
   margin: 0;
 }
-.desktop {
-  display: initial;
-}
 @media only screen and (max-width: 50em) {
   .desktop {
     display: none !important;
   }
-}
-.mobile {
-  display: initial;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   .mobile {
@@ -851,5 +794,67 @@ common btn styling
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.add-smt-button {
+  font-size: 100%;
+  position: absolute;
+  opacity: 0.8;
+  bottom: .5em;
+  right: 2em;
+  -webkit-transition: transform 200ms ease;
+  -moz-transition: transform 200ms ease;
+  -o-transition: transform 200ms ease;
+  transition: transform 200ms ease;
+}
+.add-smt-button a {
+  color: white;
+  background-color: #c31d34;
+  display: inline-block;
+  font-size: 100%;
+  vertical-align: bottom;
+  padding: .6em .5em;
+  text-decoration: none;
+  border-radius: 10%;
+  line-height: 0;
+  box-shadow: 0px 3px 5px #444;
+  -webkit-transition: background-color 200ms ease;
+  -moz-transition: background-color 200ms ease;
+  -o-transition: background-color 200ms ease;
+  transition: background-color 200ms ease;
+}
+.add-smt-button a:hover {
+  background-color: #de243d;
+  cursor: pointer;
+}
+.add-smt-button a svg {
+  color: white;
+  background-color: inherit;
+  width: 1em;
+}
+@media only screen and (min-width: 75em) {
+  .add-smt-button a svg {
+    width: 2em;
+  }
+}
+.add-smt-button span {
+  padding: 0.25em 0;
+  display: block;
+  float: right;
+}
+.btn-fixed {
+  position: absolute;
+  top: 4.8em !important;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .btn-fixed {
+    top: 1.8em !important;
+  }
 }
 /*# sourceMappingURL=common.css.map */

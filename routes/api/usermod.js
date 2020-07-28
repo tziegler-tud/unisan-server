@@ -9,15 +9,38 @@ var fs = require('fs-extra');
 const upload = require(appRoot + "/config/multer");
 
 router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, next){
-    userService.getById(req.params.id)
-        .then(user => {
-            fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/user_images/${user.id}/${user.id}.jpg`, { overwrite: true }, function (err) {
-                if (err) return console.error(err);
-                console.log("moved file to user dir: " + user.id);
-            });
-            res.json({success: true});
-        })
-        .catch(err => next(err));
+    //check if tmp
+    if(req.params.id === "tmp") {
+        //generate tmp access key with 5 digits
+        var tmpkey = "";
+        for (var i = 0; i < 5; i++){
+            tmpkey = tmpkey + Math.floor(Math.random()*10);
+        }
+
+        //upload to tmp
+        fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/tmp/${tmpkey}.jpg`, { overwrite: true }, function (err) {
+            if (err) return console.error(err);
+            console.log("moved file to tmp dir with filename " + tmpkey + ".jpg");
+        });
+
+        //return tmpkey
+        res.json({
+            success: true,
+            tmpkey: tmpkey,
+        });
+    }
+    else {
+        userService.getById(req.params.id)
+            .then(user => {
+                fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/user_images/${user.id}/${user.id}.jpg`, { overwrite: true }, function (err) {
+                    if (err) return console.error(err);
+                    console.log("moved file to user dir: " + user.id);
+                });
+                res.json({success: true});
+            })
+            .catch(err => next(err));
+    }
+
 });
 
 // routes

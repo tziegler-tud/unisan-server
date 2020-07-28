@@ -76,14 +76,14 @@ var setupTimePickerWidget = function(){
     else {
         inputs.each(function(el){
             this.type = "text";
-        })
+        });
         let options = {
             title: 'Zeit auswählen',
             twentyFour: true,
-        }
+        };
         inputs.wickedpicker(options);
     }
-}
+};
 
 Date.prototype.toDateInputValue = (function() {
     var local = new Date(this);

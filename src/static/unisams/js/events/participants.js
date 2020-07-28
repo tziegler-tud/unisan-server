@@ -48,10 +48,32 @@ $(document).ready (function () {
         });
         sidebar.show();
 
-        var handleData = {};
+        var handleData = event;
+        var filter = "";
 
         //display all users initially
-        displayParticipantsList("");
+        let data = {
+            filter: filter,
+            args: {
+                sort: "generalData.memberId.value",
+            }};
+        //get user list from server
+        $.ajax({
+            url: "/unisams/usermod/filter",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                handleData.userselectList = result;
+                // render userlist template
+                displayParticipantsList("");
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("some error");
+            }
+        });
+
 
         //setup searchbar
         // let searchbarContainer = document.getElementById("usersearch");
@@ -65,7 +87,7 @@ $(document).ready (function () {
         // });
 
         function displayParticipantsList(filter) {
-            let handleData = event;
+
 
             // render participantslist template
             $.get('/static/unisams/js/events/templates/participantslist.hbs', function (data) {
