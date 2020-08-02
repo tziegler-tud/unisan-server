@@ -43,16 +43,7 @@
       margin-left: 2em;
     }
 
-    .searchbar {
-      label {
-        float: left;
-        margin-right: 1em;
 
-      }
-      input {
-
-      }
-    }
   }
 
   .subpage-menu {
@@ -69,6 +60,19 @@
 
 }
 
+.searchbar {
+  label {
+    float: left;
+    margin-right: 1em;
+
+  }
+  input {
+
+    &.nomargin {
+      margin: 0;
+    }
+  }
+}
 
 .itemlist-header-container{
   width: 100%;
@@ -158,7 +162,7 @@ ul.itemlist {
         }
 
         &:hover > &.after {
-          border-bottom-color: @textHoverColor;
+          border-bottom-color: @text-hover-color;
         }
       }
     }

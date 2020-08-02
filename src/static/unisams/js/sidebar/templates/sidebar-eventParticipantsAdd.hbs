@@ -1,5 +1,5 @@
 
-<div id="sidebar" class="sidebar sidebar-event">
+<div id="sidebar" class="sidebar sidebar-event sidebar-addParticipant">
     <div class="sidebar-top">
         <div class="sidebar-back-btn">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -21,58 +21,25 @@
                     <span class="content-item"></span>
                 </div>
             </div>
-            <div class="sidebar-section body-section event-participants-container">
-                <div class="section-title participant-heading">
-                    Verantwortlich
-                </div>
-                <div class="event-participants">
-                    {{#each userlist}}
+            <div class="sidebar-section body-section addParticipant-container">
 
-                    {{/each}}
-                </div>
                 <div class="section-title participant-heading">
-                    Dozenten
+                    Teilnehmer hinzufügen
                 </div>
-                <div class="event-participants">
-                    {{#each participants}}
-                        {{#if (hasRole this "lecturer")}}
-                            <div class="content-item participant-item">
-                                <div class="participant-img">
-                                    <img src="/data/uploads/user_images/{{this.user.id}}/{{this.user.id}}.jpg"/>
-                                </div>
-                                <div class="participant-details">
-                                    {{this.user.generalData.firstName.value}} {{this.user.generalData.lastName.value}}
-                                </div>
-                            </div>
-                        {{/if}}
-                    {{/each}}
+
+                <div class="search-container">
+                    <div id="usersearch" class="subpage-searchbar">
+
+                    </div>
+                    <div id="sidebar-userselect-container" class="userselect-container sidebar-select-container"></div>
                 </div>
-                <div class="section-title participant-heading">
-                    Teilnehmer
-                </div>
-                <div class="event-participants">
-                    {{#each participants}}
-                        {{#if (hasRole this "participant")}}
-                            <div class="content-item participant-item">
-                                <div class="participant-img">
-                                    <img src="/data/uploads/user_images/{{this.user.id}}/{{this.user.id}}.jpg"/>
-                                </div>
-                                <div class="participant-details">
-                                    {{this.user.generalData.firstName.value}} {{this.user.generalData.lastName.value}}
-                                </div>
-                            </div>
-                        {{/if}}
-                    {{/each}}
-                </div>
+
+
             </div>
         </div>
         <div class="sidebar-bottom">
-            <div id="sidebar-participate-button-notregistered" class="select-button content-link slim sidebar-confirm sidebar-participate-button">Teilnehmen</div>
-            <select id="sidebar-participate-button-registered" class="hidden select-button content-link slim style2 sidebar-participate-button">
-                <option value="remove">Abmelden</option>
-                <option value="keep" selected>Du nimmst teil</option>
-            </select>
+            <a class="sidebar-confirm content-link">Speichern</a>
+            <a class="sidebar-delete content-link style2">Abbrechen</a>
         </div>
-        
     </div>
 </div>

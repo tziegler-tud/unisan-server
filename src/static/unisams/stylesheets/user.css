@@ -1,1 +1,125 @@
-.noselect{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.noselect{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}#userlist-container{position:relative;overflow:auto}#userlist-top-container{background-color:#fAfAfA;border-bottom:1px solid #666}#userlist-top{border-top:1px solid #AAA;width:100%}#userlist-top li{background-color:#fAfAfA}ul.userlist{margin-top:0;margin-bottom:0;position:static}ul.userlist.list-view{font-size:110%}ul.userlist.list-view li .memberid,ul.userlist.list-view li .username{display:none !important}@media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape){ul.userlist.list-view li .memberid{display:block !important}}@media only screen and (min-width: 75em){ul.userlist.list-view li .memberid,ul.userlist.list-view li .username{display:block !important}}ul.userlist.list-view li .inner{display:grid;grid-template-columns:1fr;grid-template-rows:auto}@media only screen and (min-width: 75em){ul.userlist.list-view li .inner{grid-template-columns:2fr 1fr 1fr}}@media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape){ul.userlist.list-view li .inner{grid-template-columns:2fr 1fr}}ul.userlist.list-view li .inner .item-container{display:flex;flex-flow:row nowrap;justify-content:center;align-items:center}ul.userlist.list-view li .inner .item-container .item-container-element{flex:1 1 auto;display:block}ul.userlist.list-view li .inner .userlist-img{margin-right:1em;max-width:3em}ul.userlist.list-view li .inner .userlist-img img{width:100%;border-radius:50%}ul.userlist.list-view li .inner:not(.noSelect):hover{background-color:rgba(124,0,26,0.2);cursor:pointer}ul.userlist.list-view li .inner.borderBottom{border-bottom:1px solid #AAA}ul.userlist.list-view li .inner .userDelete svg{width:1em}ul.userlist.gallery-view li{display:block}ul.userlist.gallery-view li:not(.noSelect):hover{background-color:rgba(124,0,26,0.2);cursor:pointer}ul.userlist.gallery-view li.borderBottom{border-bottom:1px solid #AAA}ul.userlist.gallery-view li .userDelete svg{width:1em}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+#userlist-container {
+  position: relative;
+  overflow: auto;
+}
+#userlist-top-container {
+  background-color: #fAfAfA;
+  border-bottom: 1px solid #666;
+}
+#userlist-top {
+  border-top: 1px solid #AAA;
+  width: 100%;
+}
+#userlist-top li {
+  background-color: #fAfAfA;
+}
+ul.userlist {
+  margin-top: 0;
+  margin-bottom: 0;
+  position: static;
+}
+ul.userlist.list-view {
+  font-size: 110%;
+}
+ul.userlist.list-view li .memberid,
+ul.userlist.list-view li .username {
+  display: none !important;
+}
+@media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  ul.userlist.list-view li .memberid {
+    display: block !important;
+  }
+}
+@media only screen and (min-width: 75em) {
+  ul.userlist.list-view li .memberid,
+  ul.userlist.list-view li .username {
+    display: block !important;
+  }
+}
+ul.userlist.list-view li .inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+}
+@media only screen and (min-width: 75em) {
+  ul.userlist.list-view li .inner {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+@media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  ul.userlist.list-view li .inner {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+ul.userlist.list-view li .inner .item-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+}
+ul.userlist.list-view li .inner .item-container .item-container-element {
+  flex: 1 1 auto;
+  display: block;
+}
+ul.userlist.list-view li .inner .userlist-img {
+  margin-right: 1em;
+  max-width: 3em;
+}
+ul.userlist.list-view li .inner .userlist-img img {
+  width: 100%;
+  border-radius: 50%;
+}
+ul.userlist.list-view li .inner:not(.noSelect):hover {
+  background-color: rgba(124, 0, 26, 0.2);
+  cursor: pointer;
+}
+ul.userlist.list-view li .inner.borderBottom {
+  border-bottom: 1px solid #AAA;
+}
+ul.userlist.list-view li .inner .userDelete svg {
+  width: 1em;
+}
+ul.userlist.gallery-view li {
+  display: block;
+}
+ul.userlist.gallery-view li:not(.noSelect):hover {
+  background-color: rgba(124, 0, 26, 0.2);
+  cursor: pointer;
+}
+ul.userlist.gallery-view li.borderBottom {
+  border-bottom: 1px solid #AAA;
+}
+ul.userlist.gallery-view li .userDelete svg {
+  width: 1em;
+}
+/*# sourceMappingURL=user.css.map */

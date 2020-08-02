@@ -156,6 +156,15 @@ body .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-sectio
   display: block;
   width: 100%;
 }
+body .sidebar-select-container {
+  position: relative;
+}
+body .sidebar-select-container .sidebar-select-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+}
 body .sidebar-errorMsg {
   display: block;
   margin: 0 !important;

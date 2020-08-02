@@ -1,4 +1,5 @@
 var lidlRTO = window.lidlRTO;
+var actions = window.actions;
 
 $(document).ready (function () {
 
@@ -48,46 +49,36 @@ $(document).ready (function () {
         });
         sidebar.show();
 
-        var handleData = event;
-        var filter = "";
+        displayParticipantsList("");
 
-        //display all users initially
-        let data = {
-            filter: filter,
-            args: {
-                sort: "generalData.memberId.value",
-            }};
-        //get user list from server
-        $.ajax({
-            url: "/unisams/usermod/filter",
-            type: 'POST',
-            contentType: "application/json; charset=UTF-8",
-            dataType: 'json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                handleData.userselectList = result;
-                // render userlist template
-                displayParticipantsList("");
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                alert("some error");
-            }
+
+
+        $('.add-participant-button').each(function(){
+            $(this).on("click", function(e){
+                e.preventDefault();
+                sidebar.addContent("addEventParticipant", {
+                    event: event,
+                    user: window.user,
+                    isParticipant: userIsParticipant,
+                    callback: {
+                        onConfirm: function(){
+                            window.actions.events.addParticipant(event.id, window.user.id)
+                        },
+                        onDelete: function(){
+                            window.actions.events.removeParticipant(event.id, window.user.id)
+                        }
+                    },
+                });
+                sidebar.show();
+
+
+            })
         });
 
 
-        //setup searchbar
-        // let searchbarContainer = document.getElementById("usersearch");
-        // var searchbar = new common.Searchbar(searchbarContainer, {
-        //     onInput: {
-        //         enabled: true,
-        //         callback: function(inputValue){
-        //             displayParticipantsList(inputValue)
-        //         },
-        //     },
-        // });
-
         function displayParticipantsList(filter) {
 
+            var handleData = event;
 
             // render participantslist template
             $.get('/static/unisams/js/events/templates/participantslist.hbs', function (data) {
@@ -106,12 +97,6 @@ $(document).ready (function () {
                 }, 250);
                 // hook user entries to sidebar.
 
-                $('.user-entry').each(function(){
-                    $(this).on("click", function(e){
-                        e.preventDefault();
-
-                    })
-                });
 
                 $('.participant-role-select').each(function(){
                     //display current role
@@ -124,7 +109,7 @@ $(document).ready (function () {
                         actions.events.changeParticipant(event.id, userId, role);
                     })
 
-                })
+                });
 
                 $('.participant-delete').each(function(){
                     $(this).on("click", function(e){
@@ -134,7 +119,8 @@ $(document).ready (function () {
                         actions.events.removeParticipant(event.id, userId);
                     })
 
-                })
+                });
+
 
 
             }
@@ -163,6 +149,7 @@ $(document).ready (function () {
                     "padding-right": scrollbarWidth + "px",
                 })
             }
+
 
             $(window).on('resize',function(){
                 adjustList();

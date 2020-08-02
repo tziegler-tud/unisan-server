@@ -12,6 +12,7 @@
         this.id = "searchbar" + common.searchbarCounter;
         searchbarArgs = applyArgs(searchbarArgs);
         this.searchbarArgs = searchbarArgs;
+        this.domElements = {};
 
         //build html
         var searchbarHTML = buildHTML(this);
@@ -33,9 +34,34 @@
         let sb = document.createElement("div");
         sb.className = "searchbar";
         sb.id= id;
-        sb.innerHTML = '<label class="searchbar-label" for=' +id + '>Suche:</label><input id="searchbarInput'+ id +'" class="searchbar-input common-input"</input>'
+        // sb.innerHTML = '<label class="searchbar-label" for=' +id + '>Suche:</label><input id="searchbarInput'+ id +'" class="searchbar-input common-input"</input>'
+
+        let label = document.createElement("label");
+        label.className = "searchbar-label";
+        label.htmlFor = id;
+        let s = "Suche:";
+        if(typeof(self.searchbarArgs.label) === "string"){
+            s = self.searchbarArgs.label;
+        }
+        label.innerHTML = s;
+        if(!self.searchbarArgs.noLabel) {
+            sb.append(label);
+        }
+
+        let input = document.createElement("input");
+        input.className = "searchbar-input common-input";
+        if(typeof(self.searchbarArgs.classes) === "string"){
+            input.classList.add(self.searchbarArgs.classes)
+        }
+        input.id = "searchbarInput "+ id;
+        sb.append(input);
+
+        self.domElements.container = sb;
+        self.domElements.label = label;
+        self.domElements.input = input;
+
         return sb;
-    }
+    };
 
     var setupEventHandlers = function(self, searchbarHTML){
         let inputElement = $(searchbarHTML).children("input");
@@ -44,7 +70,11 @@
                 self.searchbarArgs.onInput.callback(inputElement.val());
             })
         }
-    }
+    };
+
+    common.Searchbar.prototype.getInputElement = function(){
+        return this.domElements.input;
+    };
 
     return common.Searchbar;
 

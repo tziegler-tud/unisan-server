@@ -103,6 +103,10 @@
                 showEventParticipants(self,args);
                 break;
 
+            case "addEventParticipant":
+                addEventParticipant(self,args);
+                break;
+
         }
 
     };
@@ -1136,6 +1140,7 @@
     var addEventParticipant = function(self, args){
 
         var event = args.event;
+        var filteredList = args.select
         var onConfirm = args.callback.onConfirm;
 
         //populate
@@ -1151,12 +1156,28 @@
                 onConfirm(data);
             }.bind(args));
 
+            //setup searchbar
+            let searchbarContainer = document.getElementById("usersearch");
+            var searchbar = new common.Searchbar(searchbarContainer, {
+                onInput: {
+                    enabled: true,
+                    callback: function(inputValue){
+                        displayUserList(inputValue)
+                    },
+                },
+                noLabel: true,
+                classes: "nomargin"
+            });
+
+
             //hook user query to input element
             function displayUserList(filter) {
+
+                let handleData = {};
                 let data = {
                     filter: filter,
                     args: {
-                        sort: "generalData.memberId.value",
+                        sort: "generalData.lastName.value",
                     }};
                 //get user list from server
                 $.ajax({
@@ -1180,21 +1201,20 @@
 
                 function appendContent(html) {
                     //append to subpage container #userlist-container
-                    let container = document.getElementById('userselect-container');
+                    let container = document.getElementById('sidebar-userselect-container');
                     container.innerHTML = html;
 
-                    // hook user entries to sidebar.
-                    $('.user-entry').each(function () {
-                        $(this).on("click", function (e) {
-                            e.preventDefault();
-                            sidebar.addContent("user", {
-                                userid: this.dataset.userid
-                            });
-                            sidebar.show();
-                        })
-                    });
+                    //click on user selects it
 
-                    // click on
+
+                    // click outside should hide popup
+                    $(searchbar.getInputElement()).blur(function(){
+                        container.classList.add("hidden");
+                    });
+                    $(searchbar.getInputElement()).focusin(function(){
+                        container.classList.remove("hidden");
+                    })
+
                 }
             }
         });
