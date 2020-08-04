@@ -30,6 +30,10 @@
 
     common.Sidebar.prototype.addContent = function(type, args){
         var self = this;
+        self.currentPage = {
+            type: type,
+            args: args,
+        }
 
         switch(type){
 
@@ -1142,6 +1146,7 @@
         var event = args.event;
         var filteredList = args.select
         var onConfirm = args.callback.onConfirm;
+        var selectedUser = {role: "participant"};
 
         //populate
         $.get('/static/unisams/js/sidebar/templates/sidebar-eventParticipantsAdd.hbs', function (data) {
@@ -1150,13 +1155,14 @@
             registerBackButton(self,".sidebar-back-btn");
             registerConfirmButton(self, ".sidebar-confirm", function(){
                 data = {
-                    userid:  $("#sidebar-user-select").val(),
-                    role:  $("#sidebar-role-select").val()
+                    userid:  selectedUser.id,
+                    role:  selectedUser.role,
                 };
                 onConfirm(data);
             }.bind(args));
 
             //setup searchbar
+            let searchContainer = document.getElementById("search-container")
             let searchbarContainer = document.getElementById("usersearch");
             var searchbar = new common.Searchbar(searchbarContainer, {
                 onInput: {
@@ -1205,14 +1211,47 @@
                     container.innerHTML = html;
 
                     //click on user selects it
+                    $(".participant-item").on("mousedown", function(e) {
+                        e.preventDefault(); //preventDefault to stop blur event before click is fired
+                    }).on("click", function(e){
+                        let userid = this.dataset.userid;
+                        //hide searchbar, display user item instead
+                        let userentry = this.cloneNode(true);
+
+                        searchbar.hide();
+                        container.classList.add("hidden");
+                        let resultContainer = document.getElementById("sidebar-userselect-result");
+
+                        //create cancel btn
+                        let cancelBtn = document.createElement("div");
+                        cancelBtn.classList.add("before-icon",  "icon-cancel");
+                        cancelBtn.addEventListener("click", function(){
+                            //reset sidebar
+                            sidebar.resetCurrentPage();
+                        })
+                        userentry.append(cancelBtn);
+
+                        let c = document.createElement("div");
+                        c.className = "event-participants";
+                        c.append(userentry);
+                        resultContainer.append(c);
+                        selectedUser.id = userid;
+
+                    });
 
 
                     // click outside should hide popup
                     $(searchbar.getInputElement()).blur(function(){
-                        container.classList.add("hidden");
+                        if(searchbar.isActive()) {
+                            container.classList.add("hidden");
+                        }
                     });
-                    $(searchbar.getInputElement()).focusin(function(){
-                        container.classList.remove("hidden");
+                    $(searchbar.getInputElement()).focus(function(){
+                        //dont show when searchbar is disabled
+                        if(searchbar.isActive()){
+                            container.classList.remove("hidden");
+                        }
+
                     })
 
                 }
@@ -1515,5 +1554,9 @@
         }
         else func(elements)
     };
+
+    common.Sidebar.prototype.resetCurrentPage = function(){
+        this.addContent(this.currentPage.type, this.currentPage.args);
+    }
     return common.Sidebar;
 }(window.common = window.common || {}, jQuery));

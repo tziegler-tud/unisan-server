@@ -143,7 +143,7 @@ async function matchAny(matchString, args){
 async function populateParticipants(id) {
     let event = Event.findById(id).populate({
         path: 'participants.user',
-        select: 'generalData',
+        select: 'generalData username',
     });
     return event;
 }

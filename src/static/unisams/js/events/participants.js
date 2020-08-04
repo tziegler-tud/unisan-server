@@ -61,8 +61,8 @@ $(document).ready (function () {
                     user: window.user,
                     isParticipant: userIsParticipant,
                     callback: {
-                        onConfirm: function(){
-                            window.actions.events.addParticipant(event.id, window.user.id)
+                        onConfirm: function(data){
+                            window.actions.events.addParticipant(event.id, data.userid)
                         },
                         onDelete: function(){
                             window.actions.events.removeParticipant(event.id, window.user.id)

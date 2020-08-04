@@ -2,7 +2,7 @@
     <ul class="event-participants">
     {{#each userlist}}
         <li class="select-popup-entry sidebar-select-entry">
-            <div class="content-item participant-item">
+            <div class="content-item participant-item" data-userid={{this.id}}>
                 <div class="participant-img">
                     <img src="/data/uploads/user_images/{{this.id}}/{{this.id}}.jpg"/>
                 </div>
@@ -14,3 +14,4 @@
     {{/each}}
     </ul>
 </div>
+

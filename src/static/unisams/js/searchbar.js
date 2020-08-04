@@ -13,6 +13,7 @@
         searchbarArgs = applyArgs(searchbarArgs);
         this.searchbarArgs = searchbarArgs;
         this.domElements = {};
+        this.isactive = true;
 
         //build html
         var searchbarHTML = buildHTML(this);
@@ -75,6 +76,19 @@
     common.Searchbar.prototype.getInputElement = function(){
         return this.domElements.input;
     };
+
+    common.Searchbar.prototype.isActive = function(){
+        return this.isactive;
+    };
+
+    common.Searchbar.prototype.hide = function(){
+        this.domElements.container.style.display = "none";
+        this.isactive = false;
+    }
+    common.Searchbar.prototype.show = function(){
+        this.domElements.container.style.display = "";
+        this.isactive = true;
+    }
 
     return common.Searchbar;
 
