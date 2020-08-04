@@ -27,8 +27,11 @@ $(document).ready (function () {
         window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", event);
 
-        const quill = new Quill('#eventdetailseditor', {
-            theme: 'bubble'
+        let quillcontainer = document.getElementById("eventdetailseditor")
+
+        const quill = new Quill(quillcontainer, {
+            theme: 'bubble',
+            bounds: quillcontainer,
 
         });
 
