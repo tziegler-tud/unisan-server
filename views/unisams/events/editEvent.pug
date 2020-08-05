@@ -8,10 +8,12 @@ block page_includes
     script(src="/static/unisams/js/events/editEvent.js")
     script(src="/static/unisams/js/events/event.js")
     script(src="/static/unisams/js/editableTextField.js")
+    script(src="/static/unisams/js/editableInputField.js")
 
     script(src="/lib/editorjs/editor.js")
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editor.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableTextField.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableInputField.css')
 
     //// Main Quill library
     //script(src='//cdn.quilljs.com/1.3.6/quill.js')
@@ -107,7 +109,7 @@ block content
                                         .eventprofile-heading-type
                                             span.type=exploreEvent.type.value
                                         .eventprofile-heading-title
-                                            h3.title=exploreEvent.title.value
+                                            #eventtitle-input.title
                                         .eventprofile-heading-date
                                             span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
                                     .eventprofile-dropdown.dropdown-menu
@@ -125,8 +127,23 @@ block content
                             .subpage-content
                                 .eventinfo-container
                                     .eventinfo-inner
-                                        .eventinfo-section.eventinfo-card
-                                            .eventinfo-sectionheader
-                                                span Beschreibung
-                                            #eventdetailseditor.eventinfo-item.editor-container
-                                                .eventinfo-item.quill-renderer
+                                        .eventinfo-section.eventinfo-card.card-full.eventwidget-description
+                                            .eventinfo-section-inner
+                                                .eventinfo-sectionheader
+                                                    span Beschreibung
+                                                #eventDescriptionEditor.eventinfo-item.editor-container
+                                                    .eventinfo-item.quill-renderer
+
+                                        .eventinfo-section.eventinfo-card.card-half.eventwidget-location
+                                            .eventinfo-section-inner
+                                                .eventinfo-sectionheader
+                                                    span Termin
+                                                #eventLocationEditor.eventinfo-item.editor-container
+                                                    .eventinfo-item.quill-renderer
+
+                                        .eventinfo-section.eventinfo-card.card-half.eventwidget-location
+                                            .eventinfo-section-inner
+                                                .eventinfo-sectionheader
+                                                    span Termin
+                                                #eventdetailseditor.eventinfo-item.editor-container
+                                                    .eventinfo-item.quill-renderer

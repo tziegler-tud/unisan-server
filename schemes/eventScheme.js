@@ -17,6 +17,9 @@ var EventSchema = new Schema({
         value: {
             type: String,
             required: true,
+        },
+        delta: {
+
         }
     },
     type: {
@@ -112,6 +115,11 @@ EventSchema.virtual('description.longDesc.html').get(function() {
     let delta = this.description.longDesc.delta;
     let htmlContent =  convertDeltaToHtml(delta);
     return htmlContent;
+});
+
+EventSchema.virtual('title.html').get(function() {
+    let delta = this.title.delta;
+    return convertDeltaToHtml(delta);
 });
 
 EventSchema.post('save', function(error, doc, next) {

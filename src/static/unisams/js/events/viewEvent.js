@@ -40,7 +40,7 @@ $(document).ready (function () {
         let editableTextFieldContainer = document.getElementById("eventdetailseditor")
         let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
 
-        var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+        var ddMenu = common.DropdownMenu(".dropdown-menu", "click", ".dropdown-btn");
 
         var sidebar = new common.Sidebar('wrapper', {title: "Test"});
         // init event sidebar

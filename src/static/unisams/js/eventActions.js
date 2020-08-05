@@ -171,6 +171,24 @@ common = window.common;
                 }
             });
         }
+
+        events.updateKey = function(id, key, value, callback){
+            if (callback === undefined) callback = {};
+            var data = {
+                key: key,
+                value: value,
+            };
+            $.ajax({
+                url: "/unisams/eventmod/updateKey/" +id,
+                type: 'PUT',
+                contentType: "application/json; charset=UTF-8",
+                dataType: 'json',
+                data: JSON.stringify(data),
+                success: function(result) {
+                    callback.onSuccess(result);
+                }
+            });
+        }
         return events;
     }(actions.events = actions.events || {},jQuery));
 }(actions = window.actions || {},jQuery));

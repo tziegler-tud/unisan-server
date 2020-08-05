@@ -113,9 +113,23 @@ $(document).ready (function () {
                 })
             }
         };
-        let editableTextFieldContainer = document.getElementById("eventdetailseditor")
+        let editableTextFieldContainer = document.getElementById("eventDescriptionEditor")
         let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
 
+
+        let cb = {
+            onConfirm: function(editableInputField){
+                let delta = editableInputField.getQuill().getContents();
+                let key = "title.delta"
+                actions.events.updateKey(event.id, key, delta, {
+                    onSuccess: function(result){
+                        editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
+                    }
+                })
+            }
+        }
+        let titleInputContainer = document.getElementById("eventtitle-input");
+        let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {})
 
         var sidebar = new common.Sidebar('wrapper', {title: "Test"});
         // init event sidebar
