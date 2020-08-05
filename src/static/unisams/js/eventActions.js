@@ -153,6 +153,24 @@ common = window.common;
 
             return d;
         }
+
+        events.saveDelta = function(id, delta, callback){
+            if (callback === undefined) callback = {};
+            var data = {
+                key: "description.longDesc.delta",
+                value: delta,
+            };
+            $.ajax({
+                url: "/unisams/eventmod/updateKey/" +id,
+                type: 'PUT',
+                contentType: "application/json; charset=UTF-8",
+                dataType: 'json',
+                data: JSON.stringify(data),
+                success: function(result) {
+                    callback.onSuccess(result);
+                }
+            });
+        }
         return events;
     }(actions.events = actions.events || {},jQuery));
 }(actions = window.actions || {},jQuery));

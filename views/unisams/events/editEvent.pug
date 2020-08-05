@@ -7,8 +7,20 @@ block page_includes
 
     script(src="/static/unisams/js/events/editEvent.js")
     script(src="/static/unisams/js/events/event.js")
+    script(src="/static/unisams/js/editableTextField.js")
 
-    script(src="editor.js")
+    script(src="/lib/editorjs/editor.js")
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editor.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableTextField.css')
+
+    //// Main Quill library
+    //script(src='//cdn.quilljs.com/1.3.6/quill.js')
+    // Theme included stylesheets
+    link(href='/lib/quill/quill.snow-custom.css' rel='stylesheet')
+    link(href='/lib/quill/quill.bubble-custom.css' rel='stylesheet')
+    //link(href='/lib/quill/quill.core.css' rel='stylesheet')
+
+    script(type="module" src='/lib/quill/quill.js')
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
@@ -86,11 +98,7 @@ block content
                     #sec-content.subpage-container
                         #content1-heading.sec-heading.subpage-heading
                             .userimg-container.sec-heading-img
-                                .userimg.hover
-                                    .userimg-overlay.changeProfilePicture
-                                        .userimg-inner
-                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                                            span Bild ändern
+                                .userimg
                                     img#userProfileImage.userProfileImage(src="/data/uploads/event_images/" + exploreEvent.id + "/" + exploreEvent.id + ".jpg")
 
                             .sec-heading-label.eventprofile-heading
@@ -108,17 +116,17 @@ block content
 
                                             .dropdown-container
                                                 .dropdown-entry
-                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-eventid=exploreEvent.id href="/unisams/events/" + exploreEvent.id) Bearbeitung beenden
+                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-userid=exploreEvent.id href="/unisams/events/" + exploreEvent.id) Bearbeitung beenden
                                                 .dropdown-entry
-                                                    a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-eventid=exploreEvent.id) Event löschen
+                                                    a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
                                     .clear
                             .clear
                         #content1-text.sec-content.border-top
                             .subpage-content
                                 .eventinfo-container
                                     .eventinfo-inner
-                                        .eventinfo-section
+                                        .eventinfo-section.eventinfo-card
                                             .eventinfo-sectionheader
                                                 span Beschreibung
-                                            .eventinfo-item
-                                                span=exploreEvent.description.longDesc
+                                            #eventdetailseditor.eventinfo-item.editor-container
+                                                .eventinfo-item.quill-renderer

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const { convertDeltaToHtml } = require('node-quill-converter');
+
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
 /** @typedef {{ title: {title: string, value: string}, description: {shortDesc: string, longDesc: string}, date: {startDate: Date, endDate: Date}, participants: User[], createdDate: Date}} EventScheme */
 
@@ -31,7 +33,9 @@ var EventSchema = new Schema({
             type: String,
         },
         longDesc: {
-            type: String,
+            delta: {
+
+            }
         },
     },
     date: {
@@ -101,6 +105,13 @@ EventSchema.virtual('dateRangeString').get(function() {
         dateString = dateString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()+1) + "." + startDate.getFullYear() + " " + wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getDate()) + "." + wrapTime(endDate.getMonth()+1) + "." + startDate.getFullYear() + " "+ wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes());
     }
     return dateString;
+});
+
+EventSchema.virtual('description.longDesc.html').get(function() {
+
+    let delta = this.description.longDesc.delta;
+    let htmlContent =  convertDeltaToHtml(delta);
+    return htmlContent;
 });
 
 EventSchema.post('save', function(error, doc, next) {

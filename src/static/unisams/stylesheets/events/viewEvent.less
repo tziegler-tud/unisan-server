@@ -1,12 +1,17 @@
 @import "../color-rules.less";
 @import "../variables.less";
 
+#wrapper .page-container {
+  background-color: @page-bg-color-v2;
+}
 
 .subpage-container {
 
   width: 100%;
 
+
   .subpage-heading {
+    background-color: @page-bg-color;
     font-size: 100%;
     color: #333;
 
@@ -165,9 +170,13 @@
 .eventinfo-container {
 
   width: 100%;
+  background-color: @page-bg-color-v2;
   .eventinfo-inner {
 
-    margin: 1em;
+    padding: 1em;
+    display: flex;
+    flex-flow: row wrap;
+
     .eventinfo-section {
 
       display: flex;
@@ -175,10 +184,33 @@
 
       margin-bottom: 2em;
 
+      .eventinfo-section-inner {
+
+      }
+
+      &.eventinfo-card {
+        flex: 1 1 auto;
+
+
+        .eventinfo-section-inner {
+          margin: 10px;
+          background-color: @page-bg-color;
+          box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+        }
+
+        &.half {
+
+          @media @desktop, @tablet-landscape {
+            flex: 1 1 50%;
+            min-width: 20em;
+          }
+        }
+      }
       .eventinfo-sectionheader {
         font-size: 120%;
-        margin-bottom: 1em;
+        margin-bottom: .5em;
         color: #666;
+        padding: 0 12px;
 
         font-variant: small-caps;
         letter-spacing: .15em;

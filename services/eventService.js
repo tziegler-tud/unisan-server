@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
+const { convertDeltaToHtml } = require('node-quill-converter');
+
 const Event = db.Event;
 
 var fs = require('fs-extra');
@@ -10,6 +12,7 @@ module.exports = {
     getById,
     create,
     update,
+    updateKey,
     matchAny,
     populateParticipants,
     addParticipant,
@@ -28,19 +31,12 @@ async function getAll() {
 }
 
 /**
- * Gets a user by its id
- * @param {number} id The id of the user
+ * Gets an event by its id
+ * @param {number} id id of the event
  */
 async function getById(id) {
-    return await Event.findById(id).select('-password');
-}
-
-/**
- * Gets a user by its username
- * @param {string} username The username to search for
- */
-async function getByUsername(username) {
-    return await Event.findOne({username: username}).select('-password');
+    let event = await Event.findById(id).select('-password');
+    return event;
 }
 
 /**
@@ -117,6 +113,66 @@ async function update(id, eventParam) {
     Object.assign(event, eventParam);
 
     await event.save();
+}
+
+async function updateKey(id, key, value, eventParams) {
+    if (!eventParams) eventParams = {};
+
+    const event = await Event.findById(id);
+
+    // validate
+    if (!event) throw new Error('Event not found');
+
+    // validate input
+    if (!key) throw new Error('no key given');
+    if (!value) throw new Error('no value given');
+
+    //check if array operation
+    if(eventParams.isArray) {
+
+        //get current array content. Usually, key refers to an indexed array element.
+        var array;
+        if (eventParams.noIndex) {
+        }
+        else {
+            const keyPos = key.lastIndexOf(".");
+            const i = key.substring(keyPos+1);
+            key = key.substring(0,keyPos);
+        }
+        array = event.get(key);
+        // in-memory update.
+        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+
+        try {
+            if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
+            //check if array
+            var index = array.map(e => e._id).indexOf(value.id);
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error("Exception:" + e);
+                console.error("Aborting operation to ensure data integrity.");
+                throw e;
+            } else {
+                console.error("Unhandled exception: " + e);
+                throw e;
+            }
+        }
+        if (index > -1) {
+            // updating existing object @louis can you use array[index] = eventParams.value ?
+            array.splice(index, 1, value);
+        }
+        else {
+            // key not found, creating new entry
+            array.push(value);
+        }
+        event.set(key, array, {strict: false} );
+    }
+    else {
+        event.set(key, value, {strict: false} );
+    }
+    await event.save();
+    return event;
 }
 
 async function matchAny(matchString, args){

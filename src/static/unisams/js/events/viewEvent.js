@@ -27,13 +27,18 @@ $(document).ready (function () {
         window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", event);
 
-        let quillcontainer = document.getElementById("eventdetailseditor")
-
-        const quill = new Quill(quillcontainer, {
-            theme: 'bubble',
-            bounds: quillcontainer,
-
-        });
+        let callback = {
+            onConfirm: function(editableTextField){
+                let delta = editableTextField.getQuill().getContents();
+                actions.events.saveDelta(event.id, delta, {
+                    onSuccess: function(result){
+                        editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
+                    }
+                })
+            }
+        };
+        let editableTextFieldContainer = document.getElementById("eventdetailseditor")
+        let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 

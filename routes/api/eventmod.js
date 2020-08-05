@@ -58,6 +58,7 @@ router.post('/:id/uploadImage', create);
 router.post('/filter', matchAny);
 router.get('/:id', getById);
 router.put('/:id', update);
+router.put('/updateKey/:id', updateKey);
 router.delete('/:id', _delete);
 
 
@@ -74,13 +75,13 @@ function create(req, res, next) {
 
 function getAll(req, res, next) {
     eventService.getAll()
-        .then(users => res.json(users))
+        .then(events => res.json(events))
         .catch(err => next(err));
 }
 
 function getById(req, res, next) {
     eventService.getById(req.params.id)
-        .then(user => user ? res.json(user) : res.sendStatus(404))
+        .then(event => event ? res.json(event) : res.sendStatus(404))
         .catch(err => next(err));
 }
 
@@ -90,11 +91,17 @@ function update(req, res, next) {
         .catch(err => next(err));
 }
 
+function updateKey(req, res, next) {
+    eventService.updateKey(req.params.id, req.body.key, req.body.value)
+        .then((result) => res.json(result))
+        .catch(err => next(err));
+}
+
 function matchAny(req, res, next){
     if (req.body.filter === undefined) req.body.filter = "";
     eventService.matchAny(req.body.filter, req.body.args)
-        .then(function(userlist) {
-            res.json(userlist);
+        .then(function(eventlist) {
+            res.json(eventlist);
         })
         .catch(err => next(err));
 }
