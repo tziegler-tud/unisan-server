@@ -19,7 +19,7 @@ common = window.common;
         };
 
         $.ajax({
-            url: "/unisams/usermod/create",
+            url: "/api/v1/usermod/create",
             // make put for safety reasons :-)
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
@@ -35,7 +35,7 @@ common = window.common;
 
         // build a json object or do something with the form, store in data
         $.ajax({
-            url: "/unisams/usermod/" + userid,
+            url: "/api/v1/usermod/" + userid,
             type: 'DELETE',
             success: function(result) {
                 alert("User " + userid + " deleted.");
@@ -47,7 +47,7 @@ common = window.common;
 
     actions.uploadImage = function(userid){
         $.ajax({
-            url: "/unisams/usermod/" + userid + "/uploadUserImage",
+            url: "/api/v1/usermod/" + userid + "/uploadUserImage",
             type: 'POST',
             success: function(result) {
                 alert("User " + userid + " image updated");
@@ -65,7 +65,7 @@ common = window.common;
         };
 
         $.ajax({
-            url: "/unisams/usermod/deleteKey/" + userid,
+            url: "/api/v1/usermod/deleteKey/" + userid,
             // make put for safety reasons :-)
             type: 'DELETE',
             contentType: "application/json; charset=UTF-8",
@@ -85,7 +85,7 @@ common = window.common;
             args: args,
         };
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + userid,
+            url: "/api/v1/usermod/updateKey/" + userid,
             // make put for safety reasons :-)
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
@@ -105,7 +105,7 @@ common = window.common;
             args: args,
         };
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + userid,
+            url: "/api/v1/usermod/updateKey/" + userid,
             // make put for safety reasons :-)
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",

@@ -1,7 +1,11 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
+const AuthService = require('./authService');
+
+const authService = new AuthService();
 
 const User = db.User;
+const UserGroup = db.UserGroup;
 
 var fs = require('fs-extra');
 
@@ -17,6 +21,8 @@ module.exports = {
     getKey,
     delete: _delete,
     matchAny,
+    addUserGroup,
+    setUserRole,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -33,7 +39,17 @@ async function getAll() {
  * @param {number} id The id of the user
  */
 async function getById(id) {
-    return await User.findById(id).select('-password');
+    //populate userGroups
+    return User.findById(id).select('-password').populate({
+            path: 'userGroups',
+            select: 'title',
+        });
+    // let user = User.findById(id).select('-password').populate({
+    //     path: 'userGroups',
+    //     select: 'title',
+    // });
+    // return user;
+
 }
 
 /**
@@ -41,7 +57,10 @@ async function getById(id) {
  * @param {string} username The username to search for
  */
 async function getByUsername(username) {
-    return await User.findOne({username: username}).select('-password');
+    return User.findOne({username: username}).select('-password').populate({
+        path: 'userGroups',
+        select: 'title',
+    })
 }
 
 /**
@@ -85,16 +104,20 @@ async function create(userParam) {
 
 /**
  * Updates an existing user
+ * @param req {Object} express request
  * @param {number} id The id of the existing user
  * @param {UserScheme} userParam The object to save as user
  */
-async function update(id, userParam) {
-    const user = await User.findById(id);
+async function update(req, id, userParam) {
 
+    const user = await User.findById(id);
     // validate
     if (!user) throw new Error('User not found');
     if (user.username !== userParam.username && await User.findOne({ username: userParam.username }))
         throw new Error(`Username "${userParam.username}" is already taken`);
+
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // hash password if it was entered
     if (userParam.password) {
@@ -110,17 +133,21 @@ async function update(id, userParam) {
 
 /**
  * Deletes a property of a given user
+ * @param req {Object} express request
  * @param {number} id The id of the user to manipulate
  * @param {string} key Key to be deleted
  * @param {Object} userParams containing additional settings. Valid properties are: {isArray <bool>, noIndex: <bool> (true if key does not contain array element index)}
  */
-async function deleteKey(id, key, userParams) {
+async function deleteKey(req, id, key, userParams) {
     if (userParams === undefined) userParams = {};
 
     const user = await User.findById(id);
 
     // validate
     if (!user) throw new Error('User not found');
+
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -159,12 +186,25 @@ async function deleteKey(id, key, userParams) {
 
 }
 
-async function deleteArrayElement(id, key, arrayElementDbId, noIndex) {
+/**
+ *
+ * @param req {Object} express request
+ * @param id {number} The id of the user to manipulate
+ * @param key {String} key to delete, use string with dot-notation
+ * @param arrayElementDbId {String} Id of the array element, if available
+ * @param noIndex {Boolean} if set to false, assume key contains int denoting array index after last dot
+ * @returns {Promise<void>}
+ */
+
+async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
 
     const user = await User.findById(id);
 
     // validate
     if (!user) throw new Error('User not found');
+
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -291,18 +331,22 @@ async function getKey(id, key) {
  * Updates a property of a user, or inserts a new property if it doesnt exist
  * If the key is marked as array, the value is expected to be a JSON object of form value = {id: <ObjectId>, yourData..., ...}
  *
+ * @param req {Object} express request
  * @param {number} id The id of the user do manipulate
  * @param {string} key the key to update
  * @param {string} value the new value for the key
  * @param {Object} userParams containing additional settings. Valid properties are: {isArray: <bool>, noIndex: <bool>}
  */
-async function updateKey(id, key, value, userParams) {
+async function updateKey(req, id, key, value, userParams) {
     if (!userParams) userParams = {};
 
     const user = await User.findById(id);
 
     // validate
     if (!user) throw new Error('User not found');
+
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -357,6 +401,7 @@ async function updateKey(id, key, value, userParams) {
 
 async function matchAny(matchString, args){
 
+    if (args === undefined) args = {sort: "username"}
     let userlist;
     //matches a given string username, firstname and lastname
     //if filter is empty, return all results
@@ -377,12 +422,76 @@ async function matchAny(matchString, args){
     return userlist;
 }
 
+async function addUserGroup(req, id, userGroupId){
+    let user = await User.findById(id).select('-password');
+
+    // validate
+    if (!user) throw new Error('User not found');
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
+    let group = await UserGroup.findById(userGroupId);
+    if (!group) throw new Error('UserGroup not found');
+
+    //check if user already has userGroup assigned
+    if(user.userGroups.includes(userGroupId)){
+        console.log("User already has UserGroup " + group.title + "assigned.");
+    }
+    else {
+        user.userGroups.push(userGroupId);
+        await user.save();
+    }
+    return user;
+}
+
+/**
+ *
+ * @param req {Object} express request
+ * @param id {number} user id
+ * @param role {String} role
+ * @returns {Promise<*>}
+ */
+
+async function setUserRole(req, id, role, currentUser){
+    let user = await User.findById(id).select('-password');
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
+    let validRoles = AuthService.roles;
+    // validate
+    if (!user) throw new Error('User not found');
+    if(typeof(role) === 'string'){
+        if(!validRoles.includes(role)){
+            throw new Error("invalid role name");
+        }
+    }
+    else {
+        throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof(role));
+    }
+    //cant set role higher than user role
+    if (AuthService.rolesMap[role] > AuthService.rolesMap[currentUser.userRole]){
+        throw {status: 403, message: "insufficient access rights"};
+    }
+    //set new role
+    user.userRole = role;
+    await user.save();
+    return user;
+}
+
+
 /**
  * Deletes a user
+ * @param req {Object} express request
  * @param {number} id The id of the user to delete
  */
-async function _delete(id) {
+async function _delete(req, id) {
+
+    let user = await User.findById(id).select("userRole");
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
     await User.findByIdAndRemove(id);
+    return true;
 }
 
 /**

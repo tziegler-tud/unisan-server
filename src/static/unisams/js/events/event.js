@@ -72,7 +72,7 @@
 
     var getEventFromServer = function(eventId){
         pendingUserRequest.isActive = true;
-        let url = "/unisams/eventmod/" + eventId + "/populateParticipants";
+        let url = "/api/v1/eventmod/" + eventId + "/populateParticipants";
         return new Promise(function(resolve, reject){
             $.ajax({
                 url: url,

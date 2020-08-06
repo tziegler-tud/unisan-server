@@ -178,7 +178,7 @@
 
         var userid = args.userid;
 
-        getDataFromServer("/unisams/usermod/"+userid,function(context){
+        getDataFromServer("/api/v1/usermod/"+userid,function(context){
             $.get('/static/unisams/js/sidebar/templates/sidebar-user.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
@@ -213,7 +213,7 @@
         var userid = args.userid;
         var onConfirm = args.callback.onConfirm;
 
-        getDataFromServer("/unisams/usermod/"+userid,function(context){
+        getDataFromServer("/api/v1/usermod/"+userid,function(context){
             $.get('/static/unisams/js/sidebar/templates/sidebar-addDBKey.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 self.sidebarHTML.html(template(context));
@@ -233,14 +233,14 @@
 
         var res = {dataset: {}};
 
-        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             if (res.dataset.user){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+        getDataFromServer("/api/v1/dataset/user/getCategories", function(context){
             res.dataset.user = context;
             if (res.exploreUser){
                 action(res);
@@ -292,14 +292,14 @@
 
         var res = {dataset: {}};
 
-        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             if (res.dataset.user){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+        getDataFromServer("/api/v1/dataset/user/getCategories", function(context){
             res.dataset.user = context;
             if (res.exploreUser){
                 action(res);
@@ -391,14 +391,14 @@
 
         var res = {dataset: {}};
 
-        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             if (res.dataset.user){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+        getDataFromServer("/api/v1/dataset/user/getCategories", function(context){
             res.dataset.user = context;
             if (res.exploreUser){
                 action(res);
@@ -486,7 +486,7 @@
 
         var res = {};
 
-        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             action(res)
         });
@@ -526,14 +526,14 @@
 
         var type = (isCustomEntry) ? args.type : undefined;
 
-        getDataFromServer("/unisams/usermod/"+ userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             if (res.dataset.user){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+        getDataFromServer("/api/v1/dataset/user/getCategories", function(context){
             res.dataset.user = context;
             if (res.exploreUser){
                 action(res);
@@ -638,7 +638,7 @@
             filterValue = "customData";
         }
 
-        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+        getDataFromServer("/api/v1/dataset/user/getCategories", function(context){
             res.dataset.user = context;
             action(res);
         });
@@ -742,14 +742,14 @@
         var res = {dataset: {}};
         var corrupted = false;
 
-        getDataFromServer("/unisams/user/"+ userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             if (res.dataset.user){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/dataset/user/getCategories", function(context){
+        getDataFromServer("/api/v1/dataset/user/getCategories", function(context){
             res.dataset.user = context;
             if (res.exploreUser){
                 action(res);
@@ -791,14 +791,14 @@
 
         var res = {qualifications: {}};
 
-        getDataFromServer("/unisams/usermod/"+userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+userId,function(context){
             res.exploreUser = context;
             if (res.qualifications.byType){
                 action(res)
             }
         });
 
-        getDataFromServer("/unisams/qualification/groupByType", function(context){
+        getDataFromServer("/api/v1/qualification/groupByType", function(context){
             res.qualifications.byType = context;
             if (res.exploreUser){
                 action(res);
@@ -850,7 +850,7 @@
 
         var corrupted = false;
 
-        getDataFromServer("/unisams/usermod/"+userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+userId,function(context){
             res.exploreUser = context;
             res.currentQualification = context.qualifications.find(qual => qual._id === qualId);
             action(res)
@@ -892,7 +892,7 @@
 
         var corrupted = false;
 
-        getDataFromServer("/unisams/usermod/"+userId,function(context){
+        getDataFromServer("/api/v1/usermod/"+userId,function(context){
             res.exploreUser = context;
             res.currentQualification = context.qualifications.find(qual => qual._id === qualId);
             if (res.qualifications.byType){
@@ -900,7 +900,7 @@
             }
         });
 
-        getDataFromServer("/unisams/qualification/groupByType", function(context){
+        getDataFromServer("/api/v1/qualification/groupByType", function(context){
             res.qualifications.byType = context;
             if (res.exploreUser){
                 action(res);
@@ -983,7 +983,7 @@
 
         var res = {qualifications: {}};
 
-        getDataFromServer("/unisams/qualification/groupByType", function(context){
+        getDataFromServer("/api/v1/qualification/groupByType", function(context){
             res.qualifications.byType = context;
             res.currentQualification = findQualByIdInTypeArray(context, qualId);
             action(res);
@@ -1064,7 +1064,7 @@
         var onConfirm = args.callback.onConfirm;
         var res = {qualifications: {}};
 
-        getDataFromServer("/unisams/qualification/groupByType", function(context){
+        getDataFromServer("/api/v1/qualification/groupByType", function(context){
             res.qualifications.byType = context;
             action(res);
 
@@ -1187,7 +1187,7 @@
                     }};
                 //get user list from server
                 $.ajax({
-                    url: "/unisams/usermod/filter",
+                    url: "/api/v1/usermod/filter",
                     type: 'POST',
                     contentType: "application/json; charset=UTF-8",
                     dataType: 'json',
@@ -1374,7 +1374,7 @@
 
         //find selected category
         var current = doc.find(element => element._id === compareValue);
-        getDataFromServer("/unisams/dataset/user/getChildren/" + current._id, function (context) {
+        getDataFromServer("/api/v1/dataset/user/getChildren/" + current._id, function (context) {
             let userkeyObject = document.getElementById("userkey-key");
             let uservalueObject = document.getElementById("userkey-value");
             let customTypeObject = document.getElementById("custom-type");

@@ -24,16 +24,19 @@ var contactRouter = require('./routes/public/contact');
 var impressumRouter = require('./routes/public/impressum');
 var datenschutzRouter = require('./routes/public/datenschutz');
 
+const loginRouter = require('./routes/unisams/login');
+const mainRouter = require('./routes/unisams/index');
+var userManagementRouter = require('./routes/unisams/user');
+var eventManagementRouter = require('./routes/unisams/events');
+var settingsRouter = require('./routes/unisams/settings');
 
-var apiRouter = require('./routes/api/apiRouter');
-var userRouter = require('./routes/api/usermod');
-var userManagementRouter = require('./routes/api/user');
-var userauthRouter = require('./routes/api/userAuth');
-var eventManagementRouter = require('./routes/api/events');
-var eventRouter = require('./routes/api/eventmod');
-var settingsRouter = require('./routes/api/settings');
-var qualificationRouter = require('./routes/api/qualification');
-var userDatasetRouter = require('./routes/api/userDataset');
+
+var authRouter = require('./routes/api/auth');
+var userGroupRouter = require('./routes/api/userGroup');
+var userApiRouter = require('./routes/api/usermod');
+var eventApiRouter = require('./routes/api/eventmod');
+var qualificationApiRouter = require('./routes/api/qualification');
+var userDatasetApiRouter = require('./routes/api/userDataset');
 
 var server = express();
 
@@ -80,6 +83,15 @@ server.use(session({
 server.use(passport.initialize());
 server.use(passport.session());
 
+auth = function(req, res, next){
+  if (!req.isAuthenticated()) {
+    req.session.redirectTo = '/unisams';
+    res.status(401).send();
+    // res.redirect('/unisams/login');
+  } else {
+    next();
+  }
+};
 
 server.use('/', indexRouter);
 server.use('/team', teamRouter);
@@ -89,15 +101,23 @@ server.use('/kontakt', contactRouter);
 server.use('/info/impressum', impressumRouter);
 server.use('/info/datenschutz', datenschutzRouter);
 
-server.use('/unisams', apiRouter);
-server.use('/unisams', userauthRouter);
+
+//html calls
+server.use('/unisams', mainRouter);
+server.use('/unisams', loginRouter);
+server.use('/unisams', userGroupRouter);
+// server.use("/unisams/*", auth);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/settings', settingsRouter);
-server.use('/unisams/usermod', userRouter);
-server.use('/unisams/eventmod', eventRouter);
-server.use('/unisams/qualification', qualificationRouter);
-server.use('/unisams/dataset/user', userDatasetRouter);
+
+
+//API calls TODO: change url to /api/v1/...
+server.use('/api/v1', authRouter);
+server.use('/api/v1/usermod', auth, userApiRouter);
+server.use('/api/v1/eventmod', auth, eventApiRouter);
+server.use('/api/v1/qualification', auth, qualificationApiRouter);
+server.use('/api/v1/dataset/user', auth, userDatasetApiRouter);
 
 
 // catch 404 and forward to error handler

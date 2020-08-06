@@ -1,5 +1,5 @@
 var express = require('express');
-var router = express.Router();
+const router = express.Router();
 var uuid = require('uuid');
 const passport = require('passport');
 const bodyParser = require("body-parser");
@@ -13,26 +13,14 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 
-
-auth = function(req, res, next){
-    if (!req.isAuthenticated()) {
-        req.session.redirectTo = '/unisams';
-        console.log("");
-        res.redirect('/unisams/login');
-    } else {
-        next();
-    }
-};
-
-
 // routes
 
-router.get('/',  auth, getAll);
-router.get('/addUser', auth, addUser);
-router.get('/:username', auth, viewUser);
-router.get('/:username/editUser', auth, editUser);
-router.get('/:username/logs', auth, userLogs);
-router.get('/:username/events', auth, userEvents);
+router.get('/', getAll);
+router.get('/addUser', addUser);
+router.get('/:username', viewUser);
+router.get('/:username/editUser', editUser);
+router.get('/:username/logs', userLogs);
+router.get('/:username/events', userEvents);
 
 
 
@@ -67,8 +55,6 @@ function viewUser(req, res, next) {
             if (user) {
                 res.render("unisams/user/profile", {
                     user: req.user._doc,
-                    generalData: req.user._doc.generalData,
-                    customData: req.user._doc.customData,
                     title: user.username,
                     exploreUser: user,
                     exploreUserDocument: user._doc,
@@ -90,7 +76,7 @@ function viewUser(req, res, next) {
                     .catch(err=> next(err));
             }
         })
-        .catch(err => next(err));
+        .catch(err=> next(err));
 
 }
 

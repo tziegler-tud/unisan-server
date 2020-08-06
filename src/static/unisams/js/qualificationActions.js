@@ -11,7 +11,7 @@ common = window.common;
         if(args) for(var k in args) data[k]=args[k];
 
         $.ajax({
-            url: '/unisams/qualification/'+keyIdentifier,
+            url: '/api/v1/qualification/'+keyIdentifier,
             // make put for safety reasons :-)
             type: 'DELETE',
             dataType: 'json',
@@ -32,7 +32,7 @@ common = window.common;
         if(args) for(var k in args) data[k]=args[k];
 
         $.ajax({
-            url: '/unisams/qualification/'+keyIdentifier,
+            url: '/api/v1/qualification/'+keyIdentifier,
             // make put for safety reasons :-)
             type: 'PUT',
             dataType: 'json',
@@ -53,7 +53,7 @@ common = window.common;
         if(args) for(var k in args) data[k]=args[k];
 
         $.ajax({
-            url: '/unisams/qualification/create',
+            url: '/api/v1/qualification/create',
             type: 'POST',
             dataType: 'json',
             data: data,

@@ -84,7 +84,7 @@ function buildPageSlider(container) {
                         template: 'qq-template-manual-trigger',
                         request: {
                             method: 'POST',
-                            endpoint: '/unisams/usermod/tmp/uploadUserImage',
+                            endpoint: '/api/v1/usermod/tmp/uploadUserImage',
                             inputName: 'image'
 
                         },

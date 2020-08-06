@@ -36,7 +36,7 @@ $(document).ready (function () {
                 }};
             //get user list from server
             $.ajax({
-                url: "/unisams/usermod/filter",
+                url: "/api/v1/usermod/filter",
                 type: 'POST',
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',
@@ -50,7 +50,7 @@ $(document).ready (function () {
                     });
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert("some error");
+                    alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
                 }
             });
 

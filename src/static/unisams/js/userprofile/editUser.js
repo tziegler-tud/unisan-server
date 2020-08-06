@@ -105,7 +105,7 @@ $(document).ready (function () {
             template: 'qq-template-manual-trigger',
             request: {
                 method: 'POST',
-                endpoint: '/unisams/usermod/' + userid + "/uploadUserImage",
+                endpoint: '/api/v1/usermod/' + userid + "/uploadUserImage",
                 inputName: 'image'
 
             },

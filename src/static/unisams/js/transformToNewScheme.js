@@ -15,7 +15,7 @@ var getDataFromServer  = function(url, callback){
 
 function transformUser(userId){
     var user;
-    getDataFromServer("/unisams/usermod/"+userId,function(context){
+    getDataFromServer("/api/v1/usermod/"+userId,function(context){
         user = context;
         function annotate(ob){
             if (ob.title) return ob.title;
@@ -44,7 +44,7 @@ function transformUser(userId){
 
 
         $.ajax({
-            url: "/unisams/usermod/" + userId,
+            url: "/api/v1/usermod/" + userId,
             // make put for safety reasons :-)
             type: 'PUT',
             dataType: 'json',

@@ -12,7 +12,7 @@ passport.use(
             passwordField: 'password',
         }, async (name, password, done) => {
 
-            const user = await userService.getByUsername(name);
+            const user = await userService.getByUsername(name, false);
             // TODO: When done with debugging we should remove this message as any user can now try out random usernames until he finally gets the message "wrong password". This is a security risk!
             if (user == null) {
                 console.log("Username not found. :-(");

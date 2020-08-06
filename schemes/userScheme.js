@@ -124,6 +124,14 @@ var UserSchema = new Schema({
         type: Boolean,
         default: true
     },
+    userGroups: [{
+        type: Schema.Types.ObjectId,
+        ref: "UserGroup",
+    }],
+    userRole: {
+        type: String,
+        default: "member"
+    },
     createdDate: {
         type: Date,
         default: Date.now

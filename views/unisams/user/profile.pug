@@ -226,3 +226,13 @@ block content
                                             .userinfo-section
                                                 .userinfo-sectionheader
                                                     span Rollen
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList.qualificationList.border
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property Gruppe
+                                                        if exploreUserDocument.userGroups
+                                                            each val in exploreUserDocument.userGroups
+                                                                li.user-entry
+                                                                    a.inner()
+                                                                        .item-property= val.title
