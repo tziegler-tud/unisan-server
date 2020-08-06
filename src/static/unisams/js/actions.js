@@ -1,19 +1,19 @@
 common = window.common;
 (function (actions,$,undefined) {
 
-    actions.addUser = function(args) {
+    actions.addUser = function(data, args) {
         var memberId = {
             title: "Mitgliedsnummer",
         }
         if (args.memberId.setCustom){
-            memberId.value = args.memberId.value;
+            memberId.value = data.memberId;
         }
-        var data = {
-            username: args.data.username,
-            password: args.data.password,
+        var jsonData = {
+            username: data.username,
+            password: data.password,
             generalData: {
-                firstName: {title: "Vorname", value: args.data.generalData.firstName},
-                lastName: {title: "Nachname", value: args.data.generalData.lastName},
+                firstName: {title: "Vorname", value: data.generalData.firstName},
+                lastName: {title: "Nachname", value: data.generalData.lastName},
                 memberId: memberId,
             },
         };
@@ -24,7 +24,7 @@ common = window.common;
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
-            data: JSON.stringify(data),
+            data: JSON.stringify(jsonData),
             success: function(result) {
                 location.replace("/unisams/user/" + data.username + "/editUser")
             }

@@ -12,20 +12,8 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 
-
-auth = function(req, res, next){
-  if (!req.isAuthenticated()) {
-    req.session.redirectTo = req.originalUrl;
-    console.log("");
-    res.redirect('/unisams/login');
-  } else {
-    next();
-  }
-};
-
-
 /* GET pages. */
-router.get('/', auth, function(req, res, next) {
+router.get('/', function(req, res, next) {
     res.render("unisams/index", {title: "uniSams", user: req.user._doc})
 });
 

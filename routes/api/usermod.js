@@ -95,6 +95,7 @@ router.put('/updateKey/:id', updateKey);
 router.delete('/deleteKey/:id', deleteKey);
 router.delete('/:id', _delete);
 
+//access rights modifications require respective rights. set role paths carefully!
 router.post('/addUserGroup/:id', addUserGroup);
 router.post('/setUserRole/:id', setUserRole);
 router.post('/addGroupToAllUser', addGroupToAllUser);

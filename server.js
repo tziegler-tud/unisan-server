@@ -32,6 +32,7 @@ var settingsRouter = require('./routes/unisams/settings');
 
 
 var authRouter = require('./routes/api/auth');
+var accessRightsRouter = require('./routes/api/accessrights');
 var userGroupRouter = require('./routes/api/userGroup');
 var userApiRouter = require('./routes/api/usermod');
 var eventApiRouter = require('./routes/api/eventmod');
@@ -83,11 +84,19 @@ server.use(session({
 server.use(passport.initialize());
 server.use(passport.session());
 
-auth = function(req, res, next){
+apiAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
-    req.session.redirectTo = '/unisams';
     res.status(401).send();
     // res.redirect('/unisams/login');
+  } else {
+    next();
+  }
+};
+
+webAuth = function(req, res, next){
+  if (!req.isAuthenticated()) {
+    req.session.redirectTo = req.originalUrl;
+    res.status(401).redirect('/unisams/login');
   } else {
     next();
   }
@@ -103,10 +112,10 @@ server.use('/info/datenschutz', datenschutzRouter);
 
 
 //html calls
-server.use('/unisams', mainRouter);
 server.use('/unisams', loginRouter);
 server.use('/unisams', userGroupRouter);
-// server.use("/unisams/*", auth);
+server.use("/unisams*", webAuth);
+server.use('/unisams', mainRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/settings', settingsRouter);
@@ -114,10 +123,12 @@ server.use('/unisams/settings', settingsRouter);
 
 //API calls TODO: change url to /api/v1/...
 server.use('/api/v1', authRouter);
-server.use('/api/v1/usermod', auth, userApiRouter);
-server.use('/api/v1/eventmod', auth, eventApiRouter);
-server.use('/api/v1/qualification', auth, qualificationApiRouter);
-server.use('/api/v1/dataset/user', auth, userDatasetApiRouter);
+server.use('/api/v1/*', apiAuth);
+server.use('/api/v1/access', accessRightsRouter);
+server.use('/api/v1/usermod', userApiRouter);
+server.use('/api/v1/eventmod', eventApiRouter);
+server.use('/api/v1/qualification', qualificationApiRouter);
+server.use('/api/v1/dataset/user', userDatasetApiRouter);
 
 
 // catch 404 and forward to error handler
