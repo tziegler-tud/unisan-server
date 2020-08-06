@@ -2,14 +2,16 @@
 @import "variables.less";
 
 #sec1 {
-  position: relative;
+  position: absolute;
+  top: 50%;
   width: 100%;
-  margin-top: 10em;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 
   @media @desktop, @tablet-landscape {
-    margin-top: 10em;
-    position: relative;
-    height: 100%;
+    //margin-top: 10em;
+    //position: relative;
+    //height: 100%;
 
   }
 

@@ -119,6 +119,13 @@ server.use('/unisams', mainRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/settings', settingsRouter);
+// catch 404 and forward to error handler
+server.use("/unisams/*", function(req, res, next) {
+  next(createError(404));
+});
+
+// webpage error handler
+server.use("/unisams", errorHandler.webErrorHandler);
 
 
 //API calls TODO: change url to /api/v1/...
@@ -129,28 +136,22 @@ server.use('/api/v1/usermod', userApiRouter);
 server.use('/api/v1/eventmod', eventApiRouter);
 server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
-
-
 // catch 404 and forward to error handler
-server.use(function(req, res, next) {
+server.use("/api", function(req, res, next) {
   next(createError(404));
 });
-
-// error handler
-server.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  res.locals.__ = res.__ = function() {
-    return i18n.__.apply(req, arguments);
-  };
+// api error handler
+server.use("/api", errorHandler.apiErrorHandler);
 
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+
+
+
+
+  // // render the error page
+  // res.status(err.status || 500);
+  // res.render('error');
+// });
 
 // use(errorHandler());
 

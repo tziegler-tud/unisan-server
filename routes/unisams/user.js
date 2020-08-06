@@ -4,6 +4,8 @@ var uuid = require('uuid');
 const passport = require('passport');
 const bodyParser = require("body-parser");
 const userService = require('../../services/userService');
+const AuthService = require('../../services/authService');
+const authService = new AuthService();
 
 var app = express();
 
@@ -14,17 +16,31 @@ app.use(bodyParser.json());
 
 
 // routes
-
 router.get('/', getAll);
-router.get('/addUser', addUser);
-router.get('/:username', viewUser);
-router.get('/:username/editUser', editUser);
-router.get('/:username/logs', userLogs);
-router.get('/:username/events', userEvents);
+router.get('/addUser', checkUrlAccess, addUser);
+router.get('/edit/:username', checkUrlAccess, editUser);
 
-
+router.get('/view/:username', viewUser);
+router.get('/view/:username/logs', userLogs);
+router.get('/view/:username/events', userEvents);
 
 module.exports = router;
+
+
+function checkUrlAccess(req, res, next){
+    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                console.log("authorization failed!");
+                next({status:403, message: "forbidden"});
+            }
+        })
+        .catch(err => next(err))
+}
 
 /* GET home page. */
 function getAll(req, res, next) {

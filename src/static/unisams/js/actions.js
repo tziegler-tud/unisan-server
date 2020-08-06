@@ -26,7 +26,7 @@ common = window.common;
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function(result) {
-                location.replace("/unisams/user/" + data.username + "/editUser")
+                location.replace("/unisams/user/edit" + data.username)
             }
         });
     };
@@ -51,7 +51,7 @@ common = window.common;
             type: 'POST',
             success: function(result) {
                 alert("User " + userid + " image updated");
-                window.location.replace("/unisams/user/" + userid);
+                window.location.replace("/unisams/user/view/" + userid);
             }
         });
     };

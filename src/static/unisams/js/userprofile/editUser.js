@@ -484,7 +484,7 @@ $(document).ready (function () {
                                 callback: {
                                     onConfirm: function () {
                                         actions.updateDBKey(userid, key, value, args, function () {
-                                            location.replace("/unisams/user/" + userid + "/editUser");
+                                            location.replace("/unisams/user/edit/" + userid);
                                         });
                                     }
                                 }
