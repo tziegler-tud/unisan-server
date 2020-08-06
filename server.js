@@ -69,6 +69,7 @@ server.use(cookieParser());
 server.use(lessMiddleware(path.join(__dirname, 'src')));
 server.use(express.static(path.join(__dirname, 'src')));
 
+
 server.use(session({
   genid: (req) => {
     console.log('Inside the session middleware');
@@ -95,7 +96,8 @@ apiAuth = function(req, res, next){
 
 webAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
-    req.session.redirectTo = req.originalUrl;
+    // req.session.redirectTo = req.originalUrl; //strange bug setting favicon as url, disable until fixed
+    req.session.redirectTo = "/unisams";
     res.status(401).redirect('/unisams/login');
   } else {
     next();
