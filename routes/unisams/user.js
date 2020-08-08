@@ -69,12 +69,15 @@ function viewUser(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
+                //check if editing this user is allowed
+                let edit = authService.checkIfEdit(req.user, user);
                 res.render("unisams/user/profile", {
                     user: req.user._doc,
                     title: user.username,
                     exploreUser: user,
                     exploreUserDocument: user._doc,
-                    refurl: req.params.username
+                    refurl: req.params.username,
+                    allowedit: edit,
                 })
             }
             else {

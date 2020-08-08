@@ -59,21 +59,6 @@ function checkUrlAccess(req, res, next){
         })
         .catch(err => next(err))
 }
-//
-// function checkWriteAccess(req, res, next){
-//     authService.checkWriteAccess(user, target)
-//         .then(function(result){
-//             if(result){
-//                 console.log("write access authorization successful!");
-//                 next();
-//             }
-//             else {
-//                 console.log("write access denied");
-//                 res.status(403).send();
-//             }
-//         })
-//         .catch(err => next(err))
-// }
 
 // routes
 

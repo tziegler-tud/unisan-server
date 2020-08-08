@@ -45,10 +45,10 @@ class AuthService {
     async checkUrlPermission(user, method, url){
 
         //populate userGroups
-        let u = await User.findById(user.id).populate({
+        await user.populate({
             path: 'userGroups',
-        });
-        let userGroups = u.userGroups;
+        }).execPopulate();
+        let userGroups = user.userGroups;
         //check if url and method are part of userGroups
         let authorizedGroup = userGroups.find(function(group){
             return group.allowedOperations.some(function(op){
@@ -66,6 +66,19 @@ class AuthService {
         }
     }
 
+    //check if user has group
+    checkUserGroupName(user,groupname) {
+        let userGroups = user.userGroups;
+        return userGroups.some(group => group.title === groupname);
+    }
+
+    checkIfEdit(user, target){
+        //check if user is userAdmin
+        let group = this.checkUserGroupName(user, "userAdmin");
+        //check write access
+        let write = this.checkWriteAccess(user, target);
+        return (group && write);
+    }
     /**
      * check user role agains a required role
      *
@@ -87,7 +100,7 @@ class AuthService {
      * @param target {UserScheme}
      * @returns {Boolean}
      */
-    async checkWriteAccess(user, target){
+    checkWriteAccess(user, target){
         //superadmin is allowed to perform any operation
         if(user.userRole === rolesEnum.SUPERADMIN) return true;
         //operations on protected user are not allowed

@@ -5,7 +5,8 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
 const uploadService = require('../../services/uploadService');
-
+const AuthService = require('../../services/authService');
+const authService = new AuthService();
 
 var app = express();
 
@@ -45,9 +46,27 @@ auth = function(req, res, next){
 };
 
 
-// routes
+
+
+function checkUrlAccess(req, res, next){
+    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                console.log("authorization failed!");
+                res.status(403).send();
+            }
+        })
+        .catch(err => next(err))
+}
 
 // routes
+
+//check url access by user group
+router.use('/*', checkUrlAccess);
 router.post('/create', create);
 router.get('/', getAll);
 router.post('/addParticipant', addParticipant);

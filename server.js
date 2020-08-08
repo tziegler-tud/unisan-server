@@ -116,7 +116,7 @@ server.use('/info/datenschutz', datenschutzRouter);
 //html calls
 server.use('/unisams', loginRouter);
 server.use('/unisams', userGroupRouter);
-server.use("/unisams*", webAuth);
+server.use("/unisams", webAuth);
 server.use('/unisams', mainRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
