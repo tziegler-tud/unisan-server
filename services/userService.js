@@ -1,11 +1,15 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 const AuthService = require('./authService');
+const LogService = require("./logService");
+const Log = require('../utils/log');
 
 const authService = new AuthService();
 
+
 const User = db.User;
 const UserGroup = db.UserGroup;
+const DbLog = db.Log;
 
 var fs = require('fs-extra');
 
@@ -22,6 +26,7 @@ module.exports = {
     delete: _delete,
     matchAny,
     addUserGroup,
+    removeUserGroup,
     setUserRole,
 };
 
@@ -64,10 +69,12 @@ async function getByUsername(username) {
 }
 
 /**
+ *
  * Creates a new user by a given object of the user scheme
+ * @param req {Object} express request
  * @param {UserScheme} userParam The object to save as user
  */
-async function create(userParam) {
+async function create(req, userParam) {
     // validate
     if (await User.findOne({ username: userParam.username }))
         throw new Error(`Username "${userParam.username}" is already taken`);
@@ -84,21 +91,49 @@ async function create(userParam) {
         user.hash = await bcrypt.hash(userParam.password, salt);
     }
 
+    //create log
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "user",
+            actionType: "create",
+            actionDetail: "userCreate"
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "user",
+            targetObject: user._id,
+            targetObjectId: user._id,
+            targetModel: "User",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+
     // save user
     if(await user.save()){
+        //update log
+        LogService.create(log)
+            .then(
+        )
+            .catch(
+
+        );
+        //create user dir
         fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
             if (err) {
                 throw err;
             }
             else {
+                // copy dummy user image to user directory
                 fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
                     if (err) throw err;
                     console.log('dummy image copied to new user');
                 });
             }
         });
-        // copy dummy user image to user directory
-
     }
 }
 
@@ -128,6 +163,39 @@ async function update(req, id, userParam) {
     // copy userParam properties to user
     Object.assign(user, userParam);
 
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: "",
+                    fullKey: "",
+                    originalValue: "",
+                    value:  "",
+                    tag: "<OVERWRITE>"
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
     await user.save();
 }
 
@@ -151,6 +219,9 @@ async function deleteKey(req, id, key, userParams) {
 
     // validate input
     if (!key) throw new Error('no key given');
+
+    let ojVal = undefined;
+    let logKey = key;
 
     // check if key exists
     if (!user.get(key)) {
@@ -179,8 +250,44 @@ async function deleteKey(req, id, key, userParams) {
         throw new Error(msg);
     }
     else {
+        let k = user.get(key);
+        ojVal = (k.value === undefined) ? k : k.value;
+        logKey = (k.title === undefined) ? key : k.title;
         user.set(key, undefined, {strict: false} );
     }
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: key,
+                    originalValue: ojVal,
+                    value:  "",
+                    tag:  "<DELETED>",
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
     await user.save();
 
 
@@ -208,6 +315,9 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
 
     // validate input
     if (!key) throw new Error('no key given');
+
+    let ojVal = undefined;
+    let logKey = key;
 
     var array;
     if(noIndex) {
@@ -240,8 +350,9 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
     if(user.schema.path(key)!==undefined) {
         // check if trying to delete required key
         if (user.schema.path(key).isRequired) {
-            console.error('Trying to remove required key.');
-            return;
+            let msg = 'Trying to remove required key.';
+            console.error(msg);
+            throw new Error(msg);
         } else {
 
         }
@@ -272,6 +383,39 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
             throw new Error(e);
         }
         user.set(key, updatedArray, {strict: false} );
+        user.validate(function(err){
+            if (err){
+                console.log("Validation failed: " + err)
+            }
+            else {
+                //create log
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "user",
+                        actionType: "modify",
+                        actionDetail: "userModify",
+                        key: logKey,
+                        fullKey: key,
+                        originalValue: ojVal,
+                        value:  "",
+                        tag:  "<DELETED>",
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "user",
+                        targetObject: user._id,
+                        targetObjectId: user._id,
+                        targetModel: "User",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            }
+        })
         await user.save();
     }
     function removeById(array){
@@ -283,6 +427,9 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
         var index = array.map(e => e._id).indexOf(arrayElementDbId);
         if (index > -1) {
             // remove existing key from array
+            let el = array[index];
+            logKey = (el.title === undefined) ? logKey : el.title;
+            ojVal = (el.value === undefined) ? el : el.value;
             array.splice(index, 1);
             return array;
         }
@@ -301,6 +448,9 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
     function removeByIndex(array){
 
         try {
+            let el = array[index];
+            logKey = (el.title === undefined) ? logKey : el.title;
+            ojVal = (el.value === undefined) ? el : el.value;
             array.splice(index, 1);
             return array;
         }
@@ -352,6 +502,10 @@ async function updateKey(req, id, key, value, userParams) {
     if (!key) throw new Error('no key given');
     if (!value) throw new Error('no value given');
 
+    let ojVal = undefined;
+    let newVal = (value.value === undefined) ? value : value.value;
+    let logKey = (value.title === undefined) ? key : value.title;
+
     //check if array operation
     if(userParams.isArray) {
 
@@ -384,7 +538,8 @@ async function updateKey(req, id, key, value, userParams) {
             }
         }
         if (index > -1) {
-            // updating existing object @louis can you use array[index] = userParams.value ?
+            // updating existing object
+            ojVal = array[index];
             array.splice(index, 1, value);
         }
         else {
@@ -394,11 +549,51 @@ async function updateKey(req, id, key, value, userParams) {
         user.set(key, array, {strict: false} );
     }
     else {
+        let k = user.get(key);
+        ojVal = (k.value === undefined) ? k : k.value;
         user.set(key, value, {strict: false} );
     }
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: key,
+                    originalValue: ojVal,
+                    value:  newVal,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
     await user.save();
 }
 
+/**
+ *
+ * @param matchString
+ * @param args
+ * @returns {Promise<Query|*|number>}
+ */
 async function matchAny(matchString, args){
 
     if (args === undefined) args = {sort: "username"}
@@ -422,6 +617,14 @@ async function matchAny(matchString, args){
     return userlist;
 }
 
+/**
+ * adds user to group
+ * @param req {Object} express request
+ * @param id user id
+ * @param userGroupId id of group the user should be added to
+ * @returns {Promise<*>}
+ */
+
 async function addUserGroup(req, id, userGroupId){
     let user = await User.findById(id).select('-password');
 
@@ -435,12 +638,92 @@ async function addUserGroup(req, id, userGroupId){
 
     //check if user already has userGroup assigned
     if(user.userGroups.includes(userGroupId)){
-        console.log("User already has UserGroup " + group.title + "assigned.");
+        console.log("User " + user.username + " already has UserGroup " + group.title + " assigned.");
+        return user;
     }
     else {
         user.userGroups.push(userGroupId);
         await user.save();
     }
+    //create log
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "user",
+            actionType: "modify",
+            actionDetail: "userGroupAdd",
+            key: "",
+            value: group.title
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "user",
+            targetObject: user._id,
+            targetObjectId: user._id,
+            targetModel: "User",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return user;
+}
+
+/**
+ * removes user from group
+ * @param req {Object} express request
+ * @param id user id
+ * @param userGroupId id of group the user should be removed from
+ * @returns {Promise<*>}
+ */
+
+async function removeUserGroup(req, id, userGroupId){
+    let user = await User.findById(id).select('-password');
+
+    // validate
+    if (!user) throw new Error('User not found');
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
+    let group = await UserGroup.findById(userGroupId);
+    if (!group) throw new Error('invalid user group');
+
+    //check if user has userGroup assigned
+    let index = user.userGroups.indexOf(userGroupId);
+    if(index > -1){
+        // remove group
+        user.userGroups.splice(index, 1);
+        await user.save();
+    }
+    else {
+        console.log("User " + user.username + " is not part of group " + group.title);
+        return false;
+    }
+    //create log
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "user",
+            actionType: "modify",
+            actionDetail: "userGroupDelete",
+            key: "",
+            value: group.title,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "user",
+            targetObject: user._id,
+            targetObjectId: user._id,
+            targetModel: "User",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
     return user;
 }
 
@@ -475,6 +758,30 @@ async function setUserRole(req, id, role, currentUser){
     //set new role
     user.userRole = role;
     await user.save();
+
+    //create log
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "user",
+            actionType: "modify",
+            actionDetail: "userRoleModify",
+            key: "",
+            value: role,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "user",
+            targetObject: user._id,
+            targetObjectId: user._id,
+            targetModel: "User",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
     return user;
 }
 
@@ -490,12 +797,44 @@ async function _delete(req, id) {
     //check write access
     if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
-    await User.findByIdAndRemove(id);
-    return true;
+    // await User.findByIdAndRemove(id);
+    User.findByIdAndRemove(id)
+        .then(function(user){
+            console.log("Deleted user with id: " + user._id);
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "delete",
+                    actionDetail: "userDelete",
+                    key: user.id,
+                    originalValue: user.username,
+                    value: "",
+                    tag: "<DELETE>"
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log)
+                .then()
+                .catch()
+            //TODO: update exisiting logs for user
+            return true;
+        })
+        .catch()
 }
 
 /**
  *  generates a fresh member id
  *
  */
-

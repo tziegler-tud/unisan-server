@@ -83,14 +83,16 @@ class AuthService {
      * check user role agains a required role
      *
      * @param user {UserScheme}
-     * @param requiredRole {role}
+     * @param requiredRole {String}
      * @returns {Boolean}
      */
     checkRequiredRole(user, requiredRole){
+        //superadmin is allowed to perform any operation
+        if(user.userRole === rolesEnum.SUPERADMIN) return true;
         //get user access level
-        let al = rolesEnum[user.role];
+        let al = rolesEnum[user.userRole];
         //compare. must be greater to allow operation
-        return (al > rolesEnum[requiredRole]);
+        return (al > rolesMap[requiredRole]);
     }
 
     /**

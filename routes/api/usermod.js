@@ -3,6 +3,8 @@ const router = express.Router();
 const userService = require('../../services/userService');
 const uploadService = require('../../services/uploadService');
 const AuthService = require('../../services/authService');
+const LogService = require('../../services/logService');
+const Log = require('../../utils/log');
 
 var path = require('path');
 var fs = require('fs-extra');
@@ -39,6 +41,28 @@ router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, n
                     if (err) return console.error(err);
                     console.log("moved file to user dir: " + user.id);
                 });
+                //log
+                //create log
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "user",
+                        actionType: "modify",
+                        actionDetail: "userImageModify",
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "user",
+                        targetObject: user._id,
+                        targetModel: "User",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+
+                LogService.create(log).then().catch();
                 res.json({success: true});
             })
             .catch(err => next(err));
@@ -82,13 +106,14 @@ router.delete('/:id', _delete);
 
 //access rights modifications require respective rights. set role paths carefully!
 router.post('/addUserGroup/:id', addUserGroup);
+router.post('/removeUserGroup/:id', removeUserGroup);
 router.post('/setUserRole/:id', setUserRole);
 router.post('/addGroupToAllUser', addGroupToAllUser);
 
 module.exports = router;
 
 function create(req, res, next) {
-  userService.create(req.body)
+  userService.create(req, req.body)
       .then(() => res.json(req.body))
       .catch(err => {
         next(err);
@@ -161,6 +186,14 @@ function matchAny(req, res, next){
 
 function addUserGroup(req, res, next){
     userService.addUserGroup(req, req.params.id, req.body.userGroupId)
+        .then(function(user) {
+            res.json(user);
+        })
+        .catch(err => next(err));
+}
+
+function removeUserGroup(req, res, next){
+    userService.removeUserGroup(req, req.params.id, req.body.userGroupId)
         .then(function(user) {
             res.json(user);
         })

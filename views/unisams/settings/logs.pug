@@ -1,0 +1,43 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/settings/logs.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/settings/settings.css')
+    script(src="/static/unisams/js/settings.js")
+    script(src="/static/unisams/js/settings/logs.js")
+
+
+
+    script.
+        window.dockerArgs.activeContainer = "settingsContainer";
+        window.dockerArgs.activeElementId = "settingsLogs";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            h3 activity logs
+                        #content1-text.sec-content
+                            .subpage-options
+                            .subpage-content
+                                .itemlist-header-container
+                                    ul#loglist-top.loglist-top.itemlist.common-list.list-view.border
+                                        li.noSelect.rowHeading
+                                            .inner
+                                                .item-property Datum
+                                                .item-property Nutzer
+                                                .item-property Art
+                                                .item-property target type
+                                                .item-property target object
+                                                .item-property Beschreibung
+
+                                .itemlist-content-container
+                                    #loglist-container.loglist-container
+
+
+
+

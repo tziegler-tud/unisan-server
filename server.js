@@ -38,6 +38,7 @@ var userApiRouter = require('./routes/api/usermod');
 var eventApiRouter = require('./routes/api/eventmod');
 var qualificationApiRouter = require('./routes/api/qualification');
 var userDatasetApiRouter = require('./routes/api/userDataset');
+var logsRouter = require('./routes/api/logs');
 
 var server = express();
 
@@ -138,6 +139,7 @@ server.use('/api/v1/usermod', userApiRouter);
 server.use('/api/v1/eventmod', eventApiRouter);
 server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
+server.use('/api/v1/logs', logsRouter);
 // catch 404 and forward to error handler
 server.use("/api", function(req, res, next) {
   next(createError(404));

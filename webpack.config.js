@@ -5,6 +5,8 @@ module.exports = {
     entry: {
         login: "./src/webpack/login.js",
         login_style: "./src/webpack/login.scss",
+        addUser: "./src/webpack/addUser.js",
+        addUser_style: "./src/webpack/addUser.scss"
     },
     output: {
         path: path.join(__dirname, "./src/dist"),
@@ -18,7 +20,7 @@ module.exports = {
                     {
                         loader: 'file-loader',
                         options: {
-                            name: 'bundle.css',
+                            name: '[name].css',
                         },
                     },
                     { loader: 'extract-loader' },

@@ -36,4 +36,5 @@ module.exports = {
     UserDataset: require('./userDatasetScheme'),
     Event: require('./eventScheme'),
     UserGroup: require('./userGroupScheme'),
+    Log: require('./logScheme'),
 };

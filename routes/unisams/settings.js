@@ -5,6 +5,7 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const userService = require('../../services/userService');
 const qualificationService = require('../../services/qualificationService');
+const logService = require('../../services/logService');
 
 var app = express();
 
@@ -89,6 +90,13 @@ router.get('/events', auth, function(req, res, next) {
             next(err);
         })
 });
+
+router.get('/logs', auth, function(req, res, next) {
+    res.render("unisams/settings/logs", {title: "logs - uniSams",
+        user: req.user._doc,
+    })
+});
+
 
 
 

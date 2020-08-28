@@ -111,6 +111,10 @@
                 addEventParticipant(self,args);
                 break;
 
+            case "logDetails":
+                showLogDetails(self,args);
+                break;
+
         }
 
     };
@@ -147,8 +151,13 @@
         this.isActive = false;
     };
 
-    common.Sidebar.prototype.addErrorMessage = function(msg, insertFunc) {
+    common.Sidebar.prototype.addErrorMessage = function(msg, insertFunc, overwrite) {
 
+        overwrite = (overwrite === undefined) ? false : overwrite;
+        if (overwrite){
+            //clear previous errors
+            $(".sidebar-errorMsg").remove();
+        }
         var errorHtml = $("<div/>", {
             "class": "sidebar-errorMsg",
             text: msg,
@@ -1256,6 +1265,39 @@
 
                 }
             }
+        });
+
+    };
+
+    var showLogDetails = function(self, args){
+
+        let log = args.log;
+        let handleData = {
+            log: log,
+        }
+
+        $.get('/static/unisams/js/sidebar/templates/sidebar-viewLogEntry.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            self.sidebarHTML.html(template(handleData));
+            registerBackButton(self,".sidebar-back-btn");
+            registerButton (self, ".sidebar-delete", function(){
+                // delete log entry
+                $.ajax({
+                    url: "/api/v1/logs/" + log.id,
+                    type: 'DELETE',
+                    contentType: "application/json; charset=UTF-8",
+                    success: function(result) {
+                        window.location.reload();
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        // alert(textStatus + ": " + XMLHttpRequest.status + " " + errorThrown);
+                        if (XMLHttpRequest.status===403) self.addErrorMessage("Operation not permitted.", function(data){
+                            $("#sidebar-inner").before(data);
+                        }, true);
+                    }
+                });
+
+            });
         });
 
     };
