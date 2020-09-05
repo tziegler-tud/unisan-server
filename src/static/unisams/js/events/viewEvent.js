@@ -24,6 +24,8 @@ $(document).ready (function () {
 
     function buildPage(event) {
 
+        let page = new window.eventPage.EventPage();
+
         window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", event);
 
@@ -37,8 +39,24 @@ $(document).ready (function () {
                 })
             }
         };
-        let editableTextFieldContainer = document.getElementById("eventdetailseditor")
+        let editableTextFieldContainer = document.getElementById("eventdetailseditor");
         let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
+
+        //get event type
+        switch(event.type.raw){
+            case "eventTraining":
+                buildTrainingPage();
+                break;
+            case "eventSeminar":
+                buildSeminarPage();
+                break;
+            case "eventSan":
+                buildSanPage();
+                break;
+            case undefined:
+            default:
+        }
+
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click", ".dropdown-btn");
 
@@ -60,6 +78,20 @@ $(document).ready (function () {
             },
         });
         sidebar.show();
+
+        function buildTrainingPage(){
+            page.addComponent(window.eventPage.componentTypes.DESCRIPTION);
+            page.addComponent(window.eventPage.componentTypes.DATE);
+            page.addComponent(window.eventPage.componentTypes.LOCATION);
+        }
+
+        function buildSeminarPage(){
+
+        }
+
+        function buildSanPage(){
+
+        }
 
 
 

@@ -47,7 +47,7 @@ $(document).ready (function () {
                     });
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert("some error");
+                    alert(XMLHttpRequest.status + ": " + textStatus);
                 }
             });
 

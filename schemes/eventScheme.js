@@ -28,8 +28,11 @@ var EventSchema = new Schema({
             default: "Typ",
         },
         value: {
-
+            type: String,
         },
+        raw: {
+            type: String,
+        }
     },
     description: {
         shortDesc: {

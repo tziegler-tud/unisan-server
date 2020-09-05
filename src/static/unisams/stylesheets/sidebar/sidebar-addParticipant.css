@@ -44,13 +44,16 @@
   padding: 5px 1em;
   width: calc(100% - 2em);
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result {
   width: 100%;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container.hidden {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container.hidden,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result.hidden {
   display: none !important;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result .event-participants {
   width: 100%;
   padding: 0;
   list-style: none;
@@ -58,7 +61,8 @@
   overflow: auto;
   border: 1px solid #CCC;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result .event-participants .participant-item {
   width: 100%;
   display: flex;
   flex-flow: row wrap;
@@ -66,19 +70,23 @@
   align-items: center;
   padding: 5px 0;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item:not(:last-child) {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item:not(:last-child),
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result .event-participants .participant-item:not(:last-child) {
   border-bottom: 1px solid #DDD;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item .participant-img {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item .participant-img,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result .event-participants .participant-item .participant-img {
   flex: 0 0 3em;
   margin-right: 1em;
   max-width: 2em;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item .participant-img img {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item .participant-img img,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result .event-participants .participant-item .participant-img img {
   width: 100%;
   border-radius: 50%;
 }
-.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item .participant-details {
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-container .event-participants .participant-item .participant-details,
+.sidebar-addParticipant .sidebar-content .addParticipant-container .userselect-result .event-participants .participant-item .participant-details {
   flex: 1 1 auto;
 }
 .sidebar-participate-button.hidden {

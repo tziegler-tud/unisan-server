@@ -28,10 +28,14 @@
   /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
+#wrapper .page-container {
+  background-color: #f9f9f9;
+}
 .subpage-container {
   width: 100%;
 }
 .subpage-container .subpage-heading {
+  background-color: #fff;
   font-size: 100%;
   color: #333;
   display: flex;
@@ -142,19 +146,41 @@
 }
 .eventinfo-container {
   width: 100%;
+  background-color: #f9f9f9;
 }
 .eventinfo-container .eventinfo-inner {
-  margin: 1em;
+  padding: 1em;
+  display: flex;
+  flex-flow: row wrap;
 }
 .eventinfo-container .eventinfo-inner .eventinfo-section {
   display: flex;
   flex-flow: column wrap;
   margin-bottom: 2em;
 }
+.eventinfo-container .eventinfo-inner .eventinfo-section.eventinfo-card {
+  flex: 1 1 auto;
+  margin-bottom: 0;
+}
+.eventinfo-container .eventinfo-inner .eventinfo-section.eventinfo-card .eventinfo-section-inner {
+  margin: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
+}
+.eventinfo-container .eventinfo-inner .eventinfo-section.eventinfo-card.card-full {
+  flex: 0 0 100%;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .eventinfo-container .eventinfo-inner .eventinfo-section.eventinfo-card.card-half {
+    flex: 0 0 50%;
+    min-width: 20em;
+  }
+}
 .eventinfo-container .eventinfo-inner .eventinfo-section .eventinfo-sectionheader {
   font-size: 120%;
-  margin-bottom: 1em;
+  margin-bottom: .5em;
   color: #666;
+  padding: 12px 12px 0 12px;
   font-variant: small-caps;
   letter-spacing: .15em;
 }

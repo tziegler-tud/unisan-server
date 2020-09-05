@@ -661,22 +661,22 @@ select:disabled {
 /*
 common list stylings
  */
-ul {
+ul.common-list {
   margin: 0;
   list-style: none;
 }
-ul li {
+ul.common-list li {
   flex: 1 1 auto;
   background-color: #ffffff;
 }
-ul li:nth-child(odd) {
+ul.common-list li:nth-child(odd) {
   background-color: #f9f9f9;
 }
-ul li:not(.noSelect):hover {
+ul.common-list li:not(.noSelect):hover {
   background-color: rgba(124, 0, 26, 0.2);
   cursor: pointer;
 }
-ul li.borderBottom {
+ul.common-list li.borderBottom {
   border-bottom: 1px solid #666;
 }
 /*
