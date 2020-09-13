@@ -298,7 +298,7 @@ async function deleteKey(req, id, key, userParams) {
  * @param req {Object} express request
  * @param id {number} The id of the user to manipulate
  * @param key {String} key to delete, use string with dot-notation
- * @param arrayElementDbId {String} Id of the array element, if available
+ * @param arrayElementDbId {number} Id of the array element, if available
  * @param noIndex {Boolean} if set to false, assume key contains int denoting array index after last dot
  * @returns {Promise<void>}
  */
@@ -329,8 +329,9 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
         try {
             //key refers to array element. We need to find the parent array.
             array = user.get(key).parentArray();
-            var keyPos = key.lastIndexOf(".");
-            var index = key.substring(keyPos+1);
+            let keyPos = key.lastIndexOf(".");
+            let index = parseInt(key.substring(keyPos+1));
+            //TODO: validate index using regex
             key = key.substring(0,keyPos);
         }
         catch(e) {
@@ -371,93 +372,61 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
     var updatedArray;
     // if array is indexed, we use id to remove the element
     if (arrayElementDbId) {
-        updatedArray = removeById(array);
+        let rmObj = removeById(array, arrayElementDbId);
+        updatedArray = rmObj.array;
+        let el = rmObj.object;
+        logKey = (el.title === undefined) ? el : el.title;
+        ojVal  = (el.value === undefined) ? el : el.value;
     }
     else {
         if (!noIndex) {
-            updatedArray = removeByIndex(array);
+            let rmObj = removeByIndex(array, index);
+            updatedArray = rmObj.array;
+            let el = rmObj.object;
+            logKey = (el.title === undefined) ? el : el.title;
+            ojVal  = (el.value === undefined) ? el : el.value;
         }
         else {
             const e = "Failed to delete array element: Wrong parameter settings.";
             console.error(e);
             throw new Error(e);
         }
-        user.set(key, updatedArray, {strict: false} );
-        user.validate(function(err){
-            if (err){
-                console.log("Validation failed: " + err)
-            }
-            else {
-                //create log
-                let log = new Log({
-                    type: "modification",
-                    action: {
-                        objectType: "user",
-                        actionType: "modify",
-                        actionDetail: "userModify",
-                        key: logKey,
-                        fullKey: key,
-                        originalValue: ojVal,
-                        value:  "",
-                        tag:  "<DELETED>",
-                    },
-                    authorizedUser: req.user,
-                    target: {
-                        targetType: "user",
-                        targetObject: user._id,
-                        targetObjectId: user._id,
-                        targetModel: "User",
-                    },
-                    httpRequest: {
-                        method: req.method,
-                        url: req.originalUrl,
-                    }
-                })
-                LogService.create(log).then().catch();
-            }
-        })
-        await user.save();
     }
-    function removeById(array){
-        // in-memory update. get current array content
-        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
-        /** @type {any[]} */
-        if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
-
-        var index = array.map(e => e._id).indexOf(arrayElementDbId);
-        if (index > -1) {
-            // remove existing key from array
-            let el = array[index];
-            logKey = (el.title === undefined) ? logKey : el.title;
-            ojVal = (el.value === undefined) ? el : el.value;
-            array.splice(index, 1);
-            return array;
+    user.set(key, updatedArray, {strict: false} );
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
         }
         else {
-            //try to remove by index anyway.
-            if(noIndex) {
-                var msg = "Array element Id was not found in array. Aborting.";
-                console.error(msg);
-                throw new Error(msg);
-            }
-            console.warn("Id was not found in array. Trying to remove by index...");
-            return removeByIndex(array);
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: key,
+                    originalValue: ojVal,
+                    value:  "",
+                    tag:  "<DELETED>",
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
         }
-    }
-    // array not indexed, remove by index
-    function removeByIndex(array){
-
-        try {
-            let el = array[index];
-            logKey = (el.title === undefined) ? logKey : el.title;
-            ojVal = (el.value === undefined) ? el : el.value;
-            array.splice(index, 1);
-            return array;
-        }
-        catch(e) {
-
-        }
-    }
+    })
+    await user.save();
 }
 
 /**
@@ -480,6 +449,8 @@ async function getKey(id, key) {
 /**
  * Updates a property of a user, or inserts a new property if it doesnt exist
  * If the key is marked as array, the value is expected to be a JSON object of form value = {id: <ObjectId>, yourData..., ...}
+ *
+ * Note: this can be used to modify qualification entries, but it is recommended to use the dedicated api calls for qulification manipulation.
  *
  * @param req {Object} express request
  * @param {number} id The id of the user do manipulate
@@ -587,6 +558,274 @@ async function updateKey(req, id, key, value, userParams) {
     })
     await user.save();
 }
+
+async function addQualification(req, id, key, value, userParams) {
+    if (!userParams) userParams = {};
+
+    const user = await User.findById(id);
+
+    // validate
+    if (!user) throw new Error('User not found');
+
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
+    // validate input
+    if (!key) throw new Error('no key given');
+    if (!value) throw new Error('no value given');
+
+    let ojVal = undefined;
+    let newVal = (value.value === undefined) ? value : value.value;
+    let logKey = (value.title === undefined) ? key : value.title;
+
+    //check if array operation
+    if(userParams.isArray) {
+
+        //get current array content. Usually, key refers to an indexed array element.
+        var array;
+        if (userParams.noIndex) {
+        }
+        else {
+            const keyPos = key.lastIndexOf(".");
+            const i = key.substring(keyPos+1);
+            key = key.substring(0,keyPos);
+        }
+        array = user.get(key);
+        // in-memory update.
+        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+
+        try {
+            if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
+            //check if array
+            var index = array.map(e => e._id).indexOf(value.id);
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error("Exception:" + e);
+                console.error("Aborting operation to ensure data integrity.");
+                throw e;
+            } else {
+                console.error("Unhandled exception: " + e);
+                throw e;
+            }
+        }
+        if (index > -1) {
+            // updating existing object
+            ojVal = array[index];
+            array.splice(index, 1, value);
+        }
+        else {
+            // key not found, creating new entry
+            array.push(value);
+        }
+        user.set(key, array, {strict: false} );
+    }
+    else {
+        let k = user.get(key);
+        ojVal = (k.value === undefined) ? k : k.value;
+        user.set(key, value, {strict: false} );
+    }
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: key,
+                    originalValue: ojVal,
+                    value:  newVal,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
+    await user.save();
+}
+
+/**
+ *
+ * updates a single qualification entry of user
+ * @param {Object} req - express request object.
+ * @param {number} id - user id
+ * @param {number} qualificationId - qualification entrie id. Note this is not the qualficiation id from qualification collection.
+ * @param {Object} value - qualification object
+ * @param {Object} userParams - parameters: upsert <Boolean> inserts new entry if id is not present
+ * @returns {Promise<void>}
+ */
+
+async function updateQualification(req, id, qualificationId, value, userParams) {
+    if (!userParams) userParams = {};
+
+    const user = await User.findById(id);
+
+    // validate
+    if (!user) throw new Error('User not found');
+
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
+    // validate input
+    if (!key) throw new Error('no key given');
+    if (!value) throw new Error('no value given');
+
+    let ojVal = undefined;
+    let newVal = value;
+    let logKey = (value.title === undefined) ? key : value.title;
+
+   var array = user.qualifications;
+    // get current array content. Qualifications array is access by mongo ids.
+    // in-memory update.
+    // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+
+    try {
+        if (!Array.isArray(array)) throw new TypeError(`Failed to read qualifications array.`);
+        //check if array
+        var index = array.map(e => e._id).indexOf(qualificationId);
+    }
+    catch (e) {
+        if (e instanceof TypeError) {
+            console.error("Exception:" + e);
+            console.error("Aborting operation to ensure data integrity.");
+            throw e;
+        } else {
+            console.error("Unhandled exception: " + e);
+            throw e;
+        }
+    }
+    if (index > -1) {
+        // updating existing object
+        ojVal = array[index];
+        array.splice(index, 1, value);
+    }
+    else {
+        if (userParams.upsert) {
+            // key not found, creating new entry
+            array.push(value);
+        }
+        else throw new Error("Failed to update qualification entry: Invalid array id given");
+    }
+    let key = "qualifications";
+    user.set(key, array, {strict: false} );
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: key,
+                    originalValue: ojVal,
+                    value:  newVal,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
+    await user.save();
+}
+
+async function removeQualification(req, id, qualificationId, userParams) {
+    if (!userParams) userParams = {};
+    const user = await User.findById(id);
+    // validate
+    if (!user) throw new Error('User not found');
+    //check write access
+    if(!authService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    // validate input
+    if (qualificationId === undefined ) throw new Error("qualification not found: undefined id")
+    //get current array content. Usually, qualificationId refers to corresponding id in the array.
+    // Otherwise, use the isIndex parameter to allow accessing array by index
+    var array = user.qualifications;
+    let logKey = "qualifications";
+    let fullKey = logKey;
+    let ojVal = "";
+    if (userParams.isIndex) {
+        //qualificationId is array index
+        let fullKey = logKey + "." + (qualificationId).toString();
+        let rmObj = removeByIndex(array, qualificationId);
+        array = rmObj.array;
+        ojVal = rmObj.value;
+    }
+    else {
+        //qualificationId is id
+        let fullKey = logKey + "/" + (qualificationId).toString();
+        let rmObj = removeById(array, qualificationId);
+        array = rmObj.array;
+        ojVal = rmObj.value;
+    }
+    let key = "qualifications";
+    let value = array;
+    user.set(key, value, {strict: false} );
+
+    user.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: fullKey,
+                    originalValue: ojVal,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
+    await user.save();
+}
+
 
 /**
  *
@@ -834,7 +1073,58 @@ async function _delete(req, id) {
         .catch()
 }
 
-/**
- *  generates a fresh member id
- *
+/*
+helpers
  */
+
+
+/**
+ *
+ * removes an element from an array by its mongo id
+ *
+ * @param {Object} array - array to remove element from
+ * @param {number} id - mongo id of element to be removed
+ * @returns {{array: {Object}, object: {Object}}}
+ */
+function removeById(array, id){
+    // in-memory update. get current array content
+    // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+    /** @type {any[]} */
+    if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
+
+    var index = array.map(e => e._id).indexOf(id);
+    if (index > -1) {
+        // remove existing key from array
+        let el = array[index];
+        array.splice(index, 1);
+        return {array: array, object: el};
+    }
+    else {
+    //try to remove by index anyway.
+        var msg = "Array element Id was not found in array. Aborting.";
+        console.error(msg);
+        throw new Error(msg);
+    }
+}
+
+/**
+ * removes an element from an array by its index
+ *
+ * @param {Object} array - array to remove element from
+ * @param {number} index - index of element to remove. Note that arrays are 0-indexed.
+ *
+ * @returns {{array: {Object}, object: {Object}}}
+ */
+function removeByIndex(array, index){
+    // array not indexed, remove by index
+    try {
+        let el = array[index];
+        let key = (el.title === undefined) ? "" : el.title;
+        let val = (el.value === undefined) ? el : el.value;
+        array.splice(index, 1);
+        return {array: array, object: el};
+    }
+    catch(e) {
+        throw new Error(e);
+    }
+}

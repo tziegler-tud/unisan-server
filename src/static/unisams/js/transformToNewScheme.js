@@ -55,3 +55,48 @@ function transformUser(userId){
         });
     });
 }
+
+
+
+function transformEvent(eventId){
+    var user;
+    getDataFromServer("/api/v1/eventmod/"+userId,function(context){
+        user = context;
+        function annotate(ob){
+            if (ob.title) return ob.title;
+        }
+        var data = {
+            generalData: {
+                firstName: {
+                    title: "Vorname",
+                    value: user.firstName,
+                },
+                lastName: {
+                    title: "Nachname",
+                    value: user.lastName,
+                },
+                memberId: {
+                    title: "Mitgliedsnummer",
+                    value: user.generalData.memberId
+                },
+            },
+            contactData: [],
+        };
+
+        if (user.email) {
+            data.contactData.push({type: "email", title: "Email (restore)", value: user.email});
+        }
+
+
+        $.ajax({
+            url: "/api/v1/usermod/" + userId,
+            // make put for safety reasons :-)
+            type: 'PUT',
+            dataType: 'json',
+            data: data,
+            success: function(result) {
+                alert("success");
+            }
+        });
+    });
+}

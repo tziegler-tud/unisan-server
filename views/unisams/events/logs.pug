@@ -1,0 +1,60 @@
+extends ../layout
+
+block page_includes
+
+    script.
+        window.exploreEventId = "#{exploreEvent.id}";
+        window.dockerArgs.activeContainer = "eventDetailContainer";
+        window.dockerArgs.activeElementId = "eventLogs";
+
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/events/logs.css')
+    script(src="/static/unisams/js/events/event.js")
+    script(src="/static/unisams/js/events/logs.js")
+    script(src="/static/unisams/js/actions.js")
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .userimg-container.sec-heading-img
+                                .userimg
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/event_images/" + exploreEvent.id + "/" + exploreEvent.id + ".jpg")
+
+                            .sec-heading-label.eventprofile-heading
+                                .eventprofile-heading-container
+                                    .eventprofile-heading-text
+                                        .eventprofile-heading-type
+                                            span.type=exploreEvent.type.value
+                                        .eventprofile-heading-title
+                                            h3.title=exploreEvent.title.value
+                                        .eventprofile-heading-date
+                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                    .eventprofile-dropdown.dropdown-menu
+                                        .dropdown-btn
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+
+                                            .dropdown-container
+                                                .dropdown-entry
+                                                    a.before-icon.icon-edit(href="/unisams/user/edit/"+refurl) Event bearbeiten
+                                                .dropdown-entry.dropdown-entry-disabled.has-tooltip
+                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreEvent.id, data-userid=exploreEvent.id) Mitglied löschen
+                                                    span.tooltip Bearbeitung aktivieren, um Mitglied zu entfernen
+                                    .clear
+                            .clear
+                        #content1-text.sec-content.border-top.userlogs-container.logs-container
+                            .subpage-content
+                                .itemlist-header-container
+                                    ul#loglist-top.loglist-top.itemlist.common-list.list-view.border
+                                        li.noSelect.rowHeading
+                                            .inner
+                                                .item-property Datum
+                                                .item-property Nutzer
+                                                .item-property Art
+                                                .item-property Beschreibung
+
+                                .itemlist-content-container
+                                    #loglist-container.loglist-container

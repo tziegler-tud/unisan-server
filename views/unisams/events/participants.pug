@@ -12,6 +12,7 @@ block page_includes
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
 
     script.
+        window.user = !{JSON.stringify(user)};
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventParticipants";

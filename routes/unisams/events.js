@@ -32,6 +32,7 @@ router.get('/addEvent', auth, addEvent);
 router.get('/:id', auth, viewEvent);
 router.get('/:id/participants', auth, editParticipants);
 router.get('/:id/edit', auth, editEvent);
+router.get('/:id/logs', auth, eventLogs);
 
 
 module.exports = router;
@@ -91,10 +92,25 @@ function editEvent(req, res, next) {
 
 function editParticipants(req, res, next) {
     eventService.getById(req.params.id)
-    eventService.getById(req.params.id)
         .then(ev => {
             if (ev) {
                 res.render("unisams/events/participants", {
+                    user: req.user.toJSON(),
+                    title: ev.title.value,
+                    exploreEvent: ev,
+                    exploreEventDocument: ev._doc,
+                })
+            }
+        })
+        .catch(err => next(err));
+}
+
+
+function eventLogs(req, res, next) {
+    eventService.getById(req.params.id)
+        .then(ev => {
+            if (ev) {
+                res.render("unisams/events/logs", {
                     user: req.user._doc,
                     title: ev.title.value,
                     exploreEvent: ev,
@@ -103,5 +119,6 @@ function editParticipants(req, res, next) {
             }
         })
         .catch(err => next(err));
+
 }
 

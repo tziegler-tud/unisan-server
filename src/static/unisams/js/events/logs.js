@@ -4,39 +4,35 @@ var actions = window.actions;
 
 
 $(document).ready (function () {
-
-    var currentExploredUser;
-    var profile = new window.profile.Profile(window.exploreUserId);
-    var sidebar = new common.Sidebar('wrapper', {title: "Test"});
+    var currentExploredEvent;
+    var eventProfile = new window.eventRequest.Event(window.exploreEventId, {
+        populateParticipants: true,
+    });
 
     // create new observer
-    var observer = new lidl.Observer(function(user){
-        currentExploredUser = user;
+    var observer = new lidl.Observer(function(event){
+        currentExploredEvent = event;
     });
 
     // get user data from user service
     //subscribe as observer to get notification if user changes on server
-    profile.getUserAndSubscribe(observer)
-        .then(function(user){
-            buildPage(user)
+    eventProfile.getEventAndSubscribe(observer)
+        .then(function(event){
+            buildPage(event)
         })
         .catch(function(reason){
-            console.error("Failed to retrieve user data:" + reason)
+            console.error("Failed to retrieve event data:" + reason)
         });
 
-
-
-    function buildPage(user) {
+    function buildPage(event) {
 
         window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("user", user);
-        currentExploredUser = user;
-        var userid = window.exploreUserId;
+        window.DockerElement.addDockerSubPage("event", event);
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 
         //get Logs for user
-        actions.getLogs(user.id, "ALL", {
+        actions.getLogs(event.id, "ALL", {
             onSuccess: function(result){
                 displayLogList(result);
             }

@@ -33,12 +33,28 @@ var EventSchema = new Schema({
     },
     description: {
         shortDesc: {
-            type: String,
-        },
-        longDesc: {
+            title: {
+                default: "Kurzbeschreibung",
+                type: String,
+            },
+            value: {
+                type: String
+            },
             delta: {
 
-            }
+            },
+        },
+        longDesc: {
+            title: {
+                type: String,
+                default: "Beschreibung",
+            },
+            delta: {
+
+            },
+            value: {
+                type: String,
+            },
         },
     },
     date: {
@@ -76,6 +92,14 @@ var EventSchema = new Schema({
             }
         }
     ],
+    accessRights: {
+        admin: [
+            {
+              type: Schema.Types.ObjectId,
+              ref: 'User',
+            }
+        ],
+    },
     createdDate: {
         type: Date,
         default: Date.now
@@ -83,8 +107,14 @@ var EventSchema = new Schema({
 });
 
 EventSchema.virtual('dateRangeString').get(function() {
+
     var startDate = this.date.startDate;
     var endDate = this.date.endDate;
+
+    //check if date is available
+    if(startDate === undefined || endDate === undefined){
+        return "";
+    }
 
     var dateString;
 
@@ -113,12 +143,14 @@ EventSchema.virtual('dateRangeString').get(function() {
 EventSchema.virtual('description.longDesc.html').get(function() {
 
     let delta = this.description.longDesc.delta;
+    if (delta === undefined) return "";
     let htmlContent =  convertDeltaToHtml(delta);
     return htmlContent;
 });
 
 EventSchema.virtual('title.html').get(function() {
     let delta = this.title.delta;
+    if (delta === undefined) return "";
     return convertDeltaToHtml(delta);
 });
 

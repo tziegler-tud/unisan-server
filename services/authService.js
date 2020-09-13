@@ -80,7 +80,7 @@ class AuthService {
         return (group && write);
     }
     /**
-     * check user role agains a required role
+     * check user role against a required role
      *
      * @param user {UserScheme}
      * @param requiredRole {String}
@@ -113,6 +113,33 @@ class AuthService {
         return (al > rolesMap[target.userRole]);
     }
 
+    /**
+     * checks if user has right to modify event. use this for event modifications
+     *
+     * @param user {UserScheme}
+     * @param target {EventScheme}
+     * @returns {Boolean}
+     */
+    checkEventWriteAccess(user, target){
+        //validate
+        //TODO: proper validation
+
+        //superadmin is allowed to perform any operation
+        // if(user.userRole === rolesEnum.SUPERADMIN) return true;
+        //user needs general role eventAdmin or specific eventAdmin role
+        //check group
+        if (this.checkUserGroupName(user,"eventAdmin")) return true;
+        //check admin array for user id
+        if (!target.accessRights === undefined)  {
+            if (!target.accessRights.admin === undefined) {
+                if (target.accessRights.admin.includes(user.id)){
+                    //user found. access granted
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
 AuthService.roles = roles;

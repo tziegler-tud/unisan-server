@@ -17,8 +17,8 @@ common = window.common;
                     value: args.type,
                 },
                 description: {
-                    shortDesc: args.shortDesc,
-                    longDesc: args.longDesc,
+                    shortDesc: {value: args.shortDescVal, delta: args.shortDescDelta},
+                    longDesc: {value: args.longDescVal, delta: args.longDescDelta},
                 },
                 location: {
                     title: "Adresse",

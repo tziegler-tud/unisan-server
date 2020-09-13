@@ -28,17 +28,9 @@ module.exports = {
  * Gets all log entries
  */
 async function getAll() {
-    // return dbLog.find().populate({
-    //     path: 'authorizedUser',
-    //     select: 'generalData username',
-    // });
-    //
-    let logs = dbLog.find().populate({
+    let logs = await dbLog.find().populate({
         path: 'authorizedUser',
         select: 'generalData username',
-    }).populate({
-        path: 'target.targetObject',
-        select: "username"
     });
     return logs;
 }
@@ -51,10 +43,7 @@ async function getById(id) {
     return dbLog.findById(id).populate({
         path: 'authorizedUser',
         select: 'generalData username',
-    }).populate({
-        path: 'target.targetObject',
-        select: "username"
-    });
+    })
 }
 
 

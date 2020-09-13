@@ -1,13 +1,6 @@
 @import "../color-rules.less";
 @import "../variables.less";
 
-.subpage-heading {
-  margin-left: 2em;
-}
-
-.common-viewBox {
-  background-color: #fff;
-}
 
 .subpage-topbar {
   //border-bottom: 1px solid #333;
@@ -15,7 +8,7 @@
 
 #loglist-container {
   position: relative;
-  font-size: 80%;
+  font-size: 90%;
 }
 
 #loglist-top-container {
@@ -57,14 +50,14 @@ ul.itemlist{
 
       .inner {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
+        grid-template-columns: 1fr 1fr 1fr 2fr;
         grid-template-rows: auto;
 
         @media @desktop {
-          grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
+          grid-template-columns: 1fr 1fr 1fr 2fr;
         }
         @media @tablet-landscape {
-          grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
+          grid-template-columns: 1fr 1fr 1fr 2fr;
         }
 
         .item-container {
@@ -77,11 +70,6 @@ ul.itemlist{
             flex: 1 1 auto;
             display: block;
           }
-        }
-
-        .item-property {
-          overflow: auto;
-          scrollbar-width: thin;
         }
 
         .userlist-img {

@@ -119,7 +119,7 @@ common = window.common;
         });
     };
 
-    actions.getUserLogs = function(targetId,logType, callback) {
+    actions.getLogs = function(targetId, logType, callback) {
         callback = (callback == null) ? function(){} : callback;
         var data = {
             targetId: targetId,

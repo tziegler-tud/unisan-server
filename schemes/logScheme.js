@@ -9,22 +9,22 @@ var LogSchema = new Schema({
         type: Number,
     },
     action: {
-      objectType: {
+        objectType: {
           type: String,
           // [user, event, qualification, userGroup, dataset]
           required: true,
-      },
-      actionType: {
+        },
+        actionType: {
           type: String,
           //[create, delete, modify]
           required: true,
-      },
-      actionDetail: {
+        },
+        actionDetail: {
           type: String,
           /* [userCreate, userDelete, userModify, userImageModify, userAddQualification, userDeleteQualification, userModifyQualification,
                 eventCreate, eventDelete, eventModify, eventAddParticipant, eventRemoveParticipant, eventChangeParticipantRole ]
            */
-      },
+        },
         key: {
 
         },
@@ -37,9 +37,7 @@ var LogSchema = new Schema({
         value: {
 
         },
-        tag: {
-
-        }
+        tag: {}
     },
     authorizedUser: {
         type: Schema.Types.ObjectId,
@@ -50,7 +48,7 @@ var LogSchema = new Schema({
             type: String,
             // [user, event, qualification, userGroup, dataset]
             required: true,
-            default: "User"
+            default: "user"
         },
         targetObject: {
             type: Schema.Types.ObjectId,
@@ -93,19 +91,6 @@ var LogSchema = new Schema({
 
 LogSchema.virtual('description').get(function() {
 
-    // let test = this.populate({
-    //     path: 'authorizedUser',
-    //     select: 'username',
-    // }).populate({
-    //     path: 'target.targetObject',
-    // });
-
-    //validate
-    if (this.target.targetObject === undefined || this.target.targetObject === null) {
-        let str = "<DELETED>"
-        this.target.targetObject = {id: str + this.target.targetObjectId, username: str +this.target.targetObjectId};
-    }
-
     let fullDescription = {en: "", de: ""},
         shortDescription = {en: "", de: ""},
         actionDescription = {en: "", de: ""};
@@ -114,129 +99,239 @@ LogSchema.virtual('description').get(function() {
 
     //try if authorizedUser was populated
     let authorizedUser = (this.authorizedUser.username) ? this.authorizedUser.username : this.authorizedUser;
-    let target = (this.target.targetObject.username) ? this.target.targetObject.username : this.target.targetObject;
 
-    let optionalApostrophe = "";
-    if (typeof(target) === "string"){
-        if(target.slice(-1) === "s"){
-            optionalApostrophe = "'";
+
+
+
+    // //case-specific describtions
+    if(this.target.targetModel === "User"){
+
+        //validate
+        let deleted = false;
+        if (this.target.targetObject === undefined || this.target.targetObject === null) {
+            let str = "<DELETED>";
+            deleted = true;
+            this.target.targetObject = {id: str + this.target.targetObjectId, username: str +this.target.targetObjectId};
+        }
+        let target = this.populated("target.targetObject") || deleted  ? this.target.targetObject.username : this.target.targetObject;
+        let optionalApostrophe = "";
+        if (typeof(target.username) === "string"){
+            if(target.username.slice(-1) === "s"){
+                optionalApostrophe = "'";
+            }
+        }
+
+        switch(this.action.actionDetail) {
+            case "userCreate":
+                fullDescription.en = "user " + authorizedUser + " created new user: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat einen neuen Nutzer erstellt: " + target;
+
+                shortDescription.en = authorizedUser + " created user: " + target;
+                shortDescription.de = authorizedUser + " hat " + target + " angelegt";
+
+                actionDescription.en = "created user: " + target;
+                actionDescription.de = authorizedUser + "angelegt";
+
+                minDescription = target;
+                logType = "Nutzer angelegt";
+                break;
+            case "userDelete":
+                let username = this.action.originalValue;
+                fullDescription.en = "user " + authorizedUser + " deleted user: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Nutzer entfernt: " + target;
+
+                shortDescription.en = authorizedUser + " deleted user: " + target;
+                shortDescription.de = authorizedUser + " hat " + target + " entfernt";
+
+                actionDescription.en = "delted user: " + target;
+                actionDescription.de = authorizedUser + "entfernt";
+
+                minDescription = username;
+                logType = "Nutzer entfernt";
+                break;
+            case "userModify":
+
+                let tagText = "";
+                switch(this.action.tag){
+                    case "<DELETED>":
+                        tagText = this.action.tag + " ";
+                        this.action.value = this.action.originalValue;
+                        break;
+                    case "<OVERWRITE>":
+                        tagText = this.action.tag + " ";
+                        break;
+                    case "<UPDATE>":
+                    default:
+
+
+                }
+                fullDescription.en = "user " + authorizedUser + " changed " + this.action.key + " of user : " + target + " from " + this.action.originalValue + " to " + this.action.value;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat " + this.action.key + " von Nutzer: " + target + " von " + this.action.originalValue + " auf " + this.action.value +" geändert";
+
+                shortDescription.en = authorizedUser + " changed " + this.action.key + " of " + target + " to " + this.action.value;
+                shortDescription.de = authorizedUser + " änderte " + target + optionalApostrophe + "s " + this.action.key + " auf " + this.action.value;
+
+                actionDescription.en = "changed " + this.action.key + " from " + this.action.originalValue + " to " + this.action.value;
+                actionDescription.de = this.action.key + " von " + this.action.originalValue + " zu " + this.action.value + " geändert";
+
+                minDescription = tagText + this.action.key + ": " + this.action.value;
+                logType = "Nutzerdaten geändert";
+                break;
+
+            case "userImageModify":
+                fullDescription.en = "user " + authorizedUser + " changed profile picture of user : " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat das Profilbild von Nutzer: " + target + " geändert";
+
+                shortDescription.en = authorizedUser + " changed picture of " + target;
+                shortDescription.de = authorizedUser + " hat " + target + optionalApostrophe + "s Profilbild geändert";
+
+                actionDescription.en = "profile picture changed";
+                actionDescription.de = "Profilbild geändert";
+
+                minDescription = "";
+                logType = "Profilbild geändert";
+                break;
+
+            case "userGroupAdd":
+                fullDescription.en = "user " + authorizedUser + " added user : " + target +" to group " + this.action.value;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " zur Gruppe " + this.action.value + " hinzugefügt";
+
+                shortDescription.en = authorizedUser + " added " + target + " to " + this.action.value;
+                shortDescription.de = authorizedUser + " hat " + target + " zu " + this.action.value + " hinzugefügt";
+
+                actionDescription.en = "added user to group " + this.action.value;
+                actionDescription.de = "Zur Gruppe " + this.action.value + "hinzugefügt";
+
+                minDescription = this.action.value;
+                logType = "Zu Gruppe hinzugefügt";
+                break;
+
+            case "userGroupDelete":
+                fullDescription.en = "user " + authorizedUser + " removed user : " + target +" to group " + this.action.value;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " von Gruppe " + this.action.value + " entfernt";
+
+                shortDescription.en = authorizedUser + " removed " + target + " from " + this.action.value;
+                shortDescription.de = authorizedUser + " hat " + target + " von " + this.action.value + " entfernt";
+
+                actionDescription.en = "removed user from group " + this.action.value;
+                actionDescription.de = "Von Gruppe " + this.action.value + "entfernt";
+
+                minDescription = this.action.value;
+                logType = "Von Gruppe entfernt";
+                break;
+
+            case "userRoleModify":
+                fullDescription.en = "user " + authorizedUser + " changed role of user : " + target +" to " + this.action.value;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat die Rolle von " + target + " auf " + this.action.value + " geändert";
+
+                shortDescription.en = authorizedUser + " changed role of " + target + " to " + this.action.value;
+                shortDescription.de = authorizedUser + " hat " + target + "'s Rolle auf " + this.action.value + " geändert";
+
+                actionDescription.en = "changed role to " + this.action.value;
+                actionDescription.de = "Rolle geändert auf: " + this.action.value;
+
+                minDescription = this.action.value;
+                logType = "Rolle geändert";
+                break;
         }
     }
 
-    // //case-specific describtions
-    switch(this.action.actionDetail) {
-        case "userCreate":
-            fullDescription.en = "user " + authorizedUser + " created new user: " + target;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat einen neuen Nutzer erstellt: " + target;
+    if (this.target.targetModel === "Event"){
+        //validate
+        let deleted = false;
+        if (this.target.targetObject === undefined || this.target.targetObject === null) {
+            let str = "<DELETED>";
+            deleted = true;
+            this.target.targetObject = {id: str + this.target.targetObjectId, title: {value: str +this.target.targetObjectId}};
+        }
+        let target = this.populated("target.targetObject")|| deleted ? this.target.targetObject.title.value : this.target.targetObject;
+        let targetUser;
+        switch(this.action.actionDetail) {
+            case "eventCreate":
+                fullDescription.en = "user " + authorizedUser + " created new event: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat ein neues Event erstellt: " + target;
 
-            shortDescription.en = authorizedUser + " created user: " + target;
-            shortDescription.de = authorizedUser + " hat " + target + " angelegt";
+                shortDescription.en = authorizedUser + " created Event: " + target;
+                shortDescription.de = authorizedUser + " hat Event '" + target + "' angelegt";
 
-            actionDescription.en = "created user: " + target;
-            actionDescription.de = authorizedUser + "angelegt";
+                actionDescription.en = "created event: " + target;
+                actionDescription.de = authorizedUser + "angelegt";
 
-            minDescription = target;
-            logType = "Nutzer angelegt";
-            break;
-        case "userDelete":
-            let username = this.action.originalValue;
-            fullDescription.en = "user " + authorizedUser + " deleted user: " + target;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat Nutzer entfernt: " + target;
+                minDescription = this.action.value;
+                logType = "Event angelegt";
+                break;
+            case "eventDelete":
+                fullDescription.en = "user " + authorizedUser + " removed event: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat ein Event entfernt: " + target;
 
-            shortDescription.en = authorizedUser + " deleted user: " + target;
-            shortDescription.de = authorizedUser + " hat " + target + " entfernt";
+                shortDescription.en = authorizedUser + " removed event: " + target;
+                shortDescription.de = authorizedUser + " hat Event '" + target + "' entfernt";
 
-            actionDescription.en = "delted user: " + target;
-            actionDescription.de = authorizedUser + "entfernt";
+                actionDescription.en = "removed event: " + target;
+                actionDescription.de = authorizedUser + "entfernt";
 
-            minDescription = username;
-            logType = "Nutzer entfernt";
-            break;
-        case "userModify":
+                minDescription = this.action.value;
+                logType = "Event entfernt";
+                break;
+            case "eventModify":
+                fullDescription.en = "user " + authorizedUser + " changed event '" + target + "'";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Event '" + target + "' geändert.";
 
-            let tagText = "";
-            switch(this.action.tag){
-                case "<DELETED>":
-                    tagText = this.action.tag + " ";
-                    this.action.value = this.action.originalValue;
-                    break;
-                case "<OVERWRITE>":
-                    tagText = this.action.tag + " ";
-                    break;
-                case "<UPDATE>":
-                default:
+                shortDescription.en = authorizedUser + " changed '" + target + "'";
+                shortDescription.de = authorizedUser + " hat '" + target + "' geändert";
 
+                actionDescription.en = "changed event: " + target;
+                actionDescription.de = authorizedUser + "geändert";
 
-            }
-            fullDescription.en = "user " + authorizedUser + " changed " + this.action.key + " of user : " + target + " from " + this.action.originalValue + " to " + this.action.value;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat " + this.action.key + " von Nutzer: " + target + " von " + this.action.originalValue + " auf " + this.action.value +" geändert";
+                minDescription = target;
+                logType = "Event geändert";
+                break;
+            case "eventAddParticipant":
 
-            shortDescription.en = authorizedUser + " changed " + this.action.key + " of " + target + " to " + this.action.value;
-            shortDescription.de = authorizedUser + " änderte " + target + optionalApostrophe + "s " + this.action.key + " auf " + this.action.value;
+                targetUser = this.action.key;
 
-            actionDescription.en = "changed " + this.action.key + " from " + this.action.originalValue + " to " + this.action.value;
-            actionDescription.de = this.action.key + " von " + this.action.originalValue + " zu " + this.action.value + " geändert";
+                fullDescription.en = targetUser + " registered for event " + target;
+                fullDescription.de = targetUser + " nimmt am Event: " + target +" teil.";
+                shortDescription.en = targetUser + " registered for event " + target;
+                shortDescription.de = targetUser + " nimmt an " + target + " teil";
 
-            minDescription = tagText + this.action.key + ": " + this.action.value;
-            logType = "Nutzerdaten geändert";
-            break;
+                actionDescription.en = targetUser + "registered for " + target;
+                actionDescription.de = targetUser + "nimmt an " + target + " teil";
 
-        case "userImageModify":
-            fullDescription.en = "user " + authorizedUser + " changed profile picture of user : " + target;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat das Profilbild von Nutzer: " + target + " geändert";
+                minDescription = targetUser;
+                logType = "Teilnahme an Event";
+                break;
+            case "eventRemoveParticipant":
+                targetUser = this.action.key;
+                fullDescription.en = targetUser + " unregistered for event " + target;
+                fullDescription.de = targetUser + " nimmt nicht mehr am Event: " + target +" teil.";
+                shortDescription.en = targetUser + " unregistered for event " + target;
+                shortDescription.de = targetUser + " nimmt nicht an " + target + " teil";
 
-            shortDescription.en = authorizedUser + " changed picture of " + target;
-            shortDescription.de = authorizedUser + " hat " + target + optionalApostrophe + "s Profilbild geändert";
+                actionDescription.en = targetUser + "unregistered for " + target;
+                actionDescription.de = targetUser + "nimmt nicht an " + target + " teil";
 
-            actionDescription.en = "profile picture changed";
-            actionDescription.de = "Profilbild geändert";
+                minDescription = targetUser;
+                logType = "Abmeldung von Event";
+                break;
+            case "eventChangeParticipantRole":
+                targetUser = this.action.key;
+                let role = this.action.value;
+                fullDescription.en = "user " + authorizedUser + " changed role of " + targetUser + " to " + role + " for event: " + target ;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Rolle von " + targetUser + " auf " + role + " für Event: " + target + " geändert";
 
-            minDescription = "";
-            logType = "Profilbild geändert";
-            break;
+                shortDescription.en = target + ": role of " + targetUser + " changed to " + role;
+                shortDescription.de = target + ": " + targetUser + " ist jetzt " + role;
 
-        case "userGroupAdd":
-            fullDescription.en = "user " + authorizedUser + " added user : " + target +" to group " + this.action.value;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " zur Gruppe " + this.action.value + " hinzugefügt";
+                actionDescription.en = "changed role of: " + targetUser + " to " + role;
+                actionDescription.de = "Rolle von " + targetUser + " auf " + role + " geändert";
 
-            shortDescription.en = authorizedUser + " added " + target + " to " + this.action.value;
-            shortDescription.de = authorizedUser + " hat " + target + " zu " + this.action.value + " hinzugefügt";
-
-            actionDescription.en = "added user to group " + this.action.value;
-            actionDescription.de = "Zur Gruppe " + this.action.value + "hinzugefügt";
-
-            minDescription = this.action.value;
-            logType = "Zu Gruppe hinzugefügt";
-            break;
-
-        case "userGroupDelete":
-            fullDescription.en = "user " + authorizedUser + " removed user : " + target +" to group " + this.action.value;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " von Gruppe " + this.action.value + " entfernt";
-
-            shortDescription.en = authorizedUser + " removed " + target + " from " + this.action.value;
-            shortDescription.de = authorizedUser + " hat " + target + " von " + this.action.value + " entfernt";
-
-            actionDescription.en = "removed user from group " + this.action.value;
-            actionDescription.de = "Von Gruppe " + this.action.value + "entfernt";
-
-            minDescription = this.action.value;
-            logType = "Von Gruppe entfernt";
-            break;
-
-        case "userRoleModify":
-            fullDescription.en = "user " + authorizedUser + " changed role of user : " + target +" to " + this.action.value;
-            fullDescription.de = "Nutzer " + authorizedUser + " hat die Rolle von " + target + " auf " + this.action.value + " geändert";
-
-            shortDescription.en = authorizedUser + " changed role of " + target + " to " + this.action.value;
-            shortDescription.de = authorizedUser + " hat " + target + "'s Rolle auf " + this.action.value + " geändert";
-
-            actionDescription.en = "changed role to " + this.action.value;
-            actionDescription.de = "Rolle geändert auf: " + this.action.value;
-
-            minDescription = this.action.value;
-            logType = "Rolle geändert";
-            break;
+                minDescription = target + ": " + targetUser + "-" + role;
+                logType = "Rolle geändert";
+                break;
+        }
     }
+
 
     let description = {
         fullDescription: fullDescription,
@@ -257,15 +352,38 @@ LogSchema.virtual('target.title').get(function() {
     }
     else {
         //check if populated
-        if(!oj.id) {
+        if(!(this.populated("target.targetObject") || oj.username || oj.title)) {
             return oj;
         }
-        switch(this.target.targetModel) {
-            case "User":
-                return oj.username;
+        else {
+            switch(this.target.targetModel) {
+                case "User":
+                    return oj.username;
+                case "Event":
+                    return oj.title.value;
+            }
+        }
+    }
+});
 
+LogSchema.post('find', async function(docs) {
+    for (let doc of docs) {
+        switch(doc.target.targetModel){
+            case "User":
+                await doc.populate({
+                    path: "target.targetObject",
+                    select: "username"
+                }).execPopulate();
+                break;
             case "Event":
-                return oj.title;
+                await doc.populate({
+                    path: "target.targetObject",
+                    model: "Event",
+                    select: "title",
+                }).execPopulate();
+                break;
+            default:
+                break;
         }
     }
 });

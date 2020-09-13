@@ -34,8 +34,10 @@ function buildPageSlider(container) {
                 startTime:  data[2].timeStart.replace(regex, ""),
                 endTime:  data[2].timeStart.replace(regex, ""),
                 location:  data[2].location,
-                shortDesc:   data[3].shortDesc,
-                longDesc:   data[3].longDesc,
+                shortDescVal:   data[3].shortDesc,
+                shortDescDelta:   data[3].shortDesc,
+                longDescVal:   data[3].longDesc,
+                longDescDelta:   data[3].longDesc,
             };
             actions.events.addEvent(apiData);
         },

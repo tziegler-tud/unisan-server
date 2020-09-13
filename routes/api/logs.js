@@ -22,7 +22,9 @@ router.get("/addModelUser", addModelUser);
 
 function getAll(req, res, next){
     logService.getAll()
-        .then(result => res.json(result))
+        .then(function(result){
+            res.json(result)
+        })
         .catch(err => next(err));
 }
 
