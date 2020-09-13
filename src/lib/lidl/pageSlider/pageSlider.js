@@ -52,7 +52,16 @@
             })
         })
 
-
+        this.addClassToInputs = function(className){
+            $(this.container).find("input").each(function(inp){
+                this.classList.add(className);
+            })
+        }
+        this.addClassToLabel = function(className){
+            $(this.container).find("label").each(function(inp){
+                this.classList.add(className);
+            })
+        }
 
         this.setCallback = function(callbackObj) {
             this.callback.onComplete = callbackObj.onComplete;

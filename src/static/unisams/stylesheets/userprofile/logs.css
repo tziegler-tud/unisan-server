@@ -1,0 +1,124 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+#loglist-container {
+  position: relative;
+}
+#loglist-top-container {
+  background-color: #fAfAfA;
+  border-bottom: 1px solid #666;
+}
+#loglist-top {
+  border-top: 1px solid #AAA;
+  width: 100%;
+}
+#loglist-top li {
+  background-color: #fAfAfA;
+}
+ul.loglist {
+  margin-top: 0;
+  margin-bottom: 0;
+  position: static;
+}
+ul.loglist.list-view {
+  font-size: 110%;
+}
+ul.loglist.list-view li .memberid,
+ul.loglist.list-view li .username {
+  display: none !important;
+}
+@media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  ul.loglist.list-view li .memberid {
+    display: block !important;
+  }
+}
+@media only screen and (min-width: 75em) {
+  ul.loglist.list-view li .memberid,
+  ul.loglist.list-view li .username {
+    display: block !important;
+  }
+}
+ul.loglist.list-view li .inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
+}
+@media only screen and (min-width: 75em) {
+  ul.loglist.list-view li .inner {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+@media only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  ul.loglist.list-view li .inner {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+ul.loglist.list-view li .inner .item-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+}
+ul.loglist.list-view li .inner .item-container .item-container-element {
+  flex: 1 1 auto;
+  display: block;
+}
+ul.loglist.list-view li .inner .userlist-img {
+  margin-right: 1em;
+  max-width: 3em;
+}
+ul.loglist.list-view li .inner .userlist-img img {
+  width: 100%;
+  border-radius: 50%;
+}
+ul.loglist.list-view li .inner:not(.noSelect):hover {
+  background-color: rgba(124, 0, 26, 0.2);
+  cursor: pointer;
+}
+ul.loglist.list-view li .inner.borderBottom {
+  border-bottom: 1px solid #AAA;
+}
+ul.loglist.list-view li .inner .userDelete svg {
+  width: 1em;
+}
+ul.loglist.gallery-view li {
+  display: block;
+}
+ul.loglist.gallery-view li:not(.noSelect):hover {
+  background-color: rgba(124, 0, 26, 0.2);
+  cursor: pointer;
+}
+ul.loglist.gallery-view li.borderBottom {
+  border-bottom: 1px solid #AAA;
+}
+ul.loglist.gallery-view li .userDelete svg {
+  width: 1em;
+}
+/*# sourceMappingURL=logs.css.map */

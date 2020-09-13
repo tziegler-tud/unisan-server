@@ -12,6 +12,7 @@ block page_includes
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
 
     script.
+        window.user = !{JSON.stringify(user)};
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventParticipants";
@@ -102,7 +103,7 @@ block content
 
                                             .dropdown-container
                                                 .dropdown-entry
-                                                    a.before-icon.icon-edit(href=refurl + "/editUser") Akte bearbeiten
+                                                    a.before-icon.icon-edit(href="/unisams/user/edit/"+refurl) Event bearbeiten
                                                 .dropdown-entry.dropdown-entry-disabled.has-tooltip
                                                     a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreEvent.id, data-userid=exploreEvent.id) Mitglied löschen
                                                     span.tooltip Bearbeitung aktivieren, um Mitglied zu entfernen

@@ -1,0 +1,29 @@
+<ul class="common-list loglist itemlist list-view border">
+    {{#each logs}}
+        <li class="log-entry" id='logId{{this.id}}' data-logid= {{this.id}}>
+            <a class="inner noSelect">
+                <div class="item-property item-container timestamp">
+                    <span class=" item-container-element">{{transformDateTimeString this.timestamp}}</span>
+                </div>
+
+                <div class="item-property item-container authorizedUser">
+                    <span class=" item-container-element">{{this.authorizedUser.username}}</span>
+                </div>
+                <div class="item-property logType">
+                    <span class=" item-container-element">{{this.action.actionDetail}}</span>
+                </div>
+                <div class="item-property targetType">
+                    <span class=" item-container-element">{{this.target.targetType}}</span>
+                </div>
+                <div class="item-property logType">
+                    <span class=" item-container-element">{{this.target.title}}</span>
+                </div>
+                <div class="item-property value">
+                    <span class=" item-container-element">{{this.description.min}}</span>
+                </div>
+            </a>
+        </li>
+    {{/each}}
+</ul>
+
+

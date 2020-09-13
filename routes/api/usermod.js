@@ -2,11 +2,16 @@ const express = require('express');
 const router = express.Router();
 const userService = require('../../services/userService');
 const uploadService = require('../../services/uploadService');
+const AuthService = require('../../services/authService');
+const LogService = require('../../services/logService');
+const Log = require('../../utils/log');
 
 var path = require('path');
 var fs = require('fs-extra');
 
 const upload = require(appRoot + "/config/multer");
+const authService = new AuthService();
+
 
 router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, next){
     //check if tmp
@@ -36,32 +41,79 @@ router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, n
                     if (err) return console.error(err);
                     console.log("moved file to user dir: " + user.id);
                 });
+                //log
+                //create log
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "user",
+                        actionType: "modify",
+                        actionDetail: "userImageModify",
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "user",
+                        targetObject: user._id,
+                        targetModel: "User",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+
+                LogService.create(log).then().catch();
                 res.json({success: true});
             })
             .catch(err => next(err));
     }
-
 });
 
+function checkUrlAccess(req, res, next){
+    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                console.log("authorization failed!");
+                res.status(403).send();
+            }
+        })
+        .catch(err => next(err))
+}
+
 // routes
+
+//check url access by user group
+router.use('/*', checkUrlAccess);
+
 router.post('/create', create);
 router.get('/', getAll);
 router.post('/filter', matchAny);
 router.get('/current', getCurrent);
 router.get('/getByName/:username', getByName);
 router.get('/:id', getById);
-router.put('/:id', update);
 router.post('/getKey/:id', getKey);
+
+// //from this point, write access rights are required
+// router.use("/*", checkWriteAccess);
+router.put('/:id', update);
 router.put('/updateKey/:id', updateKey);
 router.delete('/deleteKey/:id', deleteKey);
 router.delete('/:id', _delete);
 
-
+//access rights modifications require respective rights. set role paths carefully!
+router.post('/addUserGroup/:id', addUserGroup);
+router.post('/removeUserGroup/:id', removeUserGroup);
+router.post('/setUserRole/:id', setUserRole);
+router.post('/addGroupToAllUser', addGroupToAllUser);
 
 module.exports = router;
 
 function create(req, res, next) {
-  userService.create(req.body)
+  userService.create(req, req.body)
       .then(() => res.json(req.body))
       .catch(err => {
         next(err);
@@ -93,7 +145,7 @@ function getByName(req, res, next) {
 }
 
 function update(req, res, next) {
-  userService.update(req.params.id, req.body)
+  userService.update(req, req.params.id, req.body)
       .then(() => res.json({}))
       .catch(err => next(err));
 }
@@ -105,19 +157,19 @@ function getKey(req, res, next) {
 }
 
 function updateKey(req, res, next) {
-    userService.updateKey(req.params.id, req.body.key, req.body.value, req.body.args)
+    userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
         .then(() => res.json({}))
         .catch(err => next(err));
 }
 
 function deleteKey(req, res, next) {
     if(req.body.isArray){
-        userService.deleteArrayElement(req.params.id, req.body.key, req.body.args)
+        userService.deleteArrayElement(req, req.params.id, req.body.key, req.body.args)
             .then(() => res.json({}))
             .catch(err => next(err));
     }
     else {
-        userService.deleteKey(req.params.id, req.body.key, req.body.args)
+        userService.deleteKey(req, req.params.id, req.body.key, req.body.args)
             .then(() => res.json({}))
             .catch(err => next(err));
     }
@@ -132,8 +184,45 @@ function matchAny(req, res, next){
         .catch(err => next(err));
 }
 
+function addUserGroup(req, res, next){
+    userService.addUserGroup(req, req.params.id, req.body.userGroupId)
+        .then(function(user) {
+            res.json(user);
+        })
+        .catch(err => next(err));
+}
+
+function removeUserGroup(req, res, next){
+    userService.removeUserGroup(req, req.params.id, req.body.userGroupId)
+        .then(function(user) {
+            res.json(user);
+        })
+        .catch(err => next(err));
+}
+
+function setUserRole(req, res, next){
+    //get user list
+    userService.setUserRole(req, req.params.id, req.body.role, req.user)
+        .then(function(result){
+            res.status(200).send();
+            })
+        .catch(err=>next(err))
+}
+
 function _delete(req, res, next) {
-  userService.delete(req.params.id)
+  userService.delete(req, req.params.id)
       .then(() => res.json({}))
       .catch(err => next(err));
+}
+
+
+function addGroupToAllUser(req, res, next){
+    //get user list
+    userService.getAll()
+        .then(function(userlist){
+            userlist.forEach(function(user){
+                userService.addUserGroup(user.id, req.body.groupId)
+                    .then(user=>console.log("user " + user.username + "has been assigned the role."))
+            })
+        })
 }

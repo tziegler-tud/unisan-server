@@ -17,8 +17,8 @@ common = window.common;
                     value: args.type,
                 },
                 description: {
-                    shortDesc: args.shortDesc,
-                    longDesc: args.longDesc,
+                    shortDesc: {value: args.shortDescVal, delta: args.shortDescDelta},
+                    longDesc: {value: args.longDescVal, delta: args.longDescDelta},
                 },
                 location: {
                     title: "Adresse",
@@ -31,7 +31,7 @@ common = window.common;
             };
 
             $.ajax({
-                url: "/unisams/eventmod/create",
+                url: "/api/v1/eventmod/create",
                 // make put for safety reasons :-)
                 type: 'POST',
                 contentType: "application/json; charset=UTF-8",
@@ -47,7 +47,7 @@ common = window.common;
 
             // build a json object or do something with the form, store in data
             $.ajax({
-                url: "/unisams/eventmod/" + eventid,
+                url: "/api/v1/eventmod/" + eventid,
                 type: 'DELETE',
                 success: function(result) {
                     alert("Event " + eventid + " deleted.");
@@ -59,7 +59,7 @@ common = window.common;
 
         events.uploadImage = function(eventid){
             $.ajax({
-                url: "/unisams/eventmod/" + eventid + "/uploadUserImage",
+                url: "/api/v1/eventmod/" + eventid + "/uploadUserImage",
                 type: 'POST',
                 success: function(result) {
                     alert("Event " + eventid + " image updated");
@@ -76,7 +76,7 @@ common = window.common;
                 args: {},
             };
             $.ajax({
-                url: "/unisams/eventmod/addParticipant",
+                url: "/api/v1/eventmod/addParticipant",
                 // make put for safety reasons :-)
                 type: 'POST',
                 contentType: "application/json; charset=UTF-8",
@@ -98,7 +98,7 @@ common = window.common;
                 args: {},
             };
             $.ajax({
-                url: "/unisams/eventmod/changeParticipant",
+                url: "/api/v1/eventmod/changeParticipant",
                 // make put for safety reasons :-)
                 type: 'POST',
                 contentType: "application/json; charset=UTF-8",
@@ -119,7 +119,7 @@ common = window.common;
                 args: {},
             };
             $.ajax({
-                url: "/unisams/eventmod/removeParticipant",
+                url: "/api/v1/eventmod/removeParticipant",
                 // make put for safety reasons :-)
                 type: 'POST',
                 contentType: "application/json; charset=UTF-8",
@@ -161,7 +161,7 @@ common = window.common;
                 value: delta,
             };
             $.ajax({
-                url: "/unisams/eventmod/updateKey/" +id,
+                url: "/api/v1/eventmod/updateKey/" +id,
                 type: 'PUT',
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',
@@ -179,7 +179,7 @@ common = window.common;
                 value: value,
             };
             $.ajax({
-                url: "/unisams/eventmod/updateKey/" +id,
+                url: "/api/v1/eventmod/updateKey/" +id,
                 type: 'PUT',
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',

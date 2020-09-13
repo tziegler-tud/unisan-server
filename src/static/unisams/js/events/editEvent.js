@@ -71,7 +71,7 @@ $(document).ready (function () {
             template: 'qq-template-manual-trigger',
             request: {
                 method: 'POST',
-                endpoint: '/unisams/eventmod/' + event.id + "/uploadImage",
+                endpoint: '/api/v1/eventmod/' + event.id + "/uploadImage",
                 inputName: 'image'
 
             },

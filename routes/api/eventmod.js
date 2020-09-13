@@ -5,7 +5,8 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
 const uploadService = require('../../services/uploadService');
-
+const AuthService = require('../../services/authService');
+const authService = new AuthService();
 
 var app = express();
 
@@ -45,9 +46,27 @@ auth = function(req, res, next){
 };
 
 
-// routes
+
+
+function checkUrlAccess(req, res, next){
+    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                console.log("authorization failed!");
+                res.status(403).send();
+            }
+        })
+        .catch(err => next(err))
+}
 
 // routes
+
+//check url access by user group
+router.use('/*', checkUrlAccess);
 router.post('/create', create);
 router.get('/', getAll);
 router.post('/addParticipant', addParticipant);
@@ -66,7 +85,7 @@ router.delete('/:id', _delete);
 module.exports = router;
 
 function create(req, res, next) {
-    eventService.create(req.body)
+    eventService.create(req, req.body)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -86,13 +105,13 @@ function getById(req, res, next) {
 }
 
 function update(req, res, next) {
-    eventService.update(req.params.id, req.body)
+    eventService.update(req, req.params.id, req.body)
         .then(() => res.json({}))
         .catch(err => next(err));
 }
 
 function updateKey(req, res, next) {
-    eventService.updateKey(req.params.id, req.body.key, req.body.value)
+    eventService.updateKey(req, req.params.id, req.body.key, req.body.value)
         .then((result) => res.json(result))
         .catch(err => next(err));
 }
@@ -112,7 +131,7 @@ function addParticipant(req, res, next) {
         role: req.body.role,
         overwrite: false
     };
-    eventService.addParticipant(req.body.id, req.body.userId, args)
+    eventService.addParticipant(req, req.body.id, req.body.userId, args)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -124,7 +143,7 @@ function changeParticipant(req, res, next) {
         role: req.body.role,
         overwrite: true,
     };
-    eventService.addParticipant(req.body.id, req.body.userId, args)
+    eventService.addParticipant(req, req.body.id, req.body.userId, args)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -135,7 +154,7 @@ function removeParticipant(req, res, next) {
     let args = {
 
     };
-    eventService.removeParticipant(req.body.id, req.body.userId, args)
+    eventService.removeParticipant(req, req.body.id, req.body.userId, args)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -153,7 +172,7 @@ function populateParticipants(req, res, next) {
 }
 
 function _delete(req, res, next) {
-    eventService.delete(req.params.id)
+    eventService.delete(req, req.params.id)
         .then(() => res.json({}))
         .catch(err => next(err));
 }

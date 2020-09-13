@@ -22,21 +22,20 @@ function buildPageSlider(container) {
             var apiData = {
                 username:   data[1].username,
                 generalData: {
-                  firstName: data[1].firstName,
-                  lastName: data[1].lastName,
-                  memberId: data[3].memberId
+                  firstName: data[1].firstname,
+                  lastName: data[1].lastname,
+                  memberId: data[3].memberid
                     },
-                password:  data[2].pwd,
+                password:  data[2].password,
             };
             let args = {
-                data: apiData,
                 memberId: {setCustom: false},
                 userImg: {
                     tmp: true,
                     tmpkey: data[4].userimg_tmpkey,
                 }
             };
-            actions.addUser(args);
+            actions.addUser(apiData, args);
         },
         onError: function(){
 
@@ -84,7 +83,7 @@ function buildPageSlider(container) {
                         template: 'qq-template-manual-trigger',
                         request: {
                             method: 'POST',
-                            endpoint: '/unisams/usermod/tmp/uploadUserImage',
+                            endpoint: '/api/v1/usermod/tmp/uploadUserImage',
                             inputName: 'image'
 
                         },

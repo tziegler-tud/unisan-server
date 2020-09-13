@@ -9,9 +9,7 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
     script(src="/static/unisams/js/userprofile/profile.js")
-    script(src="/static/unisams/js/userprofile/userprofile.js")
-    script(src="/static/unisams/js/userprofile/editUser.js")
-    script(src="/static/unisams/js/userprofile/updateUser.js")
+    script(src="/static/unisams/js/userprofile/logs.js")
     script(src="/static/unisams/js/actions.js")
 
 block content
@@ -38,7 +36,7 @@ block content
 
                                             .dropdown-container
                                                 .dropdown-entry
-                                                    a.before-icon.icon-back(id="view" + exploreUser.id, data-userid=exploreUser.id href="/unisams/user/" + exploreUser.username) Bearbeitung beenden
+                                                    a.before-icon.icon-back(id="view" + exploreUser.id, data-userid=exploreUser.id href="/unisams/user/view/" + exploreUser.username) Bearbeitung beenden
                                                 .dropdown-entry
                                                     a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
                                                 .dropdown-entry
@@ -47,6 +45,16 @@ block content
                                                     a.userTransform(id="deleteOldId" + exploreUser.id, onclick="removeOld('"+exploreUser.id+"')") (dev) remove invalid fields
                                     .clear
                                 .clear
-                        #content1-text.sec-content
+                        #content1-text.sec-content.border-top.userlogs-container.logs-container
                             .subpage-content
-                                .userlogs-container
+                                .itemlist-header-container
+                                    ul#loglist-top.loglist-top.itemlist.common-list.list-view.border
+                                        li.noSelect.rowHeading
+                                            .inner
+                                                .item-property Datum
+                                                .item-property Nutzer
+                                                .item-property Art
+                                                .item-property Beschreibung
+
+                                .itemlist-content-container
+                                    #loglist-container.loglist-container

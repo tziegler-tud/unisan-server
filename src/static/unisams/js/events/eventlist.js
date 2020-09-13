@@ -33,7 +33,7 @@ $(document).ready (function () {
             };
             //get user list from server
             $.ajax({
-                url: "/unisams/eventmod/filter",
+                url: "/api/v1/eventmod/filter",
                 type: 'POST',
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',

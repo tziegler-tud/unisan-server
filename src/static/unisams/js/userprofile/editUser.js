@@ -105,7 +105,7 @@ $(document).ready (function () {
             template: 'qq-template-manual-trigger',
             request: {
                 method: 'POST',
-                endpoint: '/unisams/usermod/' + userid + "/uploadUserImage",
+                endpoint: '/api/v1/usermod/' + userid + "/uploadUserImage",
                 inputName: 'image'
 
             },
@@ -484,7 +484,7 @@ $(document).ready (function () {
                                 callback: {
                                     onConfirm: function () {
                                         actions.updateDBKey(userid, key, value, args, function () {
-                                            location.replace("/unisams/user/" + userid + "/editUser");
+                                            location.replace("/unisams/user/edit/" + userid);
                                         });
                                     }
                                 }

@@ -11,13 +11,13 @@ $(function() {
         };
         // build a json object or do something with the form, store in data
         $.ajax({
-            url: "/unisams/usermod/" + userid,
+            url: "/api/v1/usermod/" + userid,
             type: 'PUT',
             dataType: 'json',
             data: data,
             success: function(result) {
                 alert("Updated user info.");
-                location.replace("/unisams/user/" + data.username)
+                location.replace("/unisams/user/view/" + data.username)
                 // do something when it was successful
             }
         });

@@ -1,9 +1,16 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
+const AuthService = require('./authService');
+const LogService = require("./logService");
+const Log = require('../utils/log');
+
+
+const authService = new AuthService();
 
 const { convertDeltaToHtml } = require('node-quill-converter');
 
 const Event = db.Event;
+const User = db.User;
 
 var fs = require('fs-extra');
 
@@ -40,10 +47,12 @@ async function getById(id) {
 }
 
 /**
+ *
+ * @param req {Object} express request
  * Creates a new user by a given object of the user scheme
  * @param {EventScheme} eventParam The object to save as event
  */
-async function create(eventParam) {
+async function create(req, eventParam) {
 
     //validate
     //has title?
@@ -80,8 +89,37 @@ async function create(eventParam) {
 
     const event = new Event(eventParam);
 
+    //create log
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "event",
+            actionType: "create",
+            actionDetail: "eventCreate",
+            key: event.id,
+            value: event.title.value,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "event",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "Event",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+
     // save event
     if(await event.save()){
+        LogService.create(log)
+            .then(
+            )
+            .catch(
+
+            );
         fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
             if (err) {
                 throw err;
@@ -100,10 +138,12 @@ async function create(eventParam) {
 
 /**
  * Updates an existing event
+ *
+ * @param req {Object} express request
  * @param {number} id The id of the existing event
  * @param {EventScheme} eventParam The object to save as event
  */
-async function update(id, eventParam) {
+async function update(req, id, eventParam) {
     const event = await Event.findById(id);
 
     // validate
@@ -112,10 +152,52 @@ async function update(id, eventParam) {
     // copy eventParam to event
     Object.assign(event, eventParam);
 
+    event.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "event",
+                    actionType: "modify",
+                    actionDetail: "eventModify",
+                    key: "",
+                    fullKey: "",
+                    originalValue: "",
+                    value:  "",
+                    tag: "<OVERWRITE>"
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "event",
+                    targetObject: event._id,
+                    targetObjectId: event._id,
+                    targetModel: "Event",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
     await event.save();
 }
 
-async function updateKey(id, key, value, eventParams) {
+/**
+ *
+ * @param req {Object} express request
+ * @param id
+ * @param key
+ * @param value
+ * @param eventParams
+ * @returns {Promise<*>}
+ */
+async function updateKey(req, id, key, value, eventParams) {
     if (!eventParams) eventParams = {};
 
     const event = await Event.findById(id);
@@ -126,6 +208,10 @@ async function updateKey(id, key, value, eventParams) {
     // validate input
     if (!key) throw new Error('no key given');
     if (!value) throw new Error('no value given');
+
+    let ojVal = undefined;
+    let newVal = (value.value === undefined) ? value : value.value;
+    let logKey = (value.title === undefined) ? key : value.title;
 
     //check if array operation
     if(eventParams.isArray) {
@@ -160,6 +246,7 @@ async function updateKey(id, key, value, eventParams) {
         }
         if (index > -1) {
             // updating existing object @louis can you use array[index] = eventParams.value ?
+            ojVal = array[index];
             array.splice(index, 1, value);
         }
         else {
@@ -169,12 +256,57 @@ async function updateKey(id, key, value, eventParams) {
         event.set(key, array, {strict: false} );
     }
     else {
+        let k = event.get(key);
+        if (k === undefined) {
+            ojVal = "N/A"
+        }
+        else {
+            ojVal = (k.value === undefined) ? k : k.value;
+        }
         event.set(key, value, {strict: false} );
     }
+    event.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "event",
+                    actionType: "modify",
+                    actionDetail: "eventModify",
+                    key: logKey,
+                    fullKey: key,
+                    originalValue: ojVal,
+                    value:  newVal,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "event",
+                    targetObject: event._id,
+                    targetObjectId: event._id,
+                    targetModel: "Event",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
     await event.save();
     return event;
 }
 
+/**
+ *
+ * @param matchString
+ * @param args
+ * @returns {Promise<Query|*|number>}
+ */
 async function matchAny(matchString, args){
 
     let eventlist;
@@ -206,13 +338,16 @@ async function populateParticipants(id) {
 
 /**
  * adds a user to the list of participants
+ *
+ * @param req {Object} express request
  * @param id {ObjectId} id of the event
  * @param userId {ObjectId} id of user to add
  * @param args {Object} allowed values: [admin, lecturer, participant]
  * @returns {Promise<void>}
  */
-async function addParticipant(id, userId, args) {
+async function addParticipant(req, id, userId, args) {
     const event = await Event.findById(id);
+    const user = await User.findById(userId).select("username");
     let roles = ["admin", "lecturer", "participant"];
     let rolesDefault = "participant";
     let role = args.role;
@@ -259,14 +394,46 @@ async function addParticipant(id, userId, args) {
     else {
         // push user to participants array
         event.participants.push(data);
+        //create log
+        let log = new Log({
+            type: "modification",
+            action: {
+                objectType: "event",
+                actionType: "modify",
+                actionDetail: "eventAddParticipant",
+                key: user.username,
+                value:  role,
+            },
+            authorizedUser: req.user,
+            target: {
+                targetType: "event",
+                targetObject: event._id,
+                targetObjectId: event._id,
+                targetModel: "Event",
+            },
+            httpRequest: {
+                method: req.method,
+                url: req.originalUrl,
+            }
+        })
+        LogService.create(log).then().catch();
     }
 
     await event.save();
 }
 
-async function removeParticipant(id, userId, args) {
+/**
+ *
+ * @param req {Object} express request
+ * @param id
+ * @param userId
+ * @param args
+ * @returns {Promise<void>}
+ */
+async function removeParticipant(req, id, userId, args) {
     if (args === undefined) args = {};
     const event = await Event.findById(id);
+    const user = await User.findById(userId).select("username");
     let role = args.role;
 
     // validate
@@ -291,6 +458,28 @@ async function removeParticipant(id, userId, args) {
     if (index > -1) {
         // user found. removing
         event.participants.splice(index, 1);
+        //create log
+        let log = new Log({
+            type: "modification",
+            action: {
+                objectType: "event",
+                actionType: "modify",
+                actionDetail: "eventRemoveParticipant",
+                key: user.username,
+            },
+            authorizedUser: req.user,
+            target: {
+                targetType: "event",
+                targetObject: event._id,
+                targetObjectId: event._id,
+                targetModel: "Event",
+            },
+            httpRequest: {
+                method: req.method,
+                url: req.originalUrl,
+            }
+        })
+        LogService.create(log).then().catch();
     }
     else {
         // user not found. abort
@@ -302,8 +491,47 @@ async function removeParticipant(id, userId, args) {
 
 /**
  * Deletes an event
+ * @param req {Object} express request
  * @param {number} id The id of the user to delete
  */
-async function _delete(id) {
-    await Event.findByIdAndRemove(id);
+async function _delete(req, id) {
+    // await Event.findByIdAndRemove(id);
+    let event = await Event.findById(id);
+    //check write access
+    if(!authService.checkEventWriteAccess(req.user, event)) throw {status: 403, message: "forbidden"};
+
+    // await User.findByIdAndRemove(id);
+    Event.findByIdAndRemove(id)
+        .then(function(event){
+            console.log("Deleted event with id: " + event._id);
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "event",
+                    actionType: "delete",
+                    actionDetail: "eventDelete",
+                    key: event.id,
+                    value: event.title.value,
+                    tag: "<DELETE>"
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "event",
+                    targetObject: event._id,
+                    targetObjectId: event._id,
+                    targetModel: "Event",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log)
+                .then()
+                .catch()
+            //TODO: update exisiting logs for user
+            return true;
+        })
+        .catch()
 }

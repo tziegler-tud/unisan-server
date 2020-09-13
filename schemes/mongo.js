@@ -35,4 +35,6 @@ module.exports = {
     Qualifications: require('./qualificationScheme'),
     UserDataset: require('./userDatasetScheme'),
     Event: require('./eventScheme'),
+    UserGroup: require('./userGroupScheme'),
+    Log: require('./logScheme'),
 };

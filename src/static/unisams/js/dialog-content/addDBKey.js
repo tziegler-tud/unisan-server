@@ -35,7 +35,7 @@
 
                 // get user data from server
                 $.ajax({
-                    url: "/unisams/usermod/" + userid,
+                    url: "/api/v1/usermod/" + userid,
                     type: 'GET',
                     cache: false,
                     isModified: false,
@@ -48,7 +48,7 @@
                 var data = {};
 
                 $.ajax({
-                    url: "/unisams/usermod/updateKey/" + userid,
+                    url: "/api/v1/usermod/updateKey/" + userid,
                     type: 'PUT',
                     data: data,
                     cache: false,

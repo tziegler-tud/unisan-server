@@ -1,0 +1,115 @@
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>log details</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="sidebar-title">
+                </div>
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-content">
+                    <div class="ak-form label-caps">
+                        <div class="ak-item">
+                            <label for="qual-type">Log id</label>
+                            <span class="common-viewBox" id="qual-type">
+                                {{log.id}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label for="qual-type">timestamp</label>
+                            <span class="common-viewBox" id="qual-type">
+                               {{log.timestamp}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label for="qual-name">authorized by user:</label>
+                            <span class="common-viewBox" id="qual-name">
+                                {{log.authorizedUser.username}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label for="qual-acquiredDate">action type</label>
+                            <span class="common-viewBox">
+                                {{log.action.actionDetail}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label for="qual-acquiredDate">request url</label>
+                            <span class="common-viewBox">
+                                [{{log.httpRequest.method}}] {{log.httpRequest.url}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>target type</label>
+                            <span class="common-viewBox">
+                                {{log.target.targetType}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>target</label>
+                            <span class="common-viewBox">
+                                {{log.target.title}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>key</label>
+                            <span class="common-viewBox">
+                                {{log.action.key}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>full key</label>
+                            <span class="common-viewBox">
+                                {{log.action.fullKey}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>original value</label>
+                            <span class="common-viewBox">
+                                {{log.action.originalValue}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>new value</label>
+                            <span class="common-viewBox">
+                                {{log.action.value}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>full description</label>
+                            <span class="common-viewBox">
+                                {{log.description.fullDescription.de}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>short description</label>
+                            <span class="common-viewBox">
+                                {{log.description.shortDescription.de}}
+                            </span>
+                        </div>
+                        <div class="ak-item">
+                            <label>min description</label>
+                            <span class="common-viewBox">
+                                {{log.description.min}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-delete content-link style2">Eintrag löschen</a>
+        </div>
+    </div>
+</div>

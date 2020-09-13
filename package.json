@@ -6,6 +6,8 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@material/button": "^7.0.0",
+    "@material/textfield": "^7.0.0",
     "bcrypt": "^3.0.7",
     "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.4",
@@ -34,7 +36,15 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "autoprefixer": "^9.8.6",
+    "css-loader": "^4.2.1",
+    "extract-loader": "^5.1.0",
+    "file-loader": "^6.0.0",
+    "postcss-loader": "^3.0.0",
+    "sass": "^1.26.10",
+    "sass-loader": "^9.0.3",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }

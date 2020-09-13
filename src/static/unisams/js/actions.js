@@ -1,32 +1,32 @@
 common = window.common;
 (function (actions,$,undefined) {
 
-    actions.addUser = function(args) {
+    actions.addUser = function(data, args) {
         var memberId = {
             title: "Mitgliedsnummer",
         }
         if (args.memberId.setCustom){
-            memberId.value = args.memberId.value;
+            memberId.value = data.memberId;
         }
-        var data = {
-            username: args.data.username,
-            password: args.data.password,
+        var jsonData = {
+            username: data.username,
+            password: data.password,
             generalData: {
-                firstName: {title: "Vorname", value: args.data.generalData.firstName},
-                lastName: {title: "Nachname", value: args.data.generalData.lastName},
+                firstName: {title: "Vorname", value: data.generalData.firstName},
+                lastName: {title: "Nachname", value: data.generalData.lastName},
                 memberId: memberId,
             },
         };
 
         $.ajax({
-            url: "/unisams/usermod/create",
+            url: "/api/v1/usermod/create",
             // make put for safety reasons :-)
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
-            data: JSON.stringify(data),
+            data: JSON.stringify(jsonData),
             success: function(result) {
-                location.replace("/unisams/user/" + data.username + "/editUser")
+                location.replace("/unisams/user/edit" + data.username)
             }
         });
     };
@@ -35,7 +35,7 @@ common = window.common;
 
         // build a json object or do something with the form, store in data
         $.ajax({
-            url: "/unisams/usermod/" + userid,
+            url: "/api/v1/usermod/" + userid,
             type: 'DELETE',
             success: function(result) {
                 alert("User " + userid + " deleted.");
@@ -47,11 +47,11 @@ common = window.common;
 
     actions.uploadImage = function(userid){
         $.ajax({
-            url: "/unisams/usermod/" + userid + "/uploadUserImage",
+            url: "/api/v1/usermod/" + userid + "/uploadUserImage",
             type: 'POST',
             success: function(result) {
                 alert("User " + userid + " image updated");
-                window.location.replace("/unisams/user/" + userid);
+                window.location.replace("/unisams/user/view/" + userid);
             }
         });
     };
@@ -65,7 +65,7 @@ common = window.common;
         };
 
         $.ajax({
-            url: "/unisams/usermod/deleteKey/" + userid,
+            url: "/api/v1/usermod/deleteKey/" + userid,
             // make put for safety reasons :-)
             type: 'DELETE',
             contentType: "application/json; charset=UTF-8",
@@ -85,7 +85,7 @@ common = window.common;
             args: args,
         };
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + userid,
+            url: "/api/v1/usermod/updateKey/" + userid,
             // make put for safety reasons :-)
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
@@ -105,7 +105,7 @@ common = window.common;
             args: args,
         };
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + userid,
+            url: "/api/v1/usermod/updateKey/" + userid,
             // make put for safety reasons :-)
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
@@ -118,5 +118,25 @@ common = window.common;
             }
         });
     };
+
+    actions.getLogs = function(targetId, logType, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            targetId: targetId,
+            logType: logType,
+        };
+        $.ajax({
+            url: "/api/v1/logs/get/target/",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback.onSuccess(result);
+
+            }
+        });
+    }
 
 }(actions = window.actions || {},jQuery));

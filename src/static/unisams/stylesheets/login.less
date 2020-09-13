@@ -1,153 +1,162 @@
 @import "color-rules.less";
 @import "variables.less";
+@import "color-rules.less";
 
-#sec1 {
+.centered {
   position: relative;
-  width: 100%;
-  margin-top: 10em;
 
   @media @desktop, @tablet-landscape {
-    margin-top: 10em;
-    position: relative;
-    height: 100%;
-
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
   }
 
-  #content1 {
+}
 
-    margin: 0 5%;
-    width: 90%;
-    font-size: 90%;
-    text-align: center;
+.login-page {
+  width: 100%;
+  height: 100%;
+  font-size: 80%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+
+  @media @desktop, @tablet-landscape {
+    display: block;
+    font-size: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+
+  .login-page-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    position: relative;
+
 
 
     @media @desktop, @tablet-landscape {
-      margin: 0 25% 0 25%;
-      width: 50%;
       font-size: 100%;
+      height: 100%;
+      flex-flow: row nowrap;
 
-      .sec-heading {
+    }
 
-        img {
+    .login-additional-box {
+      display: flex;
+      height: 100%;
+      flex: 1 1 50%;
+      position: relative;
+      font-size: 80%;
+      flex-flow: row wrap;
 
+      justify-content: center;
+
+      @media @desktop, @tablet-landscape {
+        font-size: 100%;
+        justify-content: center;
+      }
+
+      .additonal-content-container {
+        padding: 1em;
+        display: flex;
+        @media @desktop, @tablet-landscape {
+          display: block;
         }
 
+        .img-container{
+          width: 100%;
+          max-width: 250px;
+          margin: 0 auto;
+          @media @tablet-landscape {
+            max-width: 400px;
+          }
+          @media @desktop {
+            max-width: 500px;
+          }
+          img {
+            width: 100%;
+          }
+        }
         .unisams-label {
+          font-size: 500%;
           span {
-            }
-        }
-      }
-    }
-
-
-    .sec-heading {
-      display: inline-block;
-      .img-container {
-        max-width: 10em;
-        float: left;
-        img {
-          max-width: 10em;
-        }
-      }
-      .unisams-label {
-        float: left;
-        font-size: 400%;
-        span {
-        }
-      }
-    }
-  }
-}
-.center-in-container{
-  transform: translate(50%,50%,0);
-
-}
-
-#login-container {
-  text-align: left;
-  width: 20em;
-
-  margin: 10vh auto;
-  position: relative;
-
-  &:before, &:after {
-    content: "";
-    position: absolute;
-    height: 100%;
-    width: 100%;
-
-    border: 1px solid #00293c;
-
-    z-index: -1;
-
-  }
-
-  &:before {
-    top: 0;
-    left: 0;
-
-    border-bottom: none;
-    border-right: none;
-  }
-
-
-  &:after {
-    bottom: 0;
-    right: 0;
-
-    border-left: none;
-    border-top: none;
-  }
-
-  #login-container-inner {
-    width: 100%;
-    padding: 1em;
-
-
-    .actionbox-label {
-
-      padding: 0 0 1em 0;
-
-      color: #555;
-      font-size: 130%;
-
-    }
-
-    .actionbox-body {
-      z-index: 5;
-      .actionbox-form {
-
-        .actionbox-form-inp {
-          display: block;
-          border: 1px solid #BBB;
-          background-color: transparent;
-          padding: 5px 1em;
-          border-radius: 0;
-          color: #999;
-
-          margin-bottom: 1em;
-
-        }
-
-        .actionbox-form-submit {
-          display: block;
-          border: 1px solid #555;
-          background-color: transparent;
-          padding: 5px 1em;
-          margin: 0;
-          border-radius: 0;
-          color: #333;
-
-          outline: 0;
-
-          &:hover {
-            cursor: pointer;
 
           }
 
         }
-
       }
     }
+
+    .login-content {
+      flex: 1 1 50%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      @media @desktop, @tablet-landscape {
+        justify-content: flex-start;
+      }
+      .login-content-inner {
+        padding: 1em 5%;
+        .login-form-container {
+
+          .login-form-greeter{
+            margin-bottom: 5em;
+            .greeter-label {
+              font-size: 250%;
+            }
+            .greeter-content {
+              font-size: 150%;
+            }
+
+          }
+          .login-form-content {
+            font-size: 110%;
+            .login-form {
+              label {
+                display: block;
+                margin-bottom: 1em;
+              }
+              .login-form-inp {
+                font-size: 100%;
+                position: relative;
+              }
+              .login-form-submit{
+                font-size: 100%;
+                display: block;
+                padding: .5em 1em;
+                border-radius: 4px;
+                background-color: @akzent-color;
+                color: #fff;
+                border: none;
+                box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.no-js {
+  .login-form {
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    cursor: not-allowed !important;
+    input {
+      cursor: not-allowed !important;
+    }
+  }
+  .login-form-submit {
+    pointer-events: none;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
   }
 }

@@ -2,12 +2,6 @@
 // data aggregation for all the user-profile linked scripts.
 //obviously, we need to fetch the user. Might reduce data to the one really needed later on by using a dedicated api call.
 
-//TODO: move this to own namespace
-
-
-
-
-
     var observers = [];
 
     /**
@@ -75,7 +69,7 @@
 
     var getUserFromServer = function(self, userId){
         self.pendingUserRequest.isActive = true;
-        let url = "/unisams/usermod/" + userId;
+        let url = "/api/v1/usermod/" + userId;
         return new Promise(function(resolve, reject){
             $.ajax({
                 url: url,
@@ -209,7 +203,7 @@
             args: args,
         };
         $.ajax({
-            url: "/unisams/usermod/updateKey/" + self.currentViewedUser.userId,
+            url: "/api/v1/usermod/updateKey/" + self.currentViewedUser.userId,
             // make put for safety reasons :-)
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
