@@ -156,6 +156,7 @@ common = window.common;
 
         events.saveDelta = function(id, delta, callback){
             if (callback === undefined) callback = {};
+            if (callback.onSuccess === undefined) callback.onSuccess = function(){}
             var data = {
                 key: "description.longDesc.delta",
                 value: delta,
@@ -174,6 +175,7 @@ common = window.common;
 
         events.updateKey = function(id, key, value, callback){
             if (callback === undefined) callback = {};
+            if (callback.onSuccess === undefined) callback.onSuccess = function(){}
             var data = {
                 key: key,
                 value: value,
@@ -188,6 +190,16 @@ common = window.common;
                     callback.onSuccess(result);
                 }
             });
+        }
+        events.uploadFileToStorage = function(id, filename, file, callback){
+            $.ajax({
+                url: "/api/v1/eventmod/" + id + "/uploadFile",
+                type: 'POST',
+                success: function(result) {
+                    return result
+                }
+            });
+
         }
         return events;
     }(actions.events = actions.events || {},jQuery));

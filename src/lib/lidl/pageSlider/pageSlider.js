@@ -15,6 +15,8 @@
 
 (function (lidl,$,undefined) {
 
+    jQuery.fn.reverse = [].reverse;
+
     lidl.PageSlider = function(container, token){
 
         this.pageCounter = 0;
@@ -41,6 +43,8 @@
         //init event handlers. Note: Create buttons with class "pageslider-next" and "pageslider-prev"
         $(this.container).find(".pageslider-next").each(function(el){
             this.addEventListener("click", function(e){
+                //validate
+                if(!self.pages[self.currentPage].checkRequiredFields()) return false;
                 self.pages[self.currentPage].save();
                 self.nextPage();
             })
@@ -118,18 +122,40 @@
         var data = {};
         var container;
         this.container = {};
+        var self = this;
+        var objects = [];
+        this.onSave = function(){
+        };
 
         this.setContainer = function(c){
             this.container = c;
             container = c;
         }
+        this.addObject = function(key, value) {
+            if (key === undefined) {
+                console.error("failed to add object to Page data: invalid key")
+            }
+            if (value === undefined) {
+                console.error("failed to add object to Page data: invalid object")
+            }
+            objects.push({key: key, value: value});
+        };
+        this.setOnSaveCallback = function(func) {
+            self.onSave = func;
+        }
         this.save = function(){
+            this.onSave();
             //saves the data and moves on to the next page
             $(container).find(".pageslider-page-dataElement").each(function(){
                 let key = this.name;
                 if (key === undefined) key = "undefined";
                 data[key]= this.value;
             })
+            objects.forEach(function(el){
+                let key = el.key;
+                data[key]= el.value;
+            })
+
             parent.savePageData(this, data);
         }
         this.nextPage = function(){
@@ -148,6 +174,29 @@
         this.hide = function(){
             container.classList.add("page-hidden");
             container.classList.remove("page-active");
+        }
+
+        this.checkRequiredFields = function(){
+            let valid = true;
+            //find all inputs
+            $(container).find(".pageslider-page-dataElement").reverse().each(function(){
+                if(this.required === true){
+                    if (this.value.length === 0) {
+                        let el = this;
+                        //if mdc text field, find the container
+                        if (this.classList.contains("mdc-text-field__input")){
+                            el = $(this).parents(".mdc-text-field")
+                        }
+                        //trigger html5 styling by adding some input and removing it
+                        el.value = 1;
+                        el.value = "";
+                        el.focus();
+                        $(el).effect("shake", {distance: 2, times: 1}, "fast");
+                        valid = false;
+                    }
+                }
+            })
+            return valid;
         }
 
         return this;

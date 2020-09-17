@@ -34,6 +34,18 @@ router.post('/:id/uploadImage', upload.single('image'), function(req, res, next)
         .catch(err => next(err));
 });
 
+router.post('/:id/uploadFile', upload.single('image'), function(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/event_files/${event.id}/${req.body.filename}`, { overwrite: true }, function (err) {
+                if (err) return console.error(err);
+                console.log("moved file to dir: event_files/" + event.id);
+            });
+            res.json({success: true});
+        })
+        .catch(err => next(err));
+});
+
 
 auth = function(req, res, next){
     if (!req.isAuthenticated()) {

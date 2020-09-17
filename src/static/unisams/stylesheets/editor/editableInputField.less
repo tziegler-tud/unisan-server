@@ -3,8 +3,10 @@
 
 .editableInputField {
   position: relative;
-  margin: 0 0 0 -15px;
   background-color: #fff;
+  &.event-title {
+    margin: 0 0 0 -15px;
+  }
 
   p,ul,ol,pre,blockquote,h1,h2,h3,h4,h5,h6 {
     margin: 0;
@@ -22,10 +24,10 @@
   &.input-hidden {
     padding: 24px 15px;
     &.allow-editing {
-      .transition(outline, 250ms);
-      outline: 1px solid transparent;
+      .transition(border, 250ms);
+      border: 1px solid transparent;
       &:hover {
-        outline: 1px solid #CCC;
+        border: 1px solid #CCC;
         cursor: pointer;
       }
     }

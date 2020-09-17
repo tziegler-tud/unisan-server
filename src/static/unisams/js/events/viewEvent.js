@@ -34,13 +34,27 @@ $(document).ready (function () {
                 let delta = editableTextField.getQuill().getContents();
                 actions.events.saveDelta(event.id, delta, {
                     onSuccess: function(result){
-                        editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
+                        editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {readOnly: true})
                     }
                 })
             }
         };
         let editableTextFieldContainer = document.getElementById("eventdetailseditor");
-        let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
+        let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {readOnly: true});
+
+        let cb = {
+            onConfirm: function(editableInputField){
+                let delta = editableInputField.getQuill().getContents();
+                let key = "title.delta";
+                actions.events.updateKey(event.id, key, delta, {
+                    onSuccess: function(result){
+                        editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {readOnly: true})
+                    }
+                })
+            }
+        };
+        let titleInputContainer = document.getElementById("eventtitle-input");
+        let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {readOnly: true});
 
         //get event type
         switch(event.type.raw){

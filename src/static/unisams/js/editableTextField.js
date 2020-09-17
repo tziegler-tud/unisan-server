@@ -6,14 +6,27 @@
 
     common.editableTextFieldCounter = 0;
 
+    /**
+     * constructor for EditableTextField objects
+     *
+     * @param {HTMLElement}container - container dom element
+     * @param {Object} deltaContent - delta object to set as content
+     * @param {String} htmlContent - html content for rendering
+     * @param {Object} callback - callbacks to be executed when dialog buttons are used. currently, only 'onConfirm' is supported
+     * @param {Object} args - readOnly: [false] disable input., active: [false] initialize with active editor, disableButtons: [false] disables dialog buttons
+     * @returns {Window.common.EditableTextField}
+     * @constructor
+     */
     common.EditableTextField = function(container, deltaContent, htmlContent, callback, args){
         if (container === undefined) throw new Error("cannot instantiate search bar without container");
         callback === undefined ? this.callback = {onConfirm: function(){console.log("no callback given")}}: this.callback = callback;
         common.editableTextFieldCounter++;
         this.id = common.editableTextFieldCounter;
         args = applyArgs(args);
-
-        container.classList.add("editableTextField", "editor-hidden", "allow-editing");
+        container.classList.add("editableTextField", "editor-hidden");
+        if(!args.readOnly) {
+            container.classList.add("allow-editing");
+        }
         this.args = args;
         this.container = container;
         this.deltaContent = deltaContent;
@@ -21,7 +34,12 @@
         this.domElements = {};
 
         //deactivate on default
-        this.deactivate();
+        if (args.active === true){
+            this.activate();
+        }
+        else {
+            this.deactivate();
+        }
 
         var self = this;
 
@@ -30,14 +48,19 @@
 
     var applyArgs = function(args){
         args = (args === undefined) ? {}: args;
+        args.active = (args.active === undefined) ? false : args.active;
+        args.disableButtons = (args.disableButtons === undefined) ? false : args.disableButtons;
+        args.readOnly = (args.readOnly === undefined) ? false : args.readOnly;
         return args;
     };
 
     var buildHTML = function(self){
+
         let id = self.id;
         let buttonContainer = document.createElement("div");
         buttonContainer.className = "editableTextField-dialog-container";
         buttonContainer.id= "editableTextField-dialog-container"+id;
+        if (self.args.disableButtons === true) buttonContainer.style.display = "none";
 
         //add confirm button
         let confirmButton = document.createElement("div");
@@ -81,6 +104,7 @@
 
     common.EditableTextField.prototype.activate = function(){
         var self = this;
+        if(self.args.readOnly) return false;
         self.isactive = true;
         let container = this.container;
         container.classList.remove("editor-hidden");
@@ -93,7 +117,8 @@
         var toolbarOptions = [
             ['bold', 'italic', 'underline'/*, 'strike'*/],        // toggled buttons
             // ['blockquote', 'code-block'],
-            ['link', 'image'],
+            // ['link', 'image'],
+            [ 'link', 'image', 'video' ],
 
             // [{ 'header': 1 }, { 'header': 2 }],               // custom button values
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],

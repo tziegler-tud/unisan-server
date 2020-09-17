@@ -25,7 +25,7 @@ $(document).ready (function () {
     function buildPage(event) {
 
         window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", event);
+        let eventDockerPageId = window.DockerElement.addDockerSubPage("event", event, {});
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 
@@ -105,7 +105,10 @@ $(document).ready (function () {
 
         let callback = {
             onConfirm: function(editableTextField){
-                let delta = editableTextField.getQuill().getContents();
+                let delta = editableTextField.getQuill().getText();
+                let key = "description.longDesc.value";
+                actions.events.updateKey(event.id, key, delta, {})
+                delta = editableTextField.getQuill().getContents();
                 actions.events.saveDelta(event.id, delta, {
                     onSuccess: function(result){
                         editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
@@ -119,11 +122,23 @@ $(document).ready (function () {
 
         let cb = {
             onConfirm: function(editableInputField){
-                let delta = editableInputField.getQuill().getContents();
-                let key = "title.delta";
+                let delta = editableInputField.getQuill().getText();
+                let key = "title.value";
+                actions.events.updateKey(event.id, key, delta, {})
+                delta = editableInputField.getQuill().getContents();
+                key = "title.delta";
                 actions.events.updateKey(event.id, key, delta, {
                     onSuccess: function(result){
                         editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
+                        //update docker nav
+                        eventProfile.refreshEvent()
+                            .then(function(ev){
+                                event = ev;
+                                window.DockerElement.subpageHandler.update(eventDockerPageId, "event", event)
+                            })
+                            .catch(function(err){
+                                throw new Error(err)
+                            });
                     }
                 })
             }

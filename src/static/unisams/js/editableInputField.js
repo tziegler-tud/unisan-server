@@ -6,6 +6,18 @@
 
     common.editableInputFieldCounter = 0;
 
+    /**
+     * constructor for EditableInputField objects
+     *
+     * @param {HTMLElement}container - container dom element
+     * @param {Object} deltaContent - delta object to set as content
+     * @param {String} htmlContent - html content for rendering
+     * @param {String} type - input type. ["text"]
+     * @param {Object} callback - callbacks to be executed when dialog buttons are used. currently, only 'onConfirm' is supported
+     * @param {Object} args - readOnly: [false] disable input., active: [false] initialize with active editor, disableButtons: [false] disables dialog buttons
+     * @returns {Window.common.EditableInputField}
+     * @constructor
+     */
     common.EditableInputField = function(container, deltaContent, htmlContent, type, callback, args){
         if (container === undefined) throw new Error("cannot instantiate input field without container");
         callback === undefined ? this.callback = {onConfirm: function(){console.log("no callback given")}}: this.callback = callback;
@@ -13,15 +25,25 @@
         this.id = common.editableInputFieldCounter;
         args = applyArgs(args);
 
-        container.classList.add("editableInputField", "input-hidden", "allow-editing");
+        container.classList.add("editableInputField", "input-hidden");
+        if(!args.readOnly) {
+            container.classList.add("allow-editing");
+        }
         this.args = args;
         this.container = container;
         this.deltaContent = deltaContent;
         this.htmlContent = htmlContent;
         this.domElements = {};
+        this.quill;
 
         //deactivate on default
-        this.deactivate();
+        if (args.active === true){
+            this.activate();
+        }
+        else {
+            this.deactivate();
+        }
+
 
         var self = this;
 
@@ -38,6 +60,7 @@
         let buttonContainer = document.createElement("div");
         buttonContainer.className = "editableInputField-dialog-container";
         buttonContainer.id= "editableInputField-dialog-container"+id;
+        if (self.args.disableButtons === true) buttonContainer.style.display = "none";
 
         //add confirm button
         let confirmButton = document.createElement("div");
@@ -81,6 +104,7 @@
 
     common.EditableInputField.prototype.activate = function(){
         var self = this;
+        if(self.args.readOnly) return false;
         self.isactive = true;
         let container = this.container;
         container.classList.remove("input-hidden");

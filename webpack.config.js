@@ -6,7 +6,9 @@ module.exports = {
         login: "./src/webpack/login.js",
         login_style: "./src/webpack/login.scss",
         addUser: "./src/webpack/addUser.js",
-        addUser_style: "./src/webpack/addUser.scss"
+        addUser_style: "./src/webpack/addUser.scss",
+        addEvent: "./src/webpack/addEvent.js",
+        addEvent_style: "./src/webpack/addEvent.scss"
     },
     output: {
         path: path.join(__dirname, "./src/dist"),

@@ -56,6 +56,54 @@
             self.ready = true;
             self.resolveObserver(true);
         });
+
+        this.subpageHandler = {
+            counter: {
+                value: 0,
+                increase: function(){
+                    this.value++;
+                    return this.value;
+                }
+            },
+            subpages: [],
+            findById: function(id){
+                return this.subpages.find(e => e.id === id);
+            },
+            add: function(subpage){
+                this.subpages.push(subpage);
+            },
+            remove: function(id){
+                let index = this.subpages.findIndex(e=> e.id === id);
+                this.subpages.splice(index, 1);
+                return id;
+            },
+            show: function(id){
+                let page = this.findById(id);
+                //add css class to page
+                let dom = document.getElementById(id);
+                dom.classList.add("subpage-active");
+            },
+            hide: function(id){
+                let page = this.findById(id);
+                //add css class to page
+                let dom = document.getElementById(id);
+                dom.classList.remove("subpage-active");
+            },
+            /**
+             * regenerates the subpage with new data
+             * @param id - subpage id
+             * @param type - see signature of addDockerSubpage method
+             * @param data - see signature of addDockerSubpage method
+             */
+            update: function(id, type, data){
+                self.addDockerSubPage(type, data, {overwrite: true}, id)
+            },
+            generateId: function(){
+                return "docker-subpage_" + this.counter.increase();
+            }
+
+        }
+
         return this;
     };
 
@@ -261,23 +309,44 @@
     };
 
     /**
-     * adds a subpage to the docker
+     * adds a subpage to docker
+     * @param {String} type - type of subpage. this value determines which template is used
+     * @param {Object} data - JSON containing data for template rendering
+     * @param {Object} options - overwrite [bool]: replace existing subpages if id matches
+     * @param {Number} [id] - (Optional) set id for the new subpage. Fails if id exists without the overwrite option
+     * @returns {*}
      */
-    docker.Docker.prototype.addDockerSubPage = function(type, data){
-        // testing. lets just render the user subpage
+    docker.Docker.prototype.addDockerSubPage = function(type, data, options, id){
         var self = this;
+        if (options === undefined) options = {overwrite: false};
         // build context
         var context = {};
 
-        //generate subpageId
-        var id = subpageHandler.generateId();
+        //generate subpageId if none was provided
+        if (id === undefined) {
+            id = self.subpageHandler.generateId();
+        }
+        else {
+            if (self.subpageHandler.findById(id) !== undefined){
+                //without overwrite, fail
+                if (!options.overwrite) {
+                    throw new Error("Error (docker.js): Cannot replace existing subpages without overwrite option.");
+                }
+                //with overwrite, replace current subpage with new one
+                else {
+                    self.subpageHandler.remove(id);
+                }
+            }
+            //else: id does not exist, continue
+        }
 
         var subpage = {
             id: id,
+            type: type,
             isActive: false,
         }
 
-        subpageHandler.add(subpage);
+        self.subpageHandler.add(subpage);
 
         let url;
         switch(type){
@@ -299,6 +368,7 @@
         $.get(url, function (data) {
             let template = Handlebars.compile(data);
             appendContent(template, context)
+
         });
 
         function appendContent(template, context) {
@@ -308,7 +378,7 @@
                 subpageContainer.innerHTML= template(context);
                 const subpageDom = document.getElementById(id);
                 addSubpageEventHandlers(self, subpageDom, true);
-                subpageHandler.show(id);
+                self.subpageHandler.show(id);
                 //initially setup dom elements
                 const container = document.getElementById(dockerArgs.activeContainer);
                 const el = document.getElementById(dockerArgs.activeElementId);
@@ -319,40 +389,6 @@
 
         return id;
     };
-
-    var subpageHandler = {
-        counter: {
-            value: 0,
-            increase: function(){
-                this.value++;
-                return this.value;
-            }
-        },
-        subpages: [],
-        findById: function(){
-            console.warn("not implemented");
-        },
-        add: function(subpage){
-            this.subpages.push(subpage);
-        },
-        show: function(id){
-            let page = this.findById(id);
-            //add css class to page
-            let dom = document.getElementById(id);
-            dom.classList.add("subpage-active");
-        },
-        hide: function(id){
-            let page = this.findById(id);
-            //add css class to page
-            let dom = document.getElementById(id);
-            dom.classList.remove("subpage-active");
-        },
-        generateId: function(){
-            return "docker-subpage_" + this.counter.increase();
-        }
-
-    }
-
 
 
     return docker;
