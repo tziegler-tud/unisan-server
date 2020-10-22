@@ -1,0 +1,76 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.sidebar-user .sidebar-content .sidebar-userimg {
+  cursor: pointer;
+  width: 100%;
+  height: auto;
+  background-color: #002e46;
+}
+.sidebar-user .sidebar-content .sidebar-userimg .userimg-inner {
+  width: 80%;
+  margin: 0 10%;
+  padding: 1em 0;
+}
+.sidebar-user .sidebar-content .sidebar-userimg .userimg-inner .img-container {
+  border-radius: 50%;
+  width: 8em;
+  overflow: hidden;
+}
+.sidebar-user .sidebar-content .sidebar-userimg .userimg-inner .img-container img {
+  width: 100%;
+  transform: scale(1.2);
+}
+.sidebar-user .sidebar-content .sidebar-userimg .userimg-inner span {
+  padding-top: 15px;
+  display: block;
+  font-size: 180%;
+  font-weight: lighter;
+  color: #fff;
+  word-break: break-word;
+}
+.sidebar-user .sidebar-content .content-title {
+  font-size: 120%;
+  font-weight: bold;
+}
+.sidebar-user .sidebar-content .section-title {
+  display: block;
+  color: #AAA;
+  font-size: 110%;
+  font-variant: small-caps;
+}
+.sidebar-user .sidebar-content .section-content .content-item {
+  display: block;
+  width: 100%;
+}
+.sidebar-participate-button.hidden {
+  display: none !important;
+}
+/*# sourceMappingURL=sidebar-user.css.map */

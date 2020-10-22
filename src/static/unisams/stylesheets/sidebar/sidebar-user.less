@@ -1,0 +1,64 @@
+@import "../color-rules";
+@import "../variables";
+
+.sidebar-user {
+  .sidebar-content {
+      .sidebar-userimg {
+        cursor: pointer;
+
+        width: 100%;
+        height: auto;
+        background-color: #002e46;
+
+        .userimg-inner {
+          width: 80%;
+          margin: 0 10%;
+          padding: 1em 0;
+
+          .img-container {
+            img {
+              width: 100%;
+              transform: scale(1.2);
+            }
+            border-radius: 50%;
+            width: 8em;
+            overflow: hidden;
+
+          }
+
+          span {
+            padding-top: 15px;
+            display: block;
+            font-size: 180%;
+            font-weight: lighter;
+            color: #fff;
+            word-break: break-word;
+          }
+        }
+      }
+      .content-title {
+        font-size: 120%;
+        font-weight: bold;
+      }
+      .section-title {
+        display: block;
+        color: #AAA;
+        font-size: 110%;
+        font-variant: small-caps;
+
+      }
+      .section-content {
+        .content-item {
+          display: block;
+          width: 100%;
+        }
+
+      }
+  }
+}
+
+.sidebar-participate-button {
+  &.hidden {
+   display: none !important;
+  }
+}

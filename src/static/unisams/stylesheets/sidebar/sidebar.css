@@ -63,7 +63,7 @@ body .sidebar-container {
   transform: translateX(100%);
   position: fixed;
   border-left: 1px solid #999;
-  background-color: #f9f9f9;
+  background-color: #fff;
   z-index: 7;
   float: left;
   top: 0;
@@ -91,6 +91,7 @@ body .sidebar-container .sidebar .sidebar-top {
   height: 3em;
   width: 100%;
   border-bottom: 1px solid #999;
+  background-color: #f9f9f9;
   transform: translateX(-3em);
   -webkit-transition: transform 250ms ease;
   -moz-transition: transform 250ms ease;
@@ -130,6 +131,9 @@ body .sidebar-container .sidebar .sidebar-inner {
   justify-content: flex-start;
   overflow-y: scroll;
 }
+body .sidebar-container .sidebar .sidebar-inner .label-caps label {
+  font-variant: small-caps;
+}
 body .sidebar-container .sidebar .sidebar-inner .sidebar-bottom {
   position: relative;
   margin-bottom: 1em;
@@ -139,14 +143,6 @@ body .sidebar-container .sidebar .sidebar-inner .sidebar-content {
 }
 body .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section {
   padding: 1em;
-}
-body .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-userimg {
-  width: 50%;
-  margin: 0 25%;
-}
-body .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-userimg img {
-  border-radius: 50%;
-  width: 100%;
 }
 body .sidebar-container .sidebar .sidebar-inner .sidebar-content .sidebar-section .content-title {
   font-size: 120%;
