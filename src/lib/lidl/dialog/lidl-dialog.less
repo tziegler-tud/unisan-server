@@ -101,13 +101,70 @@
   }
 }
 
+.lidl-dialog.dialog-fullscreen {
+  .dialog-container-inner {
+    overflow: auto;
+    .dialog-wrapper {
+      position: relative;
+      top: 0;
+      left: 0;
+      margin: 0 10vw;
+      width: 80vw;
+      transform: none;
+
+      .dialog-box {
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+
+        .dialog-imageViewer {
+          display: flex;
+          flex-flow: row wrap;
+
+
+          .dialog-imageContainer {
+            flex: 0 0 40%;
+            max-width: 250px;
+            img {
+              width: 100%;
+            }
+          }
+        }
+
+        .dialog-buttons {
+          position: relative;
+          font-size: 80%;
+          .dialog-button {
+            float: left;
+            display: block;
+            padding: 2em;
+
+            width: 30%;
+
+            margin: 1em 8% 1em 8%;
+            border: 1px solid #333;
+
+            cursor: pointer;
+          }
+          .btn-disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+  }
+}
+
 /* type-dependant style */
 
 .lidl-dialog.dialog-uploadImage {
   .dialog-container-inner {
     .dialog-wrapper {
       .dialog-box {
-        width: 40em;
+        //width: 40em;
       }
     }
   }

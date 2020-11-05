@@ -55,7 +55,7 @@ $(document).ready (function () {
 
 
         const content2 = {
-            title: "Bild hochladen",
+            title: "Mitgliedsakte: Passbild",
         };
 
         var removeUseritemAction = function (args) {
@@ -71,7 +71,9 @@ $(document).ready (function () {
         };
 
         var token2 = lidlRTO.objectManager.createNewObjectToken();
-        const dialog02 = new lidl.Dialog(token2, ".changeProfilePicture", 'imageUpload', content2, args2);
+        let cb2 = {
+        }
+        const dialog02 = new lidl.Dialog(token2, ".changeProfilePicture", 'imageUpload', content2, args2, cb2);
         lidlRTO.objectManager.addObject(dialog02, token2);
 
 
@@ -120,20 +122,46 @@ $(document).ready (function () {
             multiple: false,
 
             callbacks: {
+                onSubmit: function(id, name){
+                    const prevItems = $(".imagePreview")
+                    let self = this;
+                    $(prevItems).each(function (index) {
+                        self.drawThumbnail(id, this)
+                    });
+                    dialog02.enableConfirm();
+                },
                 onComplete: function () {
                     const items = $(".userProfileImage");
+                    let src;
                     $(items).each(function (img) {
-                        const src = $(this).attr("src");
+                        src = $(this).attr("src");
                         $(this).attr("src", src + "?t=" + new Date().getTime());
                     });
-                    dialog02.confirmAndClose();
+                    dialog02.closeDialog();
+                    dialog02.disableConfirm();
+                    this.reset();
                 }
             }
         });
 
-        qq(document.getElementById("confirmBtn" + token2)).attach("click", function () {
-            manualUploader.uploadStoredFiles();
+        dialog02.setCallback({
+            onCancel: function(){
+                manualUploader.reset();
+                dialog02.disableConfirm();
+                const prevItems = $(".imagePreview");
+                prevItems.each(function(){
+                    const src = this.dataset.originalsrc;
+                    $(this).attr("src", src + "?t=" + new Date().getTime());
+                })
+            },
+            onConfirm: function(){
+                manualUploader.uploadStoredFiles();
+            }
         });
+
+        // qq(document.getElementById("confirmBtn" + token2)).attach("click", function () {
+        //     manualUploader.uploadStoredFiles();
+        // });
 
         var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
 

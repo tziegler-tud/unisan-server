@@ -27,13 +27,14 @@
      * @param type type of dialog box. Currently supported: confirmDelete, imageUpload, removeDBKey, addDBKey
      * @param content JSON object containing the following data: title, message, confirmMessage
      * @param args function to be executed when calling the action function. Use this to access information from inside the dialog function.
+     * @param {Object} callback callback functions for dialog interaction. Currently supported: onCancel, onConfirm
      *
      * @class
      * @constructor
      *
      */
 
-    lidl.Dialog = function (token, targetElementSelector, type, content, args) {
+    lidl.Dialog = function (token, targetElementSelector, type, content, args, callback) {
 
         this.token = token;
         this.targetElementSelector = targetElementSelector;
@@ -41,9 +42,11 @@
         this.content = content;
 
         this.args = args;
+        this.callback = verifyCallback(callback);
 
         this.typeInt = getTypeInt(this,type);
 
+        this.allowConfirm = true;
         this.htmlDialog = generateDialogHTML(this);
         registerTarget(this, targetElementSelector, this.htmlDialog);
     };
@@ -127,13 +130,12 @@
             "id": "confirmBtn"+self.token,
             "class": "dialog-button dialog-confirm",
             "text": "Bestätigen"
-
-        }).on('click', function(){confirmAndClose(self)});
+        }).on('click', function(e){confirmDialog(self, e)});
 
         var htmlDialogCancelButton = $('<div/>', {
             "class": "dialog-button dialog-cancel",
             "text": "Abbrechen"
-        }).on('click', function(){closeDialog(htmlLidlDialog)});
+        }).on('click', function(){self.cancelDialog(htmlLidlDialog)});
 
         var htmlDialogButtonClear = $('<div/>', {
             "class": "clear",
@@ -141,6 +143,8 @@
 
         self.title = htmlDialogTitle;
         self.message = htmlDialogMessage;
+        self.confirmBtn = htmlDialogConfirmButton;
+        self.cancelBtn = htmlDialogCancelButton;
 
         // type-dependent html & wrap-up
 
@@ -168,19 +172,33 @@
 
         if(self.typeInt === 2){
 
-            $(htmlLidlDialog).addClass("dialog-uploadImage");
+            $(htmlLidlDialog).addClass("dialog-uploadImage dialog-fullscreen");
 
             htmlDialogMessage = $('<div/>', {
                 "class": "dialog-message dialog-part",
                 "id": "imgUpload-" + self.token,
             });
-
+            let htmlDialogImage = $('<div/>', {
+                "class": "dialog-imageViewer dialog-part",
+                "id": "imgViewer-" + self.token,
+            });
+            let img = $("<div class=\"dialog-imageContainer\"><img class=\"imagePreview userProfileImage\" src=\"/data/uploads/user_images/" + window.exploreUserId + "/" + window.exploreUserId +".jpg\" data-originalsrc = \"/data/uploads/user_images/" + window.exploreUserId + "/" + window.exploreUserId +".jpg\"></div>");
             htmlDialogConfirmButton.text("Speichern");
+            htmlDialogConfirmButton.addClass("has-tooltip")
+            htmlDialogImage.append(img)
+
+            var tooltipConfirmDisabled = $('<span/>', {
+                "class": "tooltip",
+                "text": "Kein Bild zum Upload gewählt"
+            });
+            htmlDialogConfirmButton.append(tooltipConfirmDisabled);
 
             htmlDialogButtons.append(htmlDialogConfirmButton, htmlDialogCancelButton, htmlDialogButtonClear);
-            htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogMessage, htmlDialogButtons));
+            htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogImage, htmlDialogMessage, htmlDialogButtons));
             htmlLidlDialog.append(htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
+
             $('body').append(htmlLidlDialog);
+            self.disableConfirm();
             return htmlLidlDialog;
         }
 
@@ -205,12 +223,14 @@
     };
 
     var confirmDialog = function(self){
+        if (!self.allowConfirm) return false;
         var args = self.args;
         var res = self;
-        args.callback.onConfirm(res);
+        self.callback.onConfirm(res);
     };
 
-    var confirmAndClose = function(self){
+    var confirmAndClose = function(self ){
+        if (!self.allowConfirm) return false;
         confirmDialog(self);
         closeDialog(self.htmlDialog);
     };
@@ -245,6 +265,10 @@
     lidl.Dialog.prototype.closeDialog = function(){
         closeDialog(this.htmlDialog);
     };
+    lidl.Dialog.prototype.cancelDialog = function(){
+        closeDialog(this.htmlDialog);
+        this.callback.onCancel();
+    };
 
     lidl.Dialog.prototype.confirmDialog = function(){
         confirmDialog(this);
@@ -253,5 +277,35 @@
     lidl.Dialog.prototype.confirmAndClose = function(){
         confirmAndClose(this);
     };
+
+    lidl.Dialog.prototype.setCallback = function(cb){
+        this.callback = verifyCallback(cb);
+    }
+
+    lidl.Dialog.prototype.enableConfirm = function(){
+        this.confirmBtn.removeClass("btn-disabled");
+        this.allowConfirm = true;
+    }
+
+    lidl.Dialog.prototype.disableConfirm = function(){
+        this.confirmBtn.addClass("btn-disabled");
+        this.allowConfirm = false;
+    }
+
+    lidl.Dialog.prototype.reset = function(){
+        //not implemented
+    }
+
+    let verifyCallback = function(callback) {
+        function isFunction(functionToCheck) {
+            return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+        }
+        let cb = {};
+        //validate
+        if (callback === undefined) callback = {};
+        cb.onConfirm = isFunction(callback.onConfirm) ? callback.onConfirm : function(){return false};
+        cb.onCancel = isFunction(callback.onCancel) ? callback.onCancel : function(){return false};
+        return cb;
+    }
 }
 (lidl = window.lidl || {},jQuery));
