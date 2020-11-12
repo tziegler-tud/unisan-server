@@ -42,7 +42,7 @@
         this.content = content;
 
         this.args = args;
-        this.callback = verifyCallback(callback);
+        this.callback = verifyCallback(callback, args);
 
         this.typeInt = getTypeInt(this,type);
 
@@ -94,6 +94,10 @@
             "class": "lidl-dialog"
         });
 
+        var bgHelper = $('<div/>', {
+            "class": "lidl-dialog-background"
+        });
+
         var htmlDialogInner = $('<div/>', {
             "class": "dialog-container-inner"
         });
@@ -114,8 +118,14 @@
 
         var htmlDialogTitle = $('<div/>', {
             "class": "dialog-title dialog-part",
+        });
+
+        var htmlDialogTitleInner = $('<span/>', {
+            "class": "",
             "text": self.content.title + self.content.titleArg
         });
+
+        htmlDialogTitle.append(htmlDialogTitleInner);
 
         var htmlDialogMessage = $('<div/>', {
             "class": "dialog-message dialog-part",
@@ -130,7 +140,7 @@
             "id": "confirmBtn"+self.token,
             "class": "dialog-button dialog-confirm",
             "text": "Bestätigen"
-        }).on('click', function(e){confirmDialog(self, e)});
+        }).on('click', function(e){confirmAndClose(self, e)});
 
         var htmlDialogCancelButton = $('<div/>', {
             "class": "dialog-button dialog-cancel",
@@ -141,10 +151,11 @@
             "class": "clear",
         });
 
-        self.title = htmlDialogTitle;
+        self.title = htmlDialogTitleInner;
         self.message = htmlDialogMessage;
         self.confirmBtn = htmlDialogConfirmButton;
         self.cancelBtn = htmlDialogCancelButton;
+        self.overlay = bgHelper;
 
         // type-dependent html & wrap-up
 
@@ -154,7 +165,7 @@
 
             htmlDialogButtons.append(htmlDialogConfirmButton, htmlDialogCancelButton, htmlDialogButtonClear);
             htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogMessage, htmlDialogButtons));
-            htmlLidlDialog.append(htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
+            htmlLidlDialog.append(bgHelper, htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
             $('body').append(htmlLidlDialog);
             return htmlLidlDialog;
         }
@@ -165,7 +176,7 @@
 
             htmlDialogButtons.append(htmlDialogConfirmButton, htmlDialogCancelButton, htmlDialogButtonClear);
             htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogMessage, htmlDialogButtons));
-            htmlLidlDialog.append(htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
+            htmlLidlDialog.append(bgHelper, htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
             $('body').append(htmlLidlDialog);
             return htmlLidlDialog;
         }
@@ -195,7 +206,7 @@
 
             htmlDialogButtons.append(htmlDialogConfirmButton, htmlDialogCancelButton, htmlDialogButtonClear);
             htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogImage, htmlDialogMessage, htmlDialogButtons));
-            htmlLidlDialog.append(htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
+            htmlLidlDialog.append(bgHelper, htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
 
             $('body').append(htmlLidlDialog);
             self.disableConfirm();
@@ -215,7 +226,7 @@
 
             htmlDialogButtons.append(htmlDialogConfirmButton, htmlDialogCancelButton, htmlDialogButtonClear);
             htmlDialogBox.append(htmlDialogBoxInner.append(htmlDialogTitle, htmlDialogMessage, htmlDialogButtons));
-            htmlLidlDialog.append(htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
+            htmlLidlDialog.append(bgHelper, htmlDialogInner.append(htmlDialogWrapper.append(htmlDialogBox)));
             $('body').append(htmlLidlDialog);
             return htmlLidlDialog;
         }
@@ -235,16 +246,53 @@
         closeDialog(self.htmlDialog);
     };
 
-    var openDialog = function(target){
-        $(target).each(function(){
+    var openDialog = function(self){
+        //prevent interaction with background
+        $(self.overlay).on("click", function(e){
+            e.stopPropagation();
+            self.cancelDialog();
+        })
+        document.body.classList.add("dialog-active")
+        $(self.htmlDialog).each(function(){
+            let self = this;
+            $(this).css({
+                "display": "block"
+            });
             $(this).addClass("dialog-active");
+            $(this).find(".dialog-wrapper")[0].animate([
+                // keyframes
+                { transform: 'translateX(100%)' },
+                { transform: 'translateX(0)' }
+            ], {
+                // timing options
+                duration: 250,
+                iterations: 1
+            });
+
         });
     };
 
     var closeDialog = function(target){
+        document.body.classList.remove("dialog-active")
         $(target).each(function() {
+            let ob = this;
             $(this).removeClass("dialog-active");
+            $(this).find(".dialog-wrapper")[0].animate([
+                // keyframes
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(100%)' }
+            ], {
+                // timing options
+                duration: 250,
+                iterations: 1
+            });
+            setTimeout(function(){
+                $(ob).css({
+                    "display": "none"
+                });
+            }, 250);
         });
+
     };
 
     var registerTarget = function(self, selector, target){
@@ -254,12 +302,12 @@
                 self.event = e;
                 self.title.text(self.content.title + (e.target.dataset.dialogtitlearg === undefined ? "" :  " " + e.target.dataset.dialogtitlearg));
                 self.message.text(self.content.message + (e.target.dataset.dialogbodyarg === undefined ? "" : " " + e.target.dataset.dialogbodyarg));
-                openDialog(target)});
+                openDialog(self)});
         })
     };
 
     lidl.Dialog.prototype.openDialog = function(){
-        openDialog(this.htmlDialog);
+        openDialog(this);
     };
 
     lidl.Dialog.prototype.closeDialog = function(){
@@ -296,9 +344,15 @@
         //not implemented
     }
 
-    let verifyCallback = function(callback) {
+    let verifyCallback = function(callback, args) {
         function isFunction(functionToCheck) {
             return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+        }
+        //for downwards compatibility, try to find callback in args object if callback obj is undefined
+        if (callback === undefined) {
+            if (args.callback !== undefined) {
+                callback = args.callback;
+            }
         }
         let cb = {};
         //validate

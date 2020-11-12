@@ -58,10 +58,15 @@ common = window.common;
 
     actions.removeDBKey = function(userid, keyIdentifier, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
+        args = (args == null) ? function(){} : args;
         var data = {
             key: keyIdentifier,
             value: value,
-            isArray: args.isArray
+            isArray: args.isArray,
+            args: {
+                noIndex: false,
+                arrayElementDbId: undefined,
+            }
         };
 
         $.ajax({

@@ -298,12 +298,13 @@ async function deleteKey(req, id, key, userParams) {
  * @param req {Object} express request
  * @param id {number} The id of the user to manipulate
  * @param key {String} key to delete, use string with dot-notation
- * @param arrayElementDbId {number} Id of the array element, if available
  * @param noIndex {Boolean} if set to false, assume key contains int denoting array index after last dot
+ * @param arrayElementDbId {number} Id of the array element, if available
+ *
  * @returns {Promise<void>}
  */
 
-async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
+async function deleteArrayElement(req, id, key, args) {
 
     const user = await User.findById(id);
 
@@ -315,22 +316,35 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
 
     // validate input
     if (!key) throw new Error('no key given');
+    if (args === undefined || typeof(args) !== 'object') args = {};
+    var noIndex = args.noIndex;
+    var arrayElementDbId = args.arrayElementDbId;
+    // if (arrayElementDbId === undefined) arrayElementDbId = 0;
+    if (noIndex === undefined) noIndex = false;
 
     let ojVal = undefined;
     let logKey = key;
 
     var array;
+    var parentArray;
+    var index;
+
     if(noIndex) {
         //key refers to array.
-        array = user.get(key);
+        parentArray = user.get(key);
+        if(arrayElementDbId === undefined) {
+            const e = "Failed to delete array element: Wrong parameter settings.";
+            console.error(e);
+            throw new Error(e);
+        }
     }
     //check if valid index is given. Assume key is of form: key.index
     else {
         try {
             //key refers to array element. We need to find the parent array.
-            array = user.get(key).parentArray();
+            parentArray = user.get(key).parentArray();
             let keyPos = key.lastIndexOf(".");
-            let index = parseInt(key.substring(keyPos+1));
+            index = parseInt(key.substring(keyPos+1));
             //TODO: validate index using regex
             key = key.substring(0,keyPos);
         }
@@ -368,10 +382,11 @@ async function deleteArrayElement(req, id, key, arrayElementDbId, noIndex) {
         console.error(msg);
         throw new Error(msg);
     }
+    array = user.get(key)
 
     var updatedArray;
     // if array is indexed, we use id to remove the element
-    if (arrayElementDbId) {
+    if (arrayElementDbId !== undefined) {
         let rmObj = removeById(array, arrayElementDbId);
         updatedArray = rmObj.array;
         let el = rmObj.object;

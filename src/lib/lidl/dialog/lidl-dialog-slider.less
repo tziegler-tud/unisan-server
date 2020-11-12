@@ -1,0 +1,214 @@
+@import "../../../static/public/stylesheets/themes/generic/color-rules.less";
+@import "../../../static/public/stylesheets/themes/generic/variables.less";
+
+@col1: #00293c;
+@col2: #333;
+@col3: #c31d34;
+
+body.dialog-active{
+  overflow: hidden;
+  div {
+    overflow: hidden !important;
+  }
+}
+
+.lidl-dialog {
+  display:  none;
+  position: fixed;
+  top:      0;
+  left:     0;
+  width:    100vw;
+  height:   100vh;
+  z-index:  999;
+
+  .lidl-dialog-background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0;
+    background-color: rgba(0,0,0,0.8);
+    .transition(opacity, 250ms);
+  }
+  &.dialog-active {
+    //display: block !important;
+
+    .lidl-dialog-background {
+      opacity: 1;
+    }
+
+    .dialog-wrapper {
+
+    }
+  }
+
+  .dialog-container-inner {
+    position: absolute;
+    right: 0;
+    top: 0;
+    //width: 100%;
+    width: 80%;
+    height: 100vh;
+
+    @media @desktop, @tablet-landscape {
+      width: 40%;
+    }
+
+    .dialog-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      //right: -100%;
+      top: 0;
+
+
+
+      .dialog-box {
+
+        width: 100%;
+        height: 100vh;
+        background-color: #fff;
+        -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);
+
+        .dialog-box-inner {
+
+
+          .dialog-part {
+            padding: 1em;
+            display: block;
+
+          }
+
+          .dialog-title {
+            font-size: 120%;
+            color: @col2;
+            border-bottom: 1px solid #333;
+          }
+
+          .dialog-message {
+
+          }
+
+          .dialog-buttons {
+
+            .dialog-button {
+
+              float: left;
+              display: block;
+              padding: 3%;
+
+              width: 30%;
+
+              margin: 1em 8% 1em 8%;
+              border: 1px solid #333;
+
+              cursor: pointer;
+
+              &.dialog-confirm {
+                background-color: @col3;
+                color:            #FFF;
+                border:           none;
+                margin-right: 0;
+              }
+
+              &.dialog-cancel {
+                background-color: #FFF;
+                color:            @col2;
+
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+/* type-dependant style */
+
+.lidl-dialog.dialog-uploadImage {
+  .dialog-container-inner {
+    .dialog-wrapper {
+      .dialog-box {
+       .dialog-box-inner {
+          display: flex;
+          flex-flow: column nowrap;
+          height: 100%;
+          justify-content: flex-end;
+
+         .dialog-title {
+           flex: 0 0 auto;
+         }
+         .dialog-part.dialog-imageViewer {
+           flex: 1 1 auto;
+           display: flex;
+           flex-flow: row wrap;
+
+          .dialog-imageContainer {
+            flex: 0 0 100%;
+            position: relative;
+            max-width: 300px;
+            max-height: 300px;
+
+
+            @media @desktop, @tablet-landscape {
+              max-width: 50%;
+              max-height: 100%;
+            }
+
+            img {
+              position:absolute;
+              max-height: 100%;
+              //width: 100%;
+              max-width: 100%;
+              margin: auto;
+            }
+          }
+         }
+         .dialog-part.dialog-message {
+           flex: 0 0 auto;
+
+           .qq-uploader-selector {
+             min-height: 100px;
+             @media @desktop, @tablet-landscape {
+               min-height: 200px;
+             }
+           }
+           .qq-thumbnail-selector {
+             display: none;
+             @media @desktop, @tablet-landscape {
+               display: block;
+             }
+           }
+           .qq-upload-file-selector {
+             display: none;
+             width: auto;
+             padding: 5px 1em 5px 5px;
+           }
+           .qq-edit-filename-selector {
+             display: none;
+           }
+           .qq-edit-filename-icon-selector {
+             display: none;
+           }
+           .qq-upload-cancel-selector {
+             padding: .75em 1.5em;
+             margin: 10px;
+
+             color: #fff;
+             background-color: #00293c;
+             border: none;
+
+             &:hover {
+               background-color: #01334b;
+             }
+
+           }
+         }
+         .dialog-buttons {
+           flex: 0 0 auto;
+         }
+       }
+      }
+    }
+  }
+}

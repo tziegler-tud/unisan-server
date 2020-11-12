@@ -140,6 +140,13 @@ $(document).ready (function () {
                     dialog02.closeDialog();
                     dialog02.disableConfirm();
                     this.reset();
+                },
+                onCancel: function(){
+                    const prevItems = $(".imagePreview");
+                    prevItems.each(function(){
+                        const src = this.dataset.originalsrc;
+                        $(this).attr("src", src + "?t=" + new Date().getTime());
+                    })
                 }
             }
         });
