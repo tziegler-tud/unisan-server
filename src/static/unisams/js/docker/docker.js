@@ -4,6 +4,10 @@
      * @namespace: docker
      */
 
+
+    var phone = window.matchMedia("only screen and (max-width: 50em)");
+
+
     /**
      * typedef Constructor arguments
      * @typedef {Object} dockerArgs
@@ -22,10 +26,8 @@
      * // TODO: Make argument calls explicit and annotate
      * @constructor
      *
-     * @returns Docker
+     * @returns {Docker}
      */
-
-
     docker.Docker = function(dockerArgs){
 
         dockerArgs = applyArgs(dockerArgs);
@@ -38,23 +40,62 @@
         // build templating context
         let context = {};
         let self = this;
-        // render template
+        // render container template
         $.get('/static/unisams/js/docker/templates/docker-container.hbs', function (data) {
             var template = Handlebars.compile(data);
-            self.wrapper.innerHTML= template(context);
+            self.wrapper.innerHTML = template(context);
+            self.innerContainer = document.getElementById("docker-inner");
 
-            //initially setup dom elements
-            const container = document.getElementById(dockerArgs.activeContainer);
-            const el = document.getElementById(dockerArgs.activeElementId);
-            if(el) activateElement(container, el);
+            // create new observer
+            var observer = new lidl.Observer(function(user){
+                window.currentExploredUser = user;
+            });
 
-            self.elementContainer = findElementContainer();
-            initEventHandlers(self);
+            // get user data from user service
+            //subscribe as observer to get notification if user changes on server
+            window.currentUserProfile.getUserAndSubscribe(observer)
+                .then(function(user){
+                    buildDocker(user)
+                })
+                .catch(function(reason){
+                    console.error("Failed to retrieve user data:" + reason)
+                });
 
-            //enable subpages
-            self.subpagesEnabled = true;
-            self.ready = true;
-            self.resolveObserver(true);
+            var buildDocker = function(user){
+                var domElementsPromise = new Promise(function(){});
+                //render docker content depending on device
+                //desktop/tablet: render static docker
+                if(!phone.matches) {
+                    domElementsPromise = $.get('/static/unisams/js/docker/templates/docker-desktop.hbs', function (data) {
+                        var template = Handlebars.compile(data);
+                        $(self.innerContainer).append(template(context));
+                    });
+                }
+                else {
+                    domElementsPromise = new common.Drawer({user: user});
+                    //enable drawer
+                    document.getElementById("docker-top-btn").addEventListener("click", function() {
+                        window.drawer.open = !window.drawer.open;
+                    })
+                }
+                domElementsPromise.then(function(){
+                    //initially setup dom elements
+                    const container = document.getElementById(dockerArgs.activeContainer);
+                    const el = document.getElementById(dockerArgs.activeElementId);
+                    if (el) activateElement(container, el);
+
+                    self.elementContainer = findElementContainer();
+                    initEventHandlers(self);
+
+                    //enable subpages
+                    self.subpagesEnabled = true;
+                    self.ready = true;
+                    self.resolveObserver(true);
+                })
+                    .catch(function(){
+                        console.error("failed to create drawer");
+                    })
+            }
         });
 
         this.subpageHandler = {
@@ -131,7 +172,6 @@
     };
 
     const initEventHandlers = function(dockerInstance){
-
         const self = dockerInstance;
         //add onclick handlers to docker elements
         $(".docker-subElement").on('click', function(e) {
@@ -269,6 +309,10 @@
         }
     };
 
+    /**
+     *
+     * @param args
+     */
     docker.Docker.prototype.applyArgs = function(args){
         applyArgs(args)
     };

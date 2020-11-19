@@ -43,6 +43,13 @@
                             <label class="float" for="userkey-value">Wert</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip">Aktuell können eigene Werte nur als Text gespeichert werden. Weitere Datentypen sind für die Zukunft geplant.</span></div>
                             <input class="common-input" id="userkey-value" name="userkey-value" type="text"/>
                         </div>
+
+                        {{#ifEquals contactEntry.type "email" }}
+                            <div class="ak-item ak-value">
+                                <input class="common-input float " id="default-checkbox" name="default-checkbox" type="checkbox" {{#if contactEntry.default}}checked{{/if}}/>
+                                <div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip">Nutzung für Login, Systemmeldungen und in Emailverteilern.</span></div><label class="float" for="default-checkbox">Als Hauptadresse verwenden</label>
+                            </div>
+                        {{/ifEquals}}
                     </div>
                 </div>
             </div>

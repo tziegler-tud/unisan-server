@@ -6,7 +6,7 @@
 
     var observers = [];
 
-    /**
+    /***
      * Constructor of event element. Instantiate this for one call of a event-related request.
      *
      * Singleton
@@ -28,7 +28,7 @@
 
     };
 
-    /**
+    /***
      *
      * @type {{resolve: resolve, subscribe: (function(): Promise<Object|String>), subscribers: {resolve: [], reject: []}, reject: reject, isActive: boolean}}
      */

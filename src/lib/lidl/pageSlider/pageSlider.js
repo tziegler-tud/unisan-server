@@ -45,6 +45,7 @@
             this.addEventListener("click", function(e){
                 //validate
                 if(!self.pages[self.currentPage].checkRequiredFields()) return false;
+                if(!self.pages[self.currentPage].validate()) return false;
                 self.pages[self.currentPage].save();
                 self.nextPage();
             })
@@ -124,7 +125,9 @@
         this.container = {};
         var self = this;
         var objects = [];
+        this.validators = [];
         this.onSave = function(){
+            return true;
         };
 
         this.setContainer = function(c){
@@ -176,6 +179,10 @@
             container.classList.remove("page-active");
         }
 
+        this.addCustomValidator = function(func, callback) {
+            this.validators.push({function: func, callback: callback});
+        }
+
         this.checkRequiredFields = function(){
             let valid = true;
             //find all inputs
@@ -198,6 +205,29 @@
             })
             return valid;
         }
+
+        this.validate = function(){
+            var valid = true;
+            this.validators.forEach(function(validator){
+                //execute validator function
+                try {
+                    if(validator.function()) {
+                        validator.callback.onSuccess()
+                    }
+                    else {
+                        validator.callback.onFailure();
+                        valid = false;
+                    }
+                }
+                catch(e) {
+                    console.error("callback error: " + e)
+                    return false;
+                }
+            })
+            return valid;
+        }
+
+
 
         return this;
     }

@@ -26,7 +26,7 @@ $(document).ready (function () {
 
 
     function buildPage(user) {
-        window.DockerElement = new docker.Docker(window.dockerArgs);
+        // window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("user", user);
         currentExploredUser = user;
         var userid = window.exploreUserId;
@@ -374,6 +374,7 @@ $(document).ready (function () {
                     field: field,
                     user: currentExploredUser,
                     type: field.type,
+                    default: field.default,
                     callback: {
                         onConfirm: function (userid, key, value, args) {
                             profile.updateDBKey(key, value, args, function () {

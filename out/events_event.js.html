@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: events/event.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: events/event.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>(function (eventRequest, $, undefined) {
+// data aggregation for all the event linked scripts.
+//obviously, we need to fetch the event. Might reduce data to the one really needed later on by using a dedicated api call.
+
+
+
+    var observers = [];
+
+    /***
+     * Constructor of event element. Instantiate this for one call of a event-related request.
+     *
+     * Singleton
+     *
+     * @constructor
+     *
+     */
+
+    eventRequest.Event = function(eventId, args){
+        // find the event id
+        this.currentViewedEvent= {};
+        this.currentViewedEvent.id = eventId;
+
+        this.args = args;
+        return this;
+    };
+
+    eventRequest.init = function(){
+
+    };
+
+    /***
+     *
+     * @type {{resolve: resolve, subscribe: (function(): Promise&lt;Object|String>), subscribers: {resolve: [], reject: []}, reject: reject, isActive: boolean}}
+     */
+    var pendingUserRequest = {
+        isActive: false,
+        subscribers: {
+            resolve: [],
+            reject: [],
+        },
+        subscribe: function(){
+            // allow subscribing to request while it is pending.
+            let res;
+            let rej;
+            let p = new Promise(function(resolve,reject){
+                res = resolve;
+                rej = reject;
+            });
+            this.subscribers.resolve.push(res);
+            this.subscribers.reject.push(rej);
+            return p;
+        },
+        resolve: function(context){
+            this.isActive=false;
+            //push result to all subscribers.
+            this.subscribers.resolve.forEach(function(el){
+                el(context);
+            });
+            this.subscribers.resolve = [];
+            this.subscribers.reject = [];
+        },
+        reject: function(context){
+            this.isActive=false;
+            //push result to all subscribers.
+            this.subscribers.reject.forEach(function(el){
+                el(context);
+            });
+            this.subscribers.resolve = [];
+            this.subscribers.reject = [];
+        },
+    };
+
+    var getEventFromServer = function(eventId){
+        pendingUserRequest.isActive = true;
+        let url = "/api/v1/eventmod/" + eventId + "/populateParticipants";
+        return new Promise(function(resolve, reject){
+            $.ajax({
+                url: url,
+                type: 'GET',
+                cache: false,
+                isModified: false,
+                data: {},
+                success: function (context) {
+                    pendingUserRequest.resolve(context);
+                    resolve(context);
+                },
+                error: function(context){
+                    pendingUserRequest.reject(context.status);
+                    reject(context);
+                }
+            });
+        })
+    };
+
+
+
+    var subscribeToPendingRequest = function(){
+        return new Promise(function(resolve,reject){
+            if(!pendingUserRequest) reject("No pending user request.");
+            else {
+
+            }
+        })
+    };
+
+    /**
+     *
+     * Service function to get the user data. Only one api call is done at a time.
+     *
+     * @params subscribe {Boolean}
+     * @params obj {Object} subscribing object. Must implement a "update" function
+     *
+     * @returns {Promise&lt;Object|String>}
+     */
+    eventRequest.Event.prototype.getEvent = function(){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            let returnEvent = function (event) {
+                self.currentViewedEvent.event = event;
+                resolve(self.currentViewedEvent.event);
+            };
+            let fail = function (reason) {
+                reject(reason);
+            };
+          if (self.currentViewedEvent.event === undefined) {
+              // check if request is already pending
+              if (pendingUserRequest.isActive) {
+                  pendingUserRequest.subscribe()
+                      .then(function(context){
+                          returnEvent(context)
+                      })
+                      .catch(function(reason){
+                          fail(reason)
+                      })
+              }
+              else {
+                  getEventFromServer(self.currentViewedEvent.id)
+                      .then(function(context){
+                          returnEvent(context)
+                      })
+                      .catch(function(reason){
+                          fail(reason)
+                      })
+              }
+          }
+          else {
+              resolve(self.currentViewedEvent.event)
+          }
+        });
+
+    };
+
+    /**
+     *
+     * Service function to get the user data. Only one api call is done at a time.
+     * Callee is subscribed as observer to be notified if user data changes
+     *
+     * @params subscribe {Boolean}
+     * @params obj {Object} subscribing object. Must implement a "update" function
+     *
+     * @returns {Promise&lt;Object|String>}
+     */
+
+    eventRequest.Event.prototype.getEventAndSubscribe = function(observer){
+        observers.push(observer);
+        return this.getEvent();
+
+    };
+
+    eventRequest.Event.prototype.refreshEvent = function(){
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            let returnEvent = function (event) {
+                self.currentViewedEvent.event = event;
+                resolve(self.currentViewedEvent.event);
+            };
+            let fail = function (reason) {
+                reject(reason);
+            };
+            getEventFromServer(self.currentViewedEvent.id)
+                .then(function (context) {
+                    returnEvent(context)
+                })
+                .catch(function (reason) {
+                    fail(reason)
+                })
+        });
+    };
+
+    eventRequest.Event.prototype.notifyObservers = function(){
+        this.getEvent().then(function(event){
+            observers.forEach(function(ob){
+                ob.update(event)
+            })}
+        ).catch(function(){
+
+        });
+    };
+
+    eventRequest.Event.prototype.update = function(keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
+        var self = this;
+        var data = {
+            key: keyIdentifier,
+            value: value,
+            args: args,
+        };
+        $.ajax({
+            url: "/unisams/event/update/" + self.currentViewedEvent.id,
+            // make put for safety reasons :-)
+            type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                self.refreshEvent().then(function(){
+                    self.notifyObservers();
+                }).catch(reason => console.error(reason));
+                callback();
+            }
+        });
+    };
+
+    eventRequest.Event.prototype.checkIfUserIsRegistered = function(user){
+        let self = this;
+        let event = self.currentViewedEvent.event;
+        // create array of participants by id
+        try {
+            //check if array contains elements
+            if (event.participants.length > 0) {
+                var index = event.participants.map(e => e.user._id).indexOf(user.id);
+            }
+            //false if no user are registered
+            else return false;
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error("Exception:" + e);
+                console.error("Aborting operation to ensure data integrity.");
+                throw e;
+            } else {
+                console.error("Unhandled exception: " + e);
+                throw e;
+            }
+        }
+        return index > -1;
+    }
+
+return eventRequest;
+
+}(window.eventRequest = window.eventRequest||{}, jQuery));
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="common.html">common</a></li></ul><h3>Classes</h3><ul><li><a href="common.DropdownMenu.html">DropdownMenu</a></li><li><a href="common.EditableInputField.html">EditableInputField</a></li><li><a href="common.EditableTextField.html">EditableTextField</a></li><li><a href="common.Sidebar.html">Sidebar</a></li><li><a href="dialogContent.DialogContent.html">DialogContent</a></li><li><a href="docker.Docker.html">Docker</a></li><li><a href="profile.Profile.html">Profile</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Fri Nov 13 2020 15:56:35 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

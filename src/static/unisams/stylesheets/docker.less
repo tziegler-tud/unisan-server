@@ -242,109 +242,159 @@
 
         }
 
-        &.docker-container-active {
-          .docker-mainElement {
-
-            &:before {
-              width: 5px;
-            }
-          }
-
-        }
-        .docker-subElementContainer {
-          background-color: @docker-background-color2;
-        }
-
-        .docker-element {
-          cursor: pointer;
-          position: relative;
-
-          .transition(background-color, 300ms);
-
-          a {
-            padding: 1em 10%;
-            display: block;
-          }
-
-          &:before {
-            content: "";
-            width: 0;
-            height: 100%;
-
-            position: absolute;
-            top: 0;
-            left: 0;
-
-            background-color: @tabs-highlight-color;
-
-            .transition(width, 350ms);
-          }
-
-          &.docker-element-active {
-            &:before {
-              width: 5px;
-            }
-          }
-
-          &:hover {
-
-            background-color: @docker-hover-color;
-
-          }
-
-          &#docker-home {
-
-            box-shadow: 0 0 4px grey;
-            margin-bottom: 4px;
-
-            a {
-              padding: 25% 25%;
-              width: 50%;
-            }
-
-            img {
-              width: 100%;
-            }
-          }
-
-          svg {
-            color: @col1;
-            width: 1em;
-            display: block;
-            margin-right: 1em;
-            float: left;
-          }
-
-          span.docker-element-label {
-            display: block;
-            float: left;
-          }
-
-          &.docker-mainElement {
-            font-size: 100%;
-            border-bottom: 1px solid #AAA;
-          }
-
-          &.docker-subElement {
-            font-size: 90%;
-
-            a {
-              margin-left: 1em;
-            }
-
-            &:before {
-              background-color: @subtabs-highlight-color;
-            }
-            &:hover {
-              background-color: @docker-hover-color2;
-            }
-          }
-        }
-
       }
     }
   }
 }
+
+
+.docker-mobile, .docker-desktop {
+  position: relative;
+  .docker-mainPage {
+
+  }
+  .docker-subPage-container {
+    //position: absolute;
+    .docker-subpage {
+      &.subpage-active {
+        display: block;
+      }
+    }
+  }
+  .docker-elementContainer {
+
+    &.collapsing {
+
+      &.expanded {
+        .docker-mainElement {
+          border-bottom-width: 0 !important;
+        }
+
+        .docker-subElementContainer {
+
+          border-bottom: 1px solid #AAA;
+          height: auto;
+        }
+      }
+
+      .docker-subElementContainer {
+        overflow: hidden;
+        height: 0;
+        background-color: #f9f9f9;
+
+        @media @desktop, @tablet-landscape {
+          background-color: @docker-background-color2;
+        }
+
+        .transition(height, 500ms);
+      }
+
+    }
+
+    &.docker-container-active {
+      .docker-mainElement {
+
+        &:before {
+          width: 5px;
+        }
+      }
+
+    }
+
+    .docker-subElementContainer {
+      background-color: @docker-background-color2;
+    }
+
+    .docker-element {
+      cursor: pointer;
+      position: relative;
+
+      .transition(background-color, 300ms);
+
+      a {
+        padding: 1em 10%;
+        display: block;
+      }
+
+      &:before {
+        content: "";
+        width: 0;
+        height: 100%;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        background-color: @tabs-highlight-color;
+
+        .transition(width, 350ms);
+      }
+
+      &.docker-element-active {
+        &:before {
+          width: 5px;
+        }
+      }
+
+      &:hover {
+
+        background-color: @docker-hover-color;
+
+      }
+
+      &#docker-home {
+
+        box-shadow: 0 0 4px grey;
+        margin-bottom: 4px;
+
+        a {
+          padding: 25% 25%;
+          width: 50%;
+        }
+
+        img {
+          width: 100%;
+        }
+      }
+
+      svg {
+        color: @col1;
+        width: 1em;
+        display: block;
+        margin-right: 1em;
+        float: left;
+      }
+
+      span.docker-element-label {
+        display: block;
+        float: left;
+      }
+
+      &.docker-mainElement {
+        font-size: 100%;
+        border-bottom: 1px solid #AAA;
+      }
+
+      &.docker-subElement {
+        font-size: 90%;
+
+        a {
+          margin-left: 1em;
+        }
+
+        &:before {
+          background-color: @subtabs-highlight-color;
+        }
+
+        &:hover {
+          background-color: @docker-hover-color2;
+        }
+      }
+    }
+  }
+}
+
+
 
 /* color specific options */
 

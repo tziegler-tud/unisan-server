@@ -8,7 +8,9 @@ module.exports = {
         addUser: "./src/webpack/addUser.js",
         addUser_style: "./src/webpack/addUser.scss",
         addEvent: "./src/webpack/addEvent.js",
-        addEvent_style: "./src/webpack/addEvent.scss"
+        addEvent_style: "./src/webpack/addEvent.scss",
+        drawer: "./src/webpack/drawer.js",
+        drawer_style: "./src/webpack/drawer.scss"
     },
     output: {
         path: path.join(__dirname, "./src/dist"),

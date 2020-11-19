@@ -6,8 +6,11 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "@material/button": "^7.0.0",
-    "@material/textfield": "^7.0.0",
+    "@material/button": "^8.0.0",
+    "@material/drawer": "^8.0.0",
+    "@material/list": "^8.0.0",
+    "@material/textfield": "^8.0.0",
+    "@material/theme": "^8.0.0",
     "bcrypt": "^3.0.7",
     "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.4",

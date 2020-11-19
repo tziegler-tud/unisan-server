@@ -3,6 +3,22 @@
     var sidebar;
     common.sidebarCounter = 0;
 
+
+    /**
+     * @namespace: common
+     */
+
+    /**
+     *
+     * Constructor of sidebar object.
+     *
+     *
+     * @param {String} parentId  Id of sidebar container element
+     * @param {String}  content String denoting content type. Valid options are: ["user", "addUser", "UserChangeUsername", "UserAddDBKey", "UserAddContactDataKey", "UserAddGeneralDataKey", "UserUpdateDBKey", "UserUpdateContactKey", "UserViewDBKey", "UserAddQualification", "UserViewQualification", "UserUpdateQualification", "QualificationCreate", "QualificationUpdate", "eventDetails", "eventParticipants", "addEventParticipant", "addEventParticipant", "logDetails"]
+     * @param {String} [optionalId]  DOM Id of the sidebar object to be created. Optional, defaults to "sidebarX", where X is a unique integer for each sidebar created by this method.
+     * @returns {common.Sidebar}
+     * @constructor
+     */
     common.Sidebar = function(parentId, content, optionalId){
 
         common.sidebarCounter++;
@@ -28,6 +44,11 @@
         return this;
     };
 
+    /***
+     * adds content of a specific type
+     * @param {String} type string denoting the type of content to be rendered
+     * @param {Object} args args object. This is passed to subsequent methods.
+     */
     common.Sidebar.prototype.addContent = function(type, args){
         var self = this;
         self.currentPage = {
@@ -119,6 +140,10 @@
 
     };
 
+    /**
+     * toggles the sidebar activity state.
+     */
+
     common.Sidebar.prototype.toggle = function(){
 
         if(this.isActive){
@@ -135,6 +160,9 @@
         }
     };
 
+    /**
+     * shows the sidebar
+     */
     common.Sidebar.prototype.show = function(){
         this.sidebarHTML.addClass("sidebar-active");
         this.parent.addClass("sidebar-active");
@@ -143,6 +171,9 @@
         this.isActive = true;
     };
 
+    /**
+     * hides the sidebar
+     */
     common.Sidebar.prototype.hide = function(){
         this.sidebarHTML.removeClass("sidebar-active");
         this.parent.removeClass("sidebar-active");
@@ -151,6 +182,10 @@
         this.isActive = false;
     };
 
+
+    /**
+     * adds a highlighted error message to the sidebar
+     */
     common.Sidebar.prototype.addErrorMessage = function(msg, insertFunc, overwrite) {
 
         overwrite = (overwrite === undefined) ? false : overwrite;
@@ -633,11 +668,13 @@
         var catKey = args.catKey;
         var field = args.field;
         var type = args.type;
+        var isDefault = args.default;
         var onConfirm = args.callback.onConfirm;
         var onDelete = args.callback.onDelete;
 
         var res = {dataset: {}};
         res.exploreUser = args.user;
+        res.contactEntry = field;
         var corrupted = false;
 
         var isCustomEntry = false;
@@ -661,6 +698,7 @@
                 var r = document.getElementById("userkey-key");
                 var q = document.getElementById("userkey-category");
                 var v = document.getElementById("userkey-value");
+                var def = document.getElementById("default-checkbox");
 
                 registerBackButton(self, ".sidebar-back-btn");
                 registerConfirmButton(self, ".sidebar-confirm", function(){
@@ -676,7 +714,8 @@
                         value: v.value,
                         id: field._id,
                         title: r.options[r.selectedIndex].dataset.title,
-                        type: type
+                        type: type,
+                        default: def.checked,
                     };
                     if (sidebar.currentState.customEntryActive) {
                         val.title = document.getElementById("custom-type").value;

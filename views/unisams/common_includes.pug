@@ -32,6 +32,8 @@ script(src='/static/unisams/js/searchbar.js')
 script(src='/static/unisams/js/dropdownMenu.js')
 script(src='/static/unisams/js/docker/docker.js')
 
+script(src='/dist/drawer.js')
+
 if (user !== undefined)
     script.
         window.userId = "#{user._id}";
@@ -49,6 +51,8 @@ link(rel='stylesheet' type='text/css' href='/lib/jquery-ui-1.12.1/jquery-ui.css'
   ***********************************
 link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/preloader.css')
 link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/lssc_loader.css')
+link(rel='stylesheet' type='text/css' href='/dist/drawer.css')
+link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/drawer.css')
 //
   ***********************************
   ** no js fallback

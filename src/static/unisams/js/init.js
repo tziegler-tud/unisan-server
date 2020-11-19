@@ -2,8 +2,8 @@ var lidlRTO = window.lidlRTO;
 
 window.dockerArgs = {containerSelector: "nav-docker"};
 
-document.addEventListener("DOMContentLoaded", function(event) {
 
+document.addEventListener("DOMContentLoaded", function(event) {
     console.log("js active, removing noscript fallback");
     $("body").removeClass("no-js");
 
@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     lidlRTO.addManager(new lidl.ObjectManager(),true);
 
     lidl.addDebugCategory(lidl.debugCategory.FULL);
-
-    window.DockerElement = new docker.Docker(window.dockerArgs);
 
     Handlebars.registerHelper('transformDateString', function(dateString) {
         var myDate = new Date(dateString);
@@ -43,12 +41,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
     Handlebars.registerHelper('nextItem', function (array, index, options) {
         return options.fn(array[index + 1]);
     });
+    Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+        return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+    });
 
 
     //get current user
     var user;
     var profile = new window.profile.Profile(window.userId);
-
+    window.currentUserProfile = profile;
     // create new observer
     var observer = new lidl.Observer(function(u){
         user = u;
@@ -64,8 +65,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
             console.error("Failed to retrieve user data:" + reason)
         });
 
-    adjustWrapper();
+    window.DockerElement = new docker.Docker(window.dockerArgs);
 
+    adjustWrapper();
 });
 
 window.lidlRTO = lidlRTO;

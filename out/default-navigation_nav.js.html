@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: default-navigation/nav.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: default-navigation/nav.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ *
+ * lidl default navigation v1.0
+ *
+ * Setup:
+ *  //TODO: add setup instructions
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * @author: Tom Ziegler
+ *
+ *
+ * @namespace lidl
+ *
+ *
+ *************/
+
+(function (lidl,$,undefined) {
+    (function (nav,$,undefined) {
+
+    /*imports*/
+    var Hammer = window.Hammer;
+
+    /*config variables*/
+    var debug = false;
+
+
+
+    /*private variables*/
+    var navBarHeight = undefined;
+    var didScroll = false;
+    var lastScrollTop = 0;
+
+    var interval;
+    var mc;
+
+    /*scrollevent delay*/
+    var waiting = false;
+    var delay = 100;
+
+
+    /*enums*/
+    var componentEnum = {
+        NAVBAR: 0,
+        MENU:   1
+    };
+
+
+    /*public variables*/
+    var navBar = null;
+    var menu = null;
+
+    /*public functions*/
+
+
+
+
+    /**
+     * Constructor for Nav object. Call with 'new' keyword.
+     *
+     * @param {string} token lidl object token.
+     * @param {string} domId unique ID used to reference the navigation container in the DOM Tree.
+     * @param {string} domIdNavBar unique ID used to reference the header bar in the DOM Tree.
+     * @param {string} domIdMenu unique ID used to reference the menu in the DOM Tree.
+     *
+     * @returns {object} instance of the created object.
+     *
+     * @class
+     * @constructor
+     */
+
+    nav.Nav = function(token, domId, domIdNavBar, domIdMenu){
+        var self = this;
+        this.ref = document.getElementById(domId);
+        navBar = addComponent(domIdNavBar,componentEnum.NAVBAR);
+        menu = addComponent(domIdMenu,componentEnum.MENU);
+        this.token = token;
+        //mc = setupMc();
+
+        navBarHeight = navBar.getHeight();
+
+        lidl.assertHTMLElement(this.ref,debug);
+
+        adjust_menu(); //fails if called before dom loaded, but in that case gets called by event handler later on.
+        $(window).on('load',function() {
+            adjust_menu();
+        });
+        $(window).on('resize',function() {
+            adjust_menu();
+        });
+        window.addEventListener('scroll', function() {
+            if (waiting) {
+                return;
+            }
+            waiting = true;
+            if(!menu.getState()){
+                hasScrolled();
+            }
+            setTimeout(function () {
+                waiting = false;
+            }, delay);
+        });
+
+        this.getNavBar = function(){
+            return navBar;
+        };
+        this.getMenu = function(){
+            return menu;
+        };
+
+        document.getElementById("hamburger").addEventListener("click", function() {
+            this.classList.toggle("is-active");
+            toggleMenu();
+        }, false);
+    };
+
+    var toggleMenu = function(){
+        menu.toggle();
+    };
+
+    var adjust_menu = function(){
+            $(menu.ref).css({
+                "height": window.innerHeight - navBarHeight + 'px'
+            });
+            lidl.debug("console.log('setting menu height to '"+ window.innerHeight +"- " + navBarHeight,lidl.debugCategory.RESIZE);
+        };
+
+    var hasScrolled = function(){
+        var delta = 100;
+        var thresh = 3*navBar.getHeight();
+        var scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+        if(scrollTop &lt; thresh){
+            navBar.setState(true);
+        }
+        if(Math.abs(scrollTop - lastScrollTop) &lt; delta)//did not scroll
+        {
+            lidl.debug('console.log("did not scroll")',lidl.debugCategory.SCROLL);
+            return;
+        }
+        else{
+            if(scrollTop > lastScrollTop &amp;&amp; scrollTop > thresh) //scrolled down > thresh
+            {
+                lidl.debug('console.log("scroll down")',lidl.debugCategory.SCROLL);
+                navBar.setState(false);
+            }
+            else { //scrolled up or &lt; thresh
+                lidl.debug('console.log("scroll up")',lidl.debugCategory.SCROLL);
+                navBar.setState(true);
+            }
+        }
+
+        lastScrollTop = scrollTop;
+    };
+
+    var addComponent = function(domId,componentEnum){
+        var component;
+        var createComponent;
+        switch(componentEnum){
+            case 0:
+                component = navBar;
+                createComponent  = "nav.navComponent.navBar.NavBar";
+
+
+                break;
+            case 1:
+                component = menu;
+                createComponent  = "nav.navComponent.menu.Menu";
+
+
+                break;
+        }
+        if (component!=null &amp;&amp; component.isUnique) {
+            throw new Error("Object instance already assigned: An instance of the target class has already been assigned and carries the isUnique flag.")
+        }
+        else {
+            return eval("new "+ createComponent + "('" + domId + "')");
+        }
+    };
+
+    return nav;
+
+
+    }(lidl.nav = window.lidl.nav || {}, jQuery));
+
+}(lidl = window.lidl || {},jQuery));</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="lidl.html">lidl</a></li></ul><h3>Classes</h3><ul><li><a href="lidl.Button.html">Button</a></li><li><a href="lidl.Buttongroup.html">Buttongroup</a></li><li><a href="lidl.Dialog.html">Dialog</a></li><li><a href="lidl.Imagebox.html">Imagebox</a></li><li><a href="lidl.LidlManager.html">LidlManager</a></li><li><a href="lidl.Main.html">Main</a></li><li><a href="lidl.ObjectManager.html">ObjectManager</a></li><li><a href="lidl.Observer.html">Observer</a></li><li><a href="lidl.Slider.html">Slider</a></li><li><a href="menu.Menu.html">Menu</a></li><li><a href="nav.Nav.html">Nav</a></li><li><a href="navBar.NavBar.html">NavBar</a></li><li><a href="navComponent.NavComponent.html">NavComponent</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Fri Nov 13 2020 15:29:50 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

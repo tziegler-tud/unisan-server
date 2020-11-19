@@ -56,6 +56,35 @@ function buildPageSlider(container) {
             var template = Handlebars.compile(data);
             let page2 = pageslider.addPage(template());
 
+            const pwField = new MDCTextField(document.querySelector('#password'));
+            const pwCheck = new MDCTextField(document.querySelector('#passwordCheck'));
+            const pwCheckHelper = new MDCTextFieldHelperText(document.querySelector('#passwordCheck-helper'));
+            page2.addCustomValidator(function(){
+                    //entered pwds must match
+                    let pw1 = document.getElementById("eventinp-password").value;
+                    let pw2 = document.getElementById("eventinp-passwordCheck").value;
+                    // if (pw1 !== pw2) {
+                    //     return false
+                    // }
+                    return (pw1 === pw2);
+                },
+                {
+                    onSuccess: function(){ return true},
+                    onFailure: function(){
+                        // let pw2 = document.getElementById("eventinp-passwordCheck");
+                        // pw2.setCustomValidity("passwords do not match");
+                        // pw2.reportValidity();
+                        if(pwCheck.value.length === 0) {
+                            pwCheck.helperTextContent = "Passwort wiederholen";
+                            pwCheck.valid = false;
+                        }
+                        else {
+                            pwCheck.helperTextContent = "Passwörter stimmen nicht überein";
+                            pwCheck.valid = false;
+                        }
+                    }
+                });
+
             //get third page
             $.get('/static/unisams/js/user/templates/webpack/addUser-details.hbs', function (data) {
                 var template = Handlebars.compile(data);
@@ -83,13 +112,13 @@ function buildPageSlider(container) {
                     // const textFields = [].map.call(document.querySelectorAll('.mdc-input'), function(el) {
 
 
-                    const textFields = [].map.call(document.querySelectorAll('.mdc-text-field'), function(el) {
+                    const textFields = [].map.call(document.querySelectorAll('.mdc-text-field-selector'), function(el) {
                         return new MDCTextField(el);
                     });
 
                     // const helperText = new MDCTextFieldHelperText(document.querySelector('.mdc-text-field-helper-text'));
 
-                    const helperFields = [].map.call(document.querySelectorAll('.mdc-text-field-helper-text'), function(el) {
+                    const helperFields = [].map.call(document.querySelectorAll('.mdc-text-field-helper-text-selector'), function(el) {
                         return new MDCTextFieldHelperText(el);
                     });
                     const icon = new MDCTextFieldIcon(document.querySelector('.mdc-text-field-icon'));
