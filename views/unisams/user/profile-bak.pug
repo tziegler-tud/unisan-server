@@ -1,0 +1,188 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    script(src="/static/unisams/js/userprofile/userprofile.js")
+    script(src="/static/unisams/js/userprofile/profile.js")
+    script(src="/static/unisams/js/userprofile/viewUser.js")
+    script(src="/static/unisams/js/userprofile/updateUser.js")
+    script(src="/static/unisams/js/userprofile/init.js")
+    script(src="/static/unisams/js/actions.js")
+
+    script(src="/lib/fineUploader/fine-uploader.js")
+    link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script.
+        window.exploreUserId = "#{exploreUser.id}";
+        window.dockerArgs.activeContainer = "userprofileContainer";
+        window.dockerArgs.activeElementId = "userprofile";
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .userimg-container.sec-heading-img
+                                .userimg
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/user_images/" + exploreUser.id + "/" + exploreUser.id + ".jpg")
+
+                            .sec-heading-label.userprofile-heading
+                                .userprofile-heading-container
+                                    h3=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
+                                    .userprofile-dropdown.dropdown-menu
+                                        .dropdown-btn
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+
+                                            .dropdown-container
+                                                if allowedit
+                                                    .dropdown-entry
+                                                        a.before-icon.icon-edit(href="/unisams/user/edit/"+refurl) Akte bearbeiten
+                                                    .dropdown-entry.dropdown-entry-disabled.has-tooltip
+                                                        a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
+                                                        span.tooltip Bearbeitung aktivieren, um Mitglied zu entfernen
+                                    .clear
+                            .clear
+                        #content1-text.sec-content
+                            .subpage-content
+                                .userinfo-container
+                                    #tabnav-container
+                                        ul
+                                            li
+                                                a(href="#tab-userinfo-general")
+                                                    span Allgemeine Informationen
+                                            li
+                                                a(href="#tab-userinfo-qualification")
+                                                    span Qualifikationen
+                                            li
+                                                a(href="#tab-userinfo-role")
+                                                    span Rechte und Rollen
+                                            li
+                                                a(href="#tab-userinfo-other")
+                                                    span Anderes
+
+                                        #tab-userinfo-general.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span unisams
+                                                .userinfo-item
+                                                    span.userinfo-item-label.userinfo-attribute-name Username:
+                                                    span.userinfo-item-label= exploreUser.username
+                                                .userinfo-item
+                                                    span.userinfo-item-label.userinfo-attribute-name id:
+                                                    span.userinfo-item-label= exploreUser.id
+
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Allgemeine Daten
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
+                                                        if exploreUserDocument.generalData
+                                                            - var secKey = "generalData"
+                                                            - var secVal = exploreUserDocument.generalData
+                                                            each val, key in secVal
+                                                                - var title = val.title
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val.value
+                                                                if (!Array.isArray(val))
+                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey=key, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                        a.inner()
+                                                                            .item-property.userkey-entry-title
+                                                                                span= title
+                                                                            .item-property.userkey-entry-value
+                                                                                span= value
+                                                                            .clear
+                                                            if exploreUserDocument.generalData.customData
+                                                                - var subKey = 'customData'
+                                                                - var subsecKey = secKey + '.' + subKey
+                                                                - var subsecVal = exploreUserDocument.generalData.customData
+                                                                each val, key in subsecVal
+                                                                    - var title = val.title
+                                                                    - var combinedKey = subsecKey + "." + key
+                                                                    - var value = val.value
+                                                                    li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
+                                                                        a.inner()
+                                                                            .item-property.userkey-entry-title
+                                                                                span= title
+                                                                            .item-property.userkey-entry-value
+                                                                                span= value
+                                                                            .clear
+
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Kontaktdaten
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
+                                                        if exploreUserDocument.contactData
+                                                            - var secKey = "contactData"
+                                                            - var secVal = exploreUserDocument.contactData
+                                                            each val, key in secVal
+                                                                - var title = (val.title)
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val.value
+                                                                li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray= true, data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-value=value)
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
+
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span weitere Daten
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.itemlist-noSelect.userinfo-itemList
+                                                        if exploreUserDocument.customData
+                                                            - var secKey = "customData"
+                                                            - var secVal = exploreUserDocument.customData
+                                                            each val, key in exploreUserDocument.customData
+                                                                - var title = val
+                                                                - var combinedKey = secKey + "." + key
+                                                                - var value = val
+                                                                li.user-entry.userkey-entry()
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= title
+                                                                        .item-property.userkey-entry-value
+                                                                            span= value
+                                                                        .clear
+
+                                        #tab-userinfo-qualification.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Qualifikationen
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList.qualificationList.border
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property Typ
+                                                                .item-property Bezeichnung
+                                                        if exploreUserDocument.qualifications
+                                                            each val in exploreUserDocument.qualifications
+                                                                li.user-entry.quallist-entry(id= "qualId" + val.id data-qualificationid= val.id)
+                                                                    a.inner()
+                                                                        .item-property= val.qualification.qualType
+                                                                        .item-property= val.qualification.name
+
+                                        #tab-userinfo-role.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Rollen
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList.qualificationList.border
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property Gruppe
+                                                        if exploreUserDocument.userGroups
+                                                            each val in exploreUserDocument.userGroups
+                                                                li.user-entry
+                                                                    a.inner()
+                                                                        .item-property= val.title
+
+                                        #tab-userinfo-other.userinfo-inner
+                                            .userinfo-section
+                                                .userinfo-sectionheader
+                                                    span Anderes
+                                                div

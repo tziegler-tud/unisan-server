@@ -35,7 +35,7 @@ $(document).ready (function () {
 
             addDBKey_sidebar.addContent('UserViewQualification', {
                     userid: user.id,
-                    qualificationId: self.dataset.qualificationid,
+                    qualificationId: self.dataset.keyid,
                     callback: {
                         onConfirm: function(){
                         },
@@ -45,12 +45,45 @@ $(document).ready (function () {
             addDBKey_sidebar.show();
         });
 
+        let listContainer = document.getElementById("qualification-list")
+        let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
+            listItem: {
+                onClick: function(e){
+                    e.preventDefault();
+                    var self = e.currentTarget;
+
+                    addDBKey_sidebar.addContent('UserViewQualification', {
+                            userid: user.id,
+                            qualificationId: self.dataset.keyid,
+                            callback: {
+                                onConfirm: function(){
+                                },
+                            },
+                        },
+                    );
+                    addDBKey_sidebar.show();
+                }
+            }
+        });
+
+        const token2 = lidlRTO.objectManager.createNewObjectToken();
+        const dialog02 = new lidl.Dialog(token2, ".viewProfilePicture", 'imageUpload',
+            {title: "Mitgliedsakte: Passbild"},
+            {
+            userid: user.id,
+            callback: {
+                onConfirm: function () {
+                }
+            }}
+            , {});
+        lidlRTO.objectManager.addObject(dialog02, token2);
+
         // $(".userkey-entry").on("click", function(e) {
         //     e.preventDefault();
         //     var self = this;
         //
         //     addDBKey_sidebar.addContent('UserViewDBKey', {
-        //             userid: userid,
+        //             userid: user.id,
         //             keyId: self.dataset.keyid,
         //             key: self.dataset.key,
         //             catKey: self.dataset.catkey,

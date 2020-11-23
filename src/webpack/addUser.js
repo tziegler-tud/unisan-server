@@ -7,7 +7,7 @@ $(document).ready (function () {
     //setupTimePickerWidget()
 
     let pagesliderContainer = document.getElementById("pageslider-container-01");
-    $.get('/static/unisams/js/user/templates/addUser-container.hbs', function (data) {
+    $.get('/static/unisams/js/user/templates/webpack/addUser-container.hbs', function (data) {
         var template = Handlebars.compile(data);
         pagesliderContainer.innerHTML = template();
         buildPageSlider(pagesliderContainer);
@@ -47,7 +47,7 @@ function buildPageSlider(container) {
     });
 
     //get first page
-    $.get('/static/unisams/js/user/templates//webpack/addUser-general.hbs', function (data) {
+    $.get('/static/unisams/js/user/templates/webpack/addUser-general.hbs', function (data) {
         var template = Handlebars.compile(data);
         let page1 = pageslider.addPage(template());
 
@@ -60,27 +60,48 @@ function buildPageSlider(container) {
             const pwCheck = new MDCTextField(document.querySelector('#passwordCheck'));
             const pwCheckHelper = new MDCTextFieldHelperText(document.querySelector('#passwordCheck-helper'));
             page2.addCustomValidator(function(){
-                    //entered pwds must match
+                    /*
+                    resons:
+                        1 - pwds do not match
+                        2 - pwcheck empty
+                        2 - regex not passed
+                     */
+                    let result = {state: true, reason: 0}
                     let pw1 = document.getElementById("eventinp-password").value;
                     let pw2 = document.getElementById("eventinp-passwordCheck").value;
-                    // if (pw1 !== pw2) {
-                    //     return false
-                    // }
-                    return (pw1 === pw2);
+                    //entered pwds must match
+                    if (pw1 !== pw2) {
+                        result = {state: false, reason: 1}
+                    }
+                    if (pwCheck.value.length === 0) result = {state: false, reason: 2}
+                    //pw must have 8 characters and min 1 number
+                    let pwReg = new RegExp("^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})");
+                    if (!pwReg.test(pw1))  result = {state: false, reason: 3};
+
+                    return result;
                 },
                 {
                     onSuccess: function(){ return true},
-                    onFailure: function(){
-                        // let pw2 = document.getElementById("eventinp-passwordCheck");
-                        // pw2.setCustomValidity("passwords do not match");
-                        // pw2.reportValidity();
-                        if(pwCheck.value.length === 0) {
-                            pwCheck.helperTextContent = "Passwort wiederholen";
-                            pwCheck.valid = false;
-                        }
-                        else {
-                            pwCheck.helperTextContent = "Passwörter stimmen nicht überein";
-                            pwCheck.valid = false;
+                    onFailure: function(reason){
+                        switch(reason){
+                            case 1:
+                                pwCheck.helperTextContent = "Passwörter stimmen nicht überein";
+                                pwCheck.valid = false;
+                                break;
+                            case 2:
+                                pwCheck.helperTextContent = "Passwort wiederholen";
+                                pwCheck.valid = false;
+                                break;
+                            case 3:
+                                pwField.helperTextContent = "Mindestens 8 Zeichen, davon mind. 1 Zahl und 1 Buchstabe";
+                                pwCheck.helperTextContent = "Passwort wiederholen";
+                                pwField.valid = false;
+                                pwCheck.valid = false;
+                                break;
+                            default:
+                                pwCheck.helperTextContent = "failed. Error" + reason;
+                                pwCheck.valid = false;
+                                break;
                         }
                     }
                 });
@@ -121,7 +142,7 @@ function buildPageSlider(container) {
                     const helperFields = [].map.call(document.querySelectorAll('.mdc-text-field-helper-text-selector'), function(el) {
                         return new MDCTextFieldHelperText(el);
                     });
-                    const icon = new MDCTextFieldIcon(document.querySelector('.mdc-text-field-icon'));
+                    // const icon = new MDCTextFieldIcon(document.querySelector('.mdc-text-field-icon'));
 
 
                     var token2 = lidlRTO.objectManager.createNewObjectToken();

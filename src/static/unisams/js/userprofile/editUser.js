@@ -172,6 +172,63 @@ $(document).ready (function () {
 
         var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
+        let listContainer = document.getElementById("qualification-list")
+        let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
+            listItem: {
+                onClick: function(e){
+                    e.preventDefault();
+                    var self = e.currentTarget;
+                    addDBKey_sidebar.addContent('UserUpdateQualification', {
+                            userid: userid,
+                            key: self.dataset.key,
+                            keyId: self.dataset.keyid,
+                            qualificationId: self.dataset.keyid,
+                            callback: {
+                                onConfirm: function (userid, key, value) {
+                                    var args = {
+                                        isArray: true, //we reference the element directly by array index
+                                        noIndex: false,
+                                        keyId: self.dataset.keyId
+                                    };
+                                    actions.insertDBKey(userid, key, value, args, function () {
+
+                                    });
+                                },
+                                onDelete: function (userid, key, data) {
+                                    var args = {
+                                        isArray: true
+                                    };
+
+                                    const dialog_content = {
+                                        title: "Qualifikation löschen",
+                                        message: "Folgende Qualifikation wird gelöscht: " + data.qualification.name,
+                                        titleArg: "",
+                                        messageArg: ""
+                                    };
+                                    var dialog_token = lidlRTO.objectManager.createNewObjectToken();
+                                    const dialog_args = {
+                                        userid: userid,
+                                        callback: {
+                                            onConfirm: function (res) {
+                                                actions.removeDBKey(userid, key, data, args, function () {
+                                                    $("#qualId" + common.escapeSelector(data.id)).remove();
+                                                });
+                                                lidlRTO.objectManager.removeObject(dialog_token);
+                                            }
+                                        }
+                                    };
+                                    const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                                    lidlRTO.objectManager.addObject(dialog, dialog_token);
+                                    dialog.openDialog();
+                                }
+                            },
+                        },
+                    );
+                    addDBKey_sidebar.show();
+                }
+            }
+        });
+
         $(".useredit-addItemBtn").on("click", function (e) {
             e.preventDefault();
             addDBKey_sidebar.addContent('UserAddDBKey', {
@@ -253,7 +310,7 @@ $(document).ready (function () {
                     userid: userid,
                     key: self.dataset.key,
                     keyId: self.dataset.keyid,
-                    qualificationId: self.dataset.qualificationid,
+                    qualificationId: self.dataset.keyid,
                     callback: {
                         onConfirm: function (userid, key, value) {
                             var args = {
@@ -316,12 +373,15 @@ $(document).ready (function () {
                             var args = {
                                 //isArray: false
                             };
-                            actions.updateDBKey(userid, key, value, args, function () {
+                            actions.updateDBKey(userid, key, value, args, function (response) {
+                                let user = response.result;
                                 addDBKey_sidebar.hide();
                                 $(e.currentTarget).find(".userkey-entry-value").html(value.value);
                                 $(e.currentTarget).find(".userkey-entry-title").html(value.title);
                                 e.currentTarget.dataset.value = value.value;
                                 e.currentTarget.dataset.title = value.title;
+                                //if name was changed, change heading accordingly
+                                if(key === "generalData.firstName" || key === "generalData.lastName") document.getElementById("userProfileName").innerHTML = user.generalData.firstName.value + " " + user.generalData.lastName.value;
                             });
                         },
                         onDelete: function (userid, key, data) {

@@ -211,11 +211,13 @@
             this.validators.forEach(function(validator){
                 //execute validator function
                 try {
-                    if(validator.function()) {
+                    let result = validator.function()
+                    if(typeof(result)==="boolean") result = {state: result, reason: "failed"}
+                    if(result.state) {
                         validator.callback.onSuccess()
                     }
                     else {
-                        validator.callback.onFailure();
+                        validator.callback.onFailure(result.reason);
                         valid = false;
                     }
                 }

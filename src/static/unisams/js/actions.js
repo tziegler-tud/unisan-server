@@ -26,7 +26,7 @@ common = window.common;
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function(result) {
-                location.replace("/unisams/user/edit" + data.username)
+                location.replace("/unisams/user/edit/" + data.username)
             }
         });
     };
@@ -97,7 +97,7 @@ common = window.common;
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(result) {
-                callback()
+                callback(result)
             }
         });
     };

@@ -1,0 +1,134 @@
+@import "../../stylesheets/color-rules.less";
+@import "../../stylesheets/variables.less";
+
+ul.scrollableItemList {
+  &.border {
+    li {
+      .inner {
+
+        .item-property {
+          //&:not(:last-of-type) {
+          //  border-right: 1px solid #AAA;
+          //}
+          border-right: 1px solid #AAA;
+        }
+      }
+    }
+  }
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+
+  @bgCol1: #ffffff;
+  @bgCol2: #f9f9f9;
+
+  display: flex;
+  flex-flow: column wrap;
+
+  font-weight: lighter;
+
+  &.scrollableList-top {
+    .scrollableList-header-column {
+      position: relative;
+      &:hover {
+        background-color: rgba(124,0,26,0.2);
+        cursor: pointer;
+      }
+
+      &.sort-asc, &.sort-desc {
+        &:after {
+          display:        inline-block;
+          width:          1em;
+          height:         1em;
+          margin-right:   .5ex;
+          margin-left:    .5ex;
+          position:       relative;
+          top:            .2em;
+        }
+      }
+      &.sort-asc {
+        &:after {
+          content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+        }
+      }
+      &.sort-desc {
+        &:after {
+          content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up"><polyline points="18 15 12 9 6 15"></polyline></svg>');
+        }
+      }
+    }
+  }
+
+  li {
+
+    flex: 1 1 auto;
+    background-color: @bgCol1;
+
+    &:nth-child(odd) {
+      background-color: @bgCol2;
+    }
+
+    &:not(.noSelect):hover {
+      background-color: rgba(124,0,26,0.2);
+      cursor: pointer;
+    }
+
+    &.borderBottom {
+      border-bottom: 1px solid #666;
+    }
+
+    .itemDelete {
+      svg {
+        width: 1em;
+      }
+    }
+
+    .inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+      //padding: 0 1em;
+
+      .item-property {
+        padding: .5em 0 .5em 10px;
+        position: relative;
+        margin-left: 0;
+        flex: 0 0 240px;
+
+        &.after {
+          content: "";
+          display: block;
+          width: 100%;
+          position: absolute;
+          bottom: -3px;
+          left: 0;
+        }
+
+        &:hover > &.after {
+          border-bottom-color: @text-hover-color;
+        }
+      }
+    }
+  }
+
+  &.itemlist-style-clean {
+    li {
+      background-color: transparent;
+
+      .inner {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+  &.itemlist-noSelect {
+    li:hover {
+      cursor: default;
+      background-color: transparent;
+
+      span {
+        cursor: text;
+      }
+    }
+  }
+}

@@ -13,24 +13,32 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     lidl.addDebugCategory(lidl.debugCategory.FULL);
 
-    Handlebars.registerHelper('transformDateString', function(dateString) {
+    Handlebars.registerHelper('transformDateString', function(dateString, format) {
+        format = (format === undefined || typeof(format) !== "string") ? "text" : format;
         var myDate = new Date(dateString);
         var month = (myDate.getMonth()+ 1).toString().length < 2 ? "0"+(myDate.getMonth()+ 1).toString() : (myDate.getMonth()+ 1).toString();
         var day = myDate.getDate().toString().length < 2 ? "0"+myDate.getDate().toString() : myDate.getDate().toString();
+        var date;
 
-        var date = day + "." + month + "." + myDate.getFullYear();
+        if (format === "input") {
+            date = myDate.getFullYear() + "-" + month + "-" + day;
+        }
+        else {
+            date = day + "." + month + "." + myDate.getFullYear();
+        }
         return new Handlebars.SafeString(date);
     });
 
-    Handlebars.registerHelper('transformDateTimeString', function(dateString) {
+    Handlebars.registerHelper('transformDateTimeString', function(dateString, format) {
+        format = (format === undefined || typeof(format !== "String")) ? "text" : format;
         var myDate = new Date(dateString);
         var month = (myDate.getMonth()+ 1).toString().length < 2 ? "0"+(myDate.getMonth()+ 1).toString() : (myDate.getMonth()+ 1).toString();
         var day = myDate.getDate().toString().length < 2 ? "0"+myDate.getDate().toString() : myDate.getDate().toString();
 
         var hours = myDate.getHours().toString().length < 2 ? "0"+myDate.getHours().toString() : myDate.getHours().toString();
         var minutes = myDate.getMinutes().toString().length < 2 ? "0"+myDate.getMinutes().toString() : myDate.getMinutes().toString();
-
         var date =  day + "." + month + "." + myDate.getFullYear() + " " + hours + ":" + minutes;
+
         return new Handlebars.SafeString(date);
     });
 

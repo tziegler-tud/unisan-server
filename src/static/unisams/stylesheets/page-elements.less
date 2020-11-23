@@ -125,11 +125,6 @@ ul.itemlist {
       background-color: @bgCol2;
     }
 
-    &:not(.noSelect):hover {
-      background-color: rgba(124,0,26,0.2);
-      cursor: pointer;
-    }
-
     &.borderBottom {
       border-bottom: 1px solid #666;
     }
@@ -168,6 +163,22 @@ ul.itemlist {
     }
   }
 
+  &:not(.itemlist-noSelect){
+    li {
+      &:not(.noSelect):hover {
+        background-color: rgba(124, 0, 26, 0.2);
+        cursor: pointer;
+      }
+    }
+  }
+  &:not(.noHover) {
+    li {
+      &:not(.noSelect):hover {
+        background-color: rgba(124, 0, 26, 0.2);
+      }
+    }
+  }
+
   &.itemlist-style-clean {
     li {
       background-color: transparent;
@@ -181,7 +192,6 @@ ul.itemlist {
   &.itemlist-noSelect {
     li:hover {
       cursor: default;
-      background-color: transparent;
 
       span {
         cursor: text;

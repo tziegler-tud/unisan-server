@@ -16,6 +16,7 @@ var errorHandler = require("./helpers/error-handler");
 
 global.appRoot = path.resolve(__dirname);
 
+// include routes here
 var indexRouter = require('./routes/public/index');
 var teamRouter = require('./routes/public/team');
 var sanRouter = require('./routes/public/san');
@@ -40,12 +41,13 @@ var qualificationApiRouter = require('./routes/api/qualification');
 var userDatasetApiRouter = require('./routes/api/userDataset');
 var logsRouter = require('./routes/api/logs');
 
+
+//initialize server
 var server = express();
 
+
 const passport = require('./config/passport');
-
 const i18n = require ("./config/i18n");
-
 const upload = require("./config/multer");
 
 

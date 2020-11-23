@@ -158,7 +158,7 @@ function getKey(req, res, next) {
 
 function updateKey(req, res, next) {
     userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
-        .then(() => res.json({}))
+        .then((result) => res.json({result}))
         .catch(err => next(err));
 }
 

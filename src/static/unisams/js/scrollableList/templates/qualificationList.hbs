@@ -1,0 +1,26 @@
+<div class="itemlist-header-container borderBottom">
+    <ul class="common-list qualificationList itemlist scrollableItemList list-view border scrollableList-top">
+        <li class="noSelect rowHeading">
+            <div class="inner">
+                <div class="item-property scrollableList-header-column userlist-ch qualType" data-property="qualification.qualType">Typ</div>
+                <div class="item-property scrollableList-header-column userlist-ch name" data-property="qualification.name">Bezeichnung</div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list qualificationList itemlist scrollableItemList list-view border">
+        {{#each listdata}}
+            <li class="qualification-entry scrollableList-item" id= "qualId{{this._id}}" data-key="qualifications.{{@key}}" data-keyid= {{this._id}}>
+                <a class="inner">
+                    <div class="item-property item-container type">
+                        <span class="item-container-element">{{{this.qualification.qualType}}}</span>
+                    </div>
+                    <div class="item-property item-container title">
+                        <span class="item-container-element">{{this.qualification.name}}</span>
+                    </div>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+</div>

@@ -1,0 +1,37 @@
+<div class="itemlist-header-container borderBottom">
+    <ul class="common-list loglist-top loglist  itemlist scrollableItemList list-view border scrollableList-top">
+        <li class="noSelect rowHeading">
+            <div class="inner">
+                <div class="item-property scrollableList-header-column userlist-ch date" data-property="timestamp">Datum</div>
+                <div class="item-property scrollableList-header-column userlist-ch user" data-property="authorizedUser.generalData.firstName.value">Nutzer</div>
+                <div class="item-property scrollableList-header-column userlist-ch type" data-property="description.logType">Art</div>
+                <div class="item-property scrollableList-header-column userlist-ch description" data-property="description.min">Beschreibung</div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list loglist itemlist scrollableItemList list-view border">
+        {{#each listdata}}
+            <li class="log-entry  scrollableList-item" id='logId{{this.id}}' data-logid= {{this.id}}>
+                <a class="inner noSelect">
+                    <div class="item-property item-container timestamp">
+                        <span class=" item-container-element">{{transformDateTimeString this.timestamp}}</span>
+                    </div>
+
+                    <div class="item-property item-container authorizedUser">
+                        <span class=" item-container-element">{{this.authorizedUser.generalData.firstName.value}} {{this.authorizedUser.generalData.lastName.value}}</span>
+                    </div>
+                    <div class="item-property logType">
+                        <span class=" item-container-element">{{this.description.logType}}</span>
+                    </div>
+                    <div class="item-property value">
+                        <span class=" item-container-element">{{this.description.min}}</span>
+                    </div>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+
+

@@ -572,6 +572,7 @@ async function updateKey(req, id, key, value, userParams) {
         }
     })
     await user.save();
+    return user;
 }
 
 async function addQualification(req, id, key, value, userParams) {
