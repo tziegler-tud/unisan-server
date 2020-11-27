@@ -1,0 +1,28 @@
+@import "color-rules.less";
+@import "variables.less";
+
+@page-bg: @page-bg-color-v2;
+@item-bg: @page-bg-color;
+
+
+
+#wrapper {
+  .protocol-container {
+    background-color: @page-bg;
+
+    .protocol-gallery {
+      .protocol-item {
+        box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+        .inner {
+          background-color: @item-bg;
+        }
+      }
+    }
+  }
+}
+
+
+.demo-card {
+  height: 350px;
+  width: 350px;
+}

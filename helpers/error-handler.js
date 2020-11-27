@@ -37,7 +37,10 @@ function webErrorHandler(err, req, res, next) {
     res.status(err.status || 500);
 
     // // render the error page
-    res.render('error/error');
+    res.render('unisams/error/error', {
+        title: "500 - Internal Server error",
+        error: err,
+    });
 }
 
 function apiErrorHandler(err, req, res, next) {

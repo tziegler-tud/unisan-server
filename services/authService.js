@@ -52,8 +52,12 @@ class AuthService {
         //check if url and method are part of userGroups
         let authorizedGroup = userGroups.find(function(group){
             return group.allowedOperations.some(function(op){
+                let allowedUrl = op.url;
+                //replace $currentUserName, $currentUserId by respective values
+                allowedUrl = allowedUrl.replace("$currentUserName", user.username);
+                allowedUrl = allowedUrl.replace("$currentUserId", user.id);
                 //transform url to regex to respect wildcard symbols
-                let regUrl = new RegExp('^' + op.url.replace(/\/?\*/g, '.*') + '$');
+                let regUrl = new RegExp('^' + allowedUrl.replace(/\/?\*/g, '.*') + '$');
                 return (op.method === method && regUrl.test(url));
             })
         })

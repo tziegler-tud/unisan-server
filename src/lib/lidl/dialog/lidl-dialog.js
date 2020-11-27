@@ -235,7 +235,6 @@
 
     var confirmDialog = function(self){
         if (!self.allowConfirm) return false;
-        var args = self.args;
         var res = self;
         self.callback.onConfirm(res);
     };

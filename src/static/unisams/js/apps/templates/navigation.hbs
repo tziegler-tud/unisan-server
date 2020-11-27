@@ -1,0 +1,39 @@
+<header class="mdc-top-app-bar mdc-top-app-bar--fixed">
+    <div class="mdc-top-app-bar__row">
+        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+            <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu">menu</button>
+            <span class="mdc-top-app-bar__title">{{pageData.title}}</span>
+        </section>
+        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Favorite">favorite</button>
+            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">search</button>
+            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">more_vert</button>
+        </section>
+    </div>
+</header>
+<aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
+    <div class="mdc-drawer__content">
+        <div class="mdc-drawer__header">
+            <h3 class="mdc-drawer__title">{{pageData.title}}</h3>
+            <h6 class="mdc-drawer__subtitle">email@material.io</h6>
+        </div>
+        <div class="mdc-list">
+            <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
+                <span class="mdc-list-item__ripple"></span>
+                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>
+                <span class="mdc-list-item__text">Patientendaten</span>
+            </a>
+            <a class="mdc-list-item" href="#">
+                <span class="mdc-list-item__ripple"></span>
+                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
+                <span class="mdc-list-item__text">Notfallgeschehen</span>
+            </a>
+            <a class="mdc-list-item" href="#">
+                <span class="mdc-list-item__ripple"></span>
+                <i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>
+                <span class="mdc-list-item__text">Behandlung</span>
+            </a>
+        </div>
+    </div>
+</aside>
+

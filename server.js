@@ -30,6 +30,7 @@ const mainRouter = require('./routes/unisams/index');
 var userManagementRouter = require('./routes/unisams/user');
 var eventManagementRouter = require('./routes/unisams/events');
 var settingsRouter = require('./routes/unisams/settings');
+var protocolRouter = require('./routes/unisams/protocol');
 
 
 var authRouter = require('./routes/api/auth');
@@ -40,6 +41,7 @@ var eventApiRouter = require('./routes/api/eventmod');
 var qualificationApiRouter = require('./routes/api/qualification');
 var userDatasetApiRouter = require('./routes/api/userDataset');
 var logsRouter = require('./routes/api/logs');
+var protocolApiRouter = require('./routes/api/protocol');
 
 
 //initialize server
@@ -118,12 +120,12 @@ server.use('/info/datenschutz', datenschutzRouter);
 
 //html calls
 server.use('/unisams', loginRouter);
-server.use('/unisams', userGroupRouter);
 server.use("/unisams", webAuth);
 server.use('/unisams', mainRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/settings', settingsRouter);
+server.use('/unisams/apps/protocol', protocolRouter);
 // catch 404 and forward to error handler
 server.use("/unisams/*", function(req, res, next) {
   next(createError(404));
@@ -136,12 +138,14 @@ server.use("/unisams", errorHandler.webErrorHandler);
 //API calls TODO: change url to /api/v1/...
 server.use('/api/v1', authRouter);
 server.use('/api/v1/*', apiAuth);
+server.use('/api/v1/groups', userGroupRouter);
 server.use('/api/v1/access', accessRightsRouter);
 server.use('/api/v1/usermod', userApiRouter);
 server.use('/api/v1/eventmod', eventApiRouter);
 server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
 server.use('/api/v1/logs', logsRouter);
+server.use('/api/v1/apps/protocol', protocolApiRouter);
 // catch 404 and forward to error handler
 server.use("/api", function(req, res, next) {
   next(createError(404));

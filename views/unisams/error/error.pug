@@ -5,8 +5,7 @@ html
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     link(rel="shortcut icon" type="image/x-icon" href="static/icons/favicon.ico")
-
-    link(rel='stylesheet', href='/static/unisams/stylesheets/login.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/error.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader.css')
 
 
@@ -24,11 +23,11 @@ html
             .clear
           #error-container.errorbox
             #error-container-inner.errorbox-inner
-              .errorbox-status
-                span= status
-              .errorbox-body
-                span= message
+              .errorbox-heading
+                span Ooooops...
+              .errorbox-status=error.status
+              .errorbox-body.hudge= error.message
               .errorbox-link.content-link
-                | Zurück zur Startseite
+                a(href="/unisams") Zurück zur Startseite
 
     //include footer

@@ -47,7 +47,7 @@
             }
             $(document).on("click", function(event) {
                 //if you click on anything except the modal itself or the "open modal" link, close the modal
-                if (!$(event.target).closest(self.container).length) {
+                if (!($(event.target).closest(self.container).length || ($(event.target).closest(self.trigger).length))) {
                     $(self.container).removeClass("dropdown-active");
                     if (self.args.classes) {
                         $(this).removeClass(self.args.classes);

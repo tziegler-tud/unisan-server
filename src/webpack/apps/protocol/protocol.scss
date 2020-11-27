@@ -1,0 +1,12 @@
+@use "@material/card";
+@use "@material/icon-button";
+
+@import "~material-icons-font/material-icons-font.css";
+
+@include icon-button.core-styles;
+@include card.core-styles;
+
+.demo-card {
+  height: 350px;
+  width: 350px;
+}

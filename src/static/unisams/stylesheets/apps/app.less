@@ -1,0 +1,54 @@
+@import "../color-rules.less";
+@import "../variables.less";
+
+
+body {
+  .app-page-wrapper {
+    display: flex;
+    height: 100vh;
+
+    .mdc-drawer-app-content {
+      flex: auto;
+      overflow: auto;
+      position: relative;
+
+      .transition(margin, 250ms);
+    }
+
+    .app-content-container {
+      overflow: auto;
+      height: 100%;
+    }
+
+    .app-bar {
+      position: absolute;
+    }
+
+    // Only apply this style if below top app bar.
+    .mdc-top-app-bar {
+      z-index: 7;
+    }
+
+  }
+}
+
+
+//.app-page-wrapper {
+//  position: fixed;
+//  top: 0;
+//  display: flex;
+//  flex-flow: row nowrap;
+//  height: 100vh;
+//  width: 100vw;
+//  overflow: hidden;
+//
+//  .topbar-spacer {
+//    margin-top: 64px;
+//  }
+//  .app-drawer-container {
+//    flex: 0 0 300px;
+//  }
+//  .app-content-container {
+//    flex: 1 1 auto;
+//  }
+//}

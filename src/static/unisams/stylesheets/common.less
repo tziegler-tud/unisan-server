@@ -448,6 +448,17 @@ dropdown menu
         }
     }
 
+    &.menu-below {
+
+        .dropdown-container {
+            top: 100%;
+            right: 0;
+            bottom: unset;
+            left: unset;
+            transform: none;
+        }
+    }
+
     .dropdown-container {
         display: none;
 
@@ -468,6 +479,10 @@ dropdown menu
 
             &:first-of-type {
                 border-bottom: none;
+            }
+
+            &.last {
+                border-bottom: 1px solid @menu-border-color;
             }
 
             &:hover {
@@ -939,7 +954,7 @@ common btn styling
 
 
 .add-smt-button {
-    font-size:  100%;
+    font-size:  120%;
     position:   absolute;
     opacity:    0.8;
 
@@ -947,6 +962,14 @@ common btn styling
     right: 2em;
 
     .transition(transform,200ms);
+    @media @desktop, @tablet-landscape {
+        font-size:  100%;
+    }
+
+    &.gallery {
+        //move below last item
+
+    }
 
     a{
         color:              white;

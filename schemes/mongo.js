@@ -2,8 +2,6 @@ const config = require('../config/config.json');
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-plugin-autoinc-fix');
 
-
-
 mongoose.set('debug', true);
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -37,4 +35,5 @@ module.exports = {
     Event: require('./eventScheme'),
     UserGroup: require('./userGroupScheme'),
     Log: require('./logScheme'),
+    Protocol: require('./protocolScheme'),
 };

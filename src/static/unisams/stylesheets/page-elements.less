@@ -200,102 +200,216 @@ ul.itemlist {
   }
 }
 
-//ul.itemlist {
-//    &.border {
-//        li {
-//            .inner {
-//
-//                .item-property {
-//                    &:not(:last-of-type) {
-//                        border-right: 1px solid #AAA;
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    list-style: none;
-//    padding-left: 0;
-//    margin-left: 0;
-//
-//    @bgCol1: #ffffff;
-//    @bgCol2: #f9f9f9;
-//
-//    display: flex;
-//    flex-flow: column wrap;
-//
-//    font-weight: lighter;
-//
-//    li {
-//
-//        flex: 1 1 auto;
-//
-//        background-color: @bgCol1;
-//
-//        &:nth-child(odd) {
-//            background-color: @bgCol2;
-//        }
-//
-//        &:not(.noSelect):hover {
-//            background-color: rgba(124,0,26,0.2);
-//            cursor: pointer;
-//        }
-//
-//        &.borderBottom {
-//            border-bottom: 1px solid #333;
-//        }
-//
-//        .itemDelete {
-//            svg {
-//                width: 1em;
-//            }
-//        }
-//
-//        .inner {
-//            display: flex;
-//            padding: 0 1em;
-//
-//            .item-property {
-//                padding: .5em 0;
-//                position: relative;
-//                margin-left: 10px;
-//                flex: 0 0 240px;
-//
-//                &.after {
-//                    content: "";
-//                    display: block;
-//                    width: 100%;
-//                    position: absolute;
-//                    bottom: -3px;
-//                    left: 0;
-//                }
-//
-//                &:hover > &.after {
-//                    border-bottom-color: @textHoverColor;
-//                }
-//            }
-//        }
-//    }
-//
-//    &.itemlist-style-clean {
-//        li {
-//            background-color: transparent;
-//
-//            .inner {
-//                padding-left: 0;
-//                padding-right: 0;
-//            }
-//        }
-//    }
-//    &.itemlist-noSelect {
-//        li:hover {
-//            cursor: default;
-//            background-color: transparent;
-//
-//            span {
-//                cursor: text;
-//            }
-//        }
-//    }
-//}
+
+.gallery-container {
+  padding: 0;
+  list-style: none;
+  width: 90%;
+  margin: 0 auto;
+  font-size: 100%;
+  position: relative;
 
 
+  .gallery-add-item {
+    position: relative;
+    left: 0;
+    bottom: 0;
+  }
+
+  @media @desktop, @tablet-landscape {
+    width: 90%;
+  }
+
+  ul.gallery-view {
+    padding: 0;
+    list-style: none;
+    margin: 0 0 2em 0;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-auto-rows: 1fr;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+    width:        100%;
+
+    @media @phone-large {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media @tablet-landscape, @tablet-portrait {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media @desktop {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+
+
+    li.gallery-item {
+      width: 100%;
+      margin:     .5em 0;
+      max-width: 500px;
+      min-width: 200px;
+      display: block;
+
+      &:hover {
+        .inner {
+          .image {
+            img {
+              -webkit-transform: scale(1.05);
+              transform: scale(1.05);
+              filter: brightness(80%);
+            }
+          }
+        }
+      }
+
+      .inner {
+
+        text-align:       left;
+        height:           100%;
+        //background-color: #f9f9f9;
+        //max-width: 20em;
+        position:         relative;
+        display:          flex;
+        flex-flow:        column wrap;
+
+        @media @desktop, @tablet-landscape {
+          //margin:           0 1em;
+        }
+        .date {
+          font-size: 90%;
+          color: #333;
+          font-family: "Open Sans",sans-serif;
+          font-weight: lighter;
+        }
+
+        .image {
+          width:    100%;
+          height:   0;
+          overflow: hidden;
+          padding-bottom: 50%;
+          position: relative;
+          flex: none;
+
+          .thumbnail-credit {
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            display: block;
+            padding: .5em .5em;
+
+            background-color: @col1;
+            color: #fff;
+
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-weight: lighter;
+            font-size: 60%;
+          }
+
+          .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background-color: #fff;
+            opacity: 0;
+
+            .gallery-heading {
+              width: 80%;
+              margin: 1em auto;
+              font-weight: lighter;
+              font-size: 150%;
+
+              color: @col1;
+
+              position:   absolute;
+              bottom:     0;
+              left:       0;
+
+              display: block;
+              padding: .5em 1em;
+
+              .gallery-heading-inner {
+                font-weight: normal;
+                font-size: 60%;
+              }
+            }
+          }
+
+
+          img {
+            width: 100%;
+            -webkit-transform:  scale(1);
+            transform:          scale(1);
+            filter:             brightness(100%);
+            .transition(500ms);
+          }
+
+        }
+
+        .gallery-heading {
+          width: 80%;
+          margin: 1em auto 0 auto;
+          font-weight: lighter;
+          font-size: 130%;
+
+          color: @col1;
+
+          display: block;
+          padding: .5em 1em;
+
+          .gallery-heading-inner {
+            font-size: 80%;
+          }
+        }
+
+        .gallery-text {
+          width: 80%;
+          margin: .5em auto 0 auto;
+          font-size: 100%;
+        }
+
+        .gallery-abstract {
+          width: 80%;
+          margin: 1em auto;
+          font-weight: normal;
+
+          font-size: 100%;
+        }
+
+        .gallery-link {
+          border-top:    1px solid #fff;
+          margin-top: auto;
+          font-size: 70%;
+
+          position: absolute;
+          bottom: 0;
+          right: 1em;
+
+
+        }
+      }
+      .gallery-item-actions {
+        width: 100%;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+        .action-button {
+          flex: 1 1 auto;
+        }
+      }
+    }
+    li.gallery-add-item {
+      svg {
+        height: 4em;
+        width: 4em;
+        color: #c31d34;
+      }
+    }
+  }
+}

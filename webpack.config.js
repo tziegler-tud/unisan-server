@@ -10,7 +10,15 @@ module.exports = {
         addEvent: "./src/webpack/addEvent.js",
         addEvent_style: "./src/webpack/addEvent.scss",
         drawer: "./src/webpack/drawer.js",
-        drawer_style: "./src/webpack/drawer.scss"
+        drawer_style: "./src/webpack/drawer.scss",
+        protocol: "./src/webpack/apps/protocol/protocol.js",
+        protocol_style: "./src/webpack/apps/protocol/protocol.scss",
+        app_navigation: "./src/webpack/apps/app_navigation.js",
+        app_navigation_style: "./src/webpack/apps/app_navigation.scss",
+        app_drawer: "./src/webpack/apps/app_drawer.js",
+        app_drawer_style: "./src/webpack/apps/app_drawer.scss",
+        app_topbar: "./src/webpack/apps/app_topbar.js",
+        app_topbar_style: "./src/webpack/apps/app_topbar.scss"
     },
     output: {
         path: path.join(__dirname, "./src/dist"),
@@ -48,6 +56,22 @@ module.exports = {
                             },
                         }
                     },
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'fonts/'
+                        }
+                    }
                 ]
             }
         ]

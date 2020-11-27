@@ -13,13 +13,13 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 // routes
-router.get('/groups', getUserGroups);
-router.post('/groups', createGroup);
-router.put('/groups/:id', updateGroup);
-router.delete('/groups/:id', deleteGroup);
-router.get('/groups/:id', getGroup);
-router.post('/groups/addPermission/:id', addGroupPermission);
-router.post('/groups/removePermission/:id', removeGroupPermission);
+router.get('/', getUserGroups);
+router.post('', createGroup);
+router.put('/:id', updateGroup);
+router.delete('/:id', deleteGroup);
+router.get('/:id', getGroup);
+router.post('/addPermission/:id', addGroupPermission);
+router.post('/removePermission/:id', removeGroupPermission);
 
 function getUserGroups(req, res, next){
     authService.getAll()
