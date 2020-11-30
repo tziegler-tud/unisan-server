@@ -1,0 +1,156 @@
+@import "../../../color-rules.less";
+@import "../../../variables.less";
+
+@page-bg: @page-bg-color-v2;
+@item-bg: @page-bg-color;
+
+.protocol--divi {
+  //font-family: arial, sans-serif;
+  .protocol-grid-item {
+    padding: .5em .5em;
+    border: 1px solid #000;
+  }
+  .protocol-row--1 {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: auto;
+    grid-template-areas:
+            "stammdaten1 einsatzdaten"
+            "stammdaten2 einsatzdaten"
+            "stammdaten3 einsatzdaten"
+            "stammdaten4 einsatzdaten";
+
+    .divi--stammdaten1 {
+      grid-area: stammdaten1;
+    }
+    .divi--stammdaten2 {
+      grid-area: stammdaten2;
+    }
+    .divi--stammdaten3 {
+      grid-area: stammdaten3;
+    }
+    .divi--stammdaten4 {
+      grid-area: stammdaten4;
+    }
+    .divi--einsatzdaten {
+      grid-area: einsatzdaten;
+
+      .divi--einsatzdaten-header {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+
+        .divi--einsatzdaten-header-text {
+          font-weight: bold;
+          white-space: nowrap;
+        }
+
+        .divi--einsatzdaten-select {
+          font-size: 80%;
+
+          justify-items: end;
+          display: grid;
+          //grid-template-columns: 12.5% 25% 12.5% 12.5% 12.5% 12.5% 12.5%;
+          //grid-template-columns: repeat(8, auto);
+          grid-template-columns: repeat(8, auto);
+          grid-template-rows: 1fr 1fr;
+          .label {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+          }
+
+          .protocol-select-labeled {
+            display: flex;
+            flex-flow: row nowrap;
+            input, label {
+              flex: 0 0 auto;
+            }
+          }
+          .r1c2 {
+            grid-column: 2 / span 2;
+            grid-row: 1;
+          }
+          .r2c2 {
+            grid-column: 2 / span 2;
+            grid-row: 2;
+          }
+        }
+
+      }
+    }
+  }
+  .protocol-form-set {
+    width: 100%;
+    .protocol-form-set-header {
+      font-weight: bold;
+      display: block;
+      margin-bottom: .5em;
+    }
+  }
+
+  .protocol-form-inputSet {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    margin-bottom: .5em;
+    label {
+      display: block;
+      color: #666;
+      //width: 30%;
+    }
+    input {
+      display: block;
+      //width: 70%;
+    }
+  }
+  .protocol-form-input {
+    display: block;
+    border: 1px solid #333;
+    border-top: none;
+  }
+
+  .checkbox-square {
+    position: relative;
+
+    input {
+      position: absolute;
+      width: 25px;
+      height: 15px;
+      opacity: 0;
+      margin: 0;
+
+      &:checked ~ .checkmark {
+      }
+      &:checked ~ .checkmark:after, &:checked ~ .checkmark:before {
+        display: block;
+      }
+    }
+    .checkmark {
+      top:0;
+      left: 0;
+      height: 15px;
+      width: 25px;
+      border: 1px solid #333;
+      //background-color: #333;
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        display: none;
+        background-color: #333;
+
+        left: 12px;
+        top: -3px;
+        width: 1px;
+        height: 24px;
+      }
+      &:before {
+        transform: rotate(-45deg);
+      }
+      &:after {
+        transform: rotate(45deg);
+      }
+    }
+
+
+
+  }
+}

@@ -298,6 +298,7 @@
         if (selector == null) return;
         $(selector).each(function(){
             $(this).on("click", function(e){
+                e.stopPropagation();
                 self.event = e;
                 self.title.text(self.content.title + (e.target.dataset.dialogtitlearg === undefined ? "" :  " " + e.target.dataset.dialogtitlearg));
                 self.message.text(self.content.message + (e.target.dataset.dialogbodyarg === undefined ? "" : " " + e.target.dataset.dialogbodyarg));

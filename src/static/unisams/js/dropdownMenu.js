@@ -40,7 +40,8 @@
     };
 
     var registerEvent = function (self, eventType, target) {
-        $(target).on(eventType, function(){
+        $(target).on(eventType, function(e){
+            e.stopPropagation();
             $(self.container).toggleClass("dropdown-active");
             if(self.args.classes){
                 $(self.container).toggleClass(self.args.classes);
