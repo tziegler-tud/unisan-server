@@ -56,8 +56,8 @@ $(document).ready (function () {
 
   const dialogs = [].map.call(document.querySelectorAll(".documentDeleteBtn"), function (el) {
     var token = lidlRTO.objectManager.createNewObjectToken();
-    const dialogDeleteUser = new lidl.Dialog(token, el, 'confirmDelete', deleteContent, deleteArgs);
-    lidlRTO.objectManager.addObject(dialogDeleteUser, token);
+    const dialogDeleteProtocol = new lidl.Dialog(token, el, 'confirmDelete', deleteContent, deleteArgs);
+    lidlRTO.objectManager.addObject(dialogDeleteProtocol, token);
   });
 
   const selector = '.mdc-icon-button';

@@ -1,0 +1,648 @@
+@import "../../../color-rules.less";
+@import "../../../variables.less";
+
+@page-bg: @page-bg-color-v2;
+@item-bg: @page-bg-color;
+
+.protocol--divi {
+  //font-family: arial, sans-serif;
+  input {
+    font-family: monospace;
+  }
+  .protocol-grid-item {
+    padding: .5em .5em;
+    border: 1px solid #000;
+  }
+  .protocol-row--1 {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: auto;
+    grid-template-areas:
+            "stammdaten1 einsatzdaten"
+            "stammdaten2 einsatzdaten"
+            "stammdaten3 einsatzdaten"
+            "stammdaten4 einsatzdaten";
+
+    .divi--stammdaten1 {
+      grid-area: stammdaten1;
+
+      .divi--stammdaten1-geburtstag {
+        display: grid;
+        //grid-template-columns: 30% 6% 6% 6% 6% 5% 5% 5% 5% 1fr;
+        grid-template-columns: 30% repeat(8, 25px) 1fr;
+        .protocol-select-labeled {
+          font-size: 60%;
+          color: #666;
+
+          display: flex;
+          flex-flow: row nowrap;
+          input, label {
+            flex: 0 0 auto;
+          }
+        }
+      }
+    }
+    .divi--stammdaten2 {
+      font-size: 80%;
+      grid-area: stammdaten2;
+      display: grid;
+      grid-template-columns: 30% 30% 40%;
+
+      .divi--stammdaten2-sec1, .divi--stammdaten2-sec2, .divi--stammdaten2-sec3 {
+        border-left: 1px solid #333;
+      }
+
+
+      .divi--stammdaten2-sec1 {
+        border:none;
+        display: grid;
+        grid-template-columns: min-content auto;
+        grid-template-rows: auto;
+
+        .protocol-form-radioSet {
+
+        }
+
+        .radioset--geschlecht {
+          display: grid;
+          grid-template-columns: auto;
+          grid-template-rows: 33% 33% 33%;
+        }
+      }
+      .divi--stammdaten2-sec2 {
+        display: grid;
+        grid-template-columns: min-content auto;
+        padding: 0 .5em;
+        .radioset--bmi {
+          grid-column: 2;
+          grid-row: 1 / span 2;
+
+          display: grid;
+          grid-template-columns: auto;
+          grid-template-rows: 50% 50%;
+        }
+        .protocol-helper-text {
+          span {
+            display: block;
+            font-size: 90%;
+            &:first-of-type {
+              border-bottom: 1px solid #333;
+            }
+          }
+        }
+      }
+      .divi--stammdaten2-sec3 {
+        display: grid;
+        grid-template-columns: 30% 33% 30%;
+        grid-template-rows: 2fr 1fr;
+        row-gap: 4px;
+        text-align: center;
+        .age-container {
+          width: 100%;
+          display:grid;
+          grid-template-columns: 1fr 1fr;
+          input:last-of-type {
+            border-right: 1px solid #333;
+          }
+        }
+        .radio-input-container {
+          font-size: 80%;
+        }
+      }
+    }
+    .divi--stammdaten3 {
+      background-color: #EEE;
+      grid-area: stammdaten3;
+      display: flex;
+      flex-flow: column nowrap;
+      .divi-label {
+        flex: 0 0 min-content;
+        display: flex;
+        flex-flow: row nowrap;
+        font-weight: bold;
+        h3, span {
+          flex: 1 1 auto;
+
+        }
+        h3 {
+          margin: 0;
+          font-size: 150%;
+        }
+      }
+      .divi-label-subtext {
+        font-size: 80%;
+      }
+    }
+    .divi--stammdaten4 {
+      font-size: 80%;
+      grid-area: stammdaten4;
+      display: grid;
+      grid-template-rows: auto auto;
+      grid-template-columns: min-content auto 33%;
+      grid-row-gap: 4px;
+      grid-column-gap: 4px;
+      .radioset--nummer {
+        display: grid;
+        grid-template-rows: 50% 50%;
+        grid-template-columns: auto;
+      }
+      .inputset--nummer {
+        display: grid;
+        grid-template-columns: repeat(7, 25px)
+      }
+      .inputset--persnummer {
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-rows: auto;
+        align-content: end;
+        width: auto;
+        .label {
+          vertical-align: center;
+        }
+        .age-container {
+          width: 100%;
+          display:grid;
+          grid-template-columns: min-content min-content min-content;
+          .protocol-form-input--date {
+            width: 25px;
+          }
+        }
+      }
+      .inputset--standort {
+        grid-row: 2;
+        grid-column: 1 / span 2;
+      }
+      .inputset--leitstelle{
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-rows: auto;
+        align-content: end;
+        width: auto;
+        .label {
+          vertical-align: center;
+        }
+        .kfz-container {
+          width: 100%;
+          display:grid;
+          grid-template-columns: min-content min-content min-content;
+          .protocol-form-input--date {
+            width: 25px;
+          }
+        }
+      }
+    }
+    .divi--einsatzdaten {
+      grid-area: einsatzdaten;
+
+      .divi--einsatzdaten-header {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+
+        .divi--einsatzdaten-header-text {
+          font-weight: bold;
+          white-space: nowrap;
+        }
+
+        .divi--einsatzdaten-select {
+          font-size: 80%;
+
+          justify-items: end;
+          display: grid;
+          grid-template-columns: repeat(8, auto);
+          grid-template-rows: 1fr 1fr;
+          .label {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+          }
+
+          .protocol-select-labeled {
+            display: flex;
+            flex-flow: row nowrap;
+            input, label {
+              flex: 0 0 auto;
+            }
+          }
+          .r1c2 {
+            grid-column: 2 / span 2;
+            grid-row: 1;
+          }
+          .r2c2 {
+            grid-column: 2 / span 2;
+            grid-row: 2;
+          }
+        }
+
+      }
+      .divi--einsatzdaten-body {
+        display: grid;
+        grid-template-columns: 60% 40%;
+        grid-column-gap: 10px;
+
+        .divi--einsatzdaten-col1 {
+          .divi--einsatzdaten-datum {
+            display: grid;
+            grid-template-columns: 30% repeat(8, 25px);
+            .protocol-select-labeled {
+              font-size: 60%;
+              color: #666;
+
+              display: flex;
+              flex-flow: row nowrap;
+              input, label {
+                flex: 0 0 auto;
+              }
+            }
+          }
+          .divi--einsatzdaten-plz {
+            .plz {
+              margin-left: 40%;
+              margin-right: 5px;
+            }
+            .ort {
+
+            }
+
+          }
+          .divi--einsatzdaten-ort {
+            font-size: 70%;
+            grid-template-columns: auto;
+            .radioset--ort {
+              margin-left: 15%;
+              display: grid;
+              grid-template-columns: repeat(4, min-content);
+              grid-template-rows: repeat(4, min-content);
+              .sportstaette {
+                grid-column: 1 / span 3;
+                grid-row: 4;
+              }
+            }
+          }
+          .divi--einsatzdaten-art {
+            font-size: 100%;
+            grid-template-columns: 30% 70%;
+            .label {
+              font-size: 80%;
+            }
+            .radioset--art {
+              font-size: 70%;
+              margin-left: 10%;
+              display: grid;
+              grid-template-columns: repeat(2, min-content);
+              grid-template-rows: repeat(3, min-content);
+              .fehleinsatz {
+                position: relative;
+                &:after {
+                  position: absolute;
+                  width: 15px;
+                  height: 15px;
+                  bottom: -12px;
+                  left: 0;
+                  content: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>');
+                }
+              }
+            }
+          }
+          .divi--einsatzdaten-fehleinsatz {
+            font-size: 70%;
+            grid-template-columns: auto;
+            .radioset--fehleinsatz {
+              border: 1px solid #666;
+              margin-left: 15%;
+              display: grid;
+              grid-template-columns: repeat(2, min-content);
+              grid-template-rows: repeat(2, min-content);
+            }
+          }
+          .divi--einsatzdaten-ziel {
+            font-size: 70%;
+            padding-left: 5%;
+            display: grid;
+            grid-template-columns: repeat(4, min-content);
+            grid-template-rows: auto;
+
+          }
+        }
+        .divi--einsatzdaten-col2 {
+          .protocol-select-labeled {
+            font-size: 60%;
+            color: #666;
+            display: flex;
+            flex-flow: row nowrap;
+            width: 100%;
+            input, label {
+              flex: 0 0 auto;
+              white-space: nowrap;
+            }
+          }
+          padding-right: 20px;
+          justify-content: end;
+          .divi--einsatzdaten-symptombeginn-radioSet {
+            display: flex;
+            flex-flow: column nowrap;
+            input {
+              margin: 0;
+            }
+          }
+          .divi--einsatzdaten-facharzt {
+
+            display: grid;
+            grid-template-columns: 40% 60%;
+
+            .divi--einsatzdaten-facharzt-radioSet {
+              font-size: 80%;
+              display: flex;
+              flex-flow: column nowrap;
+              .radio-input-container {
+                flex: 0 0 auto;
+              }
+
+            }
+            .divi--einsatzdaten-facharzt-select {
+              border: 1px solid #AAA;
+              display: grid;
+              grid-template-rows: auto auto auto auto;
+              grid-template-columns: auto auto;
+
+              .double-column {
+                grid-row: 4;
+                grid-column: 1 / span 2;
+              }
+
+              input {
+                margin: 0;
+              }
+            }
+          }
+          .divi--einsatzdaten-rs {
+            font-size: 80%;
+            .divi--einsatzdaten-rs-radioSet {
+              display: grid;
+              grid-template-columns: repeat(4, auto);
+              grid-template-rows: auto;
+            }
+
+          }
+          .input-funkkenner {
+            grid-template-columns: min-content auto;
+            grid-column-gap: 5px;
+          }
+          .divi--einsatzdaten-uhrzeit {
+            display: grid;
+            grid-template-columns: auto repeat(4, 25px);
+
+          }
+        }
+      }
+
+
+    }
+  }
+
+  .protocol-row-2 {
+
+    .divi--notfallgeschehen {
+      .divi--notfallgeschehen-grid {
+        display: grid;
+        grid-template-columns: 60% 40%;
+        grid-template-rows: auto auto;
+
+
+        .divi--notfallgeschehen-selects {
+          display: grid;
+          grid-template-columns: auto auto;
+          grid-template-rows: repeat(8, auto);
+          font-size: 60%;
+
+          .indent  {
+            padding-left: 20px;
+          }
+          input {
+            margin: 0;
+          }
+
+          .row-items-3{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+          }
+          .row-items-2{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+          }
+          .row-items-1{
+            display: grid;
+            grid-template-columns: auto;
+          }
+          .double-column {
+            grid-column: 1 / span 2;
+          }
+        }
+
+        .divi--notfallgeschehen-text1 {
+
+          display: grid;
+          grid-template-columns: auto;
+          grid-template-rows: auto 1fr 1fr 1fr;
+          input.protocol-form-input {
+            width: 90%;
+            height: 1.5em;
+          }
+        }
+        .divi--notfallgeschehen-text2 {
+          input.protocol-form-input {
+            width: 100%;
+            height: 1.5em;
+          }
+          grid-row: 2;
+          grid-column: 1 / span 2;
+          margin-bottom: 1em;
+        }
+      }
+    }
+
+  }
+  .protocol-row-3 {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto;
+
+  }
+  .protocol-form-set {
+    width: 100%;
+    .protocol-form-set-header {
+      margin-bottom: .5em;
+      display: flex;
+      flex-flow: row nowrap;
+      h3 {
+        font-weight: bold;
+        margin: 0;
+        font-size: 100%;
+        flex: 1 1 auto;
+      }
+      span {
+        font-size: 70%;
+        color: #AAA;
+        flex: 1 1 auto;
+      }
+    }
+  }
+
+  .protocol-form-inputSet {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    margin-bottom: .5em;
+
+
+    label {
+      display: block;
+      color: #333;
+      font-size:80%;
+      //width: 30%;
+      white-space: nowrap;
+    }
+
+    input {
+      display: block;
+      //width: 70%;
+    }
+
+    &.protocol-form-dateInput {
+      grid-template-columns: repeat(8, 25px);
+      grid-column-gap: 0;
+
+
+      .date-input-container {
+        position: relative;
+        &:first-of-type {
+
+        }
+
+        input.protocol-form-input--date {
+          width: 25px;
+          //min-width: 25px;
+          text-align: center;
+        }
+        &:first-of-type {
+          input.protocol-form-input--date {
+            border-left: 1px solid #666;
+          }
+        }
+        &.border-left {
+          input.protocol-form-input--date {
+            border-left: 1px solid #666;
+          }
+        }
+        &.border-right {
+          input.protocol-form-input--date {
+            border-right: 1px solid #666;
+          }
+        }
+        &:last-of-type {
+          input.protocol-form-input--date {
+            border-right: 1px solid #666;
+          }
+        }
+      }
+
+      input.protocol-form-input--date {
+        border: none;
+        border-bottom: 1px solid #666;
+        padding: 0;
+        height: 100%;
+
+
+      }
+
+      .seperator-small, .seperator-big {
+        width: 1px;
+        background-color: #333;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+
+      }
+
+      .seperator-small {
+        height: .6em;
+      }
+
+      .seperator-big {
+        height: 1em;
+      }
+    }
+  }
+
+  .radio-input-container {
+    display: flex;
+    flex-flow: row nowrap;
+    vertical-align: center;
+    input, label {
+      margin: 0 2px 0 2px;
+      flex: 0 0 auto;
+      justify-content: flex-end;
+    }
+  }
+  .protocol-form-input {
+    display: block;
+
+    &.protocol-form-input--border {
+      border: 1px solid #666;
+      border-top: none;
+    }
+    &.protocol-form-input--border-bottom {
+      border: none;
+      border-bottom: 1px solid #666;
+    }
+  }
+
+  .checkbox-square {
+    position: relative;
+
+    input {
+      position: absolute;
+      width: 25px;
+      height: 15px;
+      opacity: 0;
+      margin: 0;
+
+      &:checked ~ .checkmark {
+      }
+      &:checked ~ .checkmark:after, &:checked ~ .checkmark:before {
+        display: block;
+      }
+    }
+    .checkmark {
+      top:0;
+      left: 0;
+      height: 15px;
+      width: 25px;
+      border: 1px solid #666;
+      //background-color: #333;
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        display: none;
+        background-color: #666;
+
+        left: 12px;
+        top: -3px;
+        width: 1px;
+        height: 24px;
+      }
+      &:before {
+        transform: rotate(-45deg);
+      }
+      &:after {
+        transform: rotate(45deg);
+      }
+    }
+
+
+
+  }
+  .protocol-helper-text {
+    font-size: 70%;
+    color: #666;
+    display: block;
+  }
+}

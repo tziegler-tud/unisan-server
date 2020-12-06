@@ -6,6 +6,8 @@ block page_includes
 
     script(src='/static/unisams/js/apps/protocol/protocol-editor.js')
     link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/apps/protocol/protocolapp.css')
+    link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/apps/protocol/layout/general.css')
+    link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/apps/protocol/layout/divi.css')
 
     script.
         window.currentExploredProtocol = !{JSON.stringify(document)}
@@ -13,7 +15,7 @@ block page_includes
 block app-content
     #wrapper.unisams-app.app-page-wrapper.protocol-app
         #page-container.app-content-container.mdc-drawer-app-content
-            h3= document.title
+            #protocol-container
 
 
 
