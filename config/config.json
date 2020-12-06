@@ -1,5 +1,5 @@
 {
-  "connectionString": "mongodb://141.30.30.134:27017/unisan-test",
+  "connectionString": "mongodb://localhost:27017/unisan-test",
   "secret": "uniSecret;-)",
   "username": "unisan-server",
   "pwd": "un!S4n",
