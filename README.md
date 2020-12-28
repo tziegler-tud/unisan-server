@@ -1,5 +1,5 @@
 # uniSAMS - Server application
-## NodeJs app containing both backend and frontend
+## NodeJs web application
 ### Author: Tom Ziegler
 #### Contributers: 
 github.com/SoulKa
