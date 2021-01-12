@@ -36,7 +36,30 @@ $(document).ready (function () {
         let content = template(protocol);
         let protocolContainer = document.getElementById("protocol-container");
         protocolContainer.innerHTML = content;
+
+        //call document specific functions
+        divi();
     });
 
+
+    function divi(){
+        $(".selectable").on("click", function(){
+            this.classList.toggle("selected");
+        })
+        $(".selectable-scale-item").on("click", function(){
+            let valElement = document.getElementById("divi--erstbefunde2-schmerze-input");
+            if (this.classList.contains("selected")){
+                this.classList.remove("selected");
+                valElement.value = 0;
+            }
+            else {
+                $(".selectable-scale-item").each(function(){
+                    this.classList.remove("selected")
+                })
+                this.classList.add("selected");
+                valElement.value = this.dataset.value;
+            }
+        })
+    }
 
 });

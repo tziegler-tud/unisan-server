@@ -1,6 +1,7 @@
 import {MDCList} from "@material/list";
 import {MDCTopAppBar} from "@material/top-app-bar";
 import {MDCDrawer} from "@material/drawer";
+import {MDCRipple} from "@material/ripple";
 
 (function (app,$,undefined) {
 
@@ -27,6 +28,7 @@ import {MDCDrawer} from "@material/drawer";
             document.body.addEventListener('MDCDrawer:closed', () => {
                 // mainContentEl.querySelector('input, button').focus();
             });
+            const buttonRipple = new MDCRipple(document.querySelector('.mdc-button'));
 
             topAppBar.setScrollTarget(mainContentEl);
             topAppBar.listen('MDCTopAppBar:nav', () => {

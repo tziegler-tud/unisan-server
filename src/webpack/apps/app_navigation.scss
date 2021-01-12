@@ -1,5 +1,6 @@
 @use "@material/drawer";
 @use "@material/list";
+@use "@material/button";
 @use "@material/icon-button";
 @use "@material/top-app-bar";
 @use "@material/top-app-bar/mdc-top-app-bar";
@@ -10,7 +11,7 @@
 @include drawer.dismissible-core-styles;
 @include drawer.modal-core-styles;
 @include list.core-styles;
-
+@include button.core-styles;
 @include icon-button.core-styles;
 
 .mdc-top-app-bar {
