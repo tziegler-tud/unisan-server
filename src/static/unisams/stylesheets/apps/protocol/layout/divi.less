@@ -76,7 +76,7 @@
         //grid-template-columns: 30% 6% 6% 6% 6% 5% 5% 5% 5% 1fr;
         grid-template-columns: 30% repeat(8, 25px) 1fr;
         .protocol-select-labeled {
-          font-size: 60%;
+          font-size: 70%;
           color: #666;
 
           display: flex;
@@ -288,7 +288,7 @@
             display: grid;
             grid-template-columns: 30% repeat(8, 25px);
             .protocol-select-labeled {
-              font-size: 60%;
+              font-size: 70%;
               color: #666;
 
               display: flex;
@@ -369,7 +369,7 @@
         }
         .divi--einsatzdaten-col2 {
           .protocol-select-labeled {
-            font-size: 60%;
+            font-size: 70%;
             color: #666;
             display: flex;
             flex-flow: row nowrap;
@@ -634,7 +634,7 @@
                   left: 0;
                   display: none;
                   //transform: translateY(-50%);
-                  background-color: #333;
+                  background-color: rgba(0,0,0,0.6);
 
 
                   &:before {
@@ -978,6 +978,7 @@
         display: grid;
         grid-template-columns: min-content 1fr 1fr 1fr min-content;
         grid-template-rows: auto auto auto;
+        grid-column-gap: 5px;
 
         .score {
           grid-column: 1;
@@ -991,6 +992,7 @@
           grid-column: 5;
           grid-row: 1 / span 3;
           border-left: 1px solid #333;
+          padding-left: 5px;
           label {
             white-space: normal;
             flex: 1 1 auto;

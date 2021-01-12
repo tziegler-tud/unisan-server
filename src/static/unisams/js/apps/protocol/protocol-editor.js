@@ -60,6 +60,27 @@ $(document).ready (function () {
                 valElement.value = this.dataset.value;
             }
         })
+        $('input[type=radio]').on("mousedown", function(e){
+            if($(this).prop("checked")) {
+               this.addEventListener("click", function(e){
+                   $(e.target).prop("checked", false);
+               }, {once : true})
+            }
+        })
+
+        $(".date-input-container input").focus(function(){
+            //find next
+            let next = $(this).parent().next().find("input:first-of-type");
+            $(this).keyup(function(e){
+                var code = e.keyCode || e.which;
+                if (code == '9'|| code == '8') return;
+                next.focus();
+            })
+        })
+        $(".continuetosibling").keyup(function(){
+            //find next
+            $(this).nextAll("input").first().focus();
+        })
     }
 
 });
