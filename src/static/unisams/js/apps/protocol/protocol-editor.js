@@ -43,6 +43,16 @@ $(document).ready (function () {
 
 
     function divi(){
+        let navinit = nav.initialize;
+        navinit.done(function(){
+            $(".app-link-page1").on("click", function(){
+                displayPage(1);
+            });
+            $(".app-link-page2").on("click",function() {
+                displayPage(2);
+            });
+        })
+        displayPage(1);
         $(".selectable").on("click", function(){
             this.classList.toggle("selected");
         })
@@ -81,6 +91,12 @@ $(document).ready (function () {
             //find next
             $(this).nextAll("input").first().focus();
         })
+
+        function displayPage(page) {
+            //find associated page container
+            $(".divi-page").removeClass("active")
+            $(".divi-page.page"+page).addClass("active");
+        }
     }
 
 });
