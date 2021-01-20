@@ -43,7 +43,7 @@ function index(req, res, next) {
         .then(function(documentList) {
             res.render("unisams/apps/protocol/index", {
                 title: "unisan apps - Dokumentation",
-                user: req.user._doc,
+                user: (req.user._doc || {}),
                 protocolList: documentList,
             })
         })
@@ -64,7 +64,6 @@ function editDoc(req, res, next) {
         .then(function(document){
             res.render("unisams/apps/protocol/protocol-editor", {
                 title: "unisan apps - Dokumentation",
-                user: req.user._doc,
                 document: document
             })
         })

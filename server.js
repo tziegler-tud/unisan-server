@@ -123,12 +123,13 @@ server.use('/info/datenschutz', datenschutzRouter);
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
 server.use('/unisams', loginRouter);
+server.use('/unisams/apps/protocol', protocolRouter);
 server.use("/unisams", webAuth);
 server.use('/unisams', mainRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/settings', settingsRouter);
-server.use('/unisams/apps/protocol', protocolRouter);
+
 // catch 404 and forward to error handler
 server.use("/unisams/*", function(req, res, next) {
   next(createError(404));
