@@ -28,7 +28,7 @@ import {MDCRipple} from "@material/ripple";
             document.body.addEventListener('MDCDrawer:closed', () => {
                 // mainContentEl.querySelector('input, button').focus();
             });
-            const buttonRipple = new MDCRipple(document.querySelector('.mdc-button'));
+            // const buttonRipple = new MDCRipple(document.querySelector('.mdc-button'));
 
             topAppBar.setScrollTarget(mainContentEl);
             topAppBar.listen('MDCTopAppBar:nav', () => {
