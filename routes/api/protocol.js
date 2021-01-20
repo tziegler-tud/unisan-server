@@ -37,6 +37,8 @@ router.post('/create', createDocument)
 router.get("/", checkUrlAccess);
 router.get('/current', getCurrentUserDocuments);
 router.get('/:userid/docs/:documentid', getDocument);
+router.post('/:userid/docs/:documentid', updateDocument);
+router.get('/:userid', getUserDocuments);
 router.get('/:userid', getUserDocuments);
 router.delete('/:id', deleteDocument);
 
@@ -70,6 +72,12 @@ function createDocument(req, res, next) {
     protocolService.create(req, req.body)
         .then(result => res.json(result))
         .catch(err=>next(err))
+}
+
+function updateDocument(req, res, next) {
+    protocolService.update(req, req.params.documentid, req.body)
+        .then(result => res.json(result))
+        .catch(err=> next(err))
 }
 
 function deleteDocument(req, res, next) {

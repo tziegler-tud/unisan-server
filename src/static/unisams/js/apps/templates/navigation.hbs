@@ -2,7 +2,7 @@
     <div class="mdc-top-app-bar__row">
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
             <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu">menu</button>
-            <span class="mdc-top-app-bar__title">{{pageData.title}}</span>
+            <span class="mdc-top-app-bar__title">{{pageData.name}}</span>
         </section>
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
 
@@ -13,7 +13,7 @@
 <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
     <div class="mdc-drawer__content">
         <div class="mdc-drawer__header">
-            <h3 class="mdc-drawer__title">{{pageData.name}}</h3>
+            <h3 class="mdc-drawer__title">{{pageData.title}}</h3>
             <h6 class="mdc-drawer__subtitle"></h6>
         </div>
         <div class="mdc-list">
@@ -27,7 +27,11 @@
                 <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
                 <span class="mdc-list-item__text">Seite 2</span>
             </a>
-
+            <button class="mdc-button mdc-button--outlined app-link-save">
+                <div class="mdc-button__ripple"></div>
+                <i class="material-icons mdc-button__icon" aria-hidden="true">save</i>
+                <span class="mdc-button__label">Speichern</span>
+            </button>
         </div>
     </div>
 </aside>

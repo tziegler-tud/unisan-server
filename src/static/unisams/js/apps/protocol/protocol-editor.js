@@ -14,7 +14,7 @@ $(document).ready (function () {
     let nav = new app.Navigation({
         pageData: {
             title: protocol.title,
-            name: protocol.name
+            name: "Divi Protokoll Online"
         },
         data: protocol
     });
@@ -52,6 +52,10 @@ $(document).ready (function () {
             $(".app-link-page2").on("click",function() {
                 displayPage(2);
             });
+            $(".app-link-save").on("click",function() {
+                saveDivi()
+            });
+            initializeFieldIds();
         })
         displayPage(1);
         $(".selectable").on("click", function(){
@@ -99,6 +103,65 @@ $(document).ready (function () {
             $(".divi-page").removeClass("active")
             $(".divi-page.page"+page).addClass("active");
         }
+
+        function initializeFieldIds(){
+            //find all inputs and give them unique identifiers
+            let uniqueCounter = 0;
+            $("input").each(function(){
+                uniqueCounter++;
+                this.dataset.fieldid = uniqueCounter;
+                //load data, if available
+                let val = protocol.content[uniqueCounter]
+                if (val !== undefined){
+                    switch (this.type){
+                        case "text":
+                            this.value = val;
+                            break;
+                        case "radio":
+                            this.checked = val;
+                            break;
+                        case "checkbox":
+                            this.checked = val;
+                            break;
+                    }
+                }
+            })
+        }
+    }
+
+    function saveDivi() {
+        let content = {}
+        //find all input fields
+        $("input").each(function(){
+            let uniqueFieldId = this.dataset.fieldid;
+            let value;
+            switch (this.type){
+                case "text":
+                    value = this.value;
+                    break;
+                case "radio":
+                    value = this.checked;
+                    break;
+                case "checkbox":
+                    value = this.checked;
+                    break;
+            }
+            content[uniqueFieldId] = value;
+        });
+        console.log(content);
+
+        //api call to save content
+        $.ajax({
+            url: "/api/v1/apps/protocol/" + window.user.id + "/docs/" + protocol.id,
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(content),
+            success: function(result) {
+                alert("protocol saved");
+            }
+        });
+
     }
 
 });

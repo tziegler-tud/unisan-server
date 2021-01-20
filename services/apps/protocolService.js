@@ -15,6 +15,7 @@ module.exports = {
     getAll,
     getById,
     create,
+    update,
     delete: _delete,
     getUserDocuments,
 };
@@ -69,6 +70,30 @@ async function create(req, doc) {
     await document.save();
     return document;
 }
+
+/**
+ * Creates a new doc entry and saves it to the db
+ * @param req {Object} express request
+ * @param id {Number} protocol id
+ * @param {Protocol} doc JSON of protocol document to save
+ */
+async function update(req, id, doc) {
+    //validation
+    const protocol = await Protocol.findById(id);
+    // validate
+    if (!protocol) throw new Error('Protocol not found');
+
+    //validation
+    // copy eventParam to event
+    let obj = {
+        content: doc,
+    }
+    Object.assign(protocol, obj);
+
+    await protocol.save();
+    return protocol;
+}
+
 
 /**
  * Deletes a protocol entry

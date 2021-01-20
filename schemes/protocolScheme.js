@@ -21,36 +21,7 @@ var ProtocolSchema = new Schema({
         default: 0,
     },
     content: {
-        date: {
-            type: Date,
-            default: Date.now()
-        },
-        startTime: {
-            type: Date,
-            default: Date.now()
-        },
-        endTime: {
-            type: Date,
 
-        },
-        patientData: {
-            name: {
-                type: String,
-                default: "",
-            },
-            address: {
-               type: String,
-               default: "",
-            },
-            insurance: {
-                type: String,
-                default: "",
-            },
-            age: {
-                type: String,
-                default: ""
-            }
-        },
     },
     createdDate: {
         type: Date,
@@ -60,7 +31,7 @@ var ProtocolSchema = new Schema({
 
 ProtocolSchema.virtual('dateTimeString').get(function() {
 
-    var date = this.content.date;
+    var date = this.createdDate;
     var dateString;
 
     function wrapTime(timeString){
