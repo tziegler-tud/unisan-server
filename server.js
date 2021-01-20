@@ -32,6 +32,8 @@ var eventManagementRouter = require('./routes/unisams/events');
 var settingsRouter = require('./routes/unisams/settings');
 var protocolRouter = require('./routes/unisams/protocol');
 
+var publicProtocolRouter = require('./routes/unisams/protocol_public');
+
 
 var authRouter = require('./routes/api/auth');
 var accessRightsRouter = require('./routes/api/accessrights');
@@ -118,6 +120,7 @@ server.use('/info/impressum', impressumRouter);
 server.use('/info/datenschutz', datenschutzRouter);
 
 
+server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
 server.use('/unisams', loginRouter);
 server.use("/unisams", webAuth);

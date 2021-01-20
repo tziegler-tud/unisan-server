@@ -14,6 +14,7 @@ $(document).ready (function () {
     let nav = new app.Navigation({
         pageData: {
             title: protocol.title,
+            name: protocol.name
         },
         data: protocol
     });
