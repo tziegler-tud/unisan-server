@@ -43,11 +43,22 @@ $(document).ready (function () {
 
 
     function divi(){
+        let navinit = nav.initialize;
+        navinit.done(function(){
+            $(".app-link-page1").on("click", function(){
+                displayPage(1);
+            });
+            $(".app-link-page2").on("click",function() {
+                displayPage(2);
+            });
+        })
+        displayPage(1);
         $(".selectable").on("click", function(){
             this.classList.toggle("selected");
         })
         $(".selectable-scale-item").on("click", function(){
-            let valElement = document.getElementById("divi--erstbefunde2-schmerze-input");
+            let for_id = this.dataset.for;
+            let valElement = document.getElementById(for_id);
             if (this.classList.contains("selected")){
                 this.classList.remove("selected");
                 valElement.value = 0;
@@ -81,6 +92,12 @@ $(document).ready (function () {
             //find next
             $(this).nextAll("input").first().focus();
         })
+
+        function displayPage(page) {
+            //find associated page container
+            $(".divi-page").removeClass("active")
+            $(".divi-page.page"+page).addClass("active");
+        }
     }
 
 });
