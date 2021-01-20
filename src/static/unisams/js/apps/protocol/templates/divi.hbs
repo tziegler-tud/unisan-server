@@ -1185,48 +1185,48 @@
                             </div>
                         </div>
                         <div class="protocol-form-inputSet protocol-form-inputSet divi--erstbefunde2-schmerzen">
-                            <input id="divi--erstbefunde2-schmerze-input" class="hidden" value="0"/>
+                            <input id="divi--erstbefunde2-schmerzen-input" class="hidden" value="0"/>
                             <label>Schmerzen</label>
                             <div class="form-input-scale">
-                                <div class="scale-item selectable-scale-item" data-value="1">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="1">
                                     <div class="scale-overlay">
                                         <span>1</span>
                                     </div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="2">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="2">
                                     <div class="scale-overlay">2</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="3">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="3">
                                     <div class="scale-overlay">3</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="4">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="4">
                                     <div class="scale-overlay">4</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="5">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="5">
                                     <div class="scale-overlay">5</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="6">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="6">
                                     <div class="scale-overlay">6</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="7">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="7">
                                     <div class="scale-overlay">7</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="8">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="8">
                                     <div class="scale-overlay">8</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item selectable-scale-item" data-value="9">
+                                <div class="scale-item selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="9">
                                     <div class="scale-overlay">9</div>
                                     <div class="checkmark"></div>
                                 </div>
-                                <div class="scale-item last selectable-scale-item" data-value="10">
+                                <div class="scale-item last selectable-scale-item" data-for="divi--erstbefunde2-schmerzen-input" data-value="10">
                                     <div class="scale-overlay">10</div>
                                     <div class="checkmark"></div>
                                 </div>
@@ -1470,7 +1470,7 @@
                                 <label>SVES / VES polymorph</label>
                             </div>
                         </div>
-                        <div id="divi--erstbefunde2--ekg" class="divi--erstbefunde2--atmung">
+                        <div id="divi--erstbefunde2--atmung" class="divi--erstbefunde2--atmung">
                             <div class="double-row title"><span>Atmung</span></div>
                             <div class="radio-input-container">
                                 <input type="radio" name="atmung">
@@ -1527,7 +1527,7 @@
                                 <label>sonstiges path. Atemmuster (Biot, Cheyne Stokes etc.)</label>
                             </div>
                         </div>
-                        <div id="divi--erstbefunde2--ekg" class="divi--erstbefunde2--haut">
+                        <div id="divi--erstbefunde2--haut" class="divi--erstbefunde2--haut">
                             <div class="double-row title"><span>Haut</span></div>
                             <div class="radio-input-container">
                                 <input type="radio" name="haut">
@@ -3071,7 +3071,877 @@
                     </div>
                 </div>
             </div>
+            <div class="protocol-grid-item  divi--medikation">
+                <div class="divi--medikation-topRow protocol-form-set">
+                    <div class="protocol-form-set-header toprow-element">
+                        <h3 class="small-caps">Medikation</h3>
+                    </div>
+                    <div class="radio-input-container toprow-element">
+                        <input type="radio" name="medikation"/>
+                        <label>keine Medikation</label>
+                    </div>
+                </div>
+                <div class="divi--medikation-container space-below">
+                    <div class="medikation-table">
+                        <div class="title">Wirkstoff / Handelsname / Infusion</div>
+                        <div class="title last-col">Dosis / Dosen</div>
+                        <div class="medikation-table-input">
+                            <input id="med-11"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-12"/>
+                        </div>
+                        <div class="medikation-table-input">
+                            <input id="med-13"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-14"/>
+                        </div>
+                        <div class="medikation-table-input">
+                            <input id="med-15"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-16"/>
+                        </div>
+                        <div class="medikation-table-input">
+                            <input id="med-17"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-18"/>
+                        </div>
+                        <div class="medikation-table-input last-row">
+                            <input id="med-111"/>
+                        </div>
+                        <div class="medikation-table-input last-col last-row">
+                            <input id="med-112"/>
+                        </div>
+                    </div>
+                    <div class="medikation-table">
+                        <div class="title">Wirkstoff / Handelsname / Infusion</div>
+                        <div class="title last-col">Dosis / Dosen</div>
+                        <div class="medikation-table-input ">
+                            <input id="med-21"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-22"/>
+                        </div>
+                        <div class="medikation-table-input">
+                            <input id="med-23"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-24"/>
+                        </div>
+                        <div class="medikation-table-input">
+                            <input id="med-25"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-26"/>
+                        </div>
+                        <div class="medikation-table-input">
+                            <input id="med-27"/>
+                        </div>
+                        <div class="medikation-table-input last-col">
+                            <input id="med-28"/>
+                        </div>
+                        <div class="medikation-table-input last-row">
+                            <input id="med-211"/>
+                        </div>
+                        <div class="medikation-table-input last-col last-row">
+                            <input id="med-212"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="medikation-bottomRow">
+                    <div class="medikation-int-container">
+                        <div class="row-span2">
+                            <label class="nowrap small-caps font-small">
+                                Vorarb-Interventionen<br>durch Rettungsdienst
+                            </label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="checkbox" name="int-mas"/>
+                            <label>Maßnahmen</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="checkbox" name="int-medi"/>
+                            <label>Medikamente</label>
+                        </div>
+                        <input class="span3 text-input protocol-form-input protocol-form-input--border-bottom">
+                        <input class="space-below span3 text-input protocol-form-input protocol-form-input--border-bottom">
+
+                    </div>
+                    <div class="medikation-lyse-container shrink-rows">
+                        <div class="row-span4">
+                            <label class="nowrap small-caps font-small">
+                                Lysetherapie
+                            </label>
+                        </div>
+                        <div class="radio-input-container span2">
+                            <input type="radio" name="int-lyse"/>
+                            <label>vor Kreislaufstillstand</label>
+                        </div>
+                        <div class="radio-input-container span2">
+                            <input type="radio" name="int-lyse"/>
+                            <label>wärend Kreislaufstillstand</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="int-lyse"/>
+                            <label>nach ROSC</label>
+                        </div>
+                        <div class="row-span2 shrinking-row-2">
+                            <div>
+                                <label class="nowrap">Beginn...</label>
+                            </div>
+                            <div class="protocol-form-inputSet protocol-form-dateInput input-4">
+                                <div class="date-input-container">
+                                    <input id="massnahmen--rea-z11" name="massnahmen--rea-z11" class="protocol-form-input protocol-form-input--date" maxlength="1">
+                                    <div class="seperator-small"></div>
+                                </div>
+                                <div class="date-input-container">
+                                    <input id="massnahmen--rea-z12" name="massnahmen--rea-z12" class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                                    <div class="seperator-big"></div>
+                                </div>
+                                <div class="date-input-container">
+                                    <input id="massnahmen--rea-z13" name="massnahmen--rea-z13" class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                                    <div class="seperator-small"></div>
+                                </div>
+                                <div class="date-input-container">
+                                    <input id="massnahmen--rea-z14" name="massnahmen--rea-z14" class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                                </div>
+                            </div>
+                        </div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="protocol-grid-item  divi--tod ">
+                <div class="divi--tod-container shrink-rows protocol-form-set">
+                    <div class="protocol-form-set-header tod-header">
+                        <h3 class="small-caps header-part nowrap">Reanimation / Tod / Todesfestellung</h3>
+                        <span class="protocol-helper-text header-part nowrap">(ergänzende Angaben)</span>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="t-tod"/>
+                        <label class="small-caps">Tod</label>
+                    </div>
+                    <div class="shrinking-row-4">
+                        <div class="radio-input-container">
+                            <input type="checkbox" name="t-rea"/>
+                            <label class="small-caps">Reanimation</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-rea-r"/>
+                            <label class="nowrap">ROSC im Verlauf</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-rea-r"/>
+                            <label class="nowrap">niemals ROSC</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-rea-r"/>
+                            <label>erfolglos</label>
+                        </div>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="t-fest"/>
+                        <label>Todesfeststellung</label>
+                    </div>
+                    <div class="shrinking-row-5">
+                        <div class="indent radio-input-container">
+                            <label class="small-caps nowrap">Beginn Rea:</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-reabeginn-r"/>
+                            <label class="nowrap">Ersthelfer</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-reabeginn-r"/>
+                            <label class="nowrap">First Resp.</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-reabeginn-r"/>
+                            <label>Rettungsd.</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-reabeginn-r"/>
+                            <label>Notarzt</label>
+                        </div>
+                    </div>
+                    <div class="shrinking-row-3 indent">
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-fest"/>
+                            <label>natürlich</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-fest"/>
+                            <label>unklar</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-fest"/>
+                            <label class="nowrap">nicht natürlich</label>
+                        </div>
+                    </div>
+                    <div class="shrinking-row-2">
+                        <div class="radio-input-container">
+                            <input type="checkbox" name="t-norea"/>
+                            <label class="nowrap">keine Reanimation</label>
+                        </div>
+                        <div class="radio-input-container font-small">
+                            <input type="radio" name="t-reabeginn-r"/>
+                            <label class="nowrap">nicht gewünscht / Patientenverfügung</label>
+                        </div>
+                    </div>
+
+                    <div class="protocol-form-inputSet protocol-form-dateInput input-4 label row-span2">
+                        <label class="nowrap">Todeszeitpunkt&nbsp;</label>
+                        <div class="date-input-container">
+                            <input id="tod--tod-z11" name="tod--tod-z11" class="protocol-form-input protocol-form-input--date" maxlength="1">
+                            <div class="seperator-small"></div>
+                        </div>
+                        <div class="date-input-container">
+                            <input id="tod--tod-z12" name="tod--tod-z12" class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                            <div class="seperator-big"></div>
+                        </div>
+                        <div class="date-input-container">
+                            <input id="tod--tod-z13" name="tod--tod-z13" class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                            <div class="seperator-small"></div>
+                        </div>
+                        <div class="date-input-container">
+                            <input id="tod--tod-z14" name="tod--tod-z14" class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                        </div>
+                    </div>
+
+                    <div class="shrinking-row-4 indent">
+                        <div class="radio-input-container">
+                            <input type="checkbox" name="t-norea-r"/>
+                            <label class="nowrap">zu spät</label>
+                        </div>
+                        <div class="radio-input-container">
+                            <input type="radio" name="t-norea-r"/>
+                            <label class="nowrap">aussichtslose Grunderkrankung</label>
+                        </div>
+                        <div class="radio-input-container font-small">
+                            <input type="radio" name="t-norea-r"/>
+                            <label class="nowrap">Sonstige</label>
+                        </div>
+                        <input id="t-norea-sonst-inp" class="sonst-inp protocol-form-input protocol-form-input--border">
+                    </div>
+                    <div class="shrinking-row-3">
+                        <div class="radio-input-container">
+                            <input type="checkbox" name="t-kh"/>
+                            <label class="nowrap">KH-Aufnahme</label>
+                        </div>
+                        <div class="radio-input-container indent">
+                            <input type="radio" name="t-kh-r"/>
+                            <label class="nowrap">mit ROSC</label>
+                        </div>
+                        <div class="radio-input-container indent">
+                            <input type="radio" name="t-kh-r"/>
+                            <label class="nowrap">laufende Reanimation</label>
+                        </div>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="t-zeit-c"/>
+                        <label class="nowrap">Todeszeitpunkt nicht bestimmbar</label>
+                    </div>
+
+                </div>
+            </div>
         </div>
-        
+        <div class="protocol-grid-row protocol-row-2">
+            <div class="protocol-grid-item protocol-form-set divi--uebergabe-werte row-span3 shrink-rows">
+
+                <div class="row-items-3 auto">
+                    <div class="protocol-form-set-header font-big span3">
+                        <h3 class="small-caps">Übergabe</h3>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="radio" name="uebergabe-keine"/>
+                        <label>keine</label>
+                    </div>
+                    <div class="shrinking-row-2 col-gap5">
+                        <label class="center-vertically">Zeitpunkt</label>
+                        <div class="protocol-form-inputSet protocol-form-dateInput input-4 label">
+
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date day1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date day2" maxlength="1">
+                                <div class="seperator-big"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date month1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date month2" maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shrinking-row-2 col-gap5">
+                        <label class="nowrap font-bold center-vertically">Glasgow Coma Scale</label>
+                        <div class="protocol-form-inputSet protocol-form-dateInput input-2">
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date day1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date day2" maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row-items-3 auto">
+                    <div id="divi--erstbefunde2-rr" class="rr-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput rr-part">
+                            <label>RR&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date rrs1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date rrs2" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date rrs3" maxlength="1">
+                            </div>
+                        </div>
+                        <div class="protocol-form-inputSet protocol-form-dateInput rr-part">
+                            <label class="font-big">/&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date rrd1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date rrd2" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date rrd3" maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divi--erstbefunde2-hf" class="hf-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput hf-part">
+                            <label>HF&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date hf1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date hf2" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date hf3" maxlength="1">
+                            </div>
+                        </div>
+                        <div class="protocol-form-radioSet shrinking-row-2 hf-radio">
+                            <div class="radio-input-container">
+                                <input type="radio" name="hf-radio">
+                                <label>rhythmisch</label>
+                            </div>
+                            <div class="radio-input-container">
+                                <input type="radio" name="hf-radio">
+                                <label>arrhythmisch</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divi--erstbefunde2-bz" class="bz-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput bz-part">
+                            <label>BZ&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date bz1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date bz2" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date bz3" maxlength="1">
+                            </div>
+                        </div>
+                        <div class="bz-button">
+                            <div class="selectable">HIGH</div>
+                            <div class="selectable">LOW</div>
+                        </div>
+                        <div class="protocol-form-radioSet row-items-2 bz-radio double-column">
+                            <div class="radio-input-container">
+                                <input type="radio" name="bz-radio">
+                                <label>mg/dl</label>
+                            </div>
+                            <div class="radio-input-container">
+                                <input type="radio" name="bz-radio">
+                                <label>mmol/l</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-items-4 auto">
+                    <div id="divi--erstbefunde2-af" class="af-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput af-part">
+                            <label>AF&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date af1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date af2" maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divi--erstbefunde2-spo2" class="spo2-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput spo2-part">
+                            <label>SpO2&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date spo21" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date spo22" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date spo23" maxlength="1">
+                            </div>
+                        </div>
+                        <div class="protocol-form-radioSet shrinking-row-2 spo2-radio">
+                            <div class="radio-input-container">
+                                <input type="radio" name="spo2-radio">
+                                <label class="nowrap">bei Raumluft</label>
+                            </div>
+                            <div class="radio-input-container">
+                                <input type="radio" name="spo2-radio">
+                                <label class="nowrap">unter O2-Gabe</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divi--erstbefunde2-temp" class="temp-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput temp-part">
+                            <label>Temp&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date temp1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date temp2" maxlength="1">
+                                <div class="seperator-big"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date temp3" maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divi--erstbefunde2-co2" class="co2-container">
+                        <div class="protocol-form-inputSet protocol-form-dateInput co2-part">
+                            <label>etCO2&nbsp;</label>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date co1" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date co2" maxlength="1">
+                                <div class="seperator-small"></div>
+                            </div>
+                            <div class="date-input-container">
+                                <input class="protocol-form-input protocol-form-input--date co3" maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="protocol-form-inputSet protocol-form-inputSet divi--uebergabe-schmerzen">
+                    <input id="divi--uebergabe-schmerzen-input" class="hidden" value="0"/>
+                    <label>Schmerzen</label>
+                    <div class="form-input-scale">
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="1">
+                            <div class="scale-overlay">
+                                <span>1</span>
+                            </div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="2">
+                            <div class="scale-overlay">2</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="3">
+                            <div class="scale-overlay">3</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="4">
+                            <div class="scale-overlay">4</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="5">
+                            <div class="scale-overlay">5</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="6">
+                            <div class="scale-overlay">6</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="7">
+                            <div class="scale-overlay">7</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="8">
+                            <div class="scale-overlay">8</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="9">
+                            <div class="scale-overlay">9</div>
+                            <div class="checkmark"></div>
+                        </div>
+                        <div class="scale-item last selectable-scale-item" data-for="divi--uebergabe-schmerzen-input" data-value="10">
+                            <div class="scale-overlay">10</div>
+                            <div class="checkmark"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="divi--uebergabe--ekg" class="protocol-grid-item protocol-form-set divi--uebergabe--ekg">
+                <div class="title"><span>EKG</span></div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>Sinusrhythmus</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>Schrittmacherrhythmus</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="ekg">
+                    <label>STEMI</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>Abs. Arrhytmie</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>Kammerflimmern</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="ekg">
+                    <label>schmale QRS-Tachykardie</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>kein EKG</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>AV-Block II°</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>PEA / EMD</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="ekg">
+                    <label>breite QRS-Tachykardie</label>
+                </div>
+                <div></div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>AV-Block III°</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="ekg">
+                    <label>Asystolie</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="ekg">
+                    <label>SVES / VES monomorph</label>
+                </div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="ekg">
+                    <label>SVES / VES polymorph</label>
+                </div>
+            </div>
+            <div id="divi--uebergabe--atmung" class="protocol-grid-item protocol-form-set divi--uebergabe--atmung">
+                <div class=" title"><span>Atmung</span></div>
+                <div class="radio-input-container">
+                    <input type="radio" name="atmung">
+                    <label>unauffällig</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="atmung">
+                    <label>Apnoe</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="atmung">
+                    <label>Stridor</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="atmung">
+                    <label>Hyperventilation</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="atmung">
+                    <label>Dyspnoe</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="atmung">
+                    <label>Beatmung</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="atmung">
+                    <label>Zyanose</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="atmung">
+                    <label>Atemwegsverlegung</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="atmung">
+                    <label>nicht US</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="atmung">
+                    <label>Schnappatmung</label>
+                </div>
+                <div></div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="atmung">
+                    <label>Spastik</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="atmung">
+                    <label>Rasselgeräusche</label>
+                </div>
+                <div></div>
+                <div class="radio-input-container span3">
+                    <input type="radio" name="atmung">
+                    <label>sonstiges path. Atemmuster (Biot, Cheyne Stokes etc.)</label>
+                </div>
+            </div>
+
+            <div class="protocol-grid-item protocol-form-set divi--uebergabe-bewusstsein">
+                <div class=" title"><span>Bewusstsein</span></div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label>wach</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label>bewusstlos</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="bewusstseinslage">
+                    <label>Reakt. auf Ansprache</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="bewusstseinslage">
+                    <label>analgosediert / Narkose</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label>nicht US</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label>getrübt</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label>nicht beurteilb.</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="bewusstseinslage">
+                    <label>Reakt. auf Schmerzreiz</label>
+                </div>
+
+
+
+            </div>
+        </div>
+        <div class="protocol-grid-row protocol-row-3">
+            <div class="protocol-grid-item protocol-form-set divi--einsatzverlauf shrink-rows">
+                <div class="protocol-form-set-header font-big">
+                    <h3 class="nowrap small-caps ">Einsatzverlauf - Besonderheiten</h3>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="verlauf-11">
+                    <label class="nowrap">Übernahme aus artzbesetztem Rettungsmittel</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="verlauf-12">
+                    <label class="nowrap">Übergabe an artzbesetztes Rettungsmittel</label>
+                </div>
+                <div class="shrinking-row-3">
+                    <div class="radio-input-container">
+                        <input type="radio" name="verlauf-2">
+                        <label class="nowrap">Transport ins Krankenhaus</label>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-2">
+                        <label class="nowrap">mit Arzt</label>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-2">
+                        <label class="nowrap">RTH</label>
+                    </div>
+                </div>
+                <div class="radio-input-container indent">
+                    <input type="checkbox" name="verlauf-2">
+                    <label class="nowrap">mindestens eine Klinik nimmt nicht auf</label>
+                </div>
+                <div class="shrinking-row-2 indent">
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-2">
+                        <label class="nowrap">Zwangsbelegung</label>
+                    </div>
+                    <div class="radio-input-container indent">
+                        <input type="checkbox" name="verlauf-2">
+                        <label class="nowrap">Zwangsunterbringung</label>
+                    </div>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="verlauf-3">
+                    <label class="nowrap">nur Untersuchung und Behandlung</label>
+                </div>
+                <div class="radio-input-container indent">
+                    <input type="radio" name="verlauf-3-r">
+                    <label class="nowrap">Transportverweigerung</label>
+                </div>
+                <div class="radio-input-container indent">
+                    <input type="radio" name="verlauf-3-r">
+                    <label class="nowrap">Patient nicht transportfähig</label>
+                </div>
+                <div class="radio-input-container indent">
+                    <input type="radio" name="verlauf-31-r">
+                    <label class="nowrap">Therapieverzicht / -beschränkung bewusst</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="verlauf-4">
+                    <label class="nowrap">Erhöhter Hygieneaufwand</label>
+                </div>
+                <div class="shrinking-row-2">
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-41">
+                        <label class="nowrap">erschwerter Pat.-Zugang</label>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-42">
+                        <label class="nowrap">techn. Rettung</label>
+                    </div>
+                </div>
+                <div class="radio-input-container space-below">
+                    <input type="checkbox" name="verlauf-5">
+                    <label class="nowrap">Schwerlasttransport erforderlich</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="verlauf-6">
+                    <label class="nowrap">LNA am Einsatz</label>
+                </div>
+                <div class="shrinking-row-2">
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-7">
+                        <label class="nowrap">Manv</label>
+                    </div>
+                    <div class="radio-input-container">
+                        <input type="checkbox" name="verlauf-7">
+                        <label class="nowrap">Behandlung meherer Patienten</label>
+                    </div>
+                </div>
+            </div>
+            <div class="protocol-grid-item protocol-form-set divi--bemerkungen row-span2">
+                <div class="protocol-form-set-header font-big">
+                    <h3 class="nowrap small-caps ">Einsatzverlauf - Besonderheiten</h3>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox" name="bewusstseinslage">
+                    <label>Massnahmenverweigerung (ggf. detailliert angeben)</label>
+                </div>
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                <input class="space-below text-input protocol-form-input protocol-form-input--border-bottom">
+                <div class="unterschrift">
+                    <input class="text-input protocol-form-input protocol-form-input--border-bottom">
+                    <label>Unterschrift Notarzt</label>
+                </div>
+            </div>
+            <div class="protocol-grid-item protocol-form-set divi--ende">
+                <div class="protocol-form-set-header font-big span2">
+                    <h3 class="nowrap small-caps ">Übergabe</h3>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label>keine</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Hausarzt / KV-Arzt vor Ort</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Einsatzstelle</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Fachambulanz</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">ZNA / INA</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Schockraum</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Stroke Unit</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Herzkatheterlabor</label>
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">CPU</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Intensivstation</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Allgemeinstation</label>
+                </div>
+                <div class="radio-input-container span2">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">OP direkt</label>
+                </div>
+                <div class="radio-input-container span2">
+                    <input type="radio" name="bewusstseinslage">
+                    <label class="nowrap">Praxis</label>
+                </div>
+                <div class="radio-input-container">
+                    <input type="checkbox"/>
+                    <label>Sonstige</label>
+                </div>
+                <input class="t-inp space-below protocol-form-input protocol-form-input--border"/>
+                <div class="radio-input-container indent">
+                    <label class="font-small">Übergabe <br>an (Name)</label>
+                </div>
+                <input class="t-inp protocol-form-input protocol-form-input--border"/>
+                <div class="space-below"></div>
+
+            </div>
+        </div>
     </div>
 </div>

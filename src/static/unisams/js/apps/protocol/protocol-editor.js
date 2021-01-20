@@ -57,7 +57,8 @@ $(document).ready (function () {
             this.classList.toggle("selected");
         })
         $(".selectable-scale-item").on("click", function(){
-            let valElement = document.getElementById("divi--erstbefunde2-schmerze-input");
+            let for_id = this.dataset.for;
+            let valElement = document.getElementById(for_id);
             if (this.classList.contains("selected")){
                 this.classList.remove("selected");
                 valElement.value = 0;
