@@ -23,6 +23,7 @@ const optLocalDb = {
     useNewUrlParser: true
 };
 
+
 mongoose.connect(config.connectionString,opt);  // use this for remote database
 // const connection = mongoose.connect("mongodb://localhost:27017/unisan-test", optLocalDb);  // use this for locale database
 mongoose.Promise = global.Promise;
