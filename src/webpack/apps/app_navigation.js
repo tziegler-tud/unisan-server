@@ -7,10 +7,25 @@ import {MDCRipple} from "@material/ripple";
 
     var phone = window.matchMedia("only screen and (max-width: 50em)");
 
-    app.Navigation = function(context){
+    /**
+     *
+     * @param context
+     * @param version
+     * @returns {Window.app.Navigation}
+     * @constructor
+     */
+    app.Navigation = function(context, version){
         let self = this;
+        let url;
+        switch (version) {
+            case "public":
+                url = '/static/unisams/js/apps/templates/navigation_public.hbs'
+                break
+            default:
+                url = '/static/unisams/js/apps/templates/navigation.hbs'
+        }
         //load drawer template and attach to body
-        self.initialize = $.get('/static/unisams/js/apps/templates/navigation.hbs', function (data) {
+        self.initialize = $.get(url, function (data) {
             var template = Handlebars.compile(data);
             // $(".app-drawer-container").prepend(template(context));
             $(".app-page-wrapper").prepend(template(context));

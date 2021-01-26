@@ -65,7 +65,8 @@ function editDoc(req, res, next) {
             res.render("unisams/apps/protocol/protocol-editor", {
                 title: "unisan apps - Dokumentation",
                 user: req.user._doc,
-                document: document
+                document: document,
+                version: "private",
             })
         })
         .catch(err=>next(err))

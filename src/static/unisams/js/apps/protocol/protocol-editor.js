@@ -3,13 +3,6 @@ var app = window.app;
 
 $(document).ready (function () {
     let protocol = window.currentExploredProtocol;
-    // let drawer = new app.Drawer({});
-    // let topbar = new app.Topbar({
-    //     pageData: {
-    //         title: document.title,
-    //     },
-    //     data: document
-    // });
 
     let nav = new app.Navigation({
         pageData: {
@@ -17,7 +10,7 @@ $(document).ready (function () {
             name: "Divi Protokoll Online"
         },
         data: protocol
-    });
+    }, window.version);
 
     //choose protocol template
     let template="divi";

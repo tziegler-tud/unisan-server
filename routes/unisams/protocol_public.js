@@ -22,7 +22,8 @@ function editDoc(req, res, next) {
     res.render("unisams/apps/protocol/protocol-editor", {
         title: "unisan apps - Dokumentation",
         user: {},
-        document: {title: "Neues Protokoll"}
+        document: {title: "Neues Protokoll", content: {}},
+        version: "public",
     })
 
 
