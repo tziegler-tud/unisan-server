@@ -214,6 +214,7 @@ $(document).ready (function () {
                                                     $("#qualId" + common.escapeSelector(data.id)).remove();
                                                 });
                                                 lidlRTO.objectManager.removeObject(dialog_token);
+                                                addDBKey_sidebar.hide()
                                             }
                                         }
                                     };
@@ -295,59 +296,6 @@ $(document).ready (function () {
                             actions.insertDBKey(userid, key, value, args, function () {
 
                             });
-                        }
-                    },
-                },
-            );
-            addDBKey_sidebar.show();
-        });
-
-        $(".quallist-entry").on("click", function (e) {
-            e.preventDefault();
-            var self = this;
-
-            addDBKey_sidebar.addContent('UserUpdateQualification', {
-                    userid: userid,
-                    key: self.dataset.key,
-                    keyId: self.dataset.keyid,
-                    qualificationId: self.dataset.keyid,
-                    callback: {
-                        onConfirm: function (userid, key, value) {
-                            var args = {
-                                isArray: true, //we reference the element directly by array index
-                                noIndex: false,
-                                keyId: self.dataset.keyId
-                            };
-                            actions.insertDBKey(userid, key, value, args, function () {
-
-                            });
-                        },
-                        onDelete: function (userid, key, data) {
-                            var args = {
-                                isArray: true
-                            };
-
-                            const dialog_content = {
-                                title: "Qualifikation löschen",
-                                message: "Folgende Qualifikation wird gelöscht: " + data.qualification.name,
-                                titleArg: "",
-                                messageArg: ""
-                            };
-                            var dialog_token = lidlRTO.objectManager.createNewObjectToken();
-                            const dialog_args = {
-                                userid: userid,
-                                callback: {
-                                    onConfirm: function (res) {
-                                        actions.removeDBKey(userid, key, data, args, function () {
-                                            $("#qualId" + common.escapeSelector(data.id)).remove();
-                                        });
-                                        lidlRTO.objectManager.removeObject(dialog_token);
-                                    }
-                                }
-                            };
-                            const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
-                            lidlRTO.objectManager.addObject(dialog, dialog_token);
-                            dialog.openDialog();
                         }
                     },
                 },

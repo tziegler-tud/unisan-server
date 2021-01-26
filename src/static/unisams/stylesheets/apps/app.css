@@ -1,1 +1,54 @@
-.noselect{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.noselect{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}body .app-page-wrapper{display:flex;height:100vh}body .app-page-wrapper .mdc-drawer-app-content{flex:auto;overflow:auto;position:relative;-webkit-transition:margin 250ms ease;-moz-transition:margin 250ms ease;-o-transition:margin 250ms ease;transition:margin 250ms ease}body .app-page-wrapper .app-content-container{overflow:auto;height:100%}body .app-page-wrapper .app-bar{position:absolute}body .app-page-wrapper .mdc-top-app-bar{z-index:7}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+body .app-page-wrapper {
+  display: flex;
+  height: 100vh;
+}
+body .app-page-wrapper .mdc-drawer-app-content {
+  flex: auto;
+  overflow: auto;
+  position: relative;
+  -webkit-transition: margin 250ms ease;
+  -moz-transition: margin 250ms ease;
+  -o-transition: margin 250ms ease;
+  transition: margin 250ms ease;
+}
+body .app-page-wrapper .app-content-container {
+  overflow: auto;
+  height: 100%;
+}
+body .app-page-wrapper .app-bar {
+  position: absolute;
+}
+body .app-page-wrapper .mdc-top-app-bar {
+  z-index: 7;
+}
+/*# sourceMappingURL=app.css.map */
