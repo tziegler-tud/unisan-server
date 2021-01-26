@@ -64,11 +64,12 @@ function editDoc(req, res, next) {
         .then(function(document){
             res.render("unisams/apps/protocol/protocol-editor", {
                 title: "unisan apps - Dokumentation",
-                document: document
+                user: req.user._doc,
+                document: document,
+                version: "private",
             })
         })
         .catch(err=>next(err))
-
 }
 
 module.exports = router;
