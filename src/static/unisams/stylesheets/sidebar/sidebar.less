@@ -76,6 +76,8 @@ body{
       height: 100%;
 
       .sidebar-top {
+        display: flex;
+        flex-flow: row nowrap;
         padding: 0;
         height: 3em;
         width: 100%;
@@ -87,6 +89,7 @@ body{
         .transition(transform, 250ms);
 
         .sidebar-back-btn {
+          flex: 0 0 1em;
           background-color: @page-bg-color-v2;
           padding: 1em;
           width: 1em;
@@ -109,7 +112,10 @@ body{
         }
 
         .sidebar-title {
-          float: left;
+          flex: 1 1 auto;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           padding: 1em;
           font-size: 90%;
           color: #333;

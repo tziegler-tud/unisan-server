@@ -7,7 +7,7 @@ const Log = require('../utils/log');
 
 const authService = new AuthService();
 
-const { convertDeltaToHtml } = require('node-quill-converter');
+const { convertDeltaToHtml, convertTextToDelta, convertHtmlToDelta } = require('node-quill-converter');
 
 const Event = db.Event;
 const User = db.User;
@@ -63,6 +63,10 @@ async function create(req, eventParam) {
         if(!eventParam.title.value){
             console.warn("Trying to create event with no title. Setting default...");
             eventParam.title.value = "Neues Event";
+        }
+        if(!eventParam.title.delta){
+            console.warn("Trying to create event with no title. Building from value...");
+            eventParam.title.delta = convertTextToDelta(eventParam.title.value);
         }
     }
     else {

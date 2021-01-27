@@ -180,12 +180,13 @@
 
         // clicks on mainElement shall expand container, second click should follow link
         $(".docker-mainElement").on('click', function(e) {
+            // might prove better to use state module pattern if this grows.
+            // e.stopPropagation();
+            e.stopImmediatePropagation();
+            e.preventDefault();
             // find container TODO: do not use jquery
             let container = $(e.currentTarget).parent(".docker-elementContainer")[0];
 
-            // might prove better to use state module pattern if this grows.
-            e.stopPropagation();
-            e.preventDefault();
             // check if container is expanded
             if (container.classList.contains("expanded")) {
                 // collaps it.
@@ -224,12 +225,13 @@
 
         // clicks on mainElement shall expand container, second click should follow link
         $(subpage).find($(".docker-mainElement")).on('click', function(e) {
+            // might prove better to use state module pattern if this grows.
+            e.stopImmediatePropagation();
+            e.preventDefault();
+
             // find container TODO: do not use jquery
             let container = $(e.currentTarget).parent(".docker-elementContainer")[0];
 
-            // might prove better to use state module pattern if this grows.
-            e.stopPropagation();
-            e.preventDefault();
             // check if container is expanded
             if (container.classList.contains("expanded")) {
                 // collaps it.

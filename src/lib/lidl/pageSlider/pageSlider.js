@@ -134,7 +134,13 @@
             this.container = c;
             container = c;
         }
-        this.addObject = function(key, value) {
+
+        /**
+         * adds a custom object to a page. Object is stored in page data object
+         * @param key object key
+         * @param value object value
+         */
+        lidl.PageSlider.Page.prototype.addObject = function(key, value) {
             if (key === undefined) {
                 console.error("failed to add object to Page data: invalid key")
             }
@@ -147,13 +153,13 @@
             self.onSave = func;
         }
         this.save = function(){
-            this.onSave();
             //saves the data and moves on to the next page
             $(container).find(".pageslider-page-dataElement").each(function(){
                 let key = this.name;
                 if (key === undefined) key = "undefined";
                 data[key]= this.value;
             })
+            this.onSave();
             objects.forEach(function(el){
                 let key = el.key;
                 data[key]= el.value;
@@ -234,6 +240,11 @@
         return this;
     }
 
+    /**
+     * adds a page to the PageSlider
+     * @param HTMLContent HTML to be rendered as page
+     * @returns {lidl.PageSlider.Page} the freshly created page object
+     */
     lidl.PageSlider.prototype.addPage = function(HTMLContent){
         let self = this;
         //create page object

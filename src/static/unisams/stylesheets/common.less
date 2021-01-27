@@ -55,6 +55,7 @@ a {
 
 #content-wrapper {
     flex: 0 0 100%;
+    overflow:hidden;
     //display: flex;
     //flex-flow: row wrap;
 
@@ -885,6 +886,16 @@ common btn styling
 
 /* common helper classes */
 
+.limitCharacters {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    > * {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
 .float {
     display: block;
     float: left;
@@ -951,6 +962,7 @@ common btn styling
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
 }
+
 
 
 .add-smt-button {

@@ -52,6 +52,7 @@ a {
 }
 #content-wrapper {
   flex: 0 0 100%;
+  overflow: hidden;
 }
 @media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
   #content-wrapper {
@@ -709,6 +710,15 @@ common btn styling
   border-bottom: 1px solid #AAA;
 }
 /* common helper classes */
+.limitCharacters {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.limitCharacters > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .float {
   display: block;
   float: left;

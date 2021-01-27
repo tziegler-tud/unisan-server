@@ -14,7 +14,7 @@
      * @param {String} htmlContent - html content for rendering
      * @param {String} type - input type. ["text"]
      * @param {Object} callback - callbacks to be executed when dialog buttons are used. currently, only 'onConfirm' is supported
-     * @param {Object} args - readOnly: [false] disable input., active: [false] initialize with active editor, disableButtons: [false] disables dialog buttons
+     * @param {Object} args - readOnly: [false] disable input., active: [false] initialize with active editor, disableButtons: [false] disables dialog buttons, limit: [0] maximum amount of characters. Value 0 disables character limit.
      * @returns {Window.common.EditableInputField}
      * @constructor
      */
@@ -51,8 +51,14 @@
     };
 
     var applyArgs = function(args){
+        let defaults = {
+            active: false,
+            disableButtons: false,
+            readOnly: false,
+            limit: 0,
+        }
         args = (args === undefined) ? {}: args;
-        return args;
+        return Object.assign(defaults, args);
     };
 
     var buildHTML = function(self){
@@ -96,6 +102,15 @@
             e.stopPropagation();
             self.deactivate();
         })
+        //limit character amount
+        if (self.args.limit > 0) {
+            self.quill.on('text-change', function(delta, old, source) {
+                if (self.quill.getLength() > self.args.limit) {
+                    self.quill.deleteText(self.args.limit, self.quill.getLength());
+                }
+            });
+        }
+
     };
     
     common.EditableInputField.prototype.isActive = function(){
@@ -161,11 +176,11 @@
 
         //build dialog buttons
         var buttons = buildHTML(this);
-        setupEventHandlers(this, buttons);
 
         //append to container
         container.append(buttons);
-        self.quill = quill;
+        this.quill = quill;
+        setupEventHandlers(this, buttons);
     }
     common.EditableInputField.prototype.deactivate = function(){
         let self = this;
