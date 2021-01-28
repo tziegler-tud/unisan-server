@@ -173,6 +173,32 @@ common = window.common;
             });
         }
 
+        events.updateDate = function(id, args, callback) {
+            if (callback === undefined) callback = {};
+            if (callback.onSuccess === undefined) callback.onSuccess = function(){}
+
+            var startDate = parseHTMLInputDate(args.date, args.startTime);
+            var endDate = parseHTMLInputDate(args.date, args.endTime);
+
+            let data = {
+                key: "date",
+                value: {
+                    startDate: startDate,
+                    endDate: endDate,
+                }
+            }
+            $.ajax({
+                url: "/api/v1/eventmod/updateKey/" +id,
+                type: 'PUT',
+                contentType: "application/json; charset=UTF-8",
+                dataType: 'json',
+                data: JSON.stringify(data),
+                success: function(result) {
+                    callback.onSuccess(result);
+                }
+            });
+        }
+
         events.updateKey = function(id, key, value, callback){
             if (callback === undefined) callback = {};
             if (callback.onSuccess === undefined) callback.onSuccess = function(){}

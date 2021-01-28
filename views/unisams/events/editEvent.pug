@@ -100,10 +100,6 @@ block content
                 section#sec1
                     #sec-content.subpage-container
                         #content1-heading.sec-heading.subpage-heading
-                            .userimg-container.sec-heading-img
-                                .userimg
-                                    img#userProfileImage.userProfileImage(src="/data/uploads/event_images/" + exploreEvent.id + "/" + exploreEvent.id + ".jpg")
-
                             .sec-heading-label.eventprofile-heading
                                 .eventprofile-heading-container
                                     .eventprofile-heading-text
@@ -139,12 +135,29 @@ block content
                                             .eventinfo-section-inner
                                                 .eventinfo-sectionheader
                                                     span Termin
-                                                #eventLocationEditor.eventinfo-item.editor-container
-                                                    .eventinfo-item.quill-renderer
+                                                #eventDateEditor.eventinfo-item.eventinfo-item-date
+                                                    .eventinfo-item-inner
+                                                        .eventinfo-date-day
+                                                            = exploreEvent.date.startDateString
+                                                        .eventinfo-date-time
+                                                            =exploreEvent.date.timeString
+                                                        .eventinfo-item-spacer
+
+
+                                                .eventinfo-sectionheader
+                                                    span Veranstaltungsort
+                                                #eventLocationEditor.eventinfo-item.eventinfo-item-date
+                                                    .eventinfo-item-inner
+                                                        .eventinfo-date-location.before-icon.icon-location
+                                                            =exploreEvent.location.value
+                                                    .eventinfo-item-spacer
+
 
                                         .eventinfo-section.eventinfo-card.card-half.eventwidget-location
                                             .eventinfo-section-inner
                                                 .eventinfo-sectionheader
-                                                    span Termin
-                                                #eventdetailseditor.eventinfo-item.editor-container
-                                                    .eventinfo-item.quill-renderer
+                                                    span Veranstaltungsort
+                                                #eventMaterialEditor.eventinfo-item.eventinfo-item-location
+                                                    .eventinfo-item-inner
+                                                        .eventinfo-location
+                                                            = exploreEvent.location.value

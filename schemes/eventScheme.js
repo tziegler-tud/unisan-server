@@ -109,6 +109,35 @@ var EventSchema = new Schema({
     },
 });
 
+function wrapTime(timeString){
+    if(parseInt(timeString) < 10){
+        return "0" + timeString;
+    }
+    else return timeString
+}
+
+function extractDateString(date){
+    return wrapTime(date.getDate()) + "." + wrapTime(date.getMonth()+1) + "." + date.getFullYear();
+}
+
+function extractTimeRangeString(startDate, endDate){
+    return wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes())
+}
+
+EventSchema.virtual('date.startDateString').get(function() {
+    return extractDateString(this.date.startDate);
+});
+
+
+EventSchema.virtual('date.endDateString').get(function() {
+    return extractDateString(this.date.endDate);
+});
+
+EventSchema.virtual('date.timeString').get(function() {
+    return extractTimeRangeString(this.date.startDate, this.date.endDate);
+});
+
+
 EventSchema.virtual('dateRangeString').get(function() {
 
     var startDate = this.date.startDate;
@@ -121,12 +150,6 @@ EventSchema.virtual('dateRangeString').get(function() {
 
     var dateString;
 
-    function wrapTime(timeString){
-        if(parseInt(timeString) < 10){
-            return "0" + timeString;
-        }
-        else return timeString
-    }
     // check if startDate and EndDate is the same day
     if (startDate.getFullYear() === endDate.getFullYear()){
         if (startDate.getMonth() === endDate.getMonth()){

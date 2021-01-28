@@ -2,12 +2,12 @@ var lidlRTO = window.lidlRTO;
 
 $(document).ready (function () {
 
-    var currentExploredUser;
+    var user;
     var profile = new window.profile.Profile(window.userId);
 
     // create new observer
-    var ob1 = new lidl.Observer(function(user){
-        currentExploredUser = user;
+    var ob1 = new lidl.Observer(function(u){
+        user = u;
     });
 
     // get user data from user service
@@ -191,8 +191,34 @@ $(document).ready (function () {
         });
         sidebar.show();
 
-
-
-
+        $("#eventDateEditor").on("click", function(){
+            sidebar.addContent("editEventDate", {
+                event: event,
+                callback: {
+                    onConfirm: function(eventid, data){
+                        window.actions.events.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime });
+                    },
+                },
+            });
+            sidebar.show();
+        })
+        $("#eventLocationEditor").on("click", function(){
+            sidebar.addContent("editEventLocation", {
+                event: event,
+                callback: {
+                    onConfirm: function(eventid, data){
+                        window.actions.events.updateKey(event.id, "location", {value: data.location}, {
+                            onSuccess: function(){
+                                window.location.reload();
+                            },
+                            onError: function(error) {
+                                sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
+                            }
+                        });
+                    },
+                },
+            });
+            sidebar.show();
+        })
     }
 });

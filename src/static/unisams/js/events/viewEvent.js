@@ -2,27 +2,53 @@ var lidlRTO = window.lidlRTO;
 
 $(document).ready (function () {
 
+    var user;
+    var profile = new window.profile.Profile(window.userId);
+
+    // create new observer
+    var ob1 = new lidl.Observer(function(u){
+        user = u;
+    });
+
+    // get user data from user service
+    //subscribe as observer to get notification if user changes on server
+    profile.getUserAndSubscribe(ob1)
+        .then(function(user){
+            notifyPage({user:user})
+        })
+        .catch(function(reason){
+            console.error("Failed to retrieve user data:" + reason)
+        });
+
     var currentExploredEvent;
     var eventProfile = new window.eventRequest.Event(window.exploreEventId, {
         populateParticipants: true,
     });
 
     // create new observer
-    var observer = new lidl.Observer(function(event){
+    var ob2 = new lidl.Observer(function(event){
         currentExploredEvent = event;
     });
 
     // get user data from user service
     //subscribe as observer to get notification if user changes on server
-    eventProfile.getEventAndSubscribe(observer)
+    eventProfile.getEventAndSubscribe(ob2)
         .then(function(event){
-            buildPage(event)
+            notifyPage({event: event})
         })
         .catch(function(reason){
             console.error("Failed to retrieve event data:" + reason)
         });
 
-    function buildPage(event) {
+    let pageData = {};
+    function notifyPage(obj) {
+        Object.assign(pageData, obj);
+        if(pageData.user && pageData.event) {
+            buildPage(pageData.user, pageData.event)
+        }
+    }
+
+    function buildPage(user, event) {
 
         let page = new window.eventPage.EventPage();
 
@@ -39,7 +65,7 @@ $(document).ready (function () {
                 })
             }
         };
-        let editableTextFieldContainer = document.getElementById("eventdetailseditor");
+        let editableTextFieldContainer = document.getElementById("eventDescribtionEditor");
         let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {readOnly: true});
 
         let cb = {
@@ -77,17 +103,17 @@ $(document).ready (function () {
         var sidebar = new common.Sidebar('wrapper', {title: "Test"});
         // init event sidebar
         //find if current user is already registered
-        let userIsParticipant = eventProfile.checkIfUserIsRegistered(window.user);
+        let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
         sidebar.addContent("eventParticipants", {
             event: event,
-            user: window.user,
+            user: user,
             isParticipant: userIsParticipant,
             callback: {
                 onConfirm: function(){
-                    window.actions.events.addParticipant(event.id, window.user.id)
+                    window.actions.events.addParticipant(event.id, user.id)
                 },
                 onDelete: function(){
-                    window.actions.events.removeParticipant(event.id, window.user.id)
+                    window.actions.events.removeParticipant(event.id, user.id)
                 }
             },
         });
