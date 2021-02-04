@@ -188,6 +188,7 @@
             htmlDialogMessage = $('<div/>', {
                 "class": "dialog-message dialog-part",
                 "id": "imgUpload-" + self.token,
+                "text": "Upload"
             });
             let htmlDialogImage = $('<div/>', {
                 "class": "dialog-imageViewer dialog-part",

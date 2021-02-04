@@ -213,6 +213,21 @@
     };
 
 
+    Date.prototype.toDateInputValue = (function() {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0,10);
+    });
+
+    Date.prototype.toTimeInputValue = (function() {
+        var local = new Date(this);
+        var hours = local.getHours().toString().length < 2 ? "0" + local.getHours().toString() : local.getHours().toString();
+        var minutes = local.getMinutes().toString().length < 2 ? "0" + local.getMinutes().toString() : local.getMinutes().toString();
+        return hours + ":" + minutes;
+    });
+
+
+
     return common;
 
 

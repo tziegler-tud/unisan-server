@@ -1,0 +1,56 @@
+
+<div id="sidebar" class="sidebar sidebar-event">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span class="quill-renderer limitCharacters">{{event.title.value}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+
+            </div>
+            <div class="sidebar-section">
+                <div class="section-title content-title">
+                    <span></span>
+                </div>
+                <div class="section-content">
+                    <span class="content-item"></span>
+                </div>
+            </div>
+            <div class="sidebar-section body-section event-participants-container">
+                <div class="form-sectionheader before-icon icon-location">
+                    <span>Location</span>
+                </div>
+                <div class="form-item useredit-item form-griditem" id="eventitem-date"><label class="form-item-label form-attribute-name nofloat" for="eventinp-location"></label>
+                    <input class="common-input" id="eventinp-location" name="eventinp-location" type="text" value="{{event.location.value}}"/>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+<!--                <div class="form-item useredit-item" id="eventitem-location">-->
+<!--                    <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">-->
+<!--                    <span class="mdc-notched-outline">-->
+<!--                        <span class="mdc-notched-outline__leading"></span>-->
+<!--                        <span class="mdc-notched-outline__notch">-->
+<!--                            <span class="mdc-floating-label" id="label1">Location</span></span>-->
+<!--                        <span class="mdc-notched-outline__trailing"></span>-->
+<!--                    </span>-->
+<!--                        <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">-->
+<!--                            place-->
+<!--                        </i>-->
+<!--                        <input class="mdc-text-field__input pageslider-page-dataElement form-inp" id="eventinp-location" name="location" type="text"  aria-labelledby="label1" required="required"/>-->
+<!--                    </label>-->
+<!--                </div>-->
+
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-confirm content-link">Speichern</a>
+        </div>
+    </div>
+
+</div>

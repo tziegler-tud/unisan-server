@@ -4,8 +4,8 @@ var uuid = require('uuid');
 const passport = require('passport');
 const bodyParser = require("body-parser");
 const protocolService = require('../../services/apps/protocolService');
-const AuthService = require('../../services/authService');
-const authService = new AuthService();
+const authService = require('../../services/authService');
+
 
 var app = express();
 

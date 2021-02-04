@@ -5,9 +5,9 @@ const LogService = require("./logService");
 const Log = require('../utils/log');
 
 
-const authService = new AuthService();
+// const authService = new AuthService();
 
-const { convertDeltaToHtml } = require('node-quill-converter');
+const { convertDeltaToHtml, convertTextToDelta, convertHtmlToDelta } = require('node-quill-converter');
 
 const Event = db.Event;
 const User = db.User;
@@ -24,7 +24,10 @@ module.exports = {
     populateParticipants,
     addParticipant,
     removeParticipant,
-    delete: _delete
+    delete: _delete,
+
+    addFileReference,
+    removeFileReference,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -63,6 +66,10 @@ async function create(req, eventParam) {
         if(!eventParam.title.value){
             console.warn("Trying to create event with no title. Setting default...");
             eventParam.title.value = "Neues Event";
+        }
+        if(!eventParam.title.delta){
+            console.warn("Trying to create event with no title. Building from value...");
+            eventParam.title.delta = convertTextToDelta(eventParam.title.value);
         }
     }
     else {
@@ -131,8 +138,12 @@ async function create(req, eventParam) {
                 });
             }
         });
-        // copy dummy user image to user directory
-
+        fs.mkdir(appRoot + '/src/data/uploads/event_files/' + event._id.toString(), { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            } else {
+            }
+        });
     }
 }
 
@@ -388,12 +399,18 @@ async function addParticipant(req, id, userId, args) {
         else {
             //overwrite
             event.participants.splice(index, 1, data);
+            if(role === "admin") {
+                addEventAdmin(event, user);
+            }
         }
 
     }
     else {
         // push user to participants array
         event.participants.push(data);
+        if(role === "admin") {
+            addEventAdmin(event, user);
+        }
         //create log
         let log = new Log({
             type: "modification",
@@ -498,7 +515,7 @@ async function _delete(req, id) {
     // await Event.findByIdAndRemove(id);
     let event = await Event.findById(id);
     //check write access
-    if(!authService.checkEventWriteAccess(req.user, event)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkEventWriteAccess(req.user, event)) throw {status: 403, message: "forbidden"};
 
     // await User.findByIdAndRemove(id);
     Event.findByIdAndRemove(id)
@@ -535,3 +552,200 @@ async function _delete(req, id) {
         })
         .catch()
 }
+
+/**
+ *
+ * @param req {Object} request object
+ * @param event {Event} event object
+ * @param filename {String} filename
+ * @param filetype {String} file extension. Supported: [jpg, png, bmp, gif, pdf, txt]
+ * @param size {Number} file size in bytes
+ * @param args {Object} {}
+ * @returns {Promise<*>}
+ */
+async function addFileReference(req, event, filename, filetype, size, args) {
+
+    // validate
+
+    if (!event) throw new Error('Event not found');
+    if (!(event instanceof Event)) {
+        // yes, it's a mongoose Cat model object
+        console.log("Failed to validate event object. Aborting")
+        throw new Error("invalid parameters given")
+    }
+
+    // validate input
+    if (!filename) throw new Error('no key given');
+    if (!filetype) {
+        filetype = "unset";
+    }
+
+
+    let key = event.files;
+    let value = {
+        filename: filename,
+        filetype: filetype,
+        size: size
+    }
+
+    // check if filename already exists
+    try {
+        //check if array
+        var index = event.files.map(e => e.filename).indexOf(filename);
+    }
+    catch (e) {
+        if (e instanceof TypeError) {
+            console.error("Exception:" + e);
+            console.error("Aborting operation to ensure data integrity.");
+            throw e;
+        } else {
+            console.error("Unhandled exception: " + e);
+            throw e;
+        }
+    }
+
+    if (index > -1) {
+        // filename already taken
+        console.log("filename " + filename + " exists for event "+ event.title.value + ": overwriting file. Is this intended?");
+        event.files[index] = value;
+    }
+    else {
+        event.files.push(value);
+    }
+    event.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "event",
+                    actionType: "modify",
+                    actionDetail: "eventAddFile",
+                    key: "files",
+                    fullKey: "event.files",
+                    value:  filename,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "event",
+                    targetObject: event._id,
+                    targetObjectId: event._id,
+                    targetModel: "Event",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
+    await event.save();
+    return event;
+}
+
+/**
+ *
+ * @param req {Object} request object
+ * @param event {Event} event object
+ * @param filename {String} filename
+ * @param args {Object} {}
+ * @returns {Promise<*>}
+ */
+async function removeFileReference(req, event, filename, args) {
+
+    // validate
+
+    if (!event) throw new Error('Event not found');
+    if (!(event instanceof Event)) {
+        // yes, it's a mongoose Cat model object
+        console.log("Failed to validate event object. Aborting")
+        throw new Error("invalid parameters given")
+    }
+
+    // validate input
+    if (!filename) throw new Error('no key given');
+
+    let key = event.files;
+    let value = {
+        filename: filename,
+    }
+
+    // check if user is already registered as participant
+    try {
+        //check if in array
+        var index = event.files.map(e => e.filename).indexOf(filename);
+
+    }
+    catch (e) {
+        if (e instanceof TypeError) {
+            console.error("Exception:" + e);
+            console.error("Aborting operation to ensure data integrity.");
+            throw e;
+        } else {
+            console.error("Unhandled exception: " + e);
+            throw e;
+        }
+    }
+
+    if (index <= -1) {
+        // file not found
+        let msg = "Failed to remove file: filename " + filename + " not found for event "+ event.title.value;
+        console.error(msg);
+        throw new Error(msg);
+    }
+
+    if (index > -1) {
+        // file found
+        event.files.splice(index, 1);
+    }
+    event.validate(function(err){
+        if (err){
+            console.log("Validation failed: " + err)
+        }
+        else {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "event",
+                    actionType: "modify",
+                    actionDetail: "eventRemoveFile",
+                    key: "files",
+                    fullKey: "event.files",
+                    value:  filename,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "event",
+                    targetObject: event._id,
+                    targetObjectId: event._id,
+                    targetModel: "Event",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        }
+    })
+    await event.save();
+    return event;
+}
+
+
+function addEventAdmin(event, user) {
+    if (event.accessRights.admin.includes(user.id)){
+        //already admin. skip
+    }
+    else {
+        //add to admin array
+        event.accessRights.admin.push(user.id);
+    }
+    return event;
+}
+

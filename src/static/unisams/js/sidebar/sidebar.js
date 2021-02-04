@@ -124,6 +124,14 @@
                 showEventDetails(self,args);
                 break;
 
+            case "editEventDate":
+                showUpdateEventDateContent(self,args);
+                break;
+
+            case "editEventLocation":
+                showUpdateEventLocationContent(self,args);
+                break;
+
             case "eventParticipants":
                 showEventParticipants(self,args);
                 break;
@@ -182,19 +190,30 @@
         this.isActive = false;
     };
 
-
     /**
+     *
      * adds a highlighted error message to the sidebar
+     *
+     * @param msg {String} error message
+     * @param insertFunc {Function} custom function to insert the error message into dom tree. Receives the generated error html as argument.
+     * @param overwrite {Boolean} [false] overwrites previous error messages if set to true
+     * @param warning {Boolean} [false] displays the message as warning instead
      */
-    common.Sidebar.prototype.addErrorMessage = function(msg, insertFunc, overwrite) {
+    common.Sidebar.prototype.addErrorMessage = function(msg, insertFunc, overwrite, warning) {
 
+        msg = (msg === undefined) ? "Something went wrong" : msg;
         overwrite = (overwrite === undefined) ? false : overwrite;
+        warning = (warning === undefined) ? false : warning;
         if (overwrite){
             //clear previous errors
             $(".sidebar-errorMsg").remove();
         }
+        let c = "sidebar-errorMsg"
+        if(warning) {
+           c = "sidebar-errorMsg warnMsg"
+        }
         var errorHtml = $("<div/>", {
-            "class": "sidebar-errorMsg",
+            "class": c,
             text: msg,
         });
         if (insertFunc == null) {
@@ -1299,13 +1318,100 @@
                         if(searchbar.isActive()){
                             container.classList.remove("hidden");
                         }
-
                     })
-
                 }
             }
         });
+    };
 
+    var showUpdateEventDateContent = function(self, args){
+
+        var onConfirm = args.callback.onConfirm;
+        var onDelete = args.callback.onDelete;
+
+        let context = {};
+        context.event = args.event;
+        var corrupted = false;
+
+        $.get('/static/unisams/js/sidebar/templates/sidebar-updateEventDate.hbs', function (data) {
+
+            var template = Handlebars.compile(data);
+            self.sidebarHTML.html(template(context));
+
+            let currentStartDate = new Date(context.event.date.startDate);
+            let currentEndDate = new Date(context.event.date.endDate);
+            if (isNaN(currentStartDate.getFullYear()) || isNaN(currentEndDate.getFullYear())) {
+                currentStartDate = new Date();
+                currentEndDate = new Date();
+                var corrupted = true;
+                console.warn("trying to read corrupted data");
+                self.addErrorMessage("Failed to read event date from database. Please set a new date.",  function(data){
+                    $("#sidebar-inner").before(data);
+                }, false, true);
+            }
+
+            var d1 = document.getElementById("eventinp-date");
+            var t1 = document.getElementById("eventinp-timeStart");
+            // var d2 = document.getElementById("endDate-input");
+            var t2 = document.getElementById("eventinp-timeEnd");
+            var l = document.getElementById("eventinp-location");
+
+            $(d1).val(currentStartDate.toDateInputValue())
+            $(t1).val(currentStartDate.toTimeInputValue())
+            $(t2).val(currentEndDate.toTimeInputValue())
+
+            registerBackButton(self, ".sidebar-back-btn");
+            registerConfirmButton(self, ".sidebar-confirm", function(){
+                let date = $(d1).val();
+                let startTime = $(t1).val();
+                let endTime = $(t2).val();
+                let location = $(l).val();
+
+                let data = {
+                    date: date,
+                    startTime: startTime,
+                    endTime: endTime,
+                    location: location,
+                }
+                onConfirm(args.event, data, {});
+            }.bind(args));
+        })
+    };
+
+    var showUpdateEventLocationContent = function(self, args){
+
+        var onConfirm = args.callback.onConfirm;
+
+        let context = {};
+        context.event = args.event;
+        var corrupted = false;
+
+        $.get('/static/unisams/js/sidebar/templates/sidebar-updateEventLocation.hbs', function (data) {
+
+            var template = Handlebars.compile(data);
+            self.sidebarHTML.html(template(context));
+
+            let location = context.event.location;
+            if (location === undefined) {
+                location = "";
+                var corrupted = true;
+                console.warn("trying to read corrupted data");
+                self.addErrorMessage("Failed to read event location from database.",  function(data){
+                    $("#sidebar-inner").before(data);
+                }, false, true);
+            }
+            var l = document.getElementById("eventinp-location");
+
+            registerBackButton(self, ".sidebar-back-btn");
+            registerConfirmButton(self, ".sidebar-confirm", function(){
+                let location = $(l).val();
+
+                let data = {
+                    location: location,
+                }
+                onConfirm(args.event, data, {});
+            }.bind(args));
+        })
     };
 
     var showLogDetails = function(self, args){

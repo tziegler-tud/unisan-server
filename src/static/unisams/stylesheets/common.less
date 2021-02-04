@@ -55,6 +55,7 @@ a {
 
 #content-wrapper {
     flex: 0 0 100%;
+    overflow:hidden;
     //display: flex;
     //flex-flow: row wrap;
 
@@ -580,6 +581,11 @@ dropdown menu
             content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>');
         }
     }
+    &.icon-location {
+        &:before {
+            content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>');
+        }
+    }
 }
 
 .has-icon {
@@ -885,6 +891,16 @@ common btn styling
 
 /* common helper classes */
 
+.limitCharacters {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    > * {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
 .float {
     display: block;
     float: left;
@@ -953,6 +969,7 @@ common btn styling
 }
 
 
+
 .add-smt-button {
     font-size:  120%;
     position:   absolute;
@@ -969,6 +986,12 @@ common btn styling
     &.gallery {
         //move below last item
 
+    }
+
+    .add-smt-button-label {
+        display: block;
+        padding: .6em .5em;
+        line-height: normal;
     }
 
     a{

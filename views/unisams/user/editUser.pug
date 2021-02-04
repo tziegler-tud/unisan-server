@@ -9,15 +9,16 @@ block page_includes
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-    script(src="/static/unisams/js/userprofile/profile.js")
-    script(src="/static/unisams/js/userprofile/userprofile.js")
-    script(src="/static/unisams/js/userprofile/editUser.js")
+    //script(src="/static/unisams/js/userprofile/editUser.js")
     script(src="/static/unisams/js/userprofile/updateUser.js")
     script(src="/static/unisams/js/actions.js")
     script(src="/static/unisams/js/transformToNewScheme.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script(src="/dist/editUser.js")
+    link(rel='stylesheet', href='/dist/editUser.css')
 
     script(type="text/template" id="qq-template-manual-trigger")
         <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Bilder hier droppen">
@@ -97,7 +98,7 @@ block content
 
                             .sec-heading-label.userprofile-heading
                                 .userprofile-heading-container
-                                    h3#userProfileName=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
+                                    h3#userProfileName.limitCharacters=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
                                     .userprofile-dropdown.dropdown-menu
                                         .dropdown-btn
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
@@ -259,6 +260,7 @@ block content
                                                     .userinfo-sectionheader
                                                         span Qualifikationen
                                                     div#qualification-list
+                                                    - var secKey = "qualifications"
                                                     .userinfo-item.useredit-item.useredit-addItem
                                                         .useredit-addQualificationBtn.btn-addItem.btn-listExt(data-catkey=secKey)
                                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>

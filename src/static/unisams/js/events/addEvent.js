@@ -50,6 +50,10 @@ function buildPageSlider(container) {
     $.get('/static/unisams/js/events/templates/addEvent-general.hbs', function (data) {
         var template = Handlebars.compile(data);
         let page1 = pageslider.addPage(template());
+        let titleInputContainer = document.getElementById("eventinp-title");
+        let editableInputField = new common.EditableInputField(titleInputContainer, {}, "", "text", {}, {active: true});
+        page1.addObject("titleDelta", editableInputField.getQuill.getContents())
+        page1.addObject("titleVal", editableInputField.getQuill.getText())
 
         //get second page
         $.get('/static/unisams/js/events/templates/addEvent-dateLocation.hbs', function (data) {

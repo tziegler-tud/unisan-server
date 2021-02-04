@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userService = require('../../services/userService');
 const uploadService = require('../../services/uploadService');
-const AuthService = require('../../services/authService');
+const authService = require('../../services/authService');
 const LogService = require('../../services/logService');
 const Log = require('../../utils/log');
 
@@ -10,7 +10,7 @@ var path = require('path');
 var fs = require('fs-extra');
 
 const upload = require(appRoot + "/config/multer");
-const authService = new AuthService();
+
 
 
 router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, next){
@@ -23,7 +23,7 @@ router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, n
         }
 
         //upload to tmp
-        fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/tmp/${tmpkey}.jpg`, { overwrite: true }, function (err) {
+        fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename, appRoot + `/src/data/uploads/tmp/${tmpkey}.jpg`, { overwrite: true }, function (err) {
             if (err) return console.error(err);
             console.log("moved file to tmp dir with filename " + tmpkey + ".jpg");
         });
@@ -37,7 +37,7 @@ router.post('/:id/uploadUserImage', upload.single('image'), function(req, res, n
     else {
         userService.getById(req.params.id)
             .then(user => {
-                fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/user_images/${user.id}/${user.id}.jpg`, { overwrite: true }, function (err) {
+                fs.move(appRoot + '/src/data/uploads/tmp/'+ req.file.filename, appRoot + `/src/data/uploads/user_images/${user.id}/${user.id}.jpg`, { overwrite: true }, function (err) {
                     if (err) return console.error(err);
                     console.log("moved file to user dir: " + user.id);
                 });
@@ -113,7 +113,10 @@ router.post('/addGroupToAllUser', addGroupToAllUser);
 module.exports = router;
 
 function create(req, res, next) {
-  userService.create(req, req.body)
+    //req.body might contain args argument, strip it from body
+    let args = (req.body.args === undefined ? {} : req.body.args);
+    req.body.args = {};
+  userService.create(req, req.body, args)
       .then(() => res.json(req.body))
       .catch(err => {
         next(err);

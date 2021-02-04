@@ -25,6 +25,7 @@
       display: flex;
       flex-flow: column wrap;
       justify-content: flex-end;
+      margin-left: 1em;
 
       .eventprofile-heading-container {
 
@@ -254,6 +255,35 @@
 
             @media @desktop, @tablet-landscape {
               width: 8em;
+            }
+          }
+        }
+        .eventinfo-item-spacer {
+          margin-top: 1em;
+        }
+
+        .eventinfo-item-inner {
+          margin: .5em;
+
+        }
+        &.eventinfo-item-date {
+          margin-left: 2em;
+          font-weight: lighter;
+
+          //text-align: center;
+
+          .eventinfo-date-day {
+            font-size: 220%;
+            //font-weight: bold;
+          }
+          .eventinfo-date-time {
+            font-size: 140%;
+            //font-weight: bold;
+          }
+          .eventinfo-date-location {
+            font-size: 140%;
+            &:before {
+              position: relative;
             }
           }
         }

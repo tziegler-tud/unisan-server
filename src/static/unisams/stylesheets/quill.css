@@ -1,0 +1,10 @@
+.quill-renderer.limitCharacters {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quill-renderer.limitCharacters * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/*# sourceMappingURL=quill.css.map */

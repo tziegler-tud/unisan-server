@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 const log = require('../utils/log');
 const AuthService = require('./authService');
-const authService = new AuthService();
 
 const UserGroup = db.UserGroup;
 const User = db.User;
@@ -128,7 +127,7 @@ async function _delete(req, id) {
     // validate
     if (!log) throw new Error('Log not found');
     //check write access
-    if(!authService.checkRequiredRole(req.user, AuthService.rolesEnum.SUPERADMIN)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkRequiredRole(req.user, AuthService.rolesEnum.SUPERADMIN)) throw {status: 403, message: "forbidden"};
     await dbLog.findByIdAndRemove(id);
     return true;
 }

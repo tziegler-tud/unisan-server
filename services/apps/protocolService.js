@@ -3,7 +3,7 @@ const db = require('../../schemes/mongo');
 const log = require('../../utils/log');
 const AuthService = require('../authService');
 const userService = require('../../services/userService');
-const authService = new AuthService();
+
 
 const UserGroup = db.UserGroup;
 const User = db.User;

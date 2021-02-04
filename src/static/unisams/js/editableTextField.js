@@ -47,11 +47,14 @@
     };
 
     var applyArgs = function(args){
+        let defaults = {
+            active: false,
+            disableButtons: false,
+            readOnly: false,
+            limit: 0,
+        }
         args = (args === undefined) ? {}: args;
-        args.active = (args.active === undefined) ? false : args.active;
-        args.disableButtons = (args.disableButtons === undefined) ? false : args.disableButtons;
-        args.readOnly = (args.readOnly === undefined) ? false : args.readOnly;
-        return args;
+        return Object.assign(defaults, args);
     };
 
     var buildHTML = function(self){
@@ -162,13 +165,13 @@
         //create div
         let textContainer = document.createElement("div");
         textContainer.className = "quill-render-text ql-editor";
-        textContainer.insertAdjacentHTML("beforeend", this.htmlContent)
-        this.container.innerHTML = "";
-        this.container.classList.add("editor-hidden");
-        this.container.classList.remove("editor-active");
-        this.container.append(textContainer);
+        textContainer.insertAdjacentHTML("beforeend", self.htmlContent)
+        self.container.innerHTML = "";
+        self.container.classList.add("editor-hidden");
+        self.container.classList.remove("editor-active");
+        self.container.append(textContainer);
 
-        this.container.addEventListener("click", function(e){
+        self.container.addEventListener("click", function(e){
             e.preventDefault();
             if(!self.isactive){
                 self.activate();
@@ -176,7 +179,7 @@
         });
 
         //preserve link behaviour
-        $("a").on("click", function(e){
+        $(self.container).find("a").on("click", function(e){
             e.stopPropagation();
         })
     }

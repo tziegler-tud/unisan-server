@@ -5,7 +5,7 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const userService = require('../../services/userService');
 const AuthService = require('../../services/authService');
-const authService = new AuthService();
+
 
 var app = express();
 
@@ -28,7 +28,7 @@ module.exports = router;
 
 
 function checkUrlAccess(req, res, next){
-    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");
@@ -70,7 +70,7 @@ function viewUser(req, res, next) {
         .then(user => {
             if (user) {
                 //check if editing this user is allowed
-                let edit = authService.checkIfEdit(req.user, user);
+                let edit = AuthService.checkIfEdit(req.user, user, "user");
                 res.render("unisams/user/profile", {
                     user: req.user._doc,
                     title: user.username,

@@ -1,4 +1,5 @@
 <ul class="common-list userlist itemlist list-view border">
+
     {{#each participants}}
         <li class="user-entry noSelect" id='userId{{this.user.id}}' data-userid= {{this.user.id}}>
             <a class="inner noSelect">
@@ -6,15 +7,9 @@
                 <div class="item-property item-container name">
                     <div class=" userlist-img item-container-element"><img src="/data/uploads/user_images/{{this.user.id}}/{{this.user.id}}.jpg"/></div>
                     <span class=" item-container-element">{{this.user.generalData.firstName.value}} {{this.user.generalData.lastName.value}}</span>
-                    <div class="participant-delete icon-delete before-icon" data-userid={{this.user.id}}></div>
                 </div>
                 <div class="item-property role">
-                    <select class="common-select participant-role-select" data-userid= {{this.user.id}}>
-                        <option class="option-participant" value="participant" {{#if (hasRole this "participant")}}selected{{/if}}>teilnehmend</option>
-                        <option class="option-lecturer" value="lecturer" {{#if (hasRole this "lecturer")}}selected{{/if}}>Dozent</option>
-                        <option class="option-admin" value="admin" {{#if (hasRole this "admin")}}selected{{/if}}>verantwortlich</option>
-                    </select>
-
+                    <span class="item-container-element">{{#if (hasRole this "participant")}}teilnehmend{{/if}}{{#if (hasRole this "lecturer")}}Dozent{{/if}}{{#if (hasRole this "admin")}}verantwortlich{{/if}}</span>
                 </div>
             </a>
         </li>
