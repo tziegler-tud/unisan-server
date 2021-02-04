@@ -9,13 +9,16 @@ block page_includes
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-    script(src="/static/unisams/js/userprofile/editUser.js")
+    //script(src="/static/unisams/js/userprofile/editUser.js")
     script(src="/static/unisams/js/userprofile/updateUser.js")
     script(src="/static/unisams/js/actions.js")
     script(src="/static/unisams/js/transformToNewScheme.js")
 
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script(src="/dist/editUser.js")
+    link(rel='stylesheet', href='/dist/editUser.css')
 
     script(type="text/template" id="qq-template-manual-trigger")
         <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Bilder hier droppen">
