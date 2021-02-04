@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
 const uploadService = require('../../services/uploadService');
 const AuthService = require('../../services/authService');
+const imageThumbnail = require('image-thumbnail');
 
 const got = require('got');
 
@@ -256,10 +257,36 @@ function filepondUploader(req, res, next){
                     throw err;
                 }
             });
-            fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename , appRoot + `/src/data/uploads/event_files/${event.id}/${uniqueId}`, { overwrite: true }, function (err) {
-                if (err) return console.error(err);
-                console.log("moved file to dir: event_files/" + event.id);
+            fs.mkdir(appRoot + '/src/data/uploads/event_files/' + event.id + "/thumbnails", { recursive: true, overwrite: false }, (err) => {
+                if (err) {
+                    throw err;
+                }
             });
+            //if img, create thumnail and move to same directory. filename: THUMB_<filename>
+            if(checkIfImageFile(req.file.mimetype)){
+                //generate thumbnail
+                let options = { width: 200 }
+                imageThumbnail(appRoot + '/src/data/uploads/tmp/' + req.file.filename, options)
+                    .then(thumbnail => {
+                        fs.writeFile(appRoot + `/src/data/uploads/event_files/${event.id}/thumbnails/${uniqueId}`, thumbnail);
+                        moveToPermanentDir();
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        moveToPermanentDir();
+                    });
+            }
+            else {
+                moveToPermanentDir()
+            }
+            function moveToPermanentDir(){
+                fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename , appRoot + `/src/data/uploads/event_files/${event.id}/${uniqueId}`, { overwrite: true }, function (err) {
+                    if (err) return console.error(err);
+                    console.log("moved file to dir: event_files/" + event.id);
+                });
+            }
+
             //store reference to event doc
             let filename = uniqueId;
             let filetype = req.file.mimetype;
@@ -364,4 +391,9 @@ function eventFileDownloader(req, res, next){
         .catch(err => next(err));
 }
 
+function checkIfImageFile(mimeType) {
+    //split mime-type into type and subtype
+    let [type, subtype] = mimeType.split("/");
+    return type==="image";
+}
 
