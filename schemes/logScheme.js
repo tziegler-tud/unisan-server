@@ -22,7 +22,7 @@ var LogSchema = new Schema({
         actionDetail: {
           type: String,
           /* [userCreate, userDelete, userModify, userImageModify, userAddQualification, userDeleteQualification, userModifyQualification,
-                eventCreate, eventDelete, eventModify, eventAddParticipant, eventRemoveParticipant, eventChangeParticipantRole ]
+                eventCreate, eventDelete, eventModify, eventAddParticipant, eventRemoveParticipant, eventChangeParticipantRole, eventAddFile ]
            */
         },
         key: {
@@ -328,6 +328,35 @@ LogSchema.virtual('description').get(function() {
 
                 minDescription = target + ": " + targetUser + "-" + role;
                 logType = "Rolle geändert";
+                break;
+            case "eventAddFile":
+                if (!this.action.value) this.action.value = "_filename_not_found";
+                fullDescription.en = "user " + authorizedUser + " added file " + this.action.value + " to event '" + target + "'";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Datei " + this.action.value + " zu Event '" + target + "' hinzugefügt.";
+
+                shortDescription.en = authorizedUser + " added file to '" + target + "'";
+                shortDescription.de = authorizedUser + " hat eine Datei zu '" + target + "' hinzufügt";
+
+                actionDescription.en = "added file: " + target;
+                actionDescription.de = "Datei hinzugefügt: " + target;
+
+                minDescription = target;
+                logType = "Event: Datei hinzugefügt";
+                break;
+
+            case "eventRemoveFile":
+                if (!this.action.value) this.action.value = "_filename_not_found";
+                fullDescription.en = "user " + authorizedUser + " removed file " + this.action.value + "from event '" + target + "'";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Datei " + this.action.value + " von Event '" + target + "' entfernt.";
+
+                shortDescription.en = authorizedUser + " removed file from '" + target + "'";
+                shortDescription.de = authorizedUser + " hat eine Datei von'" + target + "' entfernt";
+
+                actionDescription.en = "removed file: " + target;
+                actionDescription.de = "Datei entfernt: " + target;
+
+                minDescription = target;
+                logType = "Event: Datei entfernt";
                 break;
         }
     }

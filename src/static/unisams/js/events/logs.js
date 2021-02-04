@@ -28,6 +28,7 @@ $(document).ready (function () {
 
         window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", event);
+        var sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 

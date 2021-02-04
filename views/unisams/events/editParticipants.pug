@@ -1,0 +1,63 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
+    script(src="/static/unisams/js/actions.js")
+    script(src="/static/unisams/js/eventActions.js")
+
+    script(src="/static/unisams/js/events/editParticipants.js")
+    script(src="/static/unisams/js/events/event.js")
+
+    script.
+        window.user = !{JSON.stringify(user)};
+        window.exploreEventId = "#{exploreEvent.id}";
+        window.dockerArgs.activeContainer = "eventDetailContainer";
+        window.dockerArgs.activeElementId = "eventParticipants";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .userimg-container.sec-heading-img
+                                .userimg
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/event_images/" + exploreEvent.id + "/" + exploreEvent.id + ".jpg")
+
+                            .sec-heading-label.eventprofile-heading
+                                .eventprofile-heading-container
+                                    .eventprofile-heading-text
+                                        .eventprofile-heading-type
+                                            span.type=exploreEvent.type.value
+                                        .eventprofile-heading-title
+                                            h3.title=exploreEvent.title.value
+                                        .eventprofile-heading-date
+                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                    .eventprofile-dropdown.dropdown-menu
+                                        .dropdown-btn
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+
+                                            .dropdown-container
+                                                .dropdown-entry
+                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-userid=exploreEvent.id href="/unisams/events/view/" + exploreEvent.id) Bearbeitung beenden
+                                                .dropdown-entry
+                                                    a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
+                                    .clear
+                            .clear
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .itemlist-header-container
+                                    ul#userlist-top.eventlist.itemlist.common-list.list-view.border
+                                        li.noSelect.rowHeading
+                                            .inner
+                                                .item-property Mitglied
+                                                .item-property Rolle
+
+                                .itemlist-content-container
+                                    #userlist-container
+                                    .add-smt-button.add-participant-button
+                                        a.add-smt-button-inner
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+

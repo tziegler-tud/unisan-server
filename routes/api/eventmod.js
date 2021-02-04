@@ -1,20 +1,21 @@
 var express = require('express');
 var router = express.Router();
-var uuid = require('uuid');
+const { v1: uuidv1, v2: uuidv4 } = require('uuid');
 const passport = require('passport');
 const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
 const uploadService = require('../../services/uploadService');
 const AuthService = require('../../services/authService');
-const authService = new AuthService();
+
+const got = require('got');
 
 var app = express();
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-app.use(bodyParser.json());
 
+app.use(bodyParser.raw());
 
 
 var path = require('path');
@@ -22,46 +23,8 @@ var fs = require('fs-extra');
 
 const upload = require(appRoot + "/config/multer");
 
-router.post('/:id/uploadImage', upload.single('image'), function(req, res, next){
-    eventService.getById(req.params.id)
-        .then(event => {
-            fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/event_images/${event.id}/${event.id}.jpg`, { overwrite: true }, function (err) {
-                if (err) return console.error(err);
-                console.log("moved file to user dir: " + event.id);
-            });
-            res.json({success: true});
-        })
-        .catch(err => next(err));
-});
-
-router.post('/:id/uploadFile', upload.single('image'), function(req, res, next){
-    eventService.getById(req.params.id)
-        .then(event => {
-            fs.move(appRoot + '/src/data/uploads/tmp/tmp.jpg', appRoot + `/src/data/uploads/event_files/${event.id}/${req.body.filename}`, { overwrite: true }, function (err) {
-                if (err) return console.error(err);
-                console.log("moved file to dir: event_files/" + event.id);
-            });
-            res.json({success: true});
-        })
-        .catch(err => next(err));
-});
-
-
-auth = function(req, res, next){
-    if (!req.isAuthenticated()) {
-        req.session.redirectTo = '/unisams';
-        console.log("");
-        res.redirect('/unisams/login');
-    } else {
-        next();
-    }
-};
-
-
-
-
 function checkUrlAccess(req, res, next){
-    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");
@@ -75,22 +38,113 @@ function checkUrlAccess(req, res, next){
         .catch(err => next(err))
 }
 
+function checkEventEditRights(req, res, next){
+    // check group permissions
+    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                // check individual rights
+                eventService.getById(req.params.id)
+                    .then(ev => {
+                        if (ev) {
+                            if (AuthService.checkIfEdit(req.user, ev, "event")) {
+                                console.log("authorization successful!");
+                                next();
+                            }
+                            else {
+                                // eventually fail
+                                console.log("authorization failed!");
+                                res.status(403).send();
+                            }
+                        }
+                    })
+                    .catch(err => next(err));
+            }
+        })
+        .catch(err => next(err))
+}
+function checkParticipantAccess (req, res, next) {
+    //check if trying to add self
+    if (req.user.id === req.body.userId) {
+        //allow operation
+        next()
+    }
+    else {
+        //if not modifying self, editing rights are required
+        req.params.id = req.body.id;
+        checkEventEditRights(req, res, next);
+    }
+}
+
+function allowCreateEvent(req, res, next) {
+    if(AuthService.checkEventCreateAccess(req.user)) {
+        next();
+    }
+    else {
+        // eventually fail
+        console.log("authorization failed!");
+        res.status(403).send();
+    }
+}
+
+
 // routes
 
-//check url access by user group
-router.use('/*', checkUrlAccess);
-router.post('/create', create);
+// //check url access by user group
+// router.use('/:id', checkUrlAccess);
+
+
+/**
+ * eventmod routes
+ */
+
+//creation. need creation rights
+router.post('/create', allowCreateEvent, create);
+
+//modification. need general or individual editing rights
+router.put('/:id', checkEventEditRights, update);
+router.put('/updateKey/:id', checkEventEditRights, updateKey);
+router.delete('/:id', checkEventEditRights, _delete);
+
+/**
+ * filepond upload endpoint.
+ * filepond expects a unique id returned to identify the uploaded file.
+ */
+router.post('/:id/uploadFile', checkEventEditRights, upload.single("file"), filepondUploader);
+router.delete('/:id/uploadFile', checkEventEditRights, filepondDeleter);
+router.get('/:id/uploadFile/load/:filename', checkEventEditRights, filepondLoader);
+router.get('/:id/uploadFile', checkEventEditRights, filepondFetcher);
+
+router.post('/:id/uploadImage', checkEventEditRights, upload.single('image'), function(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename, appRoot + `/src/data/uploads/event_images/${event.id}/${event.id}.jpg`, { overwrite: true }, function (err) {
+                if (err) return console.error(err);
+                console.log("moved file to user dir: " + event.id);
+            });
+            res.json({success: true});
+        })
+        .catch(err => next(err));
+});
+
+//participant modification. this requires write access, unless the user modifies itself.
+router.post('/addParticipant', checkParticipantAccess, addParticipant);
+router.post('/removeParticipant', checkParticipantAccess, removeParticipant);
+// changing role requires editing rights
+router.post('/changeParticipant', checkEventEditRights, changeParticipant);
+
+
+//viewing. needs general url access
+router.get("/*", checkUrlAccess);
 router.get('/', getAll);
-router.post('/addParticipant', addParticipant);
-router.post('/changeParticipant', changeParticipant);
-router.post('/removeParticipant', removeParticipant);
 router.get('/:id/populateParticipants', populateParticipants);
-router.post('/:id/uploadImage', create);
+router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
 router.get('/:id', getById);
-router.put('/:id', update);
-router.put('/updateKey/:id', updateKey);
-router.delete('/:id', _delete);
 
 
 
@@ -139,6 +193,7 @@ function matchAny(req, res, next){
 
 
 function addParticipant(req, res, next) {
+
     let args = {
         role: req.body.role,
         overwrite: false
@@ -188,4 +243,125 @@ function _delete(req, res, next) {
         .then(() => res.json({}))
         .catch(err => next(err));
 }
+
+function filepondUploader(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            //generate unique id
+            let uniqueId = req.file.originalname;
+            let size = req.file.size;
+            //create event dir if not exist
+            fs.mkdir(appRoot + '/src/data/uploads/event_files/' + event.id, { recursive: true, overwrite: false }, (err) => {
+                if (err) {
+                    throw err;
+                }
+            });
+            fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename , appRoot + `/src/data/uploads/event_files/${event.id}/${uniqueId}`, { overwrite: true }, function (err) {
+                if (err) return console.error(err);
+                console.log("moved file to dir: event_files/" + event.id);
+            });
+            //store reference to event doc
+            let filename = uniqueId;
+            let filetype = req.file.mimetype;
+            eventService.addFileReference(req, event, filename, filetype, size, {})
+                .then(function(){
+                    res.send(uniqueId);
+                })
+                .catch(function(error){
+                    console.log(error);
+                    res.status(500);
+                })
+        })
+        .catch(err => next(err));
+}
+
+function filepondDeleter(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            //req.body contains uniqueId
+            let uniqueId = req.body
+            let path = appRoot + `/src/data/uploads/event_files/${event.id}/${uniqueId}`;
+            try {
+                fs.unlinkSync(path)
+                //file removed
+            } catch(err) {
+                console.error(err);
+                res.status(400);
+            }
+            eventService.removeFileReference(req, event, uniqueId, {})
+                .then(function(){
+                    res.status(200);
+                })
+                .catch(err => next(err))
+        })
+        .catch(err => next(err));
+}
+
+function filepondFetcher(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            //req.body contains uniqueId
+            let fetchUrl = req.query.fetch;
+
+            got(fetchUrl, {method: "GET", responseType: "buffer", encoding: null}).then(response => {
+                //try saving to see response on server
+                // fs.writeFile(appRoot + "/src/data/uploads/tmp/test2.jpg", response.body);
+                res.set('Content-Type', response.headers["content-type"]);
+                // res.set(response.headers);
+                res.send(response.body);
+            }).catch(error => {
+                console.log(error.response.body);
+            });
+
+        })
+        .catch(err => next(err));
+}
+
+function filepondLoader(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            //req.body contains uniqueId
+            let filename = req.params.filename;
+            let path = appRoot + "/src/data/uploads/event_files/" + event.id + "/"
+            let filepath = path + filename;
+            //check if file exists
+            try {
+                if (fs.existsSync(filepath)) {
+                    res.set('Content-Disposition', 'inline; filename="' + filename + '"');
+                    res.sendFile(filepath);
+                }
+            } catch(err) {
+                res.status(404);
+            }
+
+
+
+        })
+        .catch(err => next(err));
+}
+
+
+function eventFileDownloader(req, res, next){
+    eventService.getById(req.params.id)
+        .then(event => {
+            //req.body contains uniqueId
+            let filename = req.params.filename;
+            let path = appRoot + "/src/data/uploads/event_files/" + event.id + "/"
+            let filepath = path + filename;
+            //check if file exists
+            try {
+                if (fs.existsSync(filepath)) {
+                    res.set('Content-Disposition', 'attachment; filename="' + filename + '"');
+                    res.sendFile(filepath);
+                }
+            } catch(err) {
+                res.status(404);
+            }
+
+
+
+        })
+        .catch(err => next(err));
+}
+
 

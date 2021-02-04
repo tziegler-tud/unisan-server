@@ -70,19 +70,58 @@ class AuthService {
         }
     }
 
+
     //check if user has group
     checkUserGroupName(user,groupname) {
         let userGroups = user.userGroups;
         return userGroups.some(group => group.title === groupname);
     }
 
-    checkIfEdit(user, target){
-        //check if user is userAdmin
-        let group = this.checkUserGroupName(user, "userAdmin");
-        //check write access
-        let write = this.checkWriteAccess(user, target);
-        return (group && write);
+    checkIfEdit(user, target, targetType){
+        let result = false;
+        //target can be user or event atm
+        switch(targetType){
+            case "user": {
+                result = this.checkUserWriteAccess(user, target)
+                break;
+            }
+            case "event": {
+                result = this.checkEventWriteAccess(user, target);
+                break;
+            }
+            default: {
+                console.warn("AuthService.checkIfEdit: invalid target type given.")
+                result = false;
+                break;
+            }
+        }
+        return result;
+
     }
+
+    checkIfCreate(user, target, targetType){
+        let result = false;
+        //target can be user or event atm
+        switch(targetType){
+            case "user": {
+                result = this.checkUserCreateAccess(user, target)
+                break;
+            }
+            case "event": {
+                result = this.checkEventCreateAccess(user, target);
+                break;
+            }
+            default: {
+                console.warn("AuthService.checkIfEdit: invalid target type given.")
+                result = false;
+                break;
+            }
+        }
+        return result;
+
+    }
+
+
     /**
      * check user role against a required role
      *
@@ -100,13 +139,28 @@ class AuthService {
     }
 
     /**
-     * checks if user has higher role than target. use this for user modifications
+     * checks if allowed to create new user.
+     *
+     * @param user {UserScheme}
+     * @returns {Boolean}
+     */
+    checkUserCreateAccess(user){
+        //superadmin is allowed to perform any operation
+        if(user.userRole === rolesEnum.SUPERADMIN) return true;
+        //check if user is userAdmin
+        let group = this.checkUserGroupName(user, "userAdmin");
+        //check write access
+        return group;
+    }
+
+    /**
+     * checks if user has write access on target user. use this for user modifications
      *
      * @param user {UserScheme}
      * @param target {UserScheme}
      * @returns {Boolean}
      */
-    checkWriteAccess(user, target){
+    checkUserWriteAccess(user, target){
         //superadmin is allowed to perform any operation
         if(user.userRole === rolesEnum.SUPERADMIN) return true;
         //operations on protected user are not allowed
@@ -114,11 +168,31 @@ class AuthService {
         //get user access level
         let al = rolesMap[user.userRole];
         //compare. must be greater to allow operation
-        return (al > rolesMap[target.userRole]);
+        let write = (al > rolesMap[target.userRole]);
+
+        //check if user is userAdmin
+        let group = this.checkUserGroupName(user, "userAdmin");
+        //check write access
+        return (group && write);
     }
 
     /**
-     * checks if user has right to modify event. use this for event modifications
+     * checks if allowed to create new events.
+     *
+     * @param user {UserScheme}
+     * @returns {Boolean}
+     */
+    checkEventCreateAccess(user){
+        //superadmin is allowed to perform any operation
+        if(user.userRole === rolesEnum.SUPERADMIN) return true;
+        //check if user is userAdmin
+        let group = this.checkUserGroupName(user, "eventAdmin");
+        //check write access
+        return group;
+    }
+
+    /**
+     * checks if user has write access on target event. use this for event modifications
      *
      * @param user {UserScheme}
      * @param target {EventScheme}
@@ -134,8 +208,8 @@ class AuthService {
         //check group
         if (this.checkUserGroupName(user,"eventAdmin")) return true;
         //check admin array for user id
-        if (!target.accessRights === undefined)  {
-            if (!target.accessRights.admin === undefined) {
+        if (target.accessRights !== undefined)  {
+            if (target.accessRights.admin !== undefined) {
                 if (target.accessRights.admin.includes(user.id)){
                     //user found. access granted
                     return true;
@@ -146,8 +220,9 @@ class AuthService {
     }
 }
 
-AuthService.roles = roles;
-AuthService.rolesEnum = rolesEnum;
-AuthService.rolesMap = rolesMap;
-module.exports = AuthService;
+let authService = new AuthService()
+authService.roles = roles;
+authService.rolesEnum = rolesEnum;
+authService.rolesMap = rolesMap;
+module.exports = authService;
 

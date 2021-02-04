@@ -68,14 +68,12 @@ server.use(bodyParser.urlencoded({
   extended: true
 }));
 server.use(bodyParser.json());
+server.use(bodyParser.text());
 
 server.use(logger('dev'));
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
 server.use(cookieParser());
-server.use(lessMiddleware(path.join(__dirname, 'src')));
-server.use(express.static(path.join(__dirname, 'src')));
-
 
 server.use(session({
   genid: (req) => {
@@ -92,6 +90,7 @@ server.use(session({
 server.use(passport.initialize());
 server.use(passport.session());
 
+
 apiAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
     res.status(401).send();
@@ -100,6 +99,7 @@ apiAuth = function(req, res, next){
     next();
   }
 };
+
 
 webAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
@@ -110,6 +110,11 @@ webAuth = function(req, res, next){
     next();
   }
 };
+
+// data folder requires authentication
+server.use('/data/*', apiAuth);
+server.use(lessMiddleware(path.join(__dirname, 'src')));
+server.use(express.static(path.join(__dirname, 'src')));
 
 server.use('/', indexRouter);
 server.use('/team', teamRouter);
@@ -138,7 +143,7 @@ server.use("/unisams/*", function(req, res, next) {
 server.use("/unisams", errorHandler.webErrorHandler);
 
 
-//API calls TODO: change url to /api/v1/...
+//API calls
 server.use('/api/v1', authRouter);
 server.use('/api/v1/*', apiAuth);
 server.use('/api/v1/groups', userGroupRouter);

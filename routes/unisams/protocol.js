@@ -5,7 +5,7 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const protocolService = require('../../services/apps/protocolService');
 const AuthService = require('../../services/authService');
-const authService = new AuthService();
+
 
 var app = express();
 
@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 
 function checkUrlAccess(req, res, next){
-    authService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");

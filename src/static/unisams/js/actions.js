@@ -2,11 +2,26 @@ common = window.common;
 (function (actions,$,undefined) {
 
     actions.addUser = function(data, args) {
+        let defaults = {
+            memberId: {
+                setCustom: false,
+            },
+            userImg: {
+                tmp: false,
+            }
+        }
+        args = (args === undefined) ? {}: args;
+        args = Object.assign(defaults, args);
+
         var memberId = {
             title: "Mitgliedsnummer",
         }
         if (args.memberId.setCustom){
             memberId.value = data.memberId;
+        }
+        //user image has already been uploaded. Pass path to server
+        if(args.userImg.tmp){
+
         }
         var jsonData = {
             username: data.username,
@@ -16,6 +31,7 @@ common = window.common;
                 lastName: {title: "Nachname", value: data.generalData.lastName},
                 memberId: memberId,
             },
+            args: args,
         };
 
         $.ajax({

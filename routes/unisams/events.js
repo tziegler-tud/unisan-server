@@ -4,6 +4,7 @@ var uuid = require('uuid');
 const passport = require('passport');
 const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
+const AuthService = require ("../../services/authService");
 
 var app = express();
 
@@ -24,15 +25,65 @@ auth = function(req, res, next){
     }
 };
 
+function checkUrlAccess(req, res, next){
+    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                console.log("authorization failed!");
+                next({status:403, message: "forbidden"});
+            }
+        })
+        .catch(err => next(err))
+}
+
+function checkEventEditRights(req, res, next){
+    // check group permissions
+    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+        .then(function(result){
+            if(result){
+                console.log("authorization successful!");
+                next();
+            }
+            else {
+                // check individual rights
+                eventService.getById(req.params.id)
+                    .then(ev => {
+                        if (ev) {
+                            if (AuthService.checkIfEdit(req.user, ev, "event")) {
+                                console.log("authorization successful!");
+                                next();
+                            }
+                            else {
+                                // eventually fail
+                                console.log("authorization failed!");
+                                next({status:403, message: "forbidden"});
+                            }
+                        }
+                    })
+                    .catch(err => next(err));
+            }
+        })
+        .catch(err => next(err))
+}
+
 
 // routes
 
-router.get('/',  auth, getAll);
-router.get('/addEvent', auth, addEvent);
-router.get('/:id', auth, viewEvent);
-router.get('/:id/participants', auth, editParticipants);
-router.get('/:id/edit', auth, editEvent);
-router.get('/:id/logs', auth, eventLogs);
+router.get('/edit/:id', auth, checkEventEditRights, editEvent);
+//check url access by user group
+router.use('/*', auth, checkUrlAccess);
+// routes
+router.get('/', getAll);
+router.get('/addEvent', addEvent);
+router.get('/view/:id', viewEvent);
+router.get('/view/:id/participants', eventParticipants);
+router.get('/view/:id/logs', eventLogs);
+router.get('/view/:id/files/:filename', eventFileDownloader);
+
 
 
 module.exports = router;
@@ -64,11 +115,14 @@ function viewEvent(req, res, next) {
     eventService.getById(req.params.id)
         .then(ev => {
             if (ev) {
+                //check if editing this user is allowed
+                let edit = AuthService.checkIfEdit(req.user, ev, "event");
                 res.render("unisams/events/viewEvent", {
                     user: req.user._doc,
                     title: ev.title.value,
                     exploreEvent: ev,
-                    refurl: req.params.id
+                    refurl: req.params.id,
+                    allowedit: edit,
                 })
             }
         })
@@ -90,15 +144,22 @@ function editEvent(req, res, next) {
         .catch(err => next(err));
 }
 
-function editParticipants(req, res, next) {
+function eventParticipants(req, res, next) {
     eventService.getById(req.params.id)
         .then(ev => {
             if (ev) {
-                res.render("unisams/events/participants", {
+                //check if editing this user is allowed
+                let url = "unisams/events/participants";
+                let edit = AuthService.checkIfEdit(req.user, ev, "event");
+                if (edit) {
+                    url = "unisams/events/editParticipants"
+                }
+                res.render(url, {
                     user: req.user.toJSON(),
                     title: ev.title.value,
                     exploreEvent: ev,
                     exploreEventDocument: ev._doc,
+                    allowedit: edit,
                 })
             }
         })
@@ -120,5 +181,9 @@ function eventLogs(req, res, next) {
         })
         .catch(err => next(err));
 
+}
+
+function eventFileDownloader(req, res, next){
+    res.redirect('/api/v1/eventmod' + req.params.id + "/files/" + req.filename);
 }
 

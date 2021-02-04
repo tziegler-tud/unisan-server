@@ -52,30 +52,6 @@ $(document).ready (function () {
         displayParticipantsList("");
 
 
-
-        $('.add-participant-button').each(function(){
-            $(this).on("click", function(e){
-                e.preventDefault();
-                sidebar.addContent("addEventParticipant", {
-                    event: event,
-                    user: window.user,
-                    isParticipant: userIsParticipant,
-                    callback: {
-                        onConfirm: function(data){
-                            window.actions.events.addParticipant(event.id, data.userid)
-                        },
-                        onDelete: function(){
-                            window.actions.events.removeParticipant(event.id, window.user.id)
-                        }
-                    },
-                });
-                sidebar.show();
-
-
-            })
-        });
-
-
         function displayParticipantsList(filter) {
 
             var handleData = event;

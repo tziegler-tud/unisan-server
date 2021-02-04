@@ -5,7 +5,8 @@ block page_includes
     script(src="/static/unisams/js/actions.js")
     script(src="/static/unisams/js/eventActions.js")
 
-    script(src="/static/unisams/js/events/editEvent.js")
+    //script(src="/static/unisams/js/events/editEvent.js")
+    script(src="/dist/editEvent.js")
     script(src="/static/unisams/js/events/event.js")
     script(src="/static/unisams/js/editableTextField.js")
     script(src="/static/unisams/js/editableInputField.js")
@@ -14,6 +15,8 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editor.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableTextField.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableInputField.css')
+
+    link(rel='stylesheet', href='/dist/editEvent.css')
 
 
     //// Main Quill library
@@ -25,73 +28,10 @@ block page_includes
 
     script(type="module" src='/lib/quill/quill.js')
 
-    script(src="/lib/fineUploader/fine-uploader.js")
-    link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
-
     script.
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventDetail";
-
-    script(type="text/template" id="qq-template-manual-trigger")
-        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
-        <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
-        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
-        </div>
-        <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
-        <span class="qq-upload-drop-area-text-selector"></span>
-        </div>
-        <div class="buttons">
-        <div class="qq-upload-button-selector qq-upload-button">
-        <div>Select files</div>
-        </div>
-        </div>
-        <span class="qq-drop-processing-selector qq-drop-processing">
-        <span>Processing dropped files...</span>
-        <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
-        </span>
-        <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-        <li>
-        <div class="qq-progress-bar-container-selector">
-        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
-        </div>
-        <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
-        <img class="qq-thumbnail-selector" qq-max-size="100" qq-server-scale>
-        <span class="qq-upload-file-selector qq-upload-file"></span>
-        <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
-        <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
-        <span class="qq-upload-size-selector qq-upload-size"></span>
-        <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">Cancel</button>
-        <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">Retry</button>
-        <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">Delete</button>
-        <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
-        </li>
-        </ul>
-
-        <dialog class="qq-alert-dialog-selector">
-        <div class="qq-dialog-message-selector"></div>
-        <div class="qq-dialog-buttons">
-        <button type="button" class="qq-cancel-button-selector">Close</button>
-        </div>
-        </dialog>
-
-        <dialog class="qq-confirm-dialog-selector">
-        <div class="qq-dialog-message-selector"></div>
-        <div class="qq-dialog-buttons">
-        <button type="button" class="qq-cancel-button-selector">No</button>
-        <button type="button" class="qq-ok-button-selector">Yes</button>
-        </div>
-        </dialog>
-
-        <dialog class="qq-prompt-dialog-selector">
-        <div class="qq-dialog-message-selector"></div>
-        <input type="text">
-        <div class="qq-dialog-buttons">
-        <button type="button" class="qq-cancel-button-selector">Cancel</button>
-        <button type="button" class="qq-ok-button-selector">Ok</button>
-        </div>
-        </dialog>
-        </div>
 
 block content
     #wrapper
@@ -115,7 +55,7 @@ block content
 
                                             .dropdown-container
                                                 .dropdown-entry
-                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-userid=exploreEvent.id href="/unisams/events/" + exploreEvent.id) Bearbeitung beenden
+                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-userid=exploreEvent.id href="/unisams/events/view/" + exploreEvent.id) Bearbeitung beenden
                                                 .dropdown-entry
                                                     a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
                                     .clear
@@ -160,3 +100,7 @@ block content
                                                 #eventMaterialEditor.eventinfo-item.eventinfo-item-location
                                                     .eventinfo-item-inner
                                                         .eventinfo-material
+                                                            .eventinfo-material-content
+                                                            .eventinfo-material-uploadContainer
+                                                                input#materialUploadElement(type="file" name="file")
+                                                            

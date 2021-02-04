@@ -11,6 +11,12 @@ module.exports = {
         addEvent_style: "./src/webpack/addEvent.scss",
         drawer: "./src/webpack/drawer.js",
         drawer_style: "./src/webpack/drawer.scss",
+
+        editEvent: "./src/webpack/events/editEvent.js",
+        editEvent_style: "./src/webpack/events/editEvent.scss",
+        viewEvent: "./src/webpack/events/viewEvent.js",
+        viewEvent_style: "./src/webpack/events/viewEvent.scss",
+
         protocol: "./src/webpack/apps/protocol/protocol.js",
         protocol_style: "./src/webpack/apps/protocol/protocol.scss",
         app_navigation: "./src/webpack/apps/app_navigation.js",

@@ -1,11 +1,25 @@
 const mongoose = require('mongoose');
 
 const { convertDeltaToHtml } = require('node-quill-converter');
+const humanFileSize = require("../helpers/humanFileSize");
 
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
 /** @typedef {{ title: {title: string, value: string}, description: {shortDesc: string, longDesc: string}, date: {startDate: Date, endDate: Date}, participants: User[], createdDate: Date}} EventScheme */
 
 const Schema = mongoose.Schema;
+var FileReference = new Schema({
+    filename: {
+        type: String,
+    },
+    filetype: {
+        type: String,
+        default: "unset",
+    },
+    size: {
+        type: Number,
+    }
+
+});
 
 // create instance of Schema
 var EventSchema = new Schema({
@@ -95,6 +109,7 @@ var EventSchema = new Schema({
             }
         }
     ],
+    files: [FileReference],
     accessRights: {
         admin: [
             {
@@ -108,6 +123,9 @@ var EventSchema = new Schema({
         default: Date.now
     },
 });
+
+
+
 
 function wrapTime(timeString){
     if(parseInt(timeString) < 10){
@@ -125,15 +143,23 @@ function extractTimeRangeString(startDate, endDate){
 }
 
 EventSchema.virtual('date.startDateString').get(function() {
-    return extractDateString(this.date.startDate);
+    let date = this.date.startDate;
+    return (date === undefined ? null : extractDateString(date));
 });
 
 
 EventSchema.virtual('date.endDateString').get(function() {
-    return extractDateString(this.date.endDate);
+    let date = this.date.endDate;
+    return (date === undefined ? null : extractDateString(date));
 });
 
 EventSchema.virtual('date.timeString').get(function() {
+    var startDate = this.date.startDate;
+    var endDate = this.date.endDate;
+    //check if date is available
+    if(startDate === undefined || endDate === undefined){
+        return "";
+    }
     return extractTimeRangeString(this.date.startDate, this.date.endDate);
 });
 
@@ -167,11 +193,12 @@ EventSchema.virtual('dateRangeString').get(function() {
 });
 
 EventSchema.virtual('description.longDesc.html').get(function() {
+    if (this.description === undefined) return "";
+    if (this.description.longDesc === undefined) return "";
 
     let delta = this.description.longDesc.delta;
     if (delta === undefined) return "";
-    let htmlContent =  convertDeltaToHtml(delta);
-    return htmlContent;
+    return convertDeltaToHtml(delta);
 });
 
 EventSchema.virtual('title.html').get(function() {
@@ -180,10 +207,60 @@ EventSchema.virtual('title.html').get(function() {
     return convertDeltaToHtml(delta);
 });
 
+FileReference.virtual('thumbnail').get(function(){
+    let filetype = this.filetype;
+
+    //boil down filetype to use for thumbnail generation
+    //split mime-type into type/subtype
+    let typeArr = filetype.split("/");
+    let type = typeArr[0];
+    let subtype = typeArr[1]
+    let thumbnail = false;
+    let thumbnailUrl = "";
+
+    switch (type) {
+        case "application":
+            switch(subtype) {
+                case "pdf":
+                    thumbnailUrl = "/static/file-thumbnails/pdf.svg";
+                    break;
+                case "octet-stream":
+                    thumbnailUrl = "/static/file-thumbnails/binary.svg";
+                    break;
+            }
+            break;
+        case "image":
+            thumbnailUrl = this.filename;
+            break;
+
+        case "text":
+            thumbnailUrl = "/static/file-thumbnails/text.svg";
+            break;
+        case "audio":
+            thumbnailUrl = "/static/file-thumbnails/audio.svg";
+            break;
+        case "video":
+            thumbnailUrl = "/static/file-thumbnails/video.svg";
+            break;
+        default:
+            thumbnailUrl = "/static/file-thumbnails/binary.svg";
+            break;
+    }
+    return thumbnailUrl;
+})
+
+FileReference.virtual("humanReadableFileSize").get(function(){
+    if (!this.size) {
+        return "unknown file size"
+    }
+    return humanFileSize(this.size, true);
+})
+
 EventSchema.post('save', function(error, doc, next) {
     throw new Error(error);
 });
 
 EventSchema.set('toJSON', { virtuals: true, getters: true });
+FileReference.set('toJSON', { virtuals: true, getters: true });
 
 module.exports = mongoose.model('Event', EventSchema);

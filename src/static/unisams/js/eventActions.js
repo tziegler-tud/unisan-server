@@ -63,7 +63,7 @@ common = window.common;
                 type: 'POST',
                 success: function(result) {
                     alert("Event " + eventid + " image updated");
-                    window.location.replace("/unisams/events/" + eventid);
+                    window.location.replace("/unisams/events/view/" + eventid);
                 }
             });
         };
