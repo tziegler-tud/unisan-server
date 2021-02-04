@@ -17,8 +17,6 @@ app.use(bodyParser.json());
 // routes
 router.get("/", editDoc)
 
-router.get("/example", exampleJson);
-
 function editDoc(req, res, next) {
     //get protocol document
     res.render("unisams/apps/protocol/protocol-editor", {
