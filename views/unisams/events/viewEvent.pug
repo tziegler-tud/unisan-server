@@ -95,7 +95,7 @@ block content
 
 
                                         .eventinfo-section.eventinfo-card.card-half.eventwidget-location
-                                            .eventinfo-section-inner
+                                            .eventinfo-section-inner.limitCharacters
                                                 .eventinfo-sectionheader
                                                     span Material
                                                 #eventMaterialViewer.eventinfo-item.eventinfo-item-location
@@ -113,7 +113,8 @@ block content
                                                                                     span.mdc-list-item__ripple
                                                                                     span.mdc-list-item__graphic
                                                                                         if val.thumbnail === val.filename
-                                                                                            img(src="/api/v1/eventmod/" + refurl + "/files/" + title)
+                                                                                           //img(src="/api/v1/eventmod/" + refurl + "/files/" + title + "?thumbnail=true")
+                                                                                           img(src="/data/uploads/event_files/" + refurl + "/thumbnails/" + title)
                                                                                         else
                                                                                             img(src=val.thumbnail)
 

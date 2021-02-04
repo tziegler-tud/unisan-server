@@ -198,6 +198,7 @@
           margin: 10px;
           background-color: @page-bg-color;
           box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+          width: calc(~"100% - 20px");
         }
 
         &.card-full {
@@ -206,8 +207,11 @@
         &.card-half {
 
           @media @desktop, @tablet-landscape {
-            flex: 0 0 50%;
+            flex: 1 1 50%;
             min-width: 20em;
+          }
+          .eventinfo-section-inner {
+            height: 100%;
           }
         }
       }
