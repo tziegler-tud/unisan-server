@@ -222,10 +222,24 @@ common = window.common;
                 url: "/api/v1/eventmod/" + id + "/uploadFile",
                 type: 'POST',
                 success: function(result) {
-                    return result
+                    return result;
                 }
             });
 
+        }
+
+        events.deleteFileFromStorage = function(id, uniqueFileId, callback) {
+            if (callback === undefined) callback = {};
+            if (callback.onSuccess === undefined) callback.onSuccess = function(){}
+            $.ajax({
+                url: "/api/v1/eventmod/" + id + "/uploadFile",
+                type: 'DELETE',
+                contentType: 'text/plain',
+                data: uniqueFileId,
+                success: function(result) {
+                    callback.onSuccess(result);
+                }
+            });
         }
         return events;
     }(actions.events = actions.events || {},jQuery));

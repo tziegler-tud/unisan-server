@@ -8,6 +8,12 @@ block page_includes
     script(src="/static/unisams/js/events/participants.js")
     script(src="/static/unisams/js/events/event.js")
 
+    script(src="/static/unisams/js/editableTextField.js")
+    script(src="/static/unisams/js/editableInputField.js")
+
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableTextField.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableInputField.css')
+
     script.
         window.user = !{JSON.stringify(user)};
         window.exploreEventId = "#{exploreEvent.id}";

@@ -31,6 +31,10 @@ $(document).ready (function () {
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 
         var sidebar = new common.Sidebar('wrapper', {title: "Test"});
+
+        let titleInputContainer = document.getElementById("eventtitle-input");
+        let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+
         // init event sidebar
         //find if current user is already registered
         let userIsParticipant = eventProfile.checkIfUserIsRegistered(window.user);

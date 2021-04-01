@@ -1,3 +1,43 @@
+@use "@material/icon-button";
+@use "@material/list";
+
+@use "@material/menu-surface/mdc-menu-surface";
+@use "@material/menu/mdc-menu";
+
+
 @import 'filepond/dist/filepond.min.css';
 @import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
 @import 'filepond-plugin-get-file/dist/filepond-plugin-get-file.min.css';
+
+@include list.core-styles;
+@include icon-button.core-styles;
+
+.mdc-list {
+  position: relative;
+}
+
+.mdc-list-item-wrapper {
+  position: relative;
+  overflow: initial;
+
+  .mdc-dropdown-menu {
+    position: absolute;
+    top: 1em !important;
+    left: unset !important;
+    right: 3em !important;
+
+    .mdc-list-item {
+      height: 36px;
+
+      .mdc-list-item__text {
+        align-self: initial;
+      }
+
+
+      .mdc-list-item__graphic {
+        height: 18px;
+        width: 18px;
+      }
+    }
+  }
+}

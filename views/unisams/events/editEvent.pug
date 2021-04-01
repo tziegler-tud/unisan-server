@@ -51,8 +51,7 @@ block content
                                             span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
                                     .eventprofile-dropdown.dropdown-menu
                                         .dropdown-btn
-                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-
+                                            button.material-icons.mdc-icon-button(aria-label="Options") more_vert
                                             .dropdown-container
                                                 .dropdown-entry
                                                     a.before-icon.icon-back(id="view" + exploreEvent.id, data-userid=exploreEvent.id href="/unisams/events/view/" + exploreEvent.id) Bearbeitung beenden
@@ -75,7 +74,7 @@ block content
                                             .eventinfo-section-inner
                                                 .eventinfo-sectionheader
                                                     span Termin
-                                                #eventDateEditor.eventinfo-item.eventinfo-item-date
+                                                #eventDateEditor.eventinfo-item.eventinfo-item-date.eventinfo-item-editable.enabled
                                                     .eventinfo-item-inner
                                                         .eventinfo-date-day
                                                             = exploreEvent.date.startDateString
@@ -86,7 +85,7 @@ block content
 
                                                 .eventinfo-sectionheader
                                                     span Veranstaltungsort
-                                                #eventLocationEditor.eventinfo-item.eventinfo-item-date
+                                                #eventLocationEditor.eventinfo-item.eventinfo-item-date.eventinfo-item-editable.enabled
                                                     .eventinfo-item-inner
                                                         .eventinfo-date-location.before-icon.icon-location
                                                             =exploreEvent.location.value
@@ -101,6 +100,46 @@ block content
                                                     .eventinfo-item-inner
                                                         .eventinfo-material
                                                             .eventinfo-material-content
+                                                            .eventinfo-material-viewContainer
+                                                                ul.eventinfo-material-list.mdc-list.mdc-list--two-line.mdc-list--thumbnail-list
+                                                                    if exploreEvent.files
+                                                                        each val in exploreEvent.files
+                                                                            - var title = val.filename
+                                                                            - var filetype = val.filetype
+                                                                            - var size = val.humanReadableFileSize
+                                                                            .mdc-list-item-wrapper
+                                                                                li.eventinfo-material-listItem.mdc-list-item
+                                                                                    span.mdc-list-item__ripple
+                                                                                    span.mdc-list-item__graphic
+                                                                                        if val.thumbnail === val.filename
+                                                                                            //img(src="/api/v1/eventmod/" + refurl + "/files/" + title + "?thumbnail=true")
+                                                                                            img(src="/data/uploads/event_files/" + refurl + "/thumbnails/" + title)
+                                                                                        else
+                                                                                            img(src=val.thumbnail)
+
+                                                                                    span.mdc-list-item__text
+                                                                                        span.mdc-list-item__primary-text
+                                                                                            a.download-button(href="/api/v1/eventmod/" + refurl + "/files/" + title, download)= title
+                                                                                        span.mdc-list-item__secondary-text= filetype + " | " + size
+                                                                                    span.mdc-list-item__meta.mdc-menu-surface--anchor
+                                                                                        button.material-icons.mdc-icon-button(aria-label="Options") more_vert
+                                                                                .mdc-menu.mdc-dropdown-menu.mdc-menu-surface
+                                                                                    ul.mdc-list.mdc-list--icon-list.mdc-list--dense(role='menu', aria-hidden='true', aria-orientation='vertical', tabindex='-1')
+                                                                                        li.mdc-list-item.menu-entry-delete(role='menuitem' data-id= title)
+                                                                                            span.mdc-list-item__ripple
+                                                                                            span.mdc-list-item__graphic
+                                                                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2") <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                                                                            span.mdc-list-item__text Löschen
+                                                                                        li.mdc-list-item.menu-entry-download(role='menuitem')
+                                                                                            span.mdc-list-item__ripple
+                                                                                            span.mdc-list-item__graphic
+                                                                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download") <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                                                            span.mdc-list-item__text Herunterladen
+                                                                                                a.download-button(href="/api/v1/eventmod/"+ refurl + "/files/" + title, download)
+
+
+
+                                                                            li.mdc-list-divider.mdc-list-divider--inset-padding(role="separator")
                                                             .eventinfo-material-uploadContainer
                                                                 input#materialUploadElement(type="file" name="file")
                                                             

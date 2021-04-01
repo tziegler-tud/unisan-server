@@ -69,6 +69,7 @@
 
           .dropdown-btn {
             position: relative;
+            background-color: transparent;
 
             svg {
               margin-bottom: 5px;
@@ -271,8 +272,15 @@
 
         }
         &.eventinfo-item-date {
-          margin-left: 2em;
+          padding-left: 2em;
           font-weight: lighter;
+
+          &.eventinfo-item-editable.enabled {
+            &:hover {
+              outline: 1px solid #AAA;
+              cursor: pointer;
+            }
+          }
 
           //text-align: center;
 

@@ -1,6 +1,9 @@
 import * as FilePond from 'filepond';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import FilePondPluginGetFile from 'filepond-plugin-get-file';
+import {MDCList} from "@material/list";
+import {MDCRipple} from "@material/ripple";
+import {MDCMenu} from '@material/menu';
 
 
 $(document).ready (function () {
@@ -79,6 +82,38 @@ $(document).ready (function () {
         const dialogDeleteEvent = new lidl.Dialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
         lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
 
+        const list = new MDCList(document.querySelector('.mdc-list'));
+        const listItemRipples = list.listElements.map((listItemEl) => new MDCRipple(listItemEl));
+        // const dropdownOptions = list.listElements.forEach(listItemEl => new MDCMenu($(listItemEl).find('.mdc-menu')));
+        const dropdownOptions = list.listElements.forEach(function(listItemEl){
+            var it = $(listItemEl).parent(".mdc-list-item-wrapper").find('.mdc-menu');
+            var menu;
+            $(it).each(function(index){
+                menu = new MDCMenu(this);
+                menu.open = false;
+                listItemEl.menu = menu;
+                $(listItemEl).click(function(e){
+                    this.menu.open = true;
+                })
+                $(menu.items).closest(".menu-entry-delete").on("click", function(e) {
+
+                    let uniqueId = this.dataset.id;
+                    actions.events.deleteFileFromStorage(event.id, uniqueId, {
+                        onSuccess: function(){
+                            $(listItemEl).parent(".mdc-list-item-wrapper").next(".mdc-list-divider").remove();
+                            listItemEl.remove();
+                        },
+                    })
+                });
+                $(menu.items).closest(".menu-entry-download").on("click", function(e) {
+                    let url  = $(this).find(".download-button").first().attr('href');
+                    window.open(url, '_self');
+                });
+
+            })
+
+        });
+
         let callback = {
             onConfirm: function(editableTextField){
                 let delta = editableTextField.getQuill().getText();
@@ -146,7 +181,14 @@ $(document).ready (function () {
                 event: event,
                 callback: {
                     onConfirm: function(eventid, data){
-                        window.actions.events.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime });
+                        window.actions.events.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime }, {
+                            onSuccess: function(){
+                                window.location.reload();
+                            },
+                            onError: function(error) {
+                                sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
+                            }
+                        });
                     },
                 },
             });
@@ -187,20 +229,20 @@ $(document).ready (function () {
         FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginGetFile);
 
         //find previously uploaded files
-        let files = [];
-        event.files.forEach(function(file) {
-            files.push({
-                source: file.filename,
-                options: {
-                    type: 'limbo'
-                }
-            })
-        })
+        // let files = [];
+        // event.files.forEach(function(file) {
+        //     files.push({
+        //         source: file.filename,
+        //         options: {
+        //             type: 'limbo'
+        //         }
+        //     })
+        // })
         // FilePondPluginImagePreview.allowImagePreview
         const inputElement = document.querySelector('#materialUploadElement');
         const pond = FilePond.create( inputElement , {
             allowMultiple: true,
-            files: files,
+            files: [],
             credits: false,
             imagePreviewMaxHeight: 100,
         });
