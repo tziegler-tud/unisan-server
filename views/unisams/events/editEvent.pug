@@ -118,8 +118,7 @@ block content
                                                                                             img(src=val.thumbnail)
 
                                                                                     span.mdc-list-item__text
-                                                                                        span.mdc-list-item__primary-text
-                                                                                            a.download-button(href="/api/v1/eventmod/" + refurl + "/files/" + title, download)= title
+                                                                                        span.mdc-list-item__primary-text=title
                                                                                         span.mdc-list-item__secondary-text= filetype + " | " + size
                                                                                     span.mdc-list-item__meta.mdc-menu-surface--anchor
                                                                                         button.material-icons.mdc-icon-button(aria-label="Options") more_vert

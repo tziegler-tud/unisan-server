@@ -12,6 +12,13 @@
 @include list.core-styles;
 @include icon-button.core-styles;
 
+.mdc-list-item__graphic {
+  //ui fix to make thumbnails display correctly
+  img {
+    width: 100%;
+  }
+}
+
 .mdc-list {
   position: relative;
 }

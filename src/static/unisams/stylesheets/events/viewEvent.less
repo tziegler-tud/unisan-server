@@ -177,7 +177,11 @@
 
     padding: 1em;
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column nowrap;
+
+    @media @desktop, @tablet-landscape {
+      flex-flow: row wrap;
+    }
 
     .eventinfo-section {
 

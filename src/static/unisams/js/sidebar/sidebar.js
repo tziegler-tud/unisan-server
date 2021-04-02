@@ -1454,7 +1454,7 @@
       $(self.sidebarHTML).find($(selector)).each(function(){
           $(this).on("click", function(e){
               self.toggle();
-              $(this).toggleClass("btn-rotate");
+              // $(this).toggleClass("btn-rotate");
           });
       })
     };

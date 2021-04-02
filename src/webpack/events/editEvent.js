@@ -5,6 +5,9 @@ import {MDCList} from "@material/list";
 import {MDCRipple} from "@material/ripple";
 import {MDCMenu} from '@material/menu';
 
+var phone = window.matchMedia("only screen and (max-width: 50em)");
+var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
+
 
 $(document).ready (function () {
     var lidlRTO = window.lidlRTO;
@@ -174,7 +177,12 @@ $(document).ready (function () {
                 }
             },
         });
-        sidebar.show();
+        if(phone.matches || tablet.matches) {
+            sidebar.hide();
+        }
+        else {
+            sidebar.show();
+        }
 
         $("#eventDateEditor").on("click", function(){
             sidebar.addContent("editEventDate", {

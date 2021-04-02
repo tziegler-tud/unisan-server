@@ -122,10 +122,12 @@
             const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
             //get height of top navigation and topbar element
             //TODO: remove dom id dependency
-            let navHeight = document.getElementById("nav-top").clientHeight +1;
-            let topbarHeight = document.getElementById("content1-heading").clientHeight;
-            //calc remaining height in px
-            height = vh - (navHeight + topbarHeight + row.clientHeight +1) + "px";
+
+            // let navHeight = document.getElementById("nav-top").clientHeight +1;
+            let topBarHeight = window.DockerElement.getTopBarHeight();
+            let contentHeight = document.getElementById("content1-heading").clientHeight;
+            //calc remaining height in px  5px offset to compensate borders
+            height = vh - (topBarHeight + contentHeight + row.clientHeight +5) + "px";
         }
         if (self.args.height === "fixed") {
             //use fixedHeight param

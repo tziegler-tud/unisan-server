@@ -75,7 +75,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     window.DockerElement = new docker.Docker(window.dockerArgs);
 
-    adjustWrapper();
+    window.DockerElement.notifyWhenReady()
+        .then(function(){
+            adjustWrapper();
+        })
+        .catch(err => console.log(err));
 });
 
 window.lidlRTO = lidlRTO;
@@ -95,7 +99,8 @@ function adjustWrapper(){
     //get viewport height
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     //get height of top navigation and topbar element
-    let navHeight = document.getElementById("nav-top").clientHeight + 1;
+    // let navHeight = document.getElementById("nav-top").clientHeight + 1;
+    let navHeight = window.DockerElement.getTopBarHeight() + 1;
     $("#wrapper").css({
         height: (vh - navHeight) + "px"
     })
