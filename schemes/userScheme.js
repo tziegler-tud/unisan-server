@@ -109,9 +109,18 @@ var UserSchema = new Schema({
 
                 },
             },
-            acquiredDate: Date,
-            expireDate: Date,
-            trainingDate: Date,
+            acquiredDate: {
+                type: Date,
+                set: transformDate,
+            },
+            expireDate: {
+                type: Date,
+                set: transformDate,
+            },
+            trainingDate: {
+                type: Date,
+                set: transformDate,
+            },
             isValid: Boolean,
             hasDocument: Boolean,
             documentPath: String
@@ -142,6 +151,13 @@ var UserSchema = new Schema({
         default: Date.now
     },
 });
+
+function transformDate(v) {
+    if (v === "") {
+        return undefined;
+    }
+    else return v;
+}
 
 UserSchema.post('save', function(error, doc, next) {
     throw new Error(error);

@@ -109,7 +109,7 @@ function editUser(req, res, next) {
                     title: user.username,
                     exploreUser: user,
                     exploreUserDocument: user._doc,
-                    refurl: req.params.username
+                    refurl: req.params.username,
                 })
             }
             else {
