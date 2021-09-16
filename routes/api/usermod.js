@@ -73,7 +73,7 @@ function checkUrlAccess(req, res, next){
     authService.checkUrlPermission(req.user,req.method,req.originalUrl)
         .then(function(result){
             if(result){
-                console.log("authorization successful!");
+                console.log("url authorization successful!");
                 next();
             }
             else {

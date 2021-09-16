@@ -196,7 +196,14 @@ $(document).ready (function () {
                 event: event,
                 callback: {
                     onConfirm: function(eventid, data){
-                        window.actions.events.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime });
+                        window.actions.events.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime }, {
+                            onSuccess: function(){
+                                window.location.reload();
+                            },
+                            onError: function(error) {
+                                sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
+                            }
+                        });
                     },
                 },
             });

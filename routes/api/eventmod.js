@@ -318,6 +318,7 @@ function filepondDeleter(req, res, next){
             eventService.removeFileReference(req, event, uniqueId, {})
                 .then(function(){
                     res.status(200);
+                    res.send(200);
                 })
                 .catch(err => next(err))
         })

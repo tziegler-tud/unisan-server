@@ -37,10 +37,14 @@
         //find docker-container dom element.
         this.wrapper = document.getElementById(dockerArgs.containerSelector);
 
+        this.topBarHeight = 100; //default
+
         // build templating context
         let context = {};
         let self = this;
         // render container template
+
+        //promise resolved when DOM elements are build
         $.get('/static/unisams/js/docker/templates/docker-container.hbs', function (data) {
             var template = Handlebars.compile(data);
             self.wrapper.innerHTML = template(context);
@@ -77,8 +81,11 @@
                     document.getElementById("docker-top-btn").addEventListener("click", function() {
                         window.drawer.open = !window.drawer.open;
                     })
+
                 }
                 domElementsPromise.then(function(){
+                    let topBarElement = $(self.innerContainer).find("#docker-top").first();
+                    self.topBarHeight = $(topBarElement).innerHeight();
                     //initially setup dom elements
                     const container = document.getElementById(dockerArgs.activeContainer);
                     const el = document.getElementById(dockerArgs.activeElementId);
@@ -94,6 +101,7 @@
                 })
                     .catch(function(){
                         console.error("failed to create drawer");
+                        rejectReady();
                     })
             }
         });
@@ -434,6 +442,10 @@
         }
 
         return id;
+    };
+
+    docker.Docker.prototype.getTopBarHeight = function(){
+        return this.topBarHeight;
     };
 
 

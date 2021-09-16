@@ -163,7 +163,7 @@ async function update(req, id, userParam) {
         throw new Error(`Username "${userParam.username}" is already taken`);
 
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // hash password if it was entered
     if (userParam.password) {
@@ -226,7 +226,7 @@ async function deleteKey(req, id, key, userParams) {
     if (!user) throw new Error('User not found');
 
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -323,7 +323,7 @@ async function deleteArrayElement(req, id, key, args) {
     if (!user) throw new Error('User not found');
 
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -493,7 +493,7 @@ async function updateKey(req, id, key, value, userParams) {
     if (!user) throw new Error('User not found');
 
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -595,7 +595,7 @@ async function addQualification(req, id, key, value, userParams) {
     if (!user) throw new Error('User not found');
 
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -707,7 +707,7 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
     if (!user) throw new Error('User not found');
 
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -792,7 +792,7 @@ async function removeQualification(req, id, qualificationId, userParams) {
     // validate
     if (!user) throw new Error('User not found');
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
     // validate input
     if (qualificationId === undefined ) throw new Error("qualification not found: undefined id")
     //get current array content. Usually, qualificationId refers to corresponding id in the array.
@@ -897,7 +897,7 @@ async function addUserGroup(req, id, userGroupId){
     // validate
     if (!user) throw new Error('User not found');
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('UserGroup not found');
@@ -951,7 +951,7 @@ async function removeUserGroup(req, id, userGroupId){
     // validate
     if (!user) throw new Error('User not found');
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('invalid user group');
@@ -1004,7 +1004,7 @@ async function removeUserGroup(req, id, userGroupId){
 async function setUserRole(req, id, role, currentUser){
     let user = await User.findById(id).select('-password');
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     let validRoles = AuthService.roles;
     // validate
@@ -1061,7 +1061,7 @@ async function _delete(req, id) {
 
     let user = await User.findById(id).select("userRole");
     //check write access
-    if(!AuthService.checkWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // await User.findByIdAndRemove(id);
     User.findByIdAndRemove(id)
