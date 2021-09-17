@@ -47,7 +47,7 @@ class AuthService {
         //populate userGroups
         await user.populate({
             path: 'userGroups',
-        }).execPopulate();
+        });
         let userGroups = user.userGroups;
         //check if url and method are part of userGroups
         let authorizedGroup = userGroups.find(function(group){

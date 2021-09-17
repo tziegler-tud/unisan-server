@@ -402,14 +402,14 @@ LogSchema.post('find', async function(docs) {
                 await doc.populate({
                     path: "target.targetObject",
                     select: "username"
-                }).execPopulate();
+                });
                 break;
             case "Event":
                 await doc.populate({
                     path: "target.targetObject",
                     model: "Event",
                     select: "title",
-                }).execPopulate();
+                });
                 break;
             default:
                 break;

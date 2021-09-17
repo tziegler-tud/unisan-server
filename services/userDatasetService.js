@@ -134,7 +134,7 @@ async function getRoot(){
 }
 
 async function getChildren(node){
-    await node.populate('children').execPopulate();
+    await node.populate('children');
     return node.children;
 }
 
