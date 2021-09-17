@@ -3,10 +3,6 @@ const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-plugin-autoinc-fix');
 
 mongoose.set('debug', true);
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useUnifiedTopology', true);
 
 var opt = {
     user: config.username,
@@ -14,8 +10,6 @@ var opt = {
     auth: {
         authSource: config.authSource
     },
-    useCreateIndex: true,
-    useNewUrlParser: true
 };
 
 const optLocalDb = {
