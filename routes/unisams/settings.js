@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const userService = require('../../services/userService');
 const qualificationService = require('../../services/qualificationService');
 const logService = require('../../services/logService');
+const userGroupService = require('../../services/userGroupService');
 
 var app = express();
 
@@ -26,9 +27,20 @@ auth = function(req, res, next){
     }
 };
 
+//hooked at /unisams/settings
 
 /* GET home page. */
-router.get('/', auth, function(req, res, next) {
+router.get("/*", auth);
+router.get('/', database);
+router.get('/database', database);
+router.get('/user', user);
+router.get('/events', events);
+router.get('/roles', roles);
+router.get('/logs', logs);
+
+router.get("/roles/:id", editRole);
+
+function database (req, res, next) {
     var qualList = {};
     qualificationService.getAll()
         .then(quals => {
@@ -41,15 +53,14 @@ router.get('/', auth, function(req, res, next) {
         .catch(err => {
             next(err);
         })
-});
+}
 
-/* GET database settings page. */
-router.get('/database', auth, function(req, res, next) {
+function user (req, res, next) {
     var qualList = {};
     qualificationService.getAll()
         .then(quals => {
             qualList = quals;
-            res.render("unisams/settings/settingsDatabase", {title: "database settings - uniSams",
+            res.render("unisams/settings/settings", {title: "settings - uniSams",
                 user: req.user._doc,
                 qualificationList: qualList
             })
@@ -57,15 +68,15 @@ router.get('/database', auth, function(req, res, next) {
         .catch(err => {
             next(err);
         })
-});
+}
 
-/* GET user settings page. */
-router.get('/user', auth, function(req, res, next) {
+
+function events (req, res, next) {
     var qualList = {};
     qualificationService.getAll()
         .then(quals => {
             qualList = quals;
-            res.render("unisams/settings/settingsUser", {title: "user settings - uniSams",
+            res.render("unisams/settings/settings", {title: "settings - uniSams",
                 user: req.user._doc,
                 qualificationList: qualList
             })
@@ -73,29 +84,49 @@ router.get('/user', auth, function(req, res, next) {
         .catch(err => {
             next(err);
         })
-});
+}
 
-/* GET user settings page. */
-router.get('/events', auth, function(req, res, next) {
-    var qualList = {};
-    qualificationService.getAll()
-        .then(quals => {
-            qualList = quals;
-            res.render("unisams/settings/settingsEvents", {title: "event settings - uniSams",
+
+function roles (req, res, next) {
+    userGroupService.getAll()
+        .then(groups => {
+            res.render("unisams/settings/roles", {title: "Rechte und Rollen - uniSams",
                 user: req.user._doc,
-                qualificationList: qualList
+                groups: groups
             })
         })
         .catch(err => {
             next(err);
         })
-});
+}
 
-router.get('/logs', auth, function(req, res, next) {
+
+function logs (req, res, next) {
     res.render("unisams/settings/logs", {title: "logs - uniSams",
         user: req.user._doc,
     })
-});
+}
+
+function editRole(req, res, next) {
+    userGroupService.getById(req.params.id)
+        .then(function(group){
+
+            //get assigned user
+            userGroupService.getAssignedUser(req.params.id)
+                .then(function(user){
+                    res.render("unisams/roles/role",
+                        {
+                            title: "Rolle: " + group.title,
+                            user: req.user._doc,
+                            group: group._doc,
+                            assignedUser: user,
+                        })
+                })
+
+        })
+        .catch(err => next(err))
+
+}
 
 
 

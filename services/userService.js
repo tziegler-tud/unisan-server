@@ -14,6 +14,7 @@ var fs = require('fs-extra');
 
 module.exports = {
     getAll,
+    getAllFiltered,
     getById,
     getByUsername,
     create,
@@ -37,6 +38,38 @@ module.exports = {
 async function getAll() {
     return User.find().select('-password');
 }
+
+/**
+ *
+ * @param args
+ * @returns {Promise<void>}
+ */
+async function getAllFiltered(args){
+    let defaults = {
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
+
+    let filter = args.filter;
+    let sort= args.sort;
+    let query;
+    if (filter===undefined || filter.filter === undefined || filter.value === undefined) {
+        query = User.find().select("-password");
+    }
+    else {
+        let filterObj = {};
+        filterObj[filter.filter] = filter.value;
+        query = User.find(filterObj).select("-password");
+    }
+
+    if(sort === undefined) {
+        return query;
+    }
+    else {
+        return query.sort(sort);
+    }
+}
+
 
 /**
  * Gets a user by its id

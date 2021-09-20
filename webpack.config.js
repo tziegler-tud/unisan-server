@@ -2,6 +2,8 @@ const path = require("path");
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+    watch: true,
+    mode: 'development',
     entry: {
         login: "./src/webpack/login.js",
         login_style: "./src/webpack/login.scss",

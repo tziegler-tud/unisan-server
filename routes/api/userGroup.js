@@ -12,12 +12,15 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+//hooked at /api/v1/groups
+
 // routes
 router.get('/', getUserGroups);
 router.post('', createGroup);
 router.put('/:id', updateGroup);
 router.delete('/:id', deleteGroup);
 router.get('/:id', getGroup);
+router.get("/assigned/:id", getAssignedUser);
 router.post('/addPermission/:id', addGroupPermission);
 router.post('/removePermission/:id', removeGroupPermission);
 
@@ -63,6 +66,11 @@ function removeGroupPermission(req, res, next){
         .catch(err => next(err));
 }
 
+function getAssignedUser (req, res, next) {
+    userGroupService.getAssignedUser(req.params.id)
+        .then(result => res.json(result))
+        .catch(err => next(err));
+}
 
 
 

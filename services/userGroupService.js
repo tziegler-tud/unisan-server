@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
+const UserService = require("./userService");
+
 const UserGroup = db.UserGroup;
 
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
@@ -13,6 +15,7 @@ module.exports = {
     _delete,
     addPermission,
     removePermission,
+    getAssignedUser,
 };
 
 
@@ -153,4 +156,20 @@ async function removePermission(id, method, url) {
     }
     await group.save();
     return group;
+}
+
+async function getAssignedUser(id) {
+    const group = await UserGroup.findById(id);
+    // validate
+    if (group == null) throw new Error('Group not found');
+
+    //query userService for user with this group assigned
+    let args = {
+        filter: {
+            filter: "userGroups",
+            value: id
+        }
+    }
+    return UserService.getAllFiltered(args);
+
 }

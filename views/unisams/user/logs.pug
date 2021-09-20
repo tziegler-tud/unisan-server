@@ -4,7 +4,8 @@ block page_includes
 
     script.
         window.exploreUserId = "#{exploreUser.id}";
-        window.activeDockerSection = "usermanagement";
+        window.dockerArgs.activeContainer = "userprofileContainer";
+        window.dockerArgs.activeElementId = "userprofileLogs";
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')

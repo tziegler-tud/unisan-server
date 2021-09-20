@@ -98,6 +98,11 @@
                     self.subpagesEnabled = true;
                     self.ready = true;
                     self.resolveObserver(true);
+
+                    //add settings subpage to all users for now
+                    //TODO: settings subpage should only be visible for users with appropriate access rights
+                    self.addDockerSubPage("settings", {id: "DockerSettingsContainer"}, {position: {place: "first"}})
+
                 })
                     .catch(function(){
                         console.error("failed to create drawer");
@@ -114,12 +119,62 @@
                     return this.value;
                 }
             },
+            ordinals: {
+                lowest: 0,
+                highest: 0,
+                groups: [0],
+                getNewLowestGroup: function(){
+                    this.lowest = this.lowest - 1;
+                    this.groups.push(this.lowest);
+                    return this.lowest;
+                },
+                getNewHighestGroup: function(){
+                    this.highest = this.highest++;
+                    this.groups.push(this.highest);
+                    return this.highest;
+                },
+                getGroups: function(){
+                    return this.groups;
+                },
+                addGroup: function(group){
+                    if(!this.groups.includes(group)){
+                        this.groups.push(group);
+                        if(group > this.highest) this.highest = group;
+                        else if(group < this.lowest) this.lowest = group;
+                    }
+                }
+            },
             subpages: [],
             findById: function(id){
                 return this.subpages.find(e => e.id === id);
             },
             add: function(subpage){
                 this.subpages.push(subpage);
+                //handle dom positioning
+                //place subpage container at correct position
+                let subpageDomElement = document.getElementById(subpage.id);
+                switch(subpage.position.place) {
+                    case "auto":
+                        //auto positioned elements are assigned ordinal group 0
+                        subpageDomElement.style.order = 0
+                        break;
+                    case "first":
+                        //assign order attribute smaller than all other subpages
+                        let lowest = self.subpageHandler.ordinals.getNewLowestGroup();
+                        subpageDomElement.style.order = lowest;
+                        break;
+                    case "last":
+                        //assign order attribute higher than all other subpages
+                        let highest = self.subpageHandler.ordinals.getNewHighestGroup();
+                        subpageDomElement.style.order = highest;
+                        break;
+                    case "fixed":
+                        //assign to a fixed ordinal group
+                        let group = subpage.position.group;
+                        self.subpageHandler.ordinals.addGroup(group);
+                        subpageDomElement.style.order = group;
+                        break;
+                }
             },
             remove: function(id){
                 let index = this.subpages.findIndex(e=> e.id === id);
@@ -366,13 +421,20 @@
      * adds a subpage to docker
      * @param {String} type - type of subpage. this value determines which template is used
      * @param {Object} data - JSON containing data for template rendering
-     * @param {Object} options - overwrite [bool]: replace existing subpages if id matches
+     * @param {Object} options - overwrite [bool]: replace existing subpages if id matches, position: {place: ["fixed", "auto", "first", "last", "beforeMain"], group: <Number>}
      * @param {Number} [id] - (Optional) set id for the new subpage. Fails if id exists without the overwrite option
      * @returns {*}
      */
     docker.Docker.prototype.addDockerSubPage = function(type, data, options, id){
         var self = this;
-        if (options === undefined) options = {overwrite: false};
+        let defaultOptions = {
+            overwrite: false,
+            position: {
+                place: "auto",
+                group: 0,
+            },
+        }
+        options = Object.assign({}, defaultOptions, options);
         // build context
         var context = {};
 
@@ -398,14 +460,22 @@
             id: id,
             type: type,
             isActive: false,
+            position: options.position,
         }
 
-        self.subpageHandler.add(subpage);
+        // self.subpageHandler.add(subpage);
 
         let url;
         switch(type){
             case "user":
                 url = '/static/unisams/js/docker/templates/subpage-user.hbs';
+                context = {
+                    id: id,
+                    exploredUser: data,
+                };
+                break;
+            case "userEdit":
+                url = '/static/unisams/js/docker/templates/subpage-userEdit.hbs';
                 context = {
                     id: id,
                     exploredUser: data,
@@ -418,6 +488,26 @@
                     exploredEvent: data,
                 };
                 break;
+            case "eventEdit":
+                url = '/static/unisams/js/docker/templates/subpage-eventEdit.hbs';
+                context = {
+                    id: id,
+                    exploredEvent: data,
+                };
+                break;
+            case "settings":
+                url = '/static/unisams/js/docker/templates/subpage-settings.hbs';
+                context = {
+                    id: id,
+                };
+                break;
+            case "role":
+                url = '/static/unisams/js/docker/templates/subpage-role.hbs';
+                context = {
+                    id: id,
+                    roleData: data,
+                };
+                break;
         }
         $.get(url, function (data) {
             let template = Handlebars.compile(data);
@@ -426,19 +516,28 @@
         });
 
         function appendContent(template, context) {
-        self.notifyWhenReady()
-            .then(function() {
-                var subpageContainer = document.getElementById("docker-subPage-container");
-                subpageContainer.innerHTML= template(context);
-                const subpageDom = document.getElementById(id);
-                addSubpageEventHandlers(self, subpageDom, true);
-                self.subpageHandler.show(id);
-                //initially setup dom elements
-                const container = document.getElementById(dockerArgs.activeContainer);
-                const el = document.getElementById(dockerArgs.activeElementId);
-                if(el) activateElement(container, el);
-            })
-            .catch()
+            self.notifyWhenReady()
+                .then(function() {
+                    var subpageContainer = document.getElementById("docker-subPage-container");
+                    //create new wrapper
+                    let subpageWrapper = document.createElement("div");
+                    subpageWrapper.className = "subpage-wrapper";
+                    subpageWrapper.innerHTML = template(context);
+                    subpageWrapper.id = context.id;
+
+                    subpageContainer.append(subpageWrapper);
+                    self.subpageHandler.add(subpage);
+
+
+                    const subpageDom = document.getElementById(id);
+                    addSubpageEventHandlers(self, subpageDom, true);
+                    self.subpageHandler.show(id);
+                    //initially setup dom elements
+                    const container = document.getElementById(dockerArgs.activeContainer);
+                    const el = document.getElementById(dockerArgs.activeElementId);
+                    if(el) activateElement(container, el);
+                })
+                .catch()
         }
 
         return id;

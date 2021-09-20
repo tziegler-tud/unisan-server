@@ -5,7 +5,7 @@ block page_includes
     script.
         window.exploreUserId = "#{exploreUser.id}";
         window.dockerArgs.activeContainer = "userprofileContainer";
-        window.dockerArgs.activeElementId = "userprofile";
+        window.dockerArgs.activeElementId = "userprofileSettings";
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
@@ -56,6 +56,18 @@ block content
                         #content1-text.sec-content
                             .subpage-content
                                 .userinfo-container
+                                        //#tabnav-container
+                                        //    ul
+                                        //        li
+                                        //            a(href="#tab-userinfo-general")
+                                        //                span Allgemeine Informationen
+                                        //        li
+                                        //            a(href="#tab-userinfo-qualification")
+                                        //                span Qualifikationen
+                                        //        li
+                                        //            a(href="#tab-userinfo-role")
+                                        //                span Rechte und Rollen
+
                                         #tab-userinfo-general.userinfo-inner
                                             .userinfo-section.userinfo-card.card-full.userwidget-description
                                                 .userinfo-section-inner

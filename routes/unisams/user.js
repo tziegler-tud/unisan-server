@@ -15,16 +15,45 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 
+//hooked at /unisams/user
+const baseUrl = "/unisams/user";
+
 // routes
 router.get('/', getAll);
 router.get('/addUser', checkUrlAccess, addUser);
-router.get('/edit/:username', checkUrlAccess, editUser);
 
-router.get('/view/:username', viewUser);
-router.get('/view/:username/logs', userLogs);
-router.get('/view/:username/events', userEvents);
+
+/*
+legacy api call redirect
+ */
+
+router.get("/view/:username", legacyRedirect);
+router.get("/view/:username/:url", legacyRedirect);
+router.get("/edit/:username", legacyRedirect);
+router.get("/edit/:username/:url", legacyRedirect);
+
+router.get('/:username', profile);
+router.get('/:username/logs', userLogs);
+router.get('/:username/settings', userSettings);
+router.get('/:username/events', userEvents);
+
+/**
+ * legacy routes
+ */
+router.get('/edit/:username', checkUrlAccess, editUserLegacy);
+
+router.get('/view/:username', viewUserLegacy);
+router.get('/view/:username/logs', userLogsLegacy);
+router.get('/edit/:username/settings', userSettingsLegacy);
+router.get('/view/:username/events', userEventsLegacy);
 
 module.exports = router;
+
+function legacyRedirect(req, res, next) {
+    var newPath = baseUrl + "/" + req.params.username;
+    if (req.params.url) newPath = newPath + "/" + req.params.url;
+    res.redirect(newPath);
+}
 
 
 function checkUrlAccess(req, res, next){
@@ -65,7 +94,169 @@ function addUser(req, res, next) {
     })
 }
 
-function viewUser(req, res, next) {
+function profile(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                //check if editing this user is allowed
+                let edit = AuthService.checkIfEdit(req.user, user, "user");
+                if (edit) {
+                    res.render("unisams/user/editUser", {
+                        user: req.user._doc,
+                        title: user.username,
+                        exploreUser: user,
+                        exploreUserDocument: user._doc,
+                        refurl: req.params.username,
+                    })
+                }
+                else {
+                    res.render("unisams/user/profile", {
+                        user: req.user._doc,
+                        title: user.username,
+                        exploreUser: user,
+                        exploreUserDocument: user._doc,
+                        refurl: req.params.username,
+                        allowedit: edit,
+                    })
+                }
+
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err=> next(err));
+
+}
+
+function userLogs(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                //check if editing this user is allowed
+                let edit = AuthService.checkIfEdit(req.user, user, "user");
+                res.render("unisams/user/logs", {
+                    user: req.user._doc,
+                    generalData: req.user._doc.generalData,
+                    customData: req.user._doc.customData,
+                    title: user.username,
+                    exploreUser: user,
+                    exploreUserDocument: user._doc,
+                    refurl: req.params.username,
+                    allowedit: edit,
+                })
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
+
+}
+
+
+function userEvents(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                //check if editing this user is allowed
+                let edit = AuthService.checkIfEdit(req.user, user, "user");
+                res.render("unisams/user/events", {
+                    user: req.user._doc,
+                    generalData: req.user._doc.generalData,
+                    customData: req.user._doc.customData,
+                    title: user.username,
+                    exploreUser: user,
+                    exploreUserDocument: user._doc,
+                    refurl: req.params.username,
+                    allowedit: edit,
+                })
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
+
+}
+
+function userSettings(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                //check if editing this user is allowed
+                let edit = AuthService.checkIfEdit(req.user, user, "user");
+                if(edit){
+                    res.render("unisams/user/settings", {
+                        user: req.user._doc,
+                        title: user.username + " | Einstellungen",
+                        exploreUser: user,
+                        exploreUserDocument: user._doc,
+                        refurl: req.params.username,
+                        allowedit: edit
+                    })
+                }
+                else {
+                    var newPath = baseUrl + "/" + user.username;
+                    res.redirect(newPath);
+                }
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
+}
+
+/*
+legacy route handlers
+ */
+
+function viewUserLegacy(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
@@ -100,7 +291,7 @@ function viewUser(req, res, next) {
 }
 
 
-function editUser(req, res, next) {
+function editUserLegacy(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
@@ -130,7 +321,7 @@ function editUser(req, res, next) {
         .catch(err => next(err));
 }
 
-function userLogs(req, res, next) {
+function userLogsLegacy(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
@@ -164,7 +355,7 @@ function userLogs(req, res, next) {
 }
 
 
-function userEvents(req, res, next) {
+function userEventsLegacy(req, res, next) {
     userService.getByUsername(req.params.username)
         .then(user => {
             if (user) {
@@ -195,6 +386,36 @@ function userEvents(req, res, next) {
         })
         .catch(err => next(err));
 
+}
+
+function userSettingsLegacy(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                res.render("unisams/user/settings", {
+                    user: req.user._doc,
+                    title: user.username + " | Einstellungen",
+                    exploreUser: user,
+                    exploreUserDocument: user._doc,
+                    refurl: req.params.username,
+                })
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
 }
 
 
