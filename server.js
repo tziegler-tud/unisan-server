@@ -71,13 +71,13 @@ server.use(bodyParser.urlencoded({
 server.use(bodyParser.json());
 server.use(bodyParser.text());
 
-// create a write stream (in append mode)
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' })
+// // create a write stream (in append mode)
+// var accessLogStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' })
+//
+// // setup the logger
+// server.use(logger('combined', { stream: accessLogStream }))
 
-// setup the logger
-server.use(logger('combined', { stream: accessLogStream }))
-
-//server.use(logger('dev')); //logging to console
+server.use(logger('dev')); //logging to console
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
 server.use(cookieParser());

@@ -315,6 +315,16 @@ function filepondDeleter(req, res, next){
                 console.error(err);
                 res.status(400);
             }
+            //if thumbnail was created, remove it as well
+            let thumbnailPath = appRoot + `/src/data/uploads/event_files/${event.id}/thumbnails/${uniqueId}`
+            let thumbnailExists = checkFileExists(thumbnailPath)
+                .then(function(exists){
+                    if (exists) {
+                        // console.log("Removing thumbnail...");
+                        fs.unlinkSync(thumbnailPath);
+                    }
+                })
+                .catch(err => next(err))
             eventService.removeFileReference(req, event, uniqueId, {})
                 .then(function(){
                     res.status(200);
@@ -398,3 +408,16 @@ function checkIfImageFile(mimeType) {
     return type==="image";
 }
 
+/**
+ * savely checks if a file exists
+ * returns a promise that resolves to true if the file exists, or false if it does not exist
+ * @returns Promise<Boolean>
+ */
+
+function checkFileExists(path) {
+    return new Promise(function(resolve, reject){
+        fs.access(path, fs.constants.F_OK, error => {
+            resolve(!error);
+        })
+    })
+}

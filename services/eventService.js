@@ -611,11 +611,9 @@ async function addFileReference(req, event, filename, filetype, size, args) {
     else {
         event.files.push(value);
     }
-    event.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return event.save()
+        .then(function(event){
+
             //create log
             let log = new Log({
                 type: "modification",
@@ -640,10 +638,8 @@ async function addFileReference(req, event, filename, filetype, size, args) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await event.save();
-    return event;
+        })
+        .catch();
 }
 
 /**
@@ -660,7 +656,6 @@ async function removeFileReference(req, event, filename, args) {
 
     if (!event) throw new Error('Event not found');
     if (!(event instanceof Event)) {
-        // yes, it's a mongoose Cat model object
         console.log("Failed to validate event object. Aborting")
         throw new Error("invalid parameters given")
     }

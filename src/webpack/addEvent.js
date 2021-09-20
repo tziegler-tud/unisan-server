@@ -36,7 +36,7 @@ function buildPageSlider(container) {
                 type:   data[1].type,
                 date:  data[2].date,
                 startTime:  data[2].timeStart.replace(regex, ""),
-                endTime:  data[2].timeStart.replace(regex, ""),
+                endTime:  data[2].timeEnd.replace(regex, ""),
                 location:  data[2].location,
                 shortDescVal:   data[3].shortDescVal,
                 shortDescDelta:   data[3].shortDescDelta,
