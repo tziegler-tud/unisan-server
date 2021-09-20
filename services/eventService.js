@@ -348,7 +348,7 @@ async function populateParticipants(id) {
  * @param req {Object} express request
  * @param id {ObjectId} id of the event
  * @param userId {ObjectId} id of user to add
- * @param args {Object} allowed values: [admin, lecturer, participant]
+ * @param args {{role: [String], overwrite: <Boolean>}} role: [admin, lecturer, participant], overwrite: if the user already is registered, overwrite: true will update the participants role.
  * @returns {Promise<void>}
  */
 async function addParticipant(req, id, userId, args) {
@@ -371,8 +371,11 @@ async function addParticipant(req, id, userId, args) {
 
     // check if user is already registered as participant
     try {
-        //check if array
-        var index = event.participants.map(e => e.user._id).indexOf(userId);
+        //check if user is registered
+        // var index = event.participants.map(e => e.user._id).indexOf(userId); //requires populated user objects
+
+        // we currently do not populate the user objects for this step, so we need to match the ObjectId to userId
+        var index = event.participants.map(e => e.user.toString()).indexOf(userId);
     }
     catch (e) {
         if (e instanceof TypeError) {
@@ -454,7 +457,8 @@ async function removeParticipant(req, id, userId, args) {
     // check if user is already registered as participant
     try {
         //check if array
-        var index = event.participants.map(e => e.user._id).indexOf(userId);
+        // var index = event.participants.map(e => e.user._id).indexOf(userId);
+        var index = event.participants.map(e => e.user.toString()).indexOf(userId);
     }
     catch (e) {
         if (e instanceof TypeError) {
