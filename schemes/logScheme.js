@@ -434,7 +434,7 @@ module.exports = mongoose.model('Log', LogSchema);
  */
 // let Log = mongoose.model('Log', LogSchema);
 // let log = new Log();
-//log.save(err => {
+// log.save(err => {
 //
 //     // log._id === 100 -> true
 //

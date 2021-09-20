@@ -2,7 +2,7 @@ const config = require('../config/config.json');
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-plugin-autoinc-fix');
 
-mongoose.set('debug', true);
+mongoose.set('debug', false);
 
 var opt = {
     user: config.username,
