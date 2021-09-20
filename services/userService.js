@@ -131,18 +131,50 @@ async function create(req, userParam, args) {
             else {
                 //check if tmp image exists
                 if (args.userImg.tmp) {
-                    fs.copyFile(appRoot + '/src/data/uploads/tmp/' + args.userImg.tmpkey + ".jpg", appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
-                        if (err) throw err;
-                    });
+                    let tmpPath = appRoot + '/src/data/uploads/tmp/' + args.userImg.tmpkey + ".jpg";
+                    //check if file exists
+                    checkFileExists(tmpPath)
+                        .then(function(exists){
+                            if(exists) {
+                                try {
+                                    fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                                        if (err) throw err;
+                                    });
+                                }
+                                catch (err){
+                                    let msg = "file system error: " + err;
+                                    console.error(msg)
+                                    console.warn("Failed to get uploaded file. Trying to remove file from storage...");
+                                    fs.unlink(tmpPath)
+                                        .then(function(){
+                                            console.log("temporary file removed successfully.");
+                                        })
+                                        .catch(err => {
+                                            console.error("Failed to remove temporary file: " + err);
+                                            next(err);
+                                        })
+                                }
+                            }
+                            else {
+                                console.warn("invalid temporary image file path. Copying dummy user image instead...")
+                                // copy dummy user image to user directory
+                                copyDummyImage();
+                            }
+                        })
+                        .catch(err => next(err))
                 }
                 else {
                     // copy dummy user image to user directory
+                    copyDummyImage();
+                }
+
+                function copyDummyImage(){
+                    // copies the dummy user image to user directory
                     fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
                         if (err) throw err;
                         console.log('dummy image copied to new user');
                     });
                 }
-
             }
         });
     }
@@ -174,11 +206,8 @@ async function update(req, id, userParam) {
     // copy userParam properties to user
     Object.assign(user, userParam);
 
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return user.save()
+        .then(user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -205,9 +234,7 @@ async function update(req, id, userParam) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
+        })
 }
 
 /**
@@ -266,11 +293,8 @@ async function deleteKey(req, id, key, userParams) {
         logKey = (k.title === undefined) ? key : k.title;
         user.set(key, undefined, {strict: false} );
     }
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return user.save()
+        .then(user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -297,11 +321,7 @@ async function deleteKey(req, id, key, userParams) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
-
-
+        })
 }
 
 /**
@@ -419,11 +439,8 @@ async function deleteArrayElement(req, id, key, args) {
         }
     }
     user.set(key, updatedArray, {strict: false} );
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return user.save()
+        .then( user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -450,9 +467,7 @@ async function deleteArrayElement(req, id, key, args) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
+        })
 }
 
 /**
@@ -550,11 +565,8 @@ async function updateKey(req, id, key, value, userParams) {
         ojVal = (k.value === undefined) ? k : k.value;
         user.set(key, value, {strict: false} );
     }
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return user.save()
+        .then( user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -580,10 +592,7 @@ async function updateKey(req, id, key, value, userParams) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
-    return user;
+        })
 }
 
 async function addQualification(req, id, key, value, userParams) {
@@ -652,11 +661,8 @@ async function addQualification(req, id, key, value, userParams) {
         ojVal = (k.value === undefined) ? k : k.value;
         user.set(key, value, {strict: false} );
     }
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return user.save()
+        .then( user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -682,9 +688,7 @@ async function addQualification(req, id, key, value, userParams) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
+        })
 }
 
 /**
@@ -751,11 +755,9 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
     }
     let key = "qualifications";
     user.set(key, array, {strict: false} );
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+
+    return user.save()
+        .then( user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -781,9 +783,7 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
+        })
 }
 
 async function removeQualification(req, id, qualificationId, userParams) {
@@ -819,11 +819,8 @@ async function removeQualification(req, id, qualificationId, userParams) {
     let value = array;
     user.set(key, value, {strict: false} );
 
-    user.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+    return user.save()
+        .then( user => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -848,9 +845,8 @@ async function removeQualification(req, id, qualificationId, userParams) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await user.save();
+        })
+
 }
 
 
@@ -902,39 +898,44 @@ async function addUserGroup(req, id, userGroupId){
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('UserGroup not found');
 
-    //check if user already has userGroup assigned
-    if(user.userGroups.includes(userGroupId)){
-        console.log("User " + user.username + " already has UserGroup " + group.title + " assigned.");
-        return user;
-    }
-    else {
-        user.userGroups.push(userGroupId);
-        await user.save();
-    }
-    //create log
-    let log = new Log({
-        type: "modification",
-        action: {
-            objectType: "user",
-            actionType: "modify",
-            actionDetail: "userGroupAdd",
-            key: "",
-            value: group.title
-        },
-        authorizedUser: req.user,
-        target: {
-            targetType: "user",
-            targetObject: user._id,
-            targetObjectId: user._id,
-            targetModel: "User",
-        },
-        httpRequest: {
-            method: req.method,
-            url: req.originalUrl,
+    return new Promise(function(resolve, reject){
+        //check if user already has userGroup assigned
+        if(user.userGroups.includes(userGroupId)){
+            console.log("User " + user.username + " already has UserGroup " + group.title + " assigned.");
+            resolve(user);
+        }
+        else {
+            user.userGroups.push(userGroupId);
+            user.save()
+                .then( user => {
+                    resolve(user);
+                    //create log
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "user",
+                            actionType: "modify",
+                            actionDetail: "userGroupAdd",
+                            key: "",
+                            value: group.title
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "user",
+                            targetObject: user._id,
+                            targetObjectId: user._id,
+                            targetModel: "User",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    LogService.create(log).then().catch();
+                })
+                .catch(err => reject(err))
         }
     })
-    LogService.create(log).then().catch();
-    return user;
 }
 
 /**
@@ -956,41 +957,50 @@ async function removeUserGroup(req, id, userGroupId){
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('invalid user group');
 
+
     //check if user has userGroup assigned
     let index = user.userGroups.indexOf(userGroupId);
-    if(index > -1){
-        // remove group
-        user.userGroups.splice(index, 1);
-        await user.save();
-    }
-    else {
-        console.log("User " + user.username + " is not part of group " + group.title);
-        return false;
-    }
-    //create log
-    let log = new Log({
-        type: "modification",
-        action: {
-            objectType: "user",
-            actionType: "modify",
-            actionDetail: "userGroupDelete",
-            key: "",
-            value: group.title,
-        },
-        authorizedUser: req.user,
-        target: {
-            targetType: "user",
-            targetObject: user._id,
-            targetObjectId: user._id,
-            targetModel: "User",
-        },
-        httpRequest: {
-            method: req.method,
-            url: req.originalUrl,
+
+    return new Promise(function(resolve, reject){
+        //check if user has userGroup assigned
+        let index = user.userGroups.indexOf(userGroupId);
+        if(index > -1){
+            // remove group
+            user.userGroups.splice(index, 1);
+            user.save()
+                .then( user => {
+                    resolve(user);
+                    //create log
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "user",
+                            actionType: "modify",
+                            actionDetail: "userGroupDelete",
+                            key: "",
+                            value: group.title,
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "user",
+                            targetObject: user._id,
+                            targetObjectId: user._id,
+                            targetModel: "User",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    LogService.create(log).then().catch();
+                })
+                .catch(err => reject(err))
+        }
+        else {
+            console.log("User " + user.username + " is not part of group " + group.title);
+            resolve(user);
         }
     })
-    LogService.create(log).then().catch();
-    return user;
 }
 
 /**
@@ -1023,32 +1033,32 @@ async function setUserRole(req, id, role, currentUser){
     }
     //set new role
     user.userRole = role;
-    await user.save();
-
-    //create log
-    let log = new Log({
-        type: "modification",
-        action: {
-            objectType: "user",
-            actionType: "modify",
-            actionDetail: "userRoleModify",
-            key: "",
-            value: role,
-        },
-        authorizedUser: req.user,
-        target: {
-            targetType: "user",
-            targetObject: user._id,
-            targetObjectId: user._id,
-            targetModel: "User",
-        },
-        httpRequest: {
-            method: req.method,
-            url: req.originalUrl,
-        }
-    })
-    LogService.create(log).then().catch();
-    return user;
+    return user.save()
+        .then(user => {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userRoleModify",
+                    key: "",
+                    value: role,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        })
 }
 
 
@@ -1064,7 +1074,7 @@ async function _delete(req, id) {
     if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
     // await User.findByIdAndRemove(id);
-    User.findByIdAndRemove(id)
+    return User.findByIdAndRemove(id)
         .then(function(user){
             console.log("Deleted user with id: " + user._id);
             //create log
@@ -1095,7 +1105,6 @@ async function _delete(req, id) {
                 .then()
                 .catch()
             //TODO: update exisiting logs for user
-            return true;
         })
         .catch()
 }
@@ -1154,4 +1163,18 @@ function removeByIndex(array, index){
     catch(e) {
         throw new Error(e);
     }
+}
+
+/**
+ * savely checks if a file exists
+ * returns a promise that resolves to true if the file exists, or false if it does not exist
+ * @returns Promise<Boolean>
+ */
+
+function checkFileExists(path) {
+    return new Promise(function(resolve, reject){
+        fs.access(path, fs.constants.F_OK, error => {
+            resolve(!error);
+        })
+    })
 }

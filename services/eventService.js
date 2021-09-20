@@ -276,12 +276,10 @@ async function updateKey(req, id, key, value, eventParams) {
         }
         event.set(key, value, {strict: false} );
     }
-    event.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
-            //create log
+
+    return event.save()
+        .then(event => {
+            // create log
             let log = new Log({
                 type: "modification",
                 action: {
@@ -306,10 +304,7 @@ async function updateKey(req, id, key, value, eventParams) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await event.save();
-    return event;
+        })
 }
 
 /**
@@ -674,7 +669,6 @@ async function removeFileReference(req, event, filename, args) {
         filename: filename,
     }
 
-    // check if user is already registered as participant
     try {
         //check if in array
         var index = event.files.map(e => e.filename).indexOf(filename);
@@ -702,11 +696,9 @@ async function removeFileReference(req, event, filename, args) {
         // file found
         event.files.splice(index, 1);
     }
-    event.validate(function(err){
-        if (err){
-            console.log("Validation failed: " + err)
-        }
-        else {
+
+    return event.save()
+        .then( event => {
             //create log
             let log = new Log({
                 type: "modification",
@@ -731,10 +723,7 @@ async function removeFileReference(req, event, filename, args) {
                 }
             })
             LogService.create(log).then().catch();
-        }
-    })
-    await event.save();
-    return event;
+        })
 }
 
 
