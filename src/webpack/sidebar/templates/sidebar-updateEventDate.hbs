@@ -1,0 +1,51 @@
+
+<div id="sidebar" class="sidebar sidebar-event">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span class="quill-renderer limitCharacters">{{event.title.value}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+
+            </div>
+            <div class="sidebar-section">
+                <div class="section-title content-title">
+                    <span></span>
+                </div>
+                <div class="section-content">
+                    <span class="content-item"></span>
+                </div>
+            </div>
+            <div class="sidebar-section body-section event-participants-container">
+                <div class="form-sectionheader has-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span>Datum und Uhrzeit</span>
+                </div>
+                <div class="form-item useredit-item" id="eventitem-date"><label class="form-item-label form-attribute-name nofloat" for="eventinp-date">Datum:</label>
+                    <input class="common-input" id="eventinp-date" name="date" type="date" />
+                    <div class="clear"></div>
+                </div>
+
+                <div class="form-item useredit-item form-griditem" id="eventitem-timeStart"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeStart">von:</label>
+                    <input class="common-input timepicker" id="eventinp-timeStart" name="timeStart" type="time" value="19:00" />
+                    <div class="clear"></div>
+                </div>
+                <div class="form-item useredit-item form-griditem" id="eventitem-timeEnd"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeEnd">bis:</label>
+                    <input class="common-input timepicker" id="eventinp-timeEnd" name="timeEnd" type="time" value="21:00" />
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-confirm content-link">Speichern</a>
+        </div>
+    </div>
+
+</div>

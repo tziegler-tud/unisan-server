@@ -7,7 +7,7 @@ block page_includes
          window.group = !{JSON.stringify(group)}
          window.assignedUser = !{JSON.stringify(assignedUser)};
         window.dockerArgs.activeContainer = "roleContainer";
-        window.dockerArgs.activeElementId = "roleGeneral";
+        window.dockerArgs.activeElementId = "roleAdvanced";
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
@@ -21,9 +21,9 @@ block content
                 section#sec1
                     #sec-content.subpage-container
                         #content1-heading.sec-heading.subpage-heading
-                            .sec-heading-label.propertypage-heading
-                                .propertypage-heading-container
-                                    h3#userProfileName.limitCharacters= group.title
+                            .sec-heading-label.userprofile-heading
+                                .userprofile-heading-container
+                                    h3= group.title
                                     .clear
                                 .clear
                         #content1-text.sec-content.border-top.userlogs-container.logs-container
@@ -33,40 +33,22 @@ block content
                                         .userinfo-section.userinfo-card.card-full.userwidget-description
                                             .userinfo-section-inner
                                                 .userinfo-sectionheader
-                                                    span Allgemeines
+                                                    span http allowed operations
                                                 div
                                                     ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
-                                                        - var combinedKey = "title"
-                                                        - var keyTitle = "Titel"
-                                                        - var value = group.title
-                                                        li.user-entry.roletitle-change(id="rolekey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                            a.inner()
-                                                                .item-property.userkey-entry-title
-                                                                    span= keyTitle
-                                                                .item-property.userkey-entry-value
-                                                                    span= value
-                                                                .clear
-                                                        - var combinedKey = "description"
-                                                        - var keyTitle = "Beschreibung"
-                                                        - var value = group.description
-                                                        li.user-entry.roledesc-change(id="rolekey-" +combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                            a.inner()
-                                                                .item-property.userkey-entry-title
-                                                                    span= keyTitle
-                                                                .item-property.userkey-entry-value
-                                                                    span= value
-                                                                .clear
-                                                        - var combinedKey = "_id"
-                                                        - var keyTitle = "ID"
-                                                        - var value = group._id
-                                                        li.user-entry.noSelect.cursor-default(id="rolekey-"+combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                            a.inner()
-                                                                .item-property.userkey-entry-title
-                                                                    span= keyTitle
-                                                                .item-property.userkey-entry-value.has-tooltip.cursor-notAllowed
-                                                                    span= value
-                                                                    span.tooltip Id kann nicht verändert werden.
-                                                                .clear
+                                                        if group.allowedOperations
+                                                            - var secKey = "allowedOperations"
+                                                            - var secVal = group.allowedOperations
+                                                            each val, key in secVal
+                                                                - var method = val.method
+                                                                - var url = val.url
+                                                                li.user-entry.userkey-entry(id="allowedOperation" + val.id)
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span= method
+                                                                        .item-property.userkey-entry-value
+                                                                            span= url
+                                                                        .clear
 
 
 

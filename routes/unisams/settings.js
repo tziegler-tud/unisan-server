@@ -38,6 +38,7 @@ router.get('/events', events);
 router.get('/roles', roles);
 router.get('/logs', logs);
 
+router.get("/roles/:id/advanced", editRoleAdvanced);
 router.get("/roles/:id", editRole);
 
 function database (req, res, next) {
@@ -128,6 +129,26 @@ function editRole(req, res, next) {
 
 }
 
+function editRoleAdvanced(req, res, next) {
+    userGroupService.getById(req.params.id)
+        .then(function(group){
+
+            //get assigned user
+            userGroupService.getAssignedUser(req.params.id)
+                .then(function(user){
+                    res.render("unisams/roles/advanced",
+                        {
+                            title: "Rolle: " + group.title,
+                            user: req.user._doc,
+                            group: group._doc,
+                            assignedUser: user,
+                        })
+                })
+
+        })
+        .catch(err => next(err))
+
+}
 
 
 

@@ -9,7 +9,7 @@ $(document).ready (function () {
     let group = window.group;
 
     // window.DockerElement = new docker.Docker(window.dockerArgs);
-    window.DockerElement.addDockerSubPage("role", group);
+    window.DockerElement.addDockerSubPage("role", group, {});
     var sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
 
