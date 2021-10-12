@@ -570,6 +570,7 @@ async function updateKey(req, id, key, value, userParams) {
         try {
             if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
             //check if array
+            //TODO: this does not work as intended. needs revision
             var index = array.map(e => e._id).indexOf(value.id);
         }
         catch (e) {

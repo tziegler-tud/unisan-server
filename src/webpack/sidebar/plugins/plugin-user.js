@@ -2,13 +2,15 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
 
 //TODO: install Handlebars npm package
 const Handlebars = require("handlebars");
+import "../../helpers/handlebarsHelpers";
 
 let userPlugin = new SidebarPlugin("user");
+
 let showUser = new ContentHandler("user",
     function(sidebar, args, type) {
         var userid = args.userid;
         getDataFromServer("/api/v1/usermod/"+userid,function(context){
-            $.get('/static/unisams/js/sidebar/templates/sidebar-user.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-user.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(sidebar,".sidebar-back-btn");
@@ -19,7 +21,7 @@ let addUser = new ContentHandler("addUser",
     function(sidebar, args, type) {
         var context = {};
         var onConfirm = args.callback.onConfirm;
-        $.get('/static/unisams/js/sidebar/templates/sidebar-addUser.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/sidebar-addUser.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton(sidebar,".sidebar-back-btn");
@@ -53,7 +55,7 @@ let changeUsername = new ContentHandler("UserChangeUsername",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-updateUsername.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-updateUsername.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -94,7 +96,7 @@ let addDbKey = new ContentHandler("UseraddDBKey",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-addUserKey.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-addUserKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -156,7 +158,7 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-addContactDataKey.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-addContactDataKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -189,19 +191,6 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
                     }
                     onConfirm(userId, key, val, funcArgs);
                 }.bind(args));
-
-                sidebar.registerButton (sidebar, ".sidebar-delete", function(){
-
-                    // delete array entry
-                    data = {
-                        id: qualId,
-                        qualification: res.currentQualification.qualification,
-                    };
-                    if (corrupted) {
-                        data.qualification = {qualType: "error", name: "error"}
-                    }
-                    onDelete(args.userid, data);
-                });
 
                 let doc = res.dataset.user.categories;
 
@@ -249,7 +238,7 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-addGeneralDataKey.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-addGeneralDataKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -308,7 +297,7 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
 
                 r.addEventListener("change", function(e){
                     var tmpKey = catKey + "." + r.value;
-                    var val = findExistingValues(context.exploreUser,tmpKey);
+                    var val = sidebar.findExistingValues(context.exploreUser,tmpKey);
                     if (val !== undefined) {
                         v.value = val.value;
                         v.html = val.value;
@@ -355,7 +344,7 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-updateUserKey.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-updateUserKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -460,7 +449,7 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-updateContactDataKey.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-updateContactDataKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -575,7 +564,7 @@ let viewDbKey = new ContentHandler("UserViewDBKey",
         });
 
         var action = function(context) {
-            $.get('/static/unisams/js/sidebar/templates/sidebar-viewUserKey.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-viewUserKey.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
@@ -622,7 +611,7 @@ let addQualification = new ContentHandler("UserAddQualification",
             }
         });
         var action = function(context){
-            $.get('/static/unisams/js/sidebar/templates/sidebar-addUserQualification.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-addUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(sidebar,".sidebar-back-btn");
@@ -673,7 +662,7 @@ let viewQualification = new ContentHandler("UserViewQualification",
         });
 
         var action = function(context){
-            $.get('/static/unisams/js/sidebar/templates/sidebar-viewUserQualification.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-viewUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(sidebar,".sidebar-back-btn");
@@ -723,7 +712,7 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
         });
 
         var action = function(context){
-            $.get('/static/unisams/js/sidebar/templates/sidebar-updateUserQualification.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/sidebar-updateUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(sidebar,".sidebar-back-btn");
@@ -876,7 +865,7 @@ var populateUserKeys = function(sidebar, doc, compareValue, args){
 
         if (args.findExistingEntries) {
             let data = args.findExistingEntries;
-            let val = findExistingValues(data.doc, data.key);
+            let val = sidebar.findExistingValues(data.doc, data.key);
             if (val !== undefined) {
                 if (args.isCustomEntry) {
                     customTypeObject.value = val.title;
@@ -938,7 +927,7 @@ var populateCurrentQualificationDefault = function(sidebar, doc, current, args){
     if (args === undefined) args = {};
 
     // check if data are valid
-    if (!checkQualificationDataValidity(current)){
+    if (!sidebar.checkQualificationDataValidity(current)){
         return false;
     }
     else {
@@ -959,7 +948,7 @@ var populateCurrentQualificationDefault = function(sidebar, doc, current, args){
             qualNameObject.options[index] = option;
         });
         if (args.addCreateEntry) {
-            var delimiter = createSelectDelimiter();
+            var delimiter = sidebar.createSelectDelimiter();
             qualNameObject.append(delimiter);
 
             var createEntry = document.createElement('option');
@@ -1010,3 +999,5 @@ var disableViewBox = function(elements) {
     }
     else func(elements)
 };
+
+export {userPlugin}

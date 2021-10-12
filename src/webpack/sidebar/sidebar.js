@@ -1,3 +1,13 @@
+let SidebarCounter = {
+    counter: 0,
+    next: function(){
+        this.counter++;
+        return this.counter;
+    },
+    current: function(){
+      return this.counter;
+    }
+}
 
 /**
  *
@@ -16,7 +26,7 @@ var Sidebar = function(parentId, content, optionalId){
     this.plugins = [];
     this.contentHandlers = [];
     this.parent = $('#'+ parentId);
-    this.domId = optionalId === undefined ? "sidebar" + SidebarCounter : optionalId;
+    this.domId = optionalId === undefined ? "sidebar" + SidebarCounter.next() : optionalId;
     this.isActive = false;
     this.currentState = {
         activeElement: null,
@@ -65,8 +75,9 @@ Sidebar.prototype.addContentHandler = function(contentHandler) {
 
 Sidebar.prototype.addPlugin = function(sidebarPlugin){
     this.plugins.push(sidebarPlugin);
+    let sidebar = this;
     sidebarPlugin.handlers.forEach(function(handler){
-        this.addContentHandler(handler);
+        sidebar.addContentHandler(handler);
     })
 
 }
@@ -1765,6 +1776,10 @@ var checkQualificationDataValidity = function(currentQualification){
 
 };
 
+Sidebar.prototype.checkQualificationDataValidity = function(currentQualification){
+    return checkQualificationDataValidity(currentQualification);
+}
+
 /**
  *
  * @param field
@@ -1787,6 +1802,9 @@ var checkDataValidity = function(field, dataset){
     return [status, ""];
 };
 
+Sidebar.prototype.checkDataValidity = function(field, dataset){
+    return checkDataValidity(field, dataset);
+}
 
 /**
  * applies 'viewBox-disabled' class to the given elements

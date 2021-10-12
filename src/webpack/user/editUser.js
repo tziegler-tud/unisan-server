@@ -9,6 +9,9 @@ import {
 
 } from "uppload";
 
+import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import {userPlugin} from "../sidebar/plugins/plugin-user";
+
 
 $(document).ready (function () {
 
@@ -114,7 +117,9 @@ $(document).ready (function () {
         });
 
 
-        var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
+        // var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
+        let addDBKey_sidebar = new Sidebar('wrapper', "test");
+        addDBKey_sidebar.addPlugin(userPlugin);
 
         let listContainer = document.getElementById("qualification-list")
         let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
