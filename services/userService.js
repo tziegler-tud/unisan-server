@@ -23,6 +23,9 @@ module.exports = {
     deleteArrayElement,
     updateKey,
     getKey,
+    addQualification,
+    updateQualification,
+    removeQualification,
     delete: _delete,
     matchAny,
     addUserGroup,
@@ -359,6 +362,8 @@ async function deleteKey(req, id, key, userParams) {
 
 /**
  *
+ * Handler for removing arbitrary keys in the user document.
+ *
  * @param req {Object} express request
  * @param id {number} The id of the user to manipulate
  * @param key {String} key to delete, use string with dot-notation
@@ -462,8 +467,8 @@ async function deleteArrayElement(req, id, key, args) {
             let rmObj = removeByIndex(array, index);
             updatedArray = rmObj.array;
             let el = rmObj.object;
-            logKey = (el.title === undefined) ? el : el.title;
-            ojVal  = (el.value === undefined) ? el : el.value;
+            logKey = (el.title === undefined) ? "<complex object>" : el.title;
+            ojVal  = (el.value === undefined) ? "<complex value>" : el.value;
         }
         else {
             const e = "Failed to delete array element: Wrong parameter settings.";
@@ -571,103 +576,8 @@ async function updateKey(req, id, key, value, userParams) {
             if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
             //check if array
             //TODO: this does not work as intended. needs revision
-            var index = array.map(e => e._id).indexOf(value.id);
-        }
-        catch (e) {
-            if (e instanceof TypeError) {
-                console.error("Exception:" + e);
-                console.error("Aborting operation to ensure data integrity.");
-                throw e;
-            } else {
-                console.error("Unhandled exception: " + e);
-                throw e;
-            }
-        }
-        if (index > -1) {
-            // updating existing object
-            ojVal = array[index];
-            array.splice(index, 1, value);
-        }
-        else {
-            // key not found, creating new entry
-            array.push(value);
-        }
-        user.set(key, array, {strict: false} );
-    }
-    else {
-        let k = user.get(key);
-        ojVal = (k.value === undefined) ? k : k.value;
-        user.set(key, value, {strict: false} );
-    }
-    return user.save()
-        .then( user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userModify",
-                    key: logKey,
-                    fullKey: key,
-                    originalValue: ojVal,
-                    value:  newVal,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
-            })
-            LogService.create(log).then().catch();
-        })
-}
+            var index = array.map(e => e._id.toString()).indexOf(value.id);
 
-async function addQualification(req, id, key, value, userParams) {
-    if (!userParams) userParams = {};
-
-    const user = await User.findById(id);
-
-    // validate
-    if (!user) throw new Error('User not found');
-
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
-
-    // validate input
-    if (!key) throw new Error('no key given');
-    if (!value) throw new Error('no value given');
-
-    let ojVal = undefined;
-    let newVal = (value.value === undefined) ? value : value.value;
-    let logKey = (value.title === undefined) ? key : value.title;
-
-    //check if array operation
-    if(userParams.isArray) {
-
-        //get current array content. Usually, key refers to an indexed array element.
-        var array;
-        if (userParams.noIndex) {
-        }
-        else {
-            const keyPos = key.lastIndexOf(".");
-            const i = key.substring(keyPos+1);
-            key = key.substring(0,keyPos);
-        }
-        array = user.get(key);
-        // in-memory update.
-        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
-
-        try {
-            if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
-            //check if array
-            var index = array.map(e => e._id).indexOf(value.id);
         }
         catch (e) {
             if (e instanceof TypeError) {
@@ -726,6 +636,77 @@ async function addQualification(req, id, key, value, userParams) {
 }
 
 /**
+ * adds a qualification object to the user document. This is the dedicated handler to add Qualifications.
+ *
+ *
+ * @param req {Object} express request
+ * @param {number} id The id of the user to manipulate
+ * @param {Object} qualificationObject qualification object to be added.
+ * @param {Object} args containing additional settings. Valid properties are: {}
+ */
+async function addQualification(req, id, qualificationObject,  args) {
+    let defaults = {
+        noIndex: false,
+
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
+
+    const user = await User.findById(id);
+
+    // validate
+    if (!user) throw new Error('User not found');
+
+    //check write access
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+
+    let errHeader = "Failed to add Qualification: ";
+        // validate input
+    if (qualificationObject === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
+
+    let ojVal = undefined;
+    let newVal = qualificationObject.qualification.name;
+    let logKey = qualificationObject.qualification.qualType;
+
+    //get user qualification array
+    let qualArray = user.qualifications;
+    //validate array
+    if(!Array.isArray(qualArray)) throw new Error(errHeader + "Failed to read qualification array from user document. User document might be corrupted. Aborting Operation.")
+
+    //add qualfication entry to qualification object array
+    qualArray.push(qualificationObject);
+
+    return user.save()
+        .then( user => {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userModify",
+                    key: logKey,
+                    fullKey: "qualification",
+                    originalValue: ojVal,
+                    value:  newVal,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        })
+}
+
+/**
  *
  * updates a single qualification entry of user
  * @param {Object} req - express request object.
@@ -763,7 +744,7 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
     try {
         if (!Array.isArray(array)) throw new TypeError(`Failed to read qualifications array.`);
         //check if array
-        var index = array.map(e => e._id).indexOf(qualificationId);
+        var index = array.map(e => e._id.toString()).indexOf(qualificationId);
     }
     catch (e) {
         if (e instanceof TypeError) {

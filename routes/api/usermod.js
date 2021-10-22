@@ -100,7 +100,13 @@ router.post('/getKey/:id', getKey);
 // //from this point, write access rights are required
 // router.use("/*", checkWriteAccess);
 router.put('/:id', update);
+
 router.put('/updateKey/:id', updateKey);
+
+router.post('/qualification/:id', addQualification);
+router.put('/qualification/:id', updateQualification);
+router.delete('/qualification/:id', removeQualification);
+
 router.delete('/deleteKey/:id', deleteKey);
 router.delete('/:id', _delete);
 
@@ -161,6 +167,24 @@ function getKey(req, res, next) {
 
 function updateKey(req, res, next) {
     userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
+        .then((result) => res.json({result}))
+        .catch(err => next(err));
+}
+
+function addQualification(req, res, next) {
+    userService.addQualification(req, req.params.id, req.body.qualification, req.body.args)
+        .then((result) => res.json({result}))
+        .catch(err => next(err));
+}
+
+function updateQualification(req, res, next) {
+    userService.updateQualification(req, req.params.id, req.body.key, req.body.value, req.body.args)
+        .then((result) => res.json({result}))
+        .catch(err => next(err));
+}
+
+function removeQualification(req, res, next) {
+    userService.removeQualification(req, req.params.id, req.body.key, req.body.value, req.body.args)
         .then((result) => res.json({result}))
         .catch(err => next(err));
 }

@@ -139,7 +139,7 @@ $(document).ready (function () {
                                         noIndex: false,
                                         keyId: self.dataset.keyId
                                     };
-                                    actions.insertDBKey(userid, key, value, args, function () {
+                                    actions.updateQualification(userid, key, value, args, function () {
 
                                     });
                                 },
@@ -159,7 +159,7 @@ $(document).ready (function () {
                                         userid: userid,
                                         callback: {
                                             onConfirm: function (res) {
-                                                actions.removeDBKey(userid, key, data, args, function () {
+                                                actions.removeQualification(userid, key, data, args, function () {
                                                     $("#qualId" + common.escapeSelector(data.id)).remove();
                                                 });
                                                 lidlRTO.objectManager.removeObject(dialog_token);
@@ -239,10 +239,9 @@ $(document).ready (function () {
                     callback: {
                         onConfirm: function (userid, key, value, args) {
                             args = {
-                                isArray: true,
-                                noIndex: true,
+
                             };
-                            actions.insertDBKey(userid, key, value, args, function () {
+                            actions.addQualification(userid, key, value, args, function () {
 
                             });
                         }

@@ -243,7 +243,7 @@ async function updateKey(req, id, key, value, eventParams) {
         try {
             if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
             //check if array
-            var index = array.map(e => e._id).indexOf(value.id);
+            var index = array.map(e => e._id.toString()).indexOf(value.id);
         }
         catch (e) {
             if (e instanceof TypeError) {

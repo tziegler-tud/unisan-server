@@ -192,6 +192,20 @@ LogSchema.virtual('description').get(function() {
                 logType = "Profilbild geändert";
                 break;
 
+            case "userAddQualification":
+                fullDescription.en = "user " + authorizedUser + " added qualification : "  + this.action.value + " to user "+ target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat die Qualifikation" + this.action.value + " zu Nutzer " + target + " hinzugefügt";
+
+                shortDescription.en = authorizedUser + " added " + target + " to " + this.action.value;
+                shortDescription.de = authorizedUser + " hat " + target + " zu " + this.action.value + " hinzugefügt";
+
+                actionDescription.en = "added user to group " + this.action.value;
+                actionDescription.de = "Zur Gruppe " + this.action.value + "hinzugefügt";
+
+                minDescription = this.action.value;
+                logType = "Zu Gruppe hinzugefügt";
+                break;
+
             case "userGroupAdd":
                 fullDescription.en = "user " + authorizedUser + " added user : " + target +" to group " + this.action.value;
                 fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " zur Gruppe " + this.action.value + " hinzugefügt";

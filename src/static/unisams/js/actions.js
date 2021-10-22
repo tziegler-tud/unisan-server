@@ -140,6 +140,71 @@ common = window.common;
         });
     };
 
+    actions.addQualification = function(userid, keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            qualification: value,
+            args: args,
+        };
+        $.ajax({
+            url: "/api/v1/usermod/qualification/" + userid,
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback();
+                window.location.reload();
+
+            }
+        });
+    };
+
+    actions.updateQualification = function(userid, keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            key: keyIdentifier,
+            value: value,
+            args: args,
+        };
+        $.ajax({
+            url: "/api/v1/usermod/qualification/" + userid,
+            // make put for safety reasons :-)
+            type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback();
+                window.location.reload();
+
+            }
+        });
+    };
+
+    actions.removeQualification = function(userid, keyIdentifier, value, args, callback){
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            key: keyIdentifier,
+            value: value,
+            args: args,
+        };
+        $.ajax({
+            url: "/api/v1/usermod/qualification/" + userid,
+            // make put for safety reasons :-)
+            type: 'DELETE',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback();
+                window.location.reload();
+
+            }
+        });
+    };
+
     actions.getLogs = function(targetId, logType, callback) {
         callback = (callback == null) ? function(){} : callback;
         var data = {
