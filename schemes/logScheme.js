@@ -194,16 +194,44 @@ LogSchema.virtual('description').get(function() {
 
             case "userAddQualification":
                 fullDescription.en = "user " + authorizedUser + " added qualification : "  + this.action.value + " to user "+ target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat die Qualifikation" + this.action.value + " zu Nutzer " + target + " hinzugefügt";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation" + this.action.value + " zu Nutzer " + target + " hinzugefügt";
 
-                shortDescription.en = authorizedUser + " added " + target + " to " + this.action.value;
-                shortDescription.de = authorizedUser + " hat " + target + " zu " + this.action.value + " hinzugefügt";
+                shortDescription.en = authorizedUser + " added " + this.action.value + " to " + target;
+                shortDescription.de = authorizedUser + " hat " + this.action.value + " zu " + target + " hinzugefügt";
 
-                actionDescription.en = "added user to group " + this.action.value;
-                actionDescription.de = "Zur Gruppe " + this.action.value + "hinzugefügt";
+                actionDescription.en = "added qualification: " + this.action.value;
+                actionDescription.de = "Qualifikation " + this.action.value + "hinzugefügt";
 
                 minDescription = this.action.value;
-                logType = "Zu Gruppe hinzugefügt";
+                logType = "Qualifikation hinzugefügt";
+                break;
+
+            case "userUpdateQualification":
+                fullDescription.en = "user " + authorizedUser + " changed qualification : "  + this.action.value + " of user "+ target +".";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation" + this.action.value + " von Nutzer " + target + " geändert.";
+
+                shortDescription.en = authorizedUser + " changed " + this.action.value + " of " + target;
+                shortDescription.de = authorizedUser + " hat " + this.action.value + " von " + target + " geändert";
+
+                actionDescription.en = "changed qualification: " + this.action.value;
+                actionDescription.de = "Qualifikation " + this.action.value + " geändert";
+
+                minDescription = this.action.value;
+                logType = "Qualifikation geändert";
+                break;
+
+            case "userRemoveQualification":
+                fullDescription.en = "user " + authorizedUser + " removed qualification : "  + this.action.value + " of user "+ target +".";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation" + this.action.value + " von Nutzer " + target + " entfernt.";
+
+                shortDescription.en = authorizedUser + " removed " + this.action.value + " of " + target;
+                shortDescription.de = authorizedUser + " hat " + this.action.value + " von " + target + " entfernt";
+
+                actionDescription.en = "removed qualification: " + this.action.value;
+                actionDescription.de = "Qualifikation " + this.action.value + " entfernt";
+
+                minDescription = this.action.value;
+                logType = "Qualifikation entfernt";
                 break;
 
             case "userGroupAdd":

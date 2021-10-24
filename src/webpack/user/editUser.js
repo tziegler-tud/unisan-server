@@ -482,7 +482,7 @@ $(document).ready (function () {
                                 }
                             };
                             token = lidlRTO.objectManager.createNewObjectToken();
-                            const dialogChangeUsername = new lidl.Dialog(token2, null, 'confirmChange', changeContent, changeArgs);
+                            const dialogChangeUsername = new lidl.Dialog(token, null, 'confirmChange', changeContent, changeArgs);
                             lidlRTO.objectManager.addObject(dialogChangeUsername, token);
                             dialogChangeUsername.openDialog();
                         },

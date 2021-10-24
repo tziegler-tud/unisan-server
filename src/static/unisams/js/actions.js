@@ -143,7 +143,7 @@ common = window.common;
     actions.addQualification = function(userid, keyIdentifier, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var data = {
-            qualification: value,
+            data: value,
             args: args,
         };
         $.ajax({
@@ -164,8 +164,8 @@ common = window.common;
     actions.updateQualification = function(userid, keyIdentifier, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var data = {
-            key: keyIdentifier,
-            value: value,
+            id: value.id,
+            data: value,
             args: args,
         };
         $.ajax({
@@ -186,8 +186,7 @@ common = window.common;
     actions.removeQualification = function(userid, keyIdentifier, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var data = {
-            key: keyIdentifier,
-            value: value,
+            id: value.id,
             args: args,
         };
         $.ajax({

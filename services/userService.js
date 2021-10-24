@@ -684,7 +684,7 @@ async function addQualification(req, id, qualificationObject,  args) {
                 action: {
                     objectType: "user",
                     actionType: "modify",
-                    actionDetail: "userModify",
+                    actionDetail: "userAddQualification",
                     key: logKey,
                     fullKey: "qualification",
                     originalValue: ojVal,
@@ -711,14 +711,19 @@ async function addQualification(req, id, qualificationObject,  args) {
  * updates a single qualification entry of user
  * @param {Object} req - express request object.
  * @param {number} id - user id
- * @param {number} qualificationId - qualification entrie id. Note this is not the qualficiation id from qualification collection.
- * @param {Object} value - qualification object
- * @param {Object} userParams - parameters: upsert <Boolean> inserts new entry if id is not present
+ * @param {number} qualificationId - qualification entry id. Note this is not the qualificiation id from qualification collection, but a unique id associated to the array element specific for this user
+ * @param {Object} data - qualification object
+ * @param {Object} args - parameters: upsert <Boolean> inserts new entry if id is not present
  * @returns {Promise<void>}
  */
 
-async function updateQualification(req, id, qualificationId, value, userParams) {
-    if (!userParams) userParams = {};
+async function updateQualification(req, id, qualificationId, data, args) {
+    let defaults = {
+        noIndex: false,
+
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
 
     const user = await User.findById(id);
 
@@ -728,15 +733,18 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
     //check write access
     if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
+    let errHeader = "Failed to add Qualification: ";
     // validate input
-    if (!key) throw new Error('no key given');
-    if (!value) throw new Error('no value given');
+    if (data === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
 
     let ojVal = undefined;
-    let newVal = value;
-    let logKey = (value.title === undefined) ? key : value.title;
+    let newVal = data.qualification.name;
+    let logKey = data.qualification.qualType;
 
    var array = user.qualifications;
+    //validate array
+    if(!Array.isArray(array)) throw new Error(errHeader + "Failed to read qualification array from user document. User document might be corrupted. Aborting Operation.")
+
     // get current array content. Qualifications array is access by mongo ids.
     // in-memory update.
     // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
@@ -758,13 +766,13 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
     }
     if (index > -1) {
         // updating existing object
-        ojVal = array[index];
-        array.splice(index, 1, value);
+        ojVal = array[index].qualification.name;
+        array.splice(index, 1, data);
     }
     else {
-        if (userParams.upsert) {
+        if (args.upsert) {
             // key not found, creating new entry
-            array.push(value);
+            array.push(data);
         }
         else throw new Error("Failed to update qualification entry: Invalid array id given");
     }
@@ -779,9 +787,9 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
                 action: {
                     objectType: "user",
                     actionType: "modify",
-                    actionDetail: "userModify",
+                    actionDetail: "userUpdateQualification",
                     key: logKey,
-                    fullKey: key,
+                    fullKey: "qualification",
                     originalValue: ojVal,
                     value:  newVal,
                 },
@@ -801,8 +809,15 @@ async function updateQualification(req, id, qualificationId, value, userParams) 
         })
 }
 
-async function removeQualification(req, id, qualificationId, userParams) {
-    if (!userParams) userParams = {};
+async function removeQualification(req, id, qualificationId, args) {
+    let defaults = {
+        noIndex: false,
+        isIndex: false,
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
+
+
     const user = await User.findById(id);
     // validate
     if (!user) throw new Error('User not found');
@@ -816,20 +831,21 @@ async function removeQualification(req, id, qualificationId, userParams) {
     let logKey = "qualifications";
     let fullKey = logKey;
     let ojVal = "";
-    if (userParams.isIndex) {
+    if (args.isIndex) {
         //qualificationId is array index
         let fullKey = logKey + "." + (qualificationId).toString();
         let rmObj = removeByIndex(array, qualificationId);
         array = rmObj.array;
-        ojVal = rmObj.value;
+        ojVal = rmObj.object.qualification.name;
     }
     else {
         //qualificationId is id
         let fullKey = logKey + "/" + (qualificationId).toString();
         let rmObj = removeById(array, qualificationId);
         array = rmObj.array;
-        ojVal = rmObj.value;
+        ojVal = rmObj.object.qualification.name;
     }
+
     let key = "qualifications";
     let value = array;
     user.set(key, value, {strict: false} );
@@ -842,10 +858,11 @@ async function removeQualification(req, id, qualificationId, userParams) {
                 action: {
                     objectType: "user",
                     actionType: "modify",
-                    actionDetail: "userModify",
+                    actionDetail: "userRemoveQualification",
                     key: logKey,
                     fullKey: fullKey,
                     originalValue: ojVal,
+                    value:  ojVal,
                 },
                 authorizedUser: req.user,
                 target: {
@@ -1143,7 +1160,7 @@ function removeById(array, id){
     /** @type {any[]} */
     if(!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof(array)}" was found.`);
 
-    var index = array.map(e => e._id).indexOf(id);
+    var index = array.map(e => e._id.toString()).indexOf(id);
     if (index > -1) {
         // remove existing key from array
         let el = array[index];

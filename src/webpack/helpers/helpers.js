@@ -1,5 +1,5 @@
 var transformDateTimeString = function(dateString, format) {
-    format = (format === undefined || typeof(format !== "String")) ? "text" : format;
+    format = (format === undefined || typeof(format) !== "string") ? "text" : format;
     let weekDays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",  "Freitag", "Samstag"];
     var myDate = new Date(dateString);
     var month = (myDate.getMonth()+ 1).toString().length < 2 ? "0"+(myDate.getMonth()+ 1).toString() : (myDate.getMonth()+ 1).toString();

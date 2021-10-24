@@ -172,19 +172,19 @@ function updateKey(req, res, next) {
 }
 
 function addQualification(req, res, next) {
-    userService.addQualification(req, req.params.id, req.body.qualification, req.body.args)
+    userService.addQualification(req, req.params.id, req.body.data, req.body.args)
         .then((result) => res.json({result}))
         .catch(err => next(err));
 }
 
 function updateQualification(req, res, next) {
-    userService.updateQualification(req, req.params.id, req.body.key, req.body.value, req.body.args)
+    userService.updateQualification(req, req.params.id, req.body.id, req.body.data, req.body.args)
         .then((result) => res.json({result}))
         .catch(err => next(err));
 }
 
 function removeQualification(req, res, next) {
-    userService.removeQualification(req, req.params.id, req.body.key, req.body.value, req.body.args)
+    userService.removeQualification(req, req.params.id, req.body.id, req.body.args)
         .then((result) => res.json({result}))
         .catch(err => next(err));
 }

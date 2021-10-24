@@ -100,6 +100,7 @@ var UserSchema = new Schema({
     qualifications: [
         {
             qualification: {
+                _id: false,
                 qualType: {
                     type: String,
 
