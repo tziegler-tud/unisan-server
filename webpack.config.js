@@ -7,20 +7,21 @@ module.exports = {
     entry: {
         login: "./src/webpack/login.js",
         login_style: "./src/webpack/login.scss",
-        addUser: "./src/webpack/addUser.js",
-        addUser_style: "./src/webpack/addUser.scss",
-        addEvent: "./src/webpack/addEvent.js",
-        addEvent_style: "./src/webpack/addEvent.scss",
+
+        addUser: "./src/webpack/user/addUser.js",
+        addUser_style: "./src/webpack/user/addUser.scss",
+        editUser: "./src/webpack/user/editUser.js",
+        editUser_style: "./src/webpack/user/editUser.scss",
+
         drawer: "./src/webpack/drawer.js",
         drawer_style: "./src/webpack/drawer.scss",
 
+        addEvent: "./src/webpack/events/addEvent.js",
+        addEvent_style: "./src/webpack/events/addEvent.scss",
         editEvent: "./src/webpack/events/editEvent.js",
         editEvent_style: "./src/webpack/events/editEvent.scss",
         viewEvent: "./src/webpack/events/viewEvent.js",
         viewEvent_style: "./src/webpack/events/viewEvent.scss",
-
-        editUser: "./src/webpack/user/editUser.js",
-        editUser_style: "./src/webpack/user/editUser.scss",
 
         protocol: "./src/webpack/apps/protocol/protocol.js",
         protocol_style: "./src/webpack/apps/protocol/protocol.scss",

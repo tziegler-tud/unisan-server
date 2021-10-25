@@ -9,7 +9,7 @@
 @use "@material/textfield/icon";
 
 
-@import "./variables";
+@import "../variables";
 
 @include textfield.core-styles;
 @include helper-text.helper-text-core-styles;

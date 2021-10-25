@@ -7,7 +7,7 @@ $(document).ready (function () {
     //setupTimePickerWidget()
 
     let pagesliderContainer = document.getElementById("pageslider-container-01");
-    $.get('/static/unisams/js/user/templates/webpack/addUser-container.hbs', function (data) {
+    $.get('/webpack/user/templates/addUser/addUser-container.hbs', function (data) {
         var template = Handlebars.compile(data);
         pagesliderContainer.innerHTML = template();
         buildPageSlider(pagesliderContainer);
@@ -47,12 +47,12 @@ function buildPageSlider(container) {
     });
 
     //get first page
-    $.get('/static/unisams/js/user/templates/webpack/addUser-general.hbs', function (data) {
+    $.get('/webpack/user/templates/addUser/addUser-general.hbs', function (data) {
         var template = Handlebars.compile(data);
         let page1 = pageslider.addPage(template());
 
         //get second page
-        $.get('/static/unisams/js/user/templates/webpack/addUser-pw.hbs', function (data) {
+        $.get('/webpack/user/templates/addUser/addUser-pw.hbs', function (data) {
             var template = Handlebars.compile(data);
             let page2 = pageslider.addPage(template());
 
@@ -107,12 +107,12 @@ function buildPageSlider(container) {
                 });
 
             //get third page
-            $.get('/static/unisams/js/user/templates/webpack/addUser-details.hbs', function (data) {
+            $.get('/webpack/user/templates/addUser/addUser-details.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 let page3 = pageslider.addPage(template());
 
-                //get 4 page
-                $.get('/static/unisams/js/user/templates/addUser-img.hbs', function (data) {
+                //get 4th page
+                $.get('/webpack/user/templates/addUser/addUser-img.hbs', function (data) {
                     var template = Handlebars.compile(data);
                     let page3 = pageslider.addPage(template());
 
