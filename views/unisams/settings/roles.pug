@@ -3,11 +3,17 @@ extends ../layout
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
     script(src="/static/unisams/js/qualificationActions.js")
-    script(src="/static/unisams/js/settings.js")
+    //script(src="/static/unisams/js/settings.js")
+    script(src="/dist/settings.js")
 
 
 
     script.
+        //used to tell the bundled js which modules to load.
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["roles"],
+        };
         window.dockerArgs.activeContainer = "settingsContainer";
         window.dockerArgs.activeElementId = "settingsRoles";
 
@@ -37,7 +43,7 @@ block content
                                                 .item-property= group.description
                                                 .clear
 
-                                    #addQualButton.btn-addItem.btn-listExt
+                                    #addRoleButton.btn-addItem.btn-listExt.addRoleButton
                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                         span Hinzufügen
                                         .clear

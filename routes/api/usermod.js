@@ -85,6 +85,7 @@ function checkUrlAccess(req, res, next){
 }
 
 // routes
+//hooked at /api/v1/usermod
 
 //check url access by user group
 router.use('/*', checkUrlAccess);

@@ -45,7 +45,7 @@ async function getAll() {
 /**
  *
  * @param args
- * @returns {Promise<void>}
+ * @returns {Promise<[User]>}
  */
 async function getAllFiltered(args){
     let defaults = {

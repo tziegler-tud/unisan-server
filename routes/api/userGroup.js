@@ -31,7 +31,7 @@ function getUserGroups(req, res, next){
 }
 
 function createGroup(req, res, next){
-    userGroupService.create(req.body)
+    userGroupService.create(req, req.body.data, req.body.args)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
@@ -43,7 +43,7 @@ function updateGroup(req, res, next){
 }
 
 function deleteGroup(req, res, next){
-    userGroupService._delete(req.params.id)
+    userGroupService._delete(req, req.params.id)
         .then(result => res.status(200).send())
         .catch(err => next(err));
 }

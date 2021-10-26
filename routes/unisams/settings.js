@@ -120,6 +120,7 @@ function editRole(req, res, next) {
                             title: "Rolle: " + group.title,
                             user: req.user._doc,
                             group: group._doc,
+                            groupId: group._id,
                             assignedUser: user,
                         })
                 })
@@ -141,6 +142,7 @@ function editRoleAdvanced(req, res, next) {
                             title: "Rolle: " + group.title,
                             user: req.user._doc,
                             group: group._doc,
+                            groupId: group._id,
                             assignedUser: user,
                         })
                 })

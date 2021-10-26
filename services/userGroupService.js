@@ -44,11 +44,11 @@ async function getByTitle(title) {
  * Creates a new group from qualified JSON object
  * @param {UserGroup} groupObject
  */
-async function create(groupObject) {
+async function create(req, groupObject, args) {
     // create qualification document
     const group = new UserGroup(groupObject);
     // save in database
-    await group.save();
+    return group.save();
 }
 
 
@@ -68,12 +68,17 @@ async function update(id, groupObject) {
 
 /**
  * Deletes a group
+ * @param {Object} req request object
  * @param {number} id The id of the group to delete
  */
-async function _delete(id) {
-    //TODO: remove group reference from all users
-    console.log("deleting groups not supported atm.")
-    // await UserGroup.findByIdAndRemove(id);
+async function _delete(req, id) {
+    removeGroupFromAllUser(req, id)
+        .then(function(result){
+            return UserGroup.findByIdAndRemove(id);
+        })
+        .catch(function(err){
+            console.error(err)
+        });
 }
 
 /**
@@ -172,4 +177,19 @@ async function getAssignedUser(id) {
     }
     return UserService.getAllFiltered(args);
 
+}
+
+async function removeGroupFromAllUser(req, id){
+    getAssignedUser(id)
+        .then(function(userArray){
+            let promiseArray = [];
+            userArray.forEach(function(user) {
+                let promise = UserService.removeUserGroup(req, user._id, id);
+                promiseArray.push(promise)
+            })
+            return Promise.all(promiseArray);
+        })
+        .catch(function(err){
+            throw new Error("Failed to remove group from all user. Reason: Failed to get all assigned user. Error:" + err);
+        })
 }

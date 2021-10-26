@@ -3,7 +3,7 @@ extends ../layout
 block page_includes
 
     script.
-        window.roleId = "#{group.id}";
+        window.roleId = "#{group._id};
          window.group = !{JSON.stringify(group)}
          window.assignedUser = !{JSON.stringify(assignedUser)};
         window.dockerArgs.activeContainer = "roleContainer";
@@ -11,8 +11,9 @@ block page_includes
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
-    script(src="/static/unisams/js/settings/role.js")
-    script(src="/static/unisams/js/actions.js")
+    //script(src="/static/unisams/js/settings/role.js")
+    //script(src="/static/unisams/js/actions.js")
+    script(src="/dist/editRole.js")
 
 block content
     #wrapper
@@ -57,33 +58,5 @@ block content
                                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                         span Hinzufügen
                                                         .clear
-
-                                            .userinfo-section.userinfo-card.card-full.userwidget-description
-                                                .userinfo-section-inner
-                                                    .userinfo-sectionheader
-                                                        span assigned user
-                                                    div
-                                                        ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList.list-view
-                                                            if assignedUser
-                                                                each user in assignedUser
-                                                                    //li.user-entry.userkey-entry(id="userId-" + user.id)
-                                                                    //    a.inner()
-                                                                    //        .item-property.userkey-entry-title
-                                                                    //            span= user.username
-                                                                    //        .clear
-                                                                    li.user-entry(id="userId-" + user.id, data-userid=user.id)
-                                                                        a.inner
-                                                                            .item-property.item-container.name
-                                                                                .userlist-img.item-container-element
-                                                                                    img(src='/data/uploads/user_images/'+user.id+'/'+user.id+'.jpg')
-                                                                                span.item-container-element.limitCharacters=user.generalData.firstName.value + " " + user.generalData.lastName.value
-
-
-
-
-
-                                                    .userinfo-item.useredit-item.useredit-addItem
-                                                        .useredit-addGeneralItemBtn.btn-addItem.btn-listExt(data-catkey=secKey)
-                                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                                            span Hinzufügen
-                                                            .clear
+                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                            a#deleteRoleButton.content-link.deleteRoleButton Rolle löschen

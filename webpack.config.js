@@ -23,6 +23,10 @@ module.exports = {
         viewEvent: "./src/webpack/events/viewEvent.js",
         viewEvent_style: "./src/webpack/events/viewEvent.scss",
 
+        settings: "./src/webpack/settings/settings.js",
+
+        editRole: "./src/webpack/roles/editRole.js",
+
         protocol: "./src/webpack/apps/protocol/protocol.js",
         protocol_style: "./src/webpack/apps/protocol/protocol.scss",
         app_navigation: "./src/webpack/apps/app_navigation.js",
