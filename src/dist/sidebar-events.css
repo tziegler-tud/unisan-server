@@ -1,0 +1,72 @@
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+               supported by Chrome and Opera */
+}
+
+.sidebar-event .sidebar-content .event-participants-container .participant-heading {
+  padding-bottom: 1em;
+  text-transform: uppercase;
+  color: #AAA;
+  font-size: 90%;
+}
+.sidebar-event .sidebar-content .event-participants-container .event-participants .participant-item {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #CCC;
+  padding: 5px 0;
+}
+.sidebar-event .sidebar-content .event-participants-container .event-participants .participant-item .participant-img {
+  flex: 0 0 3em;
+  margin-right: 1em;
+  max-width: 2em;
+}
+.sidebar-event .sidebar-content .event-participants-container .event-participants .participant-item .participant-img img {
+  width: 100%;
+  border-radius: 50%;
+}
+.sidebar-event .sidebar-content .event-participants-container .event-participants .participant-item .participant-details {
+  flex: 1 1 auto;
+}
+.sidebar-event .sidebar-content .event-participants-container .event-participants .participant-item .participant-details a {
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  -webkit-transition: 200ms;
+  -moz-transition: 200ms;
+  -ms-transition: 200ms;
+  -o-transition: 200ms;
+  transition: 200ms;
+}
+
+.sidebar-participate-button.hidden {
+  display: none !important;
+}

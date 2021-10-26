@@ -132,4 +132,18 @@ let Counter = function(args) {
     return this;
 }
 
-export {transformDateTimeString, Counter}
+var getDataFromServer  = function(url, callback){
+
+    // get qualification data from server
+    $.ajax({
+        url: url,
+        type: 'GET',
+        cache: false,
+        isModified: false,
+        data: {},
+        success: callback,
+    });
+};
+
+
+export {transformDateTimeString, Counter, getDataFromServer}

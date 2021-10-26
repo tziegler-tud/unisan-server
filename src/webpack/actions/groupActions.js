@@ -33,18 +33,18 @@ var groupActions = {
 
     addUser: function(data, args) {
         let jsonData = {
-            userGroupId: data.id,
-            userid: data.userid,
+            userGroupId: data.userGroupId,
+            userId: data.userId,
             args: args,
         }
         $.ajax({
-            url: "/api/v1/usermod/addUserGroup/"+data.userid,
+            url: "/api/v1/usermod/addUserGroup/"+data.userId,
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+result.id)
+                location.replace("/unisams/settings/roles/"+data.userGroupId)
             }
         });
     }

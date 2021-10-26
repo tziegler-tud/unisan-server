@@ -4,9 +4,9 @@
     font-weight: 400;
     src: local('Material Icons'),
         local('MaterialIcons-Regular'),
-        url(fonts/MaterialIcons-Regular.woff2) format('woff2'),
-        url(fonts/MaterialIcons-Regular.woff) format('woff'),
-        url(fonts/MaterialIcons-Regular.ttf) format('truetype');
+        url(autofonts/MaterialIcons-Regular.woff2) format('woff2'),
+        url(autofonts/MaterialIcons-Regular.woff) format('woff'),
+        url(autofonts/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {
@@ -1355,7 +1355,7 @@ a.mdc-list-item {
   text-transform: inherit;
   /* @alternate */
   text-transform: var(--mdc-typography-subtitle1-text-transform, inherit);
-  margin: calc( (3rem - 1.5rem) / 2 ) 16px;
+  margin: calc((3rem - 1.5rem) / 2) 16px;
 }
 
 .mdc-evolution-list-item__primary-text {
@@ -2351,7 +2351,7 @@ a.mdc-evolution-list-item {
   text-transform: inherit;
   /* @alternate */
   text-transform: var(--mdc-typography-subtitle1-text-transform, inherit);
-  margin: calc( (3rem - 1.5rem) / 2 ) 16px;
+  margin: calc((3rem - 1.5rem) / 2) 16px;
 }
 
 .mdc-evolution-list-divider {

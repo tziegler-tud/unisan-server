@@ -942,7 +942,7 @@ a.mdc-list-item {
   text-transform: inherit;
   /* @alternate */
   text-transform: var(--mdc-typography-subtitle1-text-transform, inherit);
-  margin: calc( (3rem - 1.5rem) / 2 ) 16px;
+  margin: calc((3rem - 1.5rem) / 2) 16px;
 }
 
 .mdc-evolution-list-item__primary-text {
@@ -1938,7 +1938,7 @@ a.mdc-evolution-list-item {
   text-transform: inherit;
   /* @alternate */
   text-transform: var(--mdc-typography-subtitle1-text-transform, inherit);
-  margin: calc( (3rem - 1.5rem) / 2 ) 16px;
+  margin: calc((3rem - 1.5rem) / 2) 16px;
 }
 
 .mdc-evolution-list-divider {

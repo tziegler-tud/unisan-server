@@ -1,8 +1,8 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
 
-//TODO: install Handlebars npm package
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
+import {getDataFromServer} from "../../helpers/helpers";
 
 let userPlugin = new SidebarPlugin("user");
 

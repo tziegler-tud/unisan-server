@@ -43,26 +43,13 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.scss$/,
+                test: /\.s[ac]ss$/i,
                 use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            name: '[name].css',
-                        },
-                    },
-                    { loader: 'extract-loader' },
+                    // Creates `style` nodes from JS strings
+                    { loader: 'style-loader' },
+                    // Translates CSS into CommonJS
                     { loader: 'css-loader' },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            postcssOptions: {
-                                plugins: [
-                                    autoprefixer()
-                                ]
-                            }
-                        }
-                    },
+                    // Compiles Sass to CSS
                     {
                         loader: 'sass-loader',
                         options: {
@@ -76,8 +63,9 @@ module.exports = {
                             },
                         }
                     },
-                ]
+                ],
             },
+
             {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
@@ -96,4 +84,9 @@ module.exports = {
             }
         ]
     },
+    resolve: {
+        alias: {
+            handlebars: 'handlebars/dist/handlebars.min.js'
+        }
+    }
 };

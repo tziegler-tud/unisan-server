@@ -1,3 +1,8 @@
+import "./sidebar.scss";
+import "./sidebar-addParticipant.scss";
+import "./sidebar-events.scss";
+import "./sidebar-logs.scss";
+
 let SidebarCounter = {
     counter: 0,
     next: function(){

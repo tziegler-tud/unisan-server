@@ -12,6 +12,7 @@ $(document).ready (function () {
 
     //group is in window.group
     let group = window.group;
+    var groupId = window.groupId;
 
     // window.DockerElement = new docker.Docker(window.dockerArgs);
     window.DockerElement.addDockerSubPage("role", group, {});
@@ -19,7 +20,7 @@ $(document).ready (function () {
     let addDBKey_sidebar = new Sidebar('wrapper', "test");
     addDBKey_sidebar.addPlugin(rolesPlugin);
 
-    var groupId = window.groupId;
+
 
     const deleteContent = {
         title: "Gruppe löschen",
@@ -44,6 +45,8 @@ $(document).ready (function () {
     $(".addUserButton").on("click", function (e) {
         e.preventDefault();
         addDBKey_sidebar.addContent('addUserToGroup', {
+                group: group,
+                groupId: groupId,
                 callback: {
                     onConfirm: function (data, args) {
                         groupActions.addUser(data, args);
