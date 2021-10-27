@@ -72,13 +72,19 @@ async function update(id, groupObject) {
  * @param {number} id The id of the group to delete
  */
 async function _delete(req, id) {
-    removeGroupFromAllUser(req, id)
-        .then(function(result){
-            return UserGroup.findByIdAndRemove(id);
-        })
-        .catch(function(err){
-            console.error(err)
-        });
+    return new Promise(function(resolve, reject){
+        removeGroupFromAllUser(req, id)
+            .then(function(result){
+                UserGroup.findByIdAndRemove(id)
+                    .then(function(result){
+                        resolve(result);
+                    })
+            })
+            .catch(function(err){
+                reject(err)
+            });
+    })
+
 }
 
 /**
@@ -164,32 +170,52 @@ async function removePermission(id, method, url) {
 }
 
 async function getAssignedUser(id) {
-    const group = await UserGroup.findById(id);
-    // validate
-    if (group == null) throw new Error('Group not found');
+    return new Promise(function(resolve, reject)
+    {
+        UserGroup.findById(id)
+            .then(function (group) {
+                // validate
+                if (group == null) {
+                    reject('Group not found');
+                    return;
+                }
 
-    //query userService for user with this group assigned
-    let args = {
-        filter: {
-            filter: "userGroups",
-            value: id
-        }
-    }
-    return UserService.getAllFiltered(args);
-
+                //query userService for user with this group assigned
+                let args = {
+                    filter: {
+                        filter: "userGroups",
+                        value: id
+                    }
+                }
+                UserService.getAllFiltered(args)
+                    .then(function(userArray){
+                        resolve(userArray);
+                    })
+                    .catch(err => reject(err))
+            })
+            .catch(function (err) {
+                reject(err);
+            })
+    })
 }
 
 async function removeGroupFromAllUser(req, id){
-    getAssignedUser(id)
-        .then(function(userArray){
-            let promiseArray = [];
-            userArray.forEach(function(user) {
-                let promise = UserService.removeUserGroup(req, user._id, id);
-                promiseArray.push(promise)
+    return new Promise(function(resolve, reject) {
+        getAssignedUser(id)
+            .then(function (userArray) {
+                let promiseArray = [];
+                if (!Array.isArray(userArray)) reject(new Error("Failed to read assigned users"))
+                userArray.forEach(function (user) {
+                    let promise = UserService.removeUserGroup(req, user._id, id);
+                    promiseArray.push(promise)
+                })
+                Promise.all(promiseArray)
+                    .then(function(array){
+                        resolve(array)
+                    })
             })
-            return Promise.all(promiseArray);
-        })
-        .catch(function(err){
-            throw new Error("Failed to remove group from all user. Reason: Failed to get all assigned user. Error:" + err);
-        })
+            .catch(function (err) {
+                reject(err);
+            })
+    })
 }

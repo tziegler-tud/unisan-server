@@ -249,8 +249,13 @@ function addGroupToAllUser(req, res, next){
     userService.getAll()
         .then(function(userlist){
             userlist.forEach(function(user){
-                userService.addUserGroup(user.id, req.body.groupId)
-                    .then(user=>console.log("user " + user.username + "has been assigned the role."))
+                userService.addUserGroup(req, user.id, req.body.userGroupId)
+                    .then(user=>console.log("user " + user.username + "has been assigned to group."))
+                    .catch(function(err){
+                        console.log("user not found.")
+                    })
             })
         })
+        .catch(err=>next(err))
+
 }

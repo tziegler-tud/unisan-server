@@ -44,8 +44,12 @@ function updateGroup(req, res, next){
 
 function deleteGroup(req, res, next){
     userGroupService._delete(req, req.params.id)
-        .then(result => res.status(200).send())
-        .catch(err => next(err));
+        .then(function(result) {
+            res.status(200).send()
+        })
+        .catch(function(err){
+            next(err)
+        });
 }
 
 function getGroup(req, res, next){

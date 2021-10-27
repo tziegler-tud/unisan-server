@@ -894,19 +894,26 @@ async function matchAny(matchString, args){
     let userlist;
     //matches a given string username, firstname and lastname
     //if filter is empty, return all results
-    if (matchString.length === 0) {
-        userlist = User.find();
-    }
-    else {
+    let filter = args.filter;
+
+    if (filter===undefined || filter.filter === undefined || filter.value === undefined) {
+        if (matchString.length === 0) {
+            userlist = User.find();
+        }
         userlist = User.find().or([{username: { $regex: matchString, $options: "-i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "-i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "-i" }}])
 
+    }
+    else {
+        let filterObj = {};
+        filterObj[filter.filter] = filter.value;
+        userlist = User.find(filterObj).or([{username: { $regex: matchString, $options: "-i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "-i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "-i" }}]).select("-password");
     }
     //filter user by given string, using username, firstname and lastname attribute
 
     if (args.sort) {
        userlist = userlist.sort(args.sort);
-
     }
+
 
     return userlist;
 }

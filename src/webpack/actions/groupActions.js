@@ -24,7 +24,6 @@ var groupActions = {
             url: "/api/v1/groups/"+id,
             type: 'DELETE',
             contentType: "application/json; charset=UTF-8",
-            dataType: 'json',
             success: function (result) {
                 location.replace("/unisams/settings/roles")
             }
@@ -45,6 +44,23 @@ var groupActions = {
             data: JSON.stringify(jsonData),
             success: function (result) {
                 location.replace("/unisams/settings/roles/"+data.userGroupId)
+            }
+        });
+    },
+
+    addGroupToAllUser: function(userGroupId, args) {
+        let jsonData = {
+            userGroupId: userGroupId,
+            args: args,
+        }
+        $.ajax({
+            url: "/api/v1/usermod/addGroupToAllUser",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                location.replace("/unisams/settings/roles/"+userGroupId)
             }
         });
     }

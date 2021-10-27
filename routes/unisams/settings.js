@@ -124,6 +124,9 @@ function editRole(req, res, next) {
                             assignedUser: user,
                         })
                 })
+                .catch(function(err){
+                    next(next({status:404, message: err}));
+                })
 
         })
         .catch(err => next(err))
@@ -145,6 +148,9 @@ function editRoleAdvanced(req, res, next) {
                             groupId: group._id,
                             assignedUser: user,
                         })
+                })
+                .catch(function(err){
+                    next(next({status:404, message: err}));
                 })
 
         })

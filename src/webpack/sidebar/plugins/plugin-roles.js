@@ -120,6 +120,10 @@ var addUser  = new ContentHandler("addUserToGroup",
                         filter: filter,
                         args: {
                             sort: "generalData.lastName.value",
+                            filter: {
+                                filter: "userGroups",
+                                value: {$nin: [groupId]},
+                            }
                         }
                     };
                     //get user list from server

@@ -33,13 +33,13 @@ $(document).ready (function () {
         id: groupId,
         callback: {
             onConfirm: function () {
-                groupActions.removeGroup(id)
+                groupActions.removeGroup(groupId)
             }
         }
     };
 
     var token = lidlRTO.objectManager.createNewObjectToken();
-    const dialogDeleteUser = new lidl.Dialog(token, ".deleteRoleButton", 'confirmDelete', deleteContent, deleteArgs);
+    const dialogDeleteUser = new lidl.Dialog(token, ".deleteGroupButton", 'confirmDelete', deleteContent, deleteArgs);
     lidlRTO.objectManager.addObject(dialogDeleteUser, token);
 
     $(".addUserButton").on("click", function (e) {
@@ -56,5 +56,25 @@ $(document).ready (function () {
         );
         addDBKey_sidebar.show();
     });
+
+    const addToAllContent = {
+        title: "Gruppe allen Nutzern zuweisen",
+        message: "Alle Nutzer werden dieser Gruppe hinzugefügt. Fortfahren?",
+        titleArg: "",
+        messageArg: ""
+    };
+
+    var addToAllArgs = {
+        id: groupId,
+        callback: {
+            onConfirm: function () {
+                groupActions.addGroupToAllUser(groupId);
+            }
+        }
+    };
+
+    var token2 = lidlRTO.objectManager.createNewObjectToken();
+    const dialogAddToAll = new lidl.Dialog(token2, ".addToAllButton", 'confirmDelete', addToAllContent, addToAllArgs);
+    lidlRTO.objectManager.addObject(dialogAddToAll, token2);
 
 });

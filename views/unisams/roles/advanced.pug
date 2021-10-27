@@ -3,7 +3,7 @@ extends ../layout
 block page_includes
 
     script.
-        window.groupId = "#{group._id};
+        window.groupId = "#{group._id}";
          window.group = !{JSON.stringify(group)}
          window.assignedUser = !{JSON.stringify(assignedUser)};
         window.dockerArgs.activeContainer = "roleContainer";
@@ -58,5 +58,9 @@ block content
                                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                         span Hinzufügen
                                                         .clear
+
                                         .userinfo-section.userinfo-card.card-full.userwidget-description
-                                            a#deleteRoleButton.content-link.deleteRoleButton Rolle löschen
+                                            a#addToAllButton.content-link.style2.addToAllButton Gruppe allen Nutzern zuweisen
+
+                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                            a#deleteGroupButton.content-link.deleteGroupButton Gruppe löschen
