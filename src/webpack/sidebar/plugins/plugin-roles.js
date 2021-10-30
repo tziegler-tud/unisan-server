@@ -44,8 +44,9 @@ let changeGroup = new ContentHandler("changeGroup",
 
         var res = {};
 
-        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
-            res.exploreUser = context;
+        getDataFromServer("/api/v1/groups/"+ groupId,function(context){
+            res.group = context;
+            res.groupId = groupId;
             action(res)
         });
 
@@ -58,10 +59,10 @@ let changeGroup = new ContentHandler("changeGroup",
                 sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
                 sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
                     let data = {
-                        title: $("#changeRoleForm-title").val(),
-                        description: $("#changeRoleForm-description").val(),
+                        title: $("#changeGroupForm-title").val(),
+                        description: $("#changeGroupForm-description").val(),
                     };
-                    onConfirm(data);
+                    onConfirm(groupId, data);
                 }.bind(args));
 
             });
@@ -199,9 +200,80 @@ var addUser  = new ContentHandler("addUserToGroup",
         }
     });
 
+let addGroupPath = new ContentHandler("addGroupPath",
+    function(sidebar, args, type) {
+        var groupId = args.groupId;
+        var onConfirm = args.callback.onConfirm;
+        var corrupted = false;
+
+        var res = {};
+
+        getDataFromServer("/api/v1/groups/"+ groupId,function(context){
+            res.group = context;
+            res.groupId = groupId;
+            action(res)
+        });
+
+        var action = function(context) {
+            $.get('/webpack/sidebar/templates/roles/sidebar-addGroupPath.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                sidebar.sidebarHTML.html(template(context));
+
+                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
+                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                    let data = {
+                        url: $("#changeGroupForm-url").val(),
+                        method: $("#changeGroupForm-method").val(),
+                    };
+                    onConfirm(groupId, data);
+                }.bind(args));
+
+            });
+        };
+    });
+
+let updateGroupPath = new ContentHandler("addGroupPath",
+    function(sidebar, args, type) {
+        var groupId = args.groupId;
+        var onConfirm = args.callback.onConfirm;
+        var corrupted = false;
+        var currentPermission = args.permission;
+
+        var res = {};
+
+        getDataFromServer("/api/v1/groups/"+ groupId,function(context){
+            res.group = context;
+            res.groupId = groupId;
+            res.permission = currentPermission
+            action(res)
+        });
+
+        var action = function(context) {
+            $.get('/webpack/sidebar/templates/roles/sidebar-addGroupPath.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                sidebar.sidebarHTML.html(template(context));
+
+                $("#changeGroupForm-method").value = context.permission.method;
+
+                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
+                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                    let data = {
+                        url: $("#changeGroupForm-url").val(),
+                        method: $("#changeGroupForm-method").val(),
+                    };
+                    onConfirm(groupId, data);
+                }.bind(args));
+
+            });
+        };
+    });
+
 rolesPlugin.addContentHandler(addGroup);
 rolesPlugin.addContentHandler(changeGroup);
 rolesPlugin.addContentHandler(addUser);
+rolesPlugin.addContentHandler(addGroupPath);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 

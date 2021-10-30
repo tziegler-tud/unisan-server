@@ -22,9 +22,9 @@ block content
                 section#sec1
                     #sec-content.subpage-container
                         #content1-heading.sec-heading.subpage-heading
-                            .sec-heading-label.userprofile-heading
-                                .userprofile-heading-container
-                                    h3= group.title
+                            .sec-heading-label.propertypage-heading
+                                .propertypage-heading-container
+                                    h3#userProfileName.limitCharacters= group.title
                                     .clear
                                 .clear
                         #content1-text.sec-content.border-top.userlogs-container.logs-container
@@ -43,7 +43,7 @@ block content
                                                             each val, key in secVal
                                                                 - var method = val.method
                                                                 - var url = val.url
-                                                                li.user-entry.userkey-entry(id="allowedOperation" + val.id)
+                                                                li.user-entry.userkey-entry.changePathEntry(id="allowedOperation" + val.id, data-method=val.method, data-url=val.url)
                                                                     a.inner()
                                                                         .item-property.userkey-entry-title
                                                                             span= method
@@ -54,7 +54,7 @@ block content
 
 
                                                 .userinfo-item.useredit-item.useredit-addItem
-                                                    .useredit-addGeneralItemBtn.btn-addItem.btn-listExt(data-catkey=secKey)
+                                                    .addPathButton.btn-addItem.btn-listExt(data-catkey=secKey)
                                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                         span Hinzufügen
                                                         .clear

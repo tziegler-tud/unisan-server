@@ -1,6 +1,7 @@
 import {Sidebar} from "../sidebar/sidebar";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 import {groupActions} from "../actions/groupActions";
+import {Userlist} from "../helpers/userlist";
 
 
 
@@ -57,6 +58,55 @@ $(document).ready (function () {
         addDBKey_sidebar.show();
     });
 
+    $(".editGroupButton").on("click", function (e) {
+        e.preventDefault();
+        addDBKey_sidebar.addContent('changeGroup', {
+                group: group,
+                groupId: groupId,
+                callback: {
+                    onConfirm: function (id, data, args) {
+                        groupActions.changeGroup(id, data, args);
+                    }
+                }
+            },
+        );
+        addDBKey_sidebar.show();
+    });
+
+    $(".addPathButton").on("click", function (e) {
+        e.preventDefault();
+        addDBKey_sidebar.addContent('addGroupPath', {
+                group: group,
+                groupId: groupId,
+                callback: {
+                    onConfirm: function (id, data, args) {
+                        groupActions.addPermission(id, data, args);
+                    }
+                }
+            },
+        );
+        addDBKey_sidebar.show();
+    });
+
+    $(".changePathEntry").on("click", function (e) {
+        e.preventDefault();
+        addDBKey_sidebar.addContent('addGroupPath', {
+                group: group,
+                groupId: groupId,
+                permission: {
+                    method: e.dataset.method,
+                    url: e.dataset.url,
+                },
+                callback: {
+                    onConfirm: function (id, data, args) {
+                        groupActions.addPermission(id, data, args);
+                    }
+                }
+            },
+        );
+        addDBKey_sidebar.show();
+    });
+
     const addToAllContent = {
         title: "Gruppe allen Nutzern zuweisen",
         message: "Alle Nutzer werden dieser Gruppe hinzugefügt. Fortfahren?",
@@ -76,5 +126,11 @@ $(document).ready (function () {
     var token2 = lidlRTO.objectManager.createNewObjectToken();
     const dialogAddToAll = new lidl.Dialog(token2, ".addToAllButton", 'confirmDelete', addToAllContent, addToAllArgs);
     lidlRTO.objectManager.addObject(dialogAddToAll, token2);
+
+    let listData = {
+        group: group,
+        user: window.assignedUser,
+    }
+    let userlist = new Userlist("userlist-container", listData, "/webpack/templates/userlist.hbs", true);
 
 });

@@ -82,7 +82,7 @@ async function getById(id) {
     //populate userGroups
     return User.findById(id).select('-password').populate({
             path: 'userGroups',
-            select: 'title',
+            select: 'title description',
         });
     // let user = User.findById(id).select('-password').populate({
     //     path: 'userGroups',
@@ -99,7 +99,7 @@ async function getById(id) {
 async function getByUsername(username) {
     return User.findOne({username: username}).select('-password').populate({
         path: 'userGroups',
-        select: 'title',
+        select: 'title description',
     })
 }
 

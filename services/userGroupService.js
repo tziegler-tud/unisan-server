@@ -63,7 +63,7 @@ async function update(id, groupObject) {
     if (group == null) throw new Error('Group not found');
     // copy qualParam properties to qualification document
     Object.assign(group, groupObject);
-    await group.save();
+    return group.save();
 }
 
 /**
@@ -120,6 +120,54 @@ async function addPermission(id, method, url) {
     group.allowedOperations.push(permissionObject);
     await group.save();
     return group;
+}
+
+/**
+ * updates a permission
+ * @param {number} id group id
+ * @param {String} currentMethod String denoting the html request method to be updated
+ * @param {String} currentUrl  the url to be updated
+ * @param {String} newMethod String denoting the updated html request method <["GET","POST","PUT","DELETE", "ALL"]>
+ * @param {String} newUrl  the updated url for which the rule applies
+ */
+
+async function updatePermission(id, currentMethod, currentUrl, newMethod, newUrl) {
+    const group = await UserGroup.findById(id);
+    let methods = ["GET", "POST", "PUT", "DELETE", "ALL"];
+    // validate
+    if (group == null) throw new Error('Group not found');
+    if(!methods.includes(newMethod)) {
+        console.log("invalid method. Aborting...");
+        throw new Error('Invalid method');
+    }
+    if(typeof newUrl === 'string') {
+        var reg = new RegExp(/^[^\/]+\/[^\/].*$|^\/[^\/].*$/gmi);
+        if (!reg.test(url)){
+            throw new Error("invalid url");
+        }
+    }
+    else {
+        throw new Error("url not a string");
+    }
+
+    let permissionObject = {
+        method: newMethod,
+        url: newUrl,
+    };
+
+    //find object in array
+    let index = group.allowedOperations.findIndex(function(v){
+        return (v.method === currentMethod && v.url === currentUrl);
+    });
+
+    if (index > -1){
+        //remove
+        group.allowedOperations[index] = permissionObject;
+    }
+    else {
+        throw new Error("operation not found.")
+    }
+    return group.save();
 }
 
 /**

@@ -42,7 +42,7 @@ block content
                                                         - var combinedKey = "title"
                                                         - var keyTitle = "Titel"
                                                         - var value = group.title
-                                                        li.user-entry.roletitle-change(id="rolekey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                        li.user-entry.editGroupButton(id="rolekey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
                                                             a.inner()
                                                                 .item-property.userkey-entry-title
                                                                     span= keyTitle
@@ -52,7 +52,7 @@ block content
                                                         - var combinedKey = "description"
                                                         - var keyTitle = "Beschreibung"
                                                         - var value = group.description
-                                                        li.user-entry.roledesc-change(id="rolekey-" +combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                        li.user-entry.editGroupButton(id="rolekey-" +combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
                                                             a.inner()
                                                                 .item-property.userkey-entry-title
                                                                     span= keyTitle
@@ -76,21 +76,29 @@ block content
                                                 .userinfo-section-inner
                                                     .userinfo-sectionheader
                                                         span assigned user
-                                                    div
-                                                        ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList.list-view
-                                                            if assignedUser
-                                                                each user in assignedUser
-                                                                    //li.user-entry.userkey-entry(id="userId-" + user.id)
-                                                                    //    a.inner()
-                                                                    //        .item-property.userkey-entry-title
-                                                                    //            span= user.username
-                                                                    //        .clear
-                                                                    li.user-entry(id="userId-" + user.id, data-userid=user.id)
-                                                                        a.inner
-                                                                            .item-property.item-container.name
-                                                                                .userlist-img.item-container-element
-                                                                                    img(src='/data/uploads/user_images/'+user.id+'/'+user.id+'.jpg')
-                                                                                span.item-container-element.limitCharacters=user.generalData.firstName.value + " " + user.generalData.lastName.value
+                                                    div.itemlist-header-container
+                                                        ul#userlist-top.eventlist.itemlist.common-list.list-view.border
+                                                            li.noSelect.rowHeading
+                                                                .inner
+                                                                    .item-property user
+                                                                    .item-property details
+                                                    .itemlist-content-container
+                                                        #userlist-container
+
+                                                        //ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList.list-view
+                                                        //    if assignedUser
+                                                        //        each user in assignedUser
+                                                        //            //li.user-entry.userkey-entry(id="userId-" + user.id)
+                                                        //            //    a.inner()
+                                                        //            //        .item-property.userkey-entry-title
+                                                        //            //            span= user.username
+                                                        //            //        .clear
+                                                        //            li.user-entry(id="userId-" + user.id, data-userid=user.id)
+                                                        //                a.inner
+                                                        //                    .item-property.item-container.name
+                                                        //                        .userlist-img.item-container-element
+                                                        //                            img(src='/data/uploads/user_images/'+user.id+'/'+user.id+'.jpg')
+                                                        //                        span.item-container-element.limitCharacters=user.generalData.firstName.value + " " + user.generalData.lastName.value
 
 
 

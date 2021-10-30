@@ -22,6 +22,7 @@ router.delete('/:id', deleteGroup);
 router.get('/:id', getGroup);
 router.get("/assigned/:id", getAssignedUser);
 router.post('/addPermission/:id', addGroupPermission);
+router.post('/updatePermission/:id', updateGroupPermission);
 router.post('/removePermission/:id', removeGroupPermission);
 
 function getUserGroups(req, res, next){
@@ -60,6 +61,12 @@ function getGroup(req, res, next){
 
 function addGroupPermission(req, res, next){
     userGroupService.addPermission(req.params.id, req.body.method, req.body.url)
+        .then(result => res.json(result))
+        .catch(err => next(err));
+}
+
+function updateGroupPermission(req, res, next){
+    userGroupService.updatePermission(req.params.id, req.body.currentMethod, req.body.currentUrl, req.body.newMethod, req.body.newUrl)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
