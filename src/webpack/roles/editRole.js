@@ -132,5 +132,6 @@ $(document).ready (function () {
         user: window.assignedUser,
     }
     let userlist = new Userlist("userlist-container", listData, "/webpack/templates/userlist.hbs", true);
+    //TODO: Unfinished. needs to be continued
 
 });
