@@ -23,11 +23,11 @@
                     <div class="ak-form">
                         <div class="ak-item ak-key">
                             <label for="changeGroupForm-url">url ('* allowed)</label>
-                            <input class="common-input" id="changeGroupForm-url" name="changeGroupForm-url" type="text" value="{{currentPermission.url}}"/>
+                            <input class="common-input" id="changeGroupForm-url" name="changeGroupForm-url" type="text" value="{{permission.url}}"/>
                         </div>
                         <div class="ak-item ak-value">
-                            <label for="changeGroupForm-description">method</label>
-                            <select class="common-select" id="changeGroupForm-medthod" name="changeGroupForm-method">
+                            <label for="changeGroupForm-method">method</label>
+                            <select class="common-select" id="changeGroupForm-method" name="changeGroupForm-method">
                                     <option value="GET">GET</option>
                                     <option value="POST">POST</option>
                                     <option value="PUT">PUT</option>
@@ -41,6 +41,7 @@
         </div>
         <div class="sidebar-bottom">
             <a class="sidebar-confirm content-link">Speichern</a>
+            <a class="sidebar-delete content-link style2">Eintrag löschen</a>
         </div>
     </div>
 </div>

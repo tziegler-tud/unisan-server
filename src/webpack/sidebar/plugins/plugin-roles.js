@@ -32,6 +32,7 @@ let addGroup = new ContentHandler("addGroup",
                 };
                 onConfirm(data);
             }.bind(args));
+
         });
     
     });
@@ -233,10 +234,11 @@ let addGroupPath = new ContentHandler("addGroupPath",
         };
     });
 
-let updateGroupPath = new ContentHandler("addGroupPath",
+let updateGroupPath = new ContentHandler("updateGroupPath",
     function(sidebar, args, type) {
         var groupId = args.groupId;
         var onConfirm = args.callback.onConfirm;
+        var onDelete = args.callback.onDelete;
         var corrupted = false;
         var currentPermission = args.permission;
 
@@ -250,22 +252,29 @@ let updateGroupPath = new ContentHandler("addGroupPath",
         });
 
         var action = function(context) {
-            $.get('/webpack/sidebar/templates/roles/sidebar-addGroupPath.hbs', function (data) {
+            $.get('/webpack/sidebar/templates/roles/sidebar-changeGroupPath.hbs', function (data) {
 
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                $("#changeGroupForm-method").value = context.permission.method;
+                $("#changeGroupForm-method").val(context.permission.method);
 
                 sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
                 sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
                     let data = {
                         url: $("#changeGroupForm-url").val(),
                         method: $("#changeGroupForm-method").val(),
+                        current: currentPermission,
                     };
                     onConfirm(groupId, data);
                 }.bind(args));
 
+                sidebar.registerButton (sidebar, ".sidebar-delete", function(){
+
+                    if (corrupted) {
+                    }
+                    onDelete(groupId, currentPermission);
+                }.bind(args));
             });
         };
     });
@@ -274,6 +283,7 @@ rolesPlugin.addContentHandler(addGroup);
 rolesPlugin.addContentHandler(changeGroup);
 rolesPlugin.addContentHandler(addUser);
 rolesPlugin.addContentHandler(addGroupPath);
+rolesPlugin.addContentHandler(updateGroupPath);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 

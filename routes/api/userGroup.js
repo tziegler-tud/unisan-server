@@ -23,7 +23,7 @@ router.get('/:id', getGroup);
 router.get("/assigned/:id", getAssignedUser);
 router.post('/addPermission/:id', addGroupPermission);
 router.post('/updatePermission/:id', updateGroupPermission);
-router.post('/removePermission/:id', removeGroupPermission);
+router.delete('/removePermission/:id', removeGroupPermission);
 
 function getUserGroups(req, res, next){
     userGroupService.getAll()

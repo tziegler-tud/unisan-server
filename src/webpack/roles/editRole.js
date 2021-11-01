@@ -4,6 +4,9 @@ import {groupActions} from "../actions/groupActions";
 import {userActions} from "../actions/userActions";
 import {Userlist} from "../helpers/userlist";
 
+import {view} from "./view.js";
+import {advanced} from "./advanced.js";
+
 
 
 $(document).ready (function () {
@@ -16,137 +19,36 @@ $(document).ready (function () {
     let group = window.group;
     var groupId = window.groupId;
 
-    // window.DockerElement = new docker.Docker(window.dockerArgs);
-    window.DockerElement.addDockerSubPage("role", group, {});
-    //init sidebar
-    let addDBKey_sidebar = new Sidebar('wrapper', "test");
-    addDBKey_sidebar.addPlugin(rolesPlugin);
 
 
-
-    const deleteContent = {
-        title: "Gruppe löschen",
-        message: "Achtung: Unüberlegtes Löschen von Gruppen kann dazu führen, dass kein Nutzer Zugriff besitzt, um neue Rechte zu verteilen. Wirklich Fortfahren?",
-        titleArg: "",
-        messageArg: ""
+    //setup module specific loaders
+    let loaders = [];
+    let viewLoader = {
+        title: "view",
+        loader: view,
     };
-
-    var deleteArgs = {
-        id: groupId,
-        callback: {
-            onConfirm: function () {
-                groupActions.removeGroup(groupId)
-            }
-        }
+    let advancedLoader = {
+        title: "advanced",
+        loader: advanced,
     };
+    loaders.push(viewLoader, advancedLoader);
 
-    var token = lidlRTO.objectManager.createNewObjectToken();
-    const dialogDeleteUser = new lidl.Dialog(token, ".deleteGroupButton", 'confirmDelete', deleteContent, deleteArgs);
-    lidlRTO.objectManager.addObject(dialogDeleteUser, token);
+    //read from window.jsmodule which modules are to be loaded
+    let jsmodule = window.jsmodule;
+    if (jsmodule === undefined) jsmodule = {};
 
-    $(".addUserButton").on("click", function (e) {
-        e.preventDefault();
-        addDBKey_sidebar.addContent('addUserToGroup', {
-                group: group,
-                groupId: groupId,
-                callback: {
-                    onConfirm: function (data, args) {
-                        groupActions.addUser(data, args);
-                    }
-                }
-            },
-        );
-        addDBKey_sidebar.show();
-    });
-
-    $(".editGroupButton").on("click", function (e) {
-        e.preventDefault();
-        addDBKey_sidebar.addContent('changeGroup', {
-                group: group,
-                groupId: groupId,
-                callback: {
-                    onConfirm: function (id, data, args) {
-                        groupActions.changeGroup(id, data, args);
-                    }
-                }
-            },
-        );
-        addDBKey_sidebar.show();
-    });
-
-    $(".addPathButton").on("click", function (e) {
-        e.preventDefault();
-        addDBKey_sidebar.addContent('addGroupPath', {
-                group: group,
-                groupId: groupId,
-                callback: {
-                    onConfirm: function (id, data, args) {
-                        groupActions.addPermission(id, data, args);
-                    }
-                }
-            },
-        );
-        addDBKey_sidebar.show();
-    });
-
-    $(".changePathEntry").on("click", function (e) {
-        e.preventDefault();
-        addDBKey_sidebar.addContent('addGroupPath', {
-                group: group,
-                groupId: groupId,
-                permission: {
-                    method: e.dataset.method,
-                    url: e.dataset.url,
-                },
-                callback: {
-                    onConfirm: function (id, data, args) {
-                        groupActions.addPermission(id, data, args);
-                    }
-                }
-            },
-        );
-        addDBKey_sidebar.show();
-    });
-
-    const addToAllContent = {
-        title: "Gruppe allen Nutzern zuweisen",
-        message: "Alle Nutzer werden dieser Gruppe hinzugefügt. Fortfahren?",
-        titleArg: "",
-        messageArg: ""
-    };
-
-    var addToAllArgs = {
-        id: groupId,
-        callback: {
-            onConfirm: function () {
-                groupActions.addGroupToAllUser(groupId);
-            }
-        }
-    };
-
-    var token2 = lidlRTO.objectManager.createNewObjectToken();
-    const dialogAddToAll = new lidl.Dialog(token2, ".addToAllButton", 'confirmDelete', addToAllContent, addToAllArgs);
-    lidlRTO.objectManager.addObject(dialogAddToAll, token2);
-
-    let listData = {
-        group: group,
-        user: window.assignedUser,
+    if(!jsmodule.module === "settings") {
+        console.error("invalid jsmodule information: Expected 'settings', but found " + jsmodule.module)
+        return false;
     }
-    let userlist = new Userlist("userlist-container", listData, "/webpack/roles/templates/userlist.hbs", true);
-    userlist.templatePromise
-        .then(function(){
-            userlist.addEventHandler(function(){
-                $(".userlist-delete").click(function(e){
-                    let userid = this.dataset.userid;
-                    let data = {
-                        userGroupId: groupId,
-                        userId: userid,
-                    }
-                    let args = {};
-                    userActions.removeGroup(data, args)
-                })
-            })
-        });
-    //TODO: Unfinished. needs to be continued
+
+    jsmodule.loaders.forEach(function(el){
+        //see if corresponding loader is present
+        let loader = loaders.find(e => e.title === el);
+        if (loader !== undefined) {
+            loader.loader.init();
+        }
+    })
+
 
 });

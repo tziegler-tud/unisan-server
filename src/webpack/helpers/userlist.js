@@ -62,26 +62,29 @@ function displayList(container, html) {
 
     //delay adjustment until sidebar finished rendering
     adjustList(container);
+    initEventHandlers();
 
-    //setup drowpdowns
+
+
+}
+
+function initEventHandlers(callbacks) {
+//setup drowpdowns
     $(".userlist-menu-container").each(function(e){
         let menuDom = $(this).find(".mdc-menu")[0];
         const menu = new MDCMenu(menuDom);
         $(this).find(".dropdown-clicker").click(function(e){
             menu.open =true;
         })
-
-
     })
 
     const menu = new MDCMenu(document.querySelector('.mdc-menu'));
 
     //init event Handlers
-
-}
-
-function initEventHandlers(callbacks) {
-
+    $(".userlist-view").click(function(e){
+        let userid = this.dataset.userid;
+        location.replace("/unisams/user/"+userid);
+    })
 }
 
 

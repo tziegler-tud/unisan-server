@@ -14,9 +14,13 @@
                         </div>
                         <div class="mdc-menu mdc-menu-surface">
                             <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                                <li class="mdc-list-item userlist-delete" role="menuitem"  data-userid={{this.id}}>
+                                <li class="mdc-list-item userlist-delete mdc-delete-button" role="menuitem"  data-userid={{this.id}}>
                                     <span class="mdc-list-item__ripple"></span>
                                     <span class="mdc-list-item__text icon-delete before-icon">Aus Gruppe entfernen</span>
+                                </li>
+                                <li class="mdc-list-item userlist-view" role="menuitem"  data-userid={{this.id}}>
+                                    <span class="mdc-list-item__ripple"></span>
+                                    <span class="mdc-list-item__text">Akte öffnen</span>
                                 </li>
                             </ul>
                         </div>

@@ -11,6 +11,10 @@
 @import "../color-rules";
 @import "../variables";
 
+.mdc-delete-button {
+  color: $col2_light
+}
+
 .userlist-top {
   border-top: 1px solid #AAA;
   width: 100%;

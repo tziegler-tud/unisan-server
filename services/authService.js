@@ -58,7 +58,11 @@ class AuthService {
                 allowedUrl = allowedUrl.replace("$currentUserId", user.id);
                 //transform url to regex to respect wildcard symbols
                 let regUrl = new RegExp('^' + allowedUrl.replace(/\/?\*/g, '.*') + '$');
-                return (op.method === method && regUrl.test(url));
+
+                //remove url parameters
+                let strippedUrl = url.replace(/\?.*/g, "");
+
+                return (op.method === method && regUrl.test(strippedUrl));
             })
         })
         if(authorizedGroup) {
@@ -167,8 +171,8 @@ class AuthService {
         if (target.userRole === rolesEnum.PROTECTED) return false;
         //get user access level
         let al = rolesMap[user.userRole];
-        //compare. must be greater to allow operation
-        let write = (al > rolesMap[target.userRole]);
+        //compare. must be greater or equal to allow operation
+        let write = (al >= rolesMap[target.userRole]);
 
         //check if user is userAdmin
         let group = this.checkUserGroupName(user, "userAdmin");

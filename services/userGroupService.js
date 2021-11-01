@@ -14,6 +14,7 @@ module.exports = {
     create,
     _delete,
     addPermission,
+    updatePermission,
     removePermission,
     getAssignedUser,
 };
@@ -142,7 +143,7 @@ async function updatePermission(id, currentMethod, currentUrl, newMethod, newUrl
     }
     if(typeof newUrl === 'string') {
         var reg = new RegExp(/^[^\/]+\/[^\/].*$|^\/[^\/].*$/gmi);
-        if (!reg.test(url)){
+        if (!reg.test(newUrl)){
             throw new Error("invalid url");
         }
     }
@@ -171,7 +172,7 @@ async function updatePermission(id, currentMethod, currentUrl, newMethod, newUrl
 }
 
 /**
- * removes a permission to a group
+ * removes a permission
  * @param {number} id group id
  * @param {String} method String denoting the html request method <["GET","POST","PUT","DELETE"]>
  * @param {String} url  the url for which the rule applies
@@ -213,8 +214,7 @@ async function removePermission(id, method, url) {
     else {
         throw new Error("operation not found.")
     }
-    await group.save();
-    return group;
+    return group.save();
 }
 
 async function getAssignedUser(id) {

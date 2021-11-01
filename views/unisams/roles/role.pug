@@ -9,6 +9,11 @@ block page_includes
         window.dockerArgs.activeContainer = "roleContainer";
         window.dockerArgs.activeElementId = "roleGeneral";
 
+        window.jsmodule = {
+            module: "role",
+            loaders: ["view"],
+        };
+
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     //script(src="/static/unisams/js/settings/role.js")
