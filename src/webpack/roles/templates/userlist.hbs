@@ -1,0 +1,30 @@
+<ul class="common-list userlistModule itemlist list-view border">
+    {{#each user}}
+        <li class="user-entry noSelect" id='userId{{this.id}}' data-userid= {{this.id}}>
+            <a class="inner single-column noSelect">
+                <div class="item-property item-container name">
+                    <div class=" userlist-img item-container-element"><img src="/data/uploads/user_images/{{this.id}}/{{this.id}}.jpg"/></div>
+                    <span class=" item-container-element">{{this.generalData.firstName.value}} {{this.generalData.lastName.value}}</span>
+                    <div class="userlist-menu-container dropdown-wrapper mdc-menu-surface--anchor">
+                        <div class="dropdown-clicker" data-userid={{this.id}}>
+                            <button class="mdc-icon-button material-icons">
+                                <div class="mdc-icon-button__ripple"></div>
+                                more_vert
+                            </button>
+                        </div>
+                        <div class="mdc-menu mdc-menu-surface">
+                            <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                <li class="mdc-list-item userlist-delete" role="menuitem"  data-userid={{this.id}}>
+                                    <span class="mdc-list-item__ripple"></span>
+                                    <span class="mdc-list-item__text icon-delete before-icon">Aus Gruppe entfernen</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+    {{/each}}
+</ul>
+
+

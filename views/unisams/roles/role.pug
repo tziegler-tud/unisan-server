@@ -9,8 +9,8 @@ block page_includes
         window.dockerArgs.activeContainer = "roleContainer";
         window.dockerArgs.activeElementId = "roleGeneral";
 
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     //script(src="/static/unisams/js/settings/role.js")
     //script(src="/static/unisams/js/actions.js")
     script(src="/dist/editRole.js")
@@ -76,13 +76,12 @@ block content
                                                 .userinfo-section-inner
                                                     .userinfo-sectionheader
                                                         span assigned user
-                                                    div.itemlist-header-container
-                                                        ul#userlist-top.eventlist.itemlist.common-list.list-view.border
+                                                    div.itemlist-header-container.userlist-header-container
+                                                        ul#userlist-top.userlist-header.userlistModule.itemlist.common-list.list-view.border
                                                             li.noSelect.rowHeading
-                                                                .inner
+                                                                .inner.single-column
                                                                     .item-property user
-                                                                    .item-property details
-                                                    .itemlist-content-container
+                                                    .itemlist-content-container.userlist-content-container
                                                         #userlist-container
 
                                                         //ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList.list-view

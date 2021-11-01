@@ -1,6 +1,7 @@
 import {Sidebar} from "../sidebar/sidebar";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 import {groupActions} from "../actions/groupActions";
+import {userActions} from "../actions/userActions";
 import {Userlist} from "../helpers/userlist";
 
 
@@ -131,7 +132,21 @@ $(document).ready (function () {
         group: group,
         user: window.assignedUser,
     }
-    let userlist = new Userlist("userlist-container", listData, "/webpack/templates/userlist.hbs", true);
+    let userlist = new Userlist("userlist-container", listData, "/webpack/roles/templates/userlist.hbs", true);
+    userlist.templatePromise
+        .then(function(){
+            userlist.addEventHandler(function(){
+                $(".userlist-delete").click(function(e){
+                    let userid = this.dataset.userid;
+                    let data = {
+                        userGroupId: groupId,
+                        userId: userid,
+                    }
+                    let args = {};
+                    userActions.removeGroup(data, args)
+                })
+            })
+        });
     //TODO: Unfinished. needs to be continued
 
 });

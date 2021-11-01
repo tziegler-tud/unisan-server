@@ -234,6 +234,44 @@ var userActions = {
             }
         });
     },
+
+    addGroup: function(data, args) {
+        let jsonData = {
+            userGroupId: data.userGroupId,
+            userId: data.userId,
+            args: args,
+        }
+        $.ajax({
+            url: "/api/v1/usermod/addUserGroup/"+data.userId,
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                location.replace("/unisams/settings/roles/"+data.userGroupId)
+            }
+        });
+    },
+
+
+
+    removeGroup: function(data, args) {
+        let jsonData = {
+            userGroupId: data.userGroupId,
+            userId: data.userId,
+            args: args,
+        }
+        $.ajax({
+            url: "/api/v1/usermod/removeUserGroup/"+data.userId,
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                location.replace("/unisams/settings/roles/"+data.userGroupId)
+            }
+        });
+    },
 }
 
 export {userActions}

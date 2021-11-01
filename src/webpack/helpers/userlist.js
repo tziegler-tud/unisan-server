@@ -1,3 +1,8 @@
+import "./userlist.scss";
+
+import {MDCMenu} from '@material/menu';
+
+
 /**
  *
  * @param containerId {String} id of container html element
@@ -24,6 +29,8 @@ var Userlist = function(containerId, data, template, show) {
         .then(function(template){
             let html = generateHtml(template, data);
             displayList(self.container, html);
+
+
 
         })
         .catch(function(err){
@@ -55,6 +62,21 @@ function displayList(container, html) {
 
     //delay adjustment until sidebar finished rendering
     adjustList(container);
+
+    //setup drowpdowns
+    $(".userlist-menu-container").each(function(e){
+        let menuDom = $(this).find(".mdc-menu")[0];
+        const menu = new MDCMenu(menuDom);
+        $(this).find(".dropdown-clicker").click(function(e){
+            menu.open =true;
+        })
+
+
+    })
+
+    const menu = new MDCMenu(document.querySelector('.mdc-menu'));
+
+    //init event Handlers
 
 }
 

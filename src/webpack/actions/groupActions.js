@@ -62,6 +62,8 @@ var groupActions = {
         });
     },
 
+
+
     addGroupToAllUser: function(userGroupId, args) {
         let jsonData = {
             userGroupId: userGroupId,
