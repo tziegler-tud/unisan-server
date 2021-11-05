@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const lessMiddleware = require('less-middleware');
 const logger = require('morgan');
 const session = require("express-session");
 const FileStore = require('session-file-store')(session);
@@ -120,7 +119,6 @@ webAuth = function(req, res, next){
 
 // data folder requires authentication
 server.use('/data/*', apiAuth);
-server.use(lessMiddleware(path.join(__dirname, 'src')));
 server.use(express.static(path.join(__dirname, 'src')));
 
 server.use('/', indexRouter);
