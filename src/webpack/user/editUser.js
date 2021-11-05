@@ -12,6 +12,8 @@ import {
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 
+import {userActions} from "../actions/userActions";
+
 
 $(document).ready (function () {
 
@@ -122,62 +124,64 @@ $(document).ready (function () {
         addDBKey_sidebar.addPlugin(userPlugin);
 
         let listContainer = document.getElementById("qualification-list")
-        let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
-            listItem: {
-                onClick: function(e){
-                    e.preventDefault();
-                    var self = e.currentTarget;
-                    addDBKey_sidebar.addContent('UserUpdateQualification', {
-                            userid: userid,
-                            key: self.dataset.key,
-                            keyId: self.dataset.keyid,
-                            qualificationId: self.dataset.keyid,
-                            callback: {
-                                onConfirm: function (userid, key, value) {
-                                    var args = {
-                                        isArray: true, //we reference the element directly by array index
-                                        noIndex: false,
-                                        keyId: self.dataset.keyId
-                                    };
-                                    actions.updateQualification(userid, key, value, args, function () {
+        if(listContainer) {
+            let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
+                listItem: {
+                    onClick: function(e){
+                        e.preventDefault();
+                        var self = e.currentTarget;
+                        addDBKey_sidebar.addContent('UserUpdateQualification', {
+                                userid: userid,
+                                key: self.dataset.key,
+                                keyId: self.dataset.keyid,
+                                qualificationId: self.dataset.keyid,
+                                callback: {
+                                    onConfirm: function (userid, key, value) {
+                                        var args = {
+                                            isArray: true, //we reference the element directly by array index
+                                            noIndex: false,
+                                            keyId: self.dataset.keyId
+                                        };
+                                        actions.updateQualification(userid, key, value, args, function () {
 
-                                    });
-                                },
-                                onDelete: function (userid, key, data) {
-                                    var args = {
-                                        isArray: true
-                                    };
+                                        });
+                                    },
+                                    onDelete: function (userid, key, data) {
+                                        var args = {
+                                            isArray: true
+                                        };
 
-                                    const dialog_content = {
-                                        title: "Qualifikation löschen",
-                                        message: "Folgende Qualifikation wird gelöscht: " + data.qualification.name,
-                                        titleArg: "",
-                                        messageArg: ""
-                                    };
-                                    var dialog_token = lidlRTO.objectManager.createNewObjectToken();
-                                    const dialog_args = {
-                                        userid: userid,
-                                        callback: {
-                                            onConfirm: function (res) {
-                                                actions.removeQualification(userid, key, data, args, function () {
-                                                    $("#qualId" + common.escapeSelector(data.id)).remove();
-                                                });
-                                                lidlRTO.objectManager.removeObject(dialog_token);
-                                                addDBKey_sidebar.hide()
+                                        const dialog_content = {
+                                            title: "Qualifikation löschen",
+                                            message: "Folgende Qualifikation wird gelöscht: " + data.qualification.name,
+                                            titleArg: "",
+                                            messageArg: ""
+                                        };
+                                        var dialog_token = lidlRTO.objectManager.createNewObjectToken();
+                                        const dialog_args = {
+                                            userid: userid,
+                                            callback: {
+                                                onConfirm: function (res) {
+                                                    actions.removeQualification(userid, key, data, args, function () {
+                                                        $("#qualId" + common.escapeSelector(data.id)).remove();
+                                                    });
+                                                    lidlRTO.objectManager.removeObject(dialog_token);
+                                                    addDBKey_sidebar.hide()
+                                                }
                                             }
-                                        }
-                                    };
-                                    const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
-                                    lidlRTO.objectManager.addObject(dialog, dialog_token);
-                                    dialog.openDialog();
-                                }
+                                        };
+                                        const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                                        lidlRTO.objectManager.addObject(dialog, dialog_token);
+                                        dialog.openDialog();
+                                    }
+                                },
                             },
-                        },
-                    );
-                    addDBKey_sidebar.show();
+                        );
+                        addDBKey_sidebar.show();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         $(".useredit-addItemBtn").on("click", function (e) {
             e.preventDefault();
@@ -486,34 +490,22 @@ $(document).ready (function () {
                             lidlRTO.objectManager.addObject(dialogChangeUsername, token);
                             dialogChangeUsername.openDialog();
                         },
-                        onDelete: function (userid, value) {
-                            var key = "qualifications";
-                            var args = {
-                                //isArray: true
-                            };
+                    },
+                },
+            );
+            addDBKey_sidebar.show();
+        });
 
-                            const dialog_content = {
-                                title: "Eintrag löschen",
-                                message: "Folgender Eintrag wird gelöscht: " + value.title,
-                                titleArg: "",
-                                messageArg: ""
-                            };
-                            var dialog_token = lidlRTO.objectManager.createNewObjectToken();
-                            const dialog_args = {
-                                userid: userid,
-                                callback: {
-                                    onConfirm: function (res) {
-                                        actions.removeDBKey(userid, key, value, args, function () {
-                                            $("#userkey" + common.escapeSelector(key)).remove();
-                                        });
-                                        lidlRTO.objectManager.removeObject(dialog_token);
-                                    }
-                                }
-                            };
-                            const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
-                            lidlRTO.objectManager.addObject(dialog, dialog_token);
-                            dialog.openDialog();
-                        }
+        $(".userrole-change").off("click").on("click", function (e) {
+            e.preventDefault();
+            var self = this;
+            addDBKey_sidebar.addContent('UserChangeRole', {
+                    userid: userid,
+                    key: "userRole",
+                    callback: {
+                        onConfirm: function (data, args) {
+                            userActions.setRole(data, args);
+                        },
                     },
                 },
             );

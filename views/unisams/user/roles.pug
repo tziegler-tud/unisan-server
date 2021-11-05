@@ -1,0 +1,115 @@
+extends ../layout
+
+block page_includes
+
+    script.
+        window.exploreUserId = "#{exploreUser.id}";
+        window.dockerArgs.activeContainer = "userprofileContainer";
+        window.dockerArgs.activeElementId = "userprofileRoles";
+
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
+    //script(src="/static/unisams/js/userprofile/editUser.js")
+    script(src="/static/unisams/js/userprofile/updateUser.js")
+    script(src="/static/unisams/js/actions.js")
+    script(src="/static/unisams/js/transformToNewScheme.js")
+
+    script(src="/lib/fineUploader/fine-uploader.js")
+    link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script(src="/dist/editUser.js")
+    link(rel='stylesheet', href='/dist/editUser.css')
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .userimg-container.sec-heading-img
+                                .userimg.hover
+                                    .userimg-overlay.changeProfilePicture
+                                        .userimg-inner
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera") <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                            span Bild ändern
+                                    img#userProfileImage.userProfileImage(src="/data/uploads/user_images/" + exploreUser.id + "/" + exploreUser.id + ".jpg")
+
+                            .sec-heading-label.userprofile-heading
+                                .userprofile-heading-container
+                                    h3#userProfileName.limitCharacters=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
+                                    .userprofile-dropdown.dropdown-menu
+                                        .dropdown-btn
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                            .dropdown-container
+                                                .dropdown-entry.last
+                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
+
+                                    .clear
+                                .clear
+                        #content1-text.sec-content
+                            .subpage-content
+                                .userinfo-container
+                                    #tab-userinfo-general.userinfo-inner
+                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                            .userinfo-section-inner
+                                                .userinfo-sectionheader
+                                                    span unisams
+                                                div
+                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                        - var combinedKey = "username"
+                                                        - var keyTitle = "Nutzername"
+                                                        - var value = exploreUserDocument.username
+                                                        li.user-entry.username-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                            a.inner()
+                                                                .item-property.userkey-entry-title
+                                                                    span= keyTitle
+                                                                .item-property.userkey-entry-value
+                                                                    span= value
+                                                                .clear
+
+                                                        - var combinedKey = "id"
+                                                        - var keyTitle = "id"
+                                                        - var value = exploreUser.id
+                                                        li.user-entry.cursor-default(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                            a.inner()
+                                                                .item-property.userkey-entry-title
+                                                                    span= keyTitle
+                                                                .item-property.userkey-entry-value.has-tooltip.cursor-notAllowed
+                                                                    span= value
+                                                                    span.tooltip Id kann nicht verändert werden.
+                                                                .clear
+
+                                                        - var combinedKey = "userRole"
+                                                        - var keyTitle = "Rolle"
+                                                        - var value = exploreUserDocument.userRoleString
+                                                        li.user-entry.userrole-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                            a.inner()
+                                                                .item-property.userkey-entry-title
+                                                                    span= keyTitle
+                                                                .item-property.userkey-entry-value.has-tooltip
+                                                                    span= value
+                                                                    span.tooltip Rollen werden vom System benutzt, um Zugriffsrechte durchzusetzen. Normale Nutzer sollten die Rolle "Nutzer" haben, spezielle Rollen werden vom Systemadministrator vergeben.
+                                                                .clear
+
+                                    #tab-userinfo-role.userinfo-inner
+                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                            .userinfo-section-inner
+                                                .userinfo-sectionheader
+                                                    span Gruppen
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList.qualificationList.border
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property Gruppe
+                                                        if exploreUserDocument.userGroups
+                                                            each val in exploreUserDocument.userGroups
+                                                                li.user-entry
+                                                                    a.inner()
+                                                                        .item-property= val.title
+
+                            #profilemanagment-menu.subpage-menu
+                                #btn01.subpage-menu-btn
+
+

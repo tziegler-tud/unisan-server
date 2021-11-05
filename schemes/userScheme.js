@@ -174,6 +174,18 @@ UserSchema.virtual('name').get(function() {
     if (this.generalData.firstName === undefined || this.generalData.lastName === undefined) return "";
     return (this.generalData.firstName.value + " " + this.generalData.lastName.value);
 });
+
+UserSchema.virtual('userRoleString').get(function() {
+    let rolesMap = {
+        "protected": "Gesperrt",
+        "member": "Nutzer",
+        "admin": "Administrator",
+        "superadmin": "Super-Administrator",
+    }
+    return rolesMap[this.userRole];
+});
+
+
 UserSchema.virtual('contactDefault').get(function() {
     let obj;
     if (this.contactData === undefined) return "";

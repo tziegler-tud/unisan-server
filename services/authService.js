@@ -44,6 +44,8 @@ class AuthService {
      */
     async checkUrlPermission(user, method, url){
 
+        //superadmin must not pass url permission test
+        if(user.userRole === rolesEnum.SUPERADMIN) return true;
         //populate userGroups
         await user.populate({
             path: 'userGroups',
@@ -137,9 +139,9 @@ class AuthService {
         //superadmin is allowed to perform any operation
         if(user.userRole === rolesEnum.SUPERADMIN) return true;
         //get user access level
-        let al = rolesEnum[user.userRole];
+        let al = rolesMap[user.userRole];
         //compare. must be greater to allow operation
-        return (al > rolesMap[requiredRole]);
+        return (al >= rolesMap[requiredRole]);
     }
 
     /**

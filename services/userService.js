@@ -187,7 +187,6 @@ async function create(req, userParam, args) {
                                         })
                                         .catch(err => {
                                             console.error("Failed to remove temporary file: " + err);
-                                            next(err);
                                         })
                                 }
                             }
@@ -197,7 +196,7 @@ async function create(req, userParam, args) {
                                 copyDummyImage();
                             }
                         })
-                        .catch(err => next(err))
+                        .catch(err => console.error(err))
                 }
                 else {
                     // copy dummy user image to user directory

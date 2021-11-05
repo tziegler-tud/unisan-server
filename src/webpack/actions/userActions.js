@@ -272,6 +272,24 @@ var userActions = {
             }
         });
     },
+
+    setRole: function(data, args, callback) {
+        let jsonData = {
+            role: data.role,
+            userId: data.userId,
+            args: args,
+        }
+        $.ajax({
+            url: "/api/v1/usermod/setUserRole/"+data.userId,
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                location.reload();
+            }
+        });
+    }
 }
 
 export {userActions}

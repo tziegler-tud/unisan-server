@@ -779,10 +779,46 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
         };
     });
 
+let changeRole = new ContentHandler("UserChangeRole",
+    function(sidebar, args, type) {
+        var userId = args.userid;
+        var key = args.key;
+        var onConfirm = args.callback.onConfirm;
+        var corrupted = false;
+
+        var res = {};
+
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            action(res)
+        });
+
+        var action = function(context) {
+            $.get('/webpack/sidebar/templates/user/sidebar-updateUserRole.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                sidebar.sidebarHTML.html(template(context));
+
+                $("#changeUserRole-select").val(context.exploreUser.userRole);
+
+                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
+                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                    data = {
+                        userId: userId,
+                        role: $("#changeUserRole-select").val(),
+                    };
+                    onConfirm(data);
+                }.bind(args));
+
+            });
+        };
+    });
+
 
 userPlugin.addContentHandler(showUser);
 userPlugin.addContentHandler(addUser);
 userPlugin.addContentHandler(changeUsername);
+userPlugin.addContentHandler(changeRole);
 userPlugin.addContentHandler(addDbKey);
 userPlugin.addContentHandler(addContactData);
 userPlugin.addContentHandler(addGeneralKey);

@@ -35,6 +35,7 @@ router.get("/edit/:username/:url", legacyRedirect);
 router.get('/:username', profile);
 router.get('/:username/logs', userLogs);
 router.get('/:username/settings', userSettings);
+router.get('/:username/roles', userRoles);
 router.get('/:username/events', userEvents);
 
 /**
@@ -225,6 +226,45 @@ function userSettings(req, res, next) {
                         title: user.username + " | Einstellungen",
                         exploreUser: user,
                         exploreUserDocument: user._doc,
+                        refurl: req.params.username,
+                        allowedit: edit
+                    })
+                }
+                else {
+                    var newPath = baseUrl + "/" + user.username;
+                    res.redirect(newPath);
+                }
+            }
+            else {
+                // try if id was given
+                userService.getById(req.params.username)
+                    .then(user => {
+                        if (user) {
+                            var newPath = req.originalUrl.replace(user.id, user.username);
+                            res.redirect(newPath);
+                        } else {
+                            //give up
+                            res.send("user not found");
+                        }
+                    })
+                    .catch(err=> next(err));
+            }
+        })
+        .catch(err => next(err));
+}
+
+function userRoles(req, res, next) {
+    userService.getByUsername(req.params.username)
+        .then(user => {
+            if (user) {
+                //check if editing this user is allowed
+                let edit = AuthService.checkIfEdit(req.user, user, "user");
+                if(edit){
+                    res.render("unisams/user/roles", {
+                        user: req.user._doc,
+                        title: user.username + " | Rechte & Rollen",
+                        exploreUser: user,
+                        exploreUserDocument: user.toJSON(),
                         refurl: req.params.username,
                         allowedit: edit
                     })

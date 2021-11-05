@@ -84,6 +84,17 @@ function checkUrlAccess(req, res, next){
         .catch(err => next(err))
 }
 
+function checkAdminRights(req, res, next){
+    let access = authService.checkRequiredRole(req.user, authService.rolesEnum.ADMIN);
+    if (access){
+        console.log("admin authorization successful!");
+        next();
+    }
+    else {
+        console.log("admin authorization failed!");
+        res.status(403).send();
+    }
+}
 // routes
 //hooked at /api/v1/usermod
 
@@ -114,8 +125,11 @@ router.delete('/:id', _delete);
 //access rights modifications require respective rights. set role paths carefully!
 router.post('/addUserGroup/:id', addUserGroup);
 router.post('/removeUserGroup/:id', removeUserGroup);
-router.post('/setUserRole/:id', setUserRole);
 router.post('/addGroupToAllUser', addGroupToAllUser);
+
+//role modification requires highest access rights
+router.all("/*", checkAdminRights);
+router.post('/setUserRole/:id', setUserRole);
 
 module.exports = router;
 
@@ -230,9 +244,11 @@ function removeUserGroup(req, res, next){
 
 function setUserRole(req, res, next){
     //get user list
+    //setting user roles requires superadmin or admin role on acting user
+
     userService.setUserRole(req, req.params.id, req.body.role, req.user)
         .then(function(result){
-            res.status(200).send();
+            res.status(200).json({success: true});
             })
         .catch(err=>next(err))
 }
