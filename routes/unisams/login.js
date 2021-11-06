@@ -26,9 +26,13 @@ router.post('/login', function(req, res, next) {
   } else {
     passport.authenticate('local', {}, (err, user, info) => {
       if (!user) { return res.redirect("/unisams/login"); }
-      req.login(user, (err) => {
-        var redirectTo = req.session.redirectTo || "/unisams";
-        res.redirect(redirectTo);
+      req.login(user, {}, (err) => {
+        //passport.js race condition bug requires you to save the session explicitly before redirecting.
+        req.session.save(function(){
+          var redirectTo = req.session.redirectTo || "/unisams";
+          res.redirect(redirectTo);
+        })
+
       })
     })(req, res, next);
   }
@@ -36,7 +40,10 @@ router.post('/login', function(req, res, next) {
 
 router.all("/logout", function(req, res, next) {
   req.logout();
-  res.redirect("/unisams");
+  req.session.destroy(function(err){
+    res.redirect("/unisams");
+  })
+
 });
 
 

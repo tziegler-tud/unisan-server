@@ -17,6 +17,7 @@ module.exports = {
     getAllFiltered,
     getById,
     getByUsername,
+    getByUsernameWithHash,
     create,
     update,
     deleteKey,
@@ -39,7 +40,7 @@ module.exports = {
  * Gets all users
  */
 async function getAll() {
-    return User.find().select('-password');
+    return User.find().select('-hash');
 }
 
 /**
@@ -57,12 +58,12 @@ async function getAllFiltered(args){
     let sort= args.sort;
     let query;
     if (filter===undefined || filter.filter === undefined || filter.value === undefined) {
-        query = User.find().select("-password");
+        query = User.find().select("-hash");
     }
     else {
         let filterObj = {};
         filterObj[filter.filter] = filter.value;
-        query = User.find(filterObj).select("-password");
+        query = User.find(filterObj).select("-hash");
     }
 
     if(sort === undefined) {
@@ -80,15 +81,10 @@ async function getAllFiltered(args){
  */
 async function getById(id) {
     //populate userGroups
-    return User.findById(id).select('-password').populate({
+    return User.findById(id).select('-hash').populate({
             path: 'userGroups',
             select: 'title description',
         });
-    // let user = User.findById(id).select('-password').populate({
-    //     path: 'userGroups',
-    //     select: 'title',
-    // });
-    // return user;
 
 }
 
@@ -97,11 +93,32 @@ async function getById(id) {
  * @param {string} username The username to search for
  */
 async function getByUsername(username) {
-    return User.findOne({username: username}).select('-password').populate({
+    return User.findOne({username: username}).select('-hash').populate({
         path: 'userGroups',
         select: 'title description',
     })
 }
+
+/**
+ * gets a user by its username, and returns the assigned hash value with the document. Use this for authentication only.
+ * @param username {String} username
+ * @param populate {Boolean} if true, document is populated
+ * @returns {Promise<Query<(Document<any, any, unknown> & Require_id<unknown>) | null, Document<any, any, unknown> & Require_id<unknown>, {}, unknown>>}
+ */
+async function getByUsernameWithHash(username, populate) {
+    if (populate === undefined) populate = false;
+    if (populate) {
+        return User.findOne({username: username});
+    }
+
+    else {
+        return User.findOne({username: username}).populate({
+            path: 'userGroups',
+            select: 'title description',
+        })
+    }
+}
+
 
 /**
  *
@@ -122,7 +139,7 @@ async function create(req, userParam, args) {
 
     const user = new User(userParam);
 
-    // @louis: password is not mentioned in the userScheme. Is this correct?
+    // @louis: password is not mentioned in the userScheme. Is this correct? @Tom: yes, we only store hashes in the db
     // hash password
     if (userParam.password) {
         const salt = await bcrypt.genSalt(10);
@@ -905,7 +922,7 @@ async function matchAny(matchString, args){
     else {
         let filterObj = {};
         filterObj[filter.filter] = filter.value;
-        userlist = User.find(filterObj).or([{username: { $regex: matchString, $options: "-i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "-i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "-i" }}]).select("-password");
+        userlist = User.find(filterObj).or([{username: { $regex: matchString, $options: "-i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "-i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "-i" }}]).select("-hash");
     }
     //filter user by given string, using username, firstname and lastname attribute
 
@@ -926,7 +943,7 @@ async function matchAny(matchString, args){
  */
 
 async function addUserGroup(req, id, userGroupId){
-    let user = await User.findById(id).select('-password');
+    let user = await User.findById(id).select('-hash');
 
     // validate
     if (!user) throw new Error('User not found');
@@ -985,7 +1002,7 @@ async function addUserGroup(req, id, userGroupId){
  */
 
 async function removeUserGroup(req, id, userGroupId){
-    let user = await User.findById(id).select('-password');
+    let user = await User.findById(id).select('-hash');
 
     // validate
     if (!user) throw new Error('User not found');
@@ -1050,7 +1067,7 @@ async function removeUserGroup(req, id, userGroupId){
  */
 
 async function setUserRole(req, id, role, currentUser){
-    let user = await User.findById(id).select('-password');
+    let user = await User.findById(id).select('-hash');
     //check write access
     if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
 
