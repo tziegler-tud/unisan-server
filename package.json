@@ -13,6 +13,7 @@
     "@material/list": "8.0.0",
     "@material/menu": "8.0.0",
     "@material/ripple": "8.0.0",
+    "@material/snackbar": "^8.0.0",
     "@material/textfield": "8.0.0",
     "@material/theme": "8.0.0",
     "@material/top-app-bar": "8.0.0",

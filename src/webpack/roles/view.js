@@ -3,6 +3,7 @@ import {Sidebar} from "../sidebar/sidebar";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 import {userActions} from "../actions/userActions";
 import {Userlist} from "../helpers/userlist";
+import {Snackbar} from "../helpers/snackbar";
 
 
 let view = {
@@ -16,6 +17,8 @@ let view = {
             //group is in window.group
             let group = window.group;
             var groupId = window.groupId;
+
+            window.snackbar = new Snackbar();
 
             // window.DockerElement = new docker.Docker(window.dockerArgs);
             window.DockerElement.addDockerSubPage("role", group, {});
@@ -33,7 +36,22 @@ let view = {
                         groupId: groupId,
                         callback: {
                             onConfirm: function (data, args) {
-                                groupActions.addUser(data, args);
+                                groupActions.addUser(data, args)
+                                    .done(function(result){
+
+                                    })
+                                    .fail(function(jqxhr, textstatus, error){
+                                        let message = "Error " + jqxhr.status +": " + jqxhr.responseText;
+                                        let options = {
+                                            timeout: -1,
+                                            closeOnEscape: true,
+                                            actionButton: {
+                                                display: true,
+                                                text: "Nagut",
+                                            }
+                                        }
+                                        window.snackbar.show(message, options);
+                                    });
                             }
                         }
                     },

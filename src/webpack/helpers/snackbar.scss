@@ -1,0 +1,20 @@
+@use "@material/snackbar/mdc-snackbar";
+
+
+@import "~material-icons-font/material-icons-font.css";
+
+
+@import "../color-rules";
+@import "../variables";
+
+
+.mdc-snackbar {
+  .mdc-snackbar__action {
+    display: none;
+  }
+  &.show-action {
+    .mdc-snackbar__action {
+      display: block;
+    }
+  }
+}

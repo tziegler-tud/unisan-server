@@ -8,15 +8,20 @@ import {MDCMenu} from '@material/menu';
  * @param containerId {String} id of container html element
  * @param data {Object} data to render
  * @param template  {String} path to handlebars template (.hbs)
- * @param show {Boolean} Default=true display list initially
+ * @param args {Object} { show: {Boolean} Default=true display list initially, height: {String} [fill, fixed, auto], fixedHeight: {String} }
  * @returns {Userlist}
  * @constructor
  */
-var Userlist = function(containerId, data, template, show) {
+var Userlist = function(containerId, data, template, args) {
     let defaults = {
         template: '/webpack/templates/userlist.hbs',
         data: {},
         containerId: "userlist-container",
+        args: {
+            show: false,
+            height: "fill",
+            fixedHeight: "unset",
+        }
     }
     template = template === undefined ? defaults.template : template;
 
@@ -28,9 +33,7 @@ var Userlist = function(containerId, data, template, show) {
     this.templatePromise
         .then(function(template){
             let html = generateHtml(template, data);
-            displayList(self.container, html);
-
-
+            displayList(self.container, html, args);
 
         })
         .catch(function(err){
@@ -57,17 +60,13 @@ Userlist.prototype.addEventHandler = function(handler) {
     handler();
 }
 
-function displayList(container, html) {
+
+function displayList(container, html, args) {
     container.innerHTML = html;
-
     //delay adjustment until sidebar finished rendering
-    adjustList(container);
+    adjustList(container, args);
     initEventHandlers();
-
-
-
 }
-
 function initEventHandlers(callbacks) {
 //setup drowpdowns
     $(".userlist-menu-container").each(function(e){
@@ -89,21 +88,43 @@ function initEventHandlers(callbacks) {
 
 
 
-function adjustList(c) {
+function adjustList(c, args) {
     let container = c === undefined ? document.getElementById('userlist-container') : c;
     // set width of first row
     let row = document.getElementById("userlist-top");
 
-    //get viewport height
-    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-    //get height of top navigation and topbar element
-    let navHeight = document.getElementById("nav-top").clientHeight +1;
-    let topbarHeight = document.getElementById("content1-heading").clientHeight;
-    //calc remaining height
-    let h = vh - (navHeight + topbarHeight + row.clientHeight + 10);
+    //height adjustment depends on args
+    let type = args.height;
+    let fixed = args.fixedHeight;
+
+    let cssHeightProperty = "auto";
+
+    switch(type){
+        case "auto":
+            cssHeightProperty = "auto";
+            break;
+
+        case "fill":
+            //get viewport height
+            const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+            //get height of top navigation and topbar element
+            let navHeight = document.getElementById("nav-top").clientHeight +1;
+            let topbarHeight = document.getElementById("content1-heading").clientHeight;
+            //calc remaining height
+            let h = vh - (navHeight + topbarHeight + row.clientHeight + 10);
+            cssHeightProperty = h + "px";
+            break;
+
+        case "fixed":
+            if (fixed === undefined) {
+                console.warn("Trying to set userlist to fixed height, but no value was given. Setting to auto...");
+                cssHeightProperty = "auto";
+            }
+            cssHeightProperty = fixed;
+    }
     //set element height
     $(container).css({
-        "height": h + "px",
+        "height": cssHeightProperty,
         "overflow": "auto",
     });
 

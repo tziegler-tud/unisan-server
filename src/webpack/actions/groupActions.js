@@ -50,7 +50,7 @@ var groupActions = {
             userId: data.userId,
             args: args,
         }
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/usermod/addUserGroup/"+data.userId,
             type: 'POST',
             contentType: "application/json; charset=UTF-8",

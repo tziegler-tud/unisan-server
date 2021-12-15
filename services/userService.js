@@ -948,7 +948,7 @@ async function addUserGroup(req, id, userGroupId){
     // validate
     if (!user) throw new Error('User not found');
     //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "Fehler beim Hinzufügen des Nutzers: Sie haben keine Berechtigung, diesen Nutzer zu bearbeiten."};
 
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('UserGroup not found');
