@@ -13,6 +13,10 @@ var UserGroupSchema = new Schema({
     description: {
         type: String,
     },
+    default: {
+        type: Boolean,
+        default: false,
+    },
     allowedOperations: [
         {
             method: {

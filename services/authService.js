@@ -28,11 +28,177 @@ let roles = [
     "superadmin",
 ]
 
+let defaultMember = {
+    title: "member",
+    description: "Standardgruppe für Nutzer. Erlaubt grundlegenden Systemzugriff.",
+    default: true,
+    allowedOperations: [
+        {
+            method: "GET",
+            url: "/api/v1/usermod/current"
+        },
+        {
+            method: "GET",
+            url: "/unisams/user/view/*"
+        },
+        {
+            method: "POST",
+            url: "/api/v1/usermod/filter"
+        },
+        {
+            method: "GET",
+            url: "/api/v1/usermod/*"
+        }
+    ],
+}
+
+let defaultUserAdmin = {
+    title: "userAdmin",
+    description: "Nutzer erstellen, bearbeiten und löschen",
+    default: true,
+    allowedOperations: [
+        {
+            method: "POST",
+            url: "/api/v1/usermod/create"
+        },
+        {
+            method: "DELETE",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "POST",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "PUT",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "GET",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "GET",
+            url: "/unisams/user/*"
+        }
+    ]
+}
+
+let defaultEventAdmin = {
+    title: "eventAdmin",
+    description: "Events erstellen, bearbeiten und löschen",
+    default: true,
+    allowedOperations: [
+        {
+
+            method: "GET",
+            url: "/api/v1/eventmod/*"
+        },
+        {
+
+            method: "POST",
+            url: "/api/v1/eventmod/*"
+        },
+        {
+
+            method: "PUT",
+            url: "/api/v1/eventmod/*"
+        },
+        {
+
+            method: "DELETE",
+            url: "/api/v1/eventmod/*"
+        },
+        {
+            method: "GET",
+            url: "/unisams/events/*"
+        },
+        {
+            method: "POST",
+            url: "/unisams/events/*"
+        },
+        {
+            method: "GET",
+            url: "/unisams/user/*",
+        }
+    ]
+}
+
+let defaultSysAdmin = {
+    title: "systemAdmin",
+    description: "Systemeinstellungen bearbeiten, Rechte vergeben",
+    default: true,
+    allowedOperations: [
+        {
+
+            method: "GET",
+            url: "/api/v1/groups/*"
+        },
+        {
+
+            method: "POST",
+            url: "/api/v1/groups/*"
+        },
+        {
+
+            method: "PUT",
+            url: "/api/v1/groups/*"
+        },
+        {
+
+            method: "DELETE",
+            url: "/api/v1/groups/*"
+        },
+        {
+            method: "GET",
+            url: "/unisams/settings*"
+        },
+        {
+            method: "POST",
+            url: "/unisams/settings*"
+        },
+        {
+            method: "POST",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "PUT",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "GET",
+            url: "/api/v1/usermod/*"
+        },
+        {
+            method: "GET",
+            url: "/unisams/user/*",
+        }
+    ]
+}
+
+let defaultGroups = [
+    defaultMember,
+    defaultUserAdmin,
+    defaultEventAdmin,
+    defaultSysAdmin,
+]
+
 class AuthService {
     constructor() {
         console.log("initializing authentication service...\n");
-        //might wanna do smt here later
-        console.log("authentication service initialized succesfully.");
+        let init = new Promise(function(resolve, reject){
+            //might wanna do smt here later
+            this.verifyDefaultRoles().
+            then(function(result){
+                if(result) resolve();
+            })
+                .catch(function(err){
+                    reject(err)
+                })
+        });
+        init.then(function(resolve){
+            console.log("authentication service initialized succesfully.");
+        })
     }
 
     /**
@@ -223,6 +389,10 @@ class AuthService {
             }
         }
         return false;
+    }
+
+    async verifyDefaultRoles(){
+
     }
 }
 
