@@ -186,9 +186,10 @@ let defaultGroups = [
 class AuthService {
     constructor() {
         console.log("initializing authentication service...\n");
+        let self = this;
         let init = new Promise(function(resolve, reject){
             //might wanna do smt here later
-            this.verifyDefaultRoles().
+            self.verifyDefaultRoles().
             then(function(result){
                 if(result) resolve();
             })
@@ -392,6 +393,7 @@ class AuthService {
     }
 
     async verifyDefaultRoles(){
+        return true;
 
     }
 }
