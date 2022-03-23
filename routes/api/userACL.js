@@ -13,19 +13,16 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-//hooked at /api/v1/groups
+//hooked at /api/v1/acl
 
 // routes
 router.get('/', getAll);
 router.get('/:id', getUserACL);
 router.post('/:id', createUserACL);
-router.put('/:id', updateGroup);
-router.delete('/:id', deleteGroup);
-router.get('/:id', getGroup);
-router.get("/assigned/:id", getAssignedUser);
-router.post('/addPermission/:id', addGroupPermission);
-router.post('/updatePermission/:id', updateGroupPermission);
-router.delete('/removePermission/:id', removeGroupPermission);
+router.put('/:id', updateACL);
+router.delete('/:id', deleteACL);
+router.post('/addGroup/:id', addGroup);
+router.delete('/removeGroup/:id', removeGroup);
 
 function getAll(req, res, next){
     aclService.getAll()
@@ -46,26 +43,20 @@ function createUserACL(req, res, next){
         .catch(err => next(err));
 }
 
-function addGroupPermission(req, res, next){
-    userGroupService.addPermission(req.params.id, req.body.method, req.body.url)
+function deleteACL(req, res, next){
+    aclService.remove(req.params.id)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
 
-function updateGroupPermission(req, res, next){
-    userGroupService.updatePermission(req.params.id, req.body.currentMethod, req.body.currentUrl, req.body.newMethod, req.body.newUrl)
+function addGroup(req, res, next){
+    aclService.addUserGroup(req, req.params.id, req.body.groupId)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
 
-function removeGroupPermission(req, res, next){
-    userGroupService.removePermission(req.params.id, req.body.method, req.body.url)
-        .then(result => res.json(result))
-        .catch(err => next(err));
-}
-
-function getAssignedUser (req, res, next) {
-    userGroupService.getAssignedUser(req.params.id)
+function removeGroup(req, res, next){
+    aclService.removeUserGroup(req, req.params.id, req.body.groupId)
         .then(result => res.json(result))
         .catch(err => next(err));
 }

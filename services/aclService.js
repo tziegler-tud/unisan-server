@@ -40,6 +40,8 @@ module.exports = {
     setUserRole,
     addUserGroup,
     removeUserGroup,
+    remove,
+    update,
 
 };
 
@@ -52,7 +54,7 @@ async function getAll (req) {
 
 async function getUserACL (req, userid) {
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.findById(userid);
+    let userACL = await UserACL.find({user: userid});
 
     // validate
     if (!user) throw new Error('User not found');
@@ -78,7 +80,7 @@ async function createUserACL (req, userid, data, overwrite) {
     Object.assign(defaultData, data);
 
     //check if user already has ACL
-    let userACL = await UserACL.findById(userid);
+    let userACL = await UserACL.find({user: userid});
     if (userACL) {
         //user already has acl
         console.log("trying to create acl, but acl for this user is already present. Checking overwrite parameter...")
@@ -108,7 +110,7 @@ async function createUserACL (req, userid, data, overwrite) {
 
 async function getUserRole (req, userid) {
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.findById(userid);
+    let userACL = await UserACL.find({user: userid});
 
     // validate
     if (!user) throw new Error('User not found');
@@ -124,7 +126,7 @@ async function getUserRole (req, userid) {
 
 async function setUserRole (req, userid, role) {
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.findById(userid);
+    let userACL = await UserACL.find({user: userid});
 
     // validate
     if (!user) throw new Error('User not found');
@@ -184,7 +186,7 @@ async function setUserRole (req, userid, role) {
 
 async function addUserGroup(req, userid, userGroupId){
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.findById(userid);
+    let userACL = await UserACL.find({user: userid});
 
     // validate
     if (!user) throw new Error('User not found');
@@ -237,7 +239,7 @@ async function addUserGroup(req, userid, userGroupId){
 
 async function removeUserGroup(req, id, userGroupId){
     let user = await User.findById(id).select('-hash');
-    let userACL = await UserACL.findById(userid);
+    let userACL = await UserACL.find({user: id});
 
     // validate
     if (!user) throw new Error('User not found');
@@ -292,4 +294,12 @@ async function removeUserGroup(req, id, userGroupId){
             resolve(userACL);
         }
     })
+}
+
+async function remove(req, id) {
+    return UserACL.findByIdAndDelete(id);
+}
+
+async function update(req, id, data) {
+    return false;
 }
