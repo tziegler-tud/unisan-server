@@ -9,6 +9,7 @@ var UserGroupSchema = new Schema({
     title: {
         type: String,
         required: true,
+        unique: true,
     },
     description: {
         type: String,
@@ -17,17 +18,12 @@ var UserGroupSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    type: { //<custom>, user, useradmin, eventadmin, system
+        type: String,
+        default: "user",
+    },
     allowedOperations: [
-        {
-            method: {
-                type: String,
-                required: true,
-            },
-            url: {
-                type: String,
-                required: true,
-            }
-        }
+
     ],
 });
 

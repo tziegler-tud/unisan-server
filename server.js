@@ -36,6 +36,7 @@ var publicProtocolRouter = require('./routes/unisams/protocol_public');
 
 
 var authRouter = require('./routes/api/auth');
+var userACLRouter = require('./routes/api/userACL');
 var accessRightsRouter = require('./routes/api/accessrights');
 var userGroupRouter = require('./routes/api/userGroup');
 var userApiRouter = require('./routes/api/usermod');
@@ -152,6 +153,7 @@ server.use("/unisams", errorHandler.webErrorHandler);
 //API calls
 server.use('/api/v1', authRouter);
 server.use('/api/v1/*', apiAuth);
+server.use('/api/v1/acl', userACLRouter);
 server.use('/api/v1/groups', userGroupRouter);
 server.use('/api/v1/access', accessRightsRouter);
 server.use('/api/v1/usermod', userApiRouter);

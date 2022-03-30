@@ -2,18 +2,21 @@ const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 const AuthService = require('./authService');
 const LogService = require("./logService");
+const aclService = require("./aclService");
 const Log = require('../utils/log');
 
 
 
 const User = db.User;
 const UserGroup = db.UserGroup;
+const UserACL = db.UserACL;
 const DbLog = db.Log;
 
 var fs = require('fs-extra');
 
 module.exports = {
     getAll,
+    getManyById,
     getAllFiltered,
     getById,
     getByUsername,
@@ -41,6 +44,17 @@ module.exports = {
  */
 async function getAll() {
     return User.find().select('-hash');
+}
+
+/**
+ * Returns all users corresponding to the given array of ids.
+ */
+async function getManyById(idArray) {
+    return User.find({
+        '_id': {
+            $in: idArray
+        }
+    }).select('-hash')
 }
 
 /**
@@ -130,105 +144,113 @@ async function getByUsernameWithHash(username, populate) {
 async function create(req, userParam, args) {
     if (args === undefined) args = {};
 
-    // validate
-    if (await User.findOne({ username: userParam.username }))
-        throw new Error(`Username "${userParam.username}" is already taken`);
+    //auth
+    let access = await AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.CREATE)
+    if (!access) throw new Error("Forbidden.");
+    else {
+        // validate
+        if (await User.findOne({ username: userParam.username }))
+            throw new Error(`Username "${userParam.username}" is already taken`);
 
-    if (await User.findOne({ generalData: {memberId: userParam.generalData.memberId }}))
-        throw new Error(`MemberId ` + userParam.generalData.memberId + ` is already taken`);
+        if (await User.findOne({ generalData: {memberId: userParam.generalData.memberId }}))
+            throw new Error(`MemberId ` + userParam.generalData.memberId + ` is already taken`);
 
-    const user = new User(userParam);
+        const user = new User(userParam);
 
-    // @louis: password is not mentioned in the userScheme. Is this correct? @Tom: yes, we only store hashes in the db
-    // hash password
-    if (userParam.password) {
-        const salt = await bcrypt.genSalt(10);
-        user.hash = await bcrypt.hash(userParam.password, salt);
-    }
-
-    //create log
-    let log = new Log({
-        type: "modification",
-        action: {
-            objectType: "user",
-            actionType: "create",
-            actionDetail: "userCreate"
-        },
-        authorizedUser: req.user,
-        target: {
-            targetType: "user",
-            targetObject: user._id,
-            targetObjectId: user._id,
-            targetModel: "User",
-        },
-        httpRequest: {
-            method: req.method,
-            url: req.originalUrl,
+        // @louis: password is not mentioned in the userScheme. Is this correct? @Tom: yes, we only store hashes in the db
+        // hash password
+        if (userParam.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.hash = await bcrypt.hash(userParam.password, salt);
         }
-    })
 
-    // save user
-    if(await user.save()){
-        //update log
-        LogService.create(log)
-            .then(
-        )
-            .catch(
-
-        );
-        //create user dir
-        fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
-            if (err) {
-                throw err;
+        //create log
+        let log = new Log({
+            type: "modification",
+            action: {
+                objectType: "user",
+                actionType: "create",
+                actionDetail: "userCreate"
+            },
+            authorizedUser: req.user,
+            target: {
+                targetType: "user",
+                targetObject: user._id,
+                targetObjectId: user._id,
+                targetModel: "User",
+            },
+            httpRequest: {
+                method: req.method,
+                url: req.originalUrl,
             }
-            else {
-                //check if tmp image exists
-                if (args.userImg.tmp) {
-                    let tmpPath = appRoot + '/src/data/uploads/tmp/' + args.userImg.tmpkey + ".jpg";
-                    //check if file exists
-                    checkFileExists(tmpPath)
-                        .then(function(exists){
-                            if(exists) {
-                                try {
-                                    fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
-                                        if (err) throw err;
-                                    });
-                                }
-                                catch (err){
-                                    let msg = "file system error: " + err;
-                                    console.error(msg)
-                                    console.warn("Failed to get uploaded file. Trying to remove file from storage...");
-                                    fs.unlink(tmpPath)
-                                        .then(function(){
-                                            console.log("temporary file removed successfully.");
-                                        })
-                                        .catch(err => {
-                                            console.error("Failed to remove temporary file: " + err);
-                                        })
-                                }
-                            }
-                            else {
-                                console.warn("invalid temporary image file path. Copying dummy user image instead...")
-                                // copy dummy user image to user directory
-                                copyDummyImage();
-                            }
-                        })
-                        .catch(err => console.error(err))
+        })
+
+        // save user
+        if(await user.save()){
+            //create fresh acl document and assign user to it
+            const userACL = new UserACL({user: user.id})
+            userACL.save();
+            //update log
+            LogService.create(log)
+                .then(
+                )
+                .catch(
+
+                );
+            //create user dir
+            fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
+                if (err) {
+                    throw err;
                 }
                 else {
-                    // copy dummy user image to user directory
-                    copyDummyImage();
-                }
+                    //check if tmp image exists
+                    if (args.userImg.tmp) {
+                        let tmpPath = appRoot + '/src/data/uploads/tmp/' + args.userImg.tmpkey + ".jpg";
+                        //check if file exists
+                        checkFileExists(tmpPath)
+                            .then(function(exists){
+                                if(exists) {
+                                    try {
+                                        fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                                            if (err) throw err;
+                                        });
+                                    }
+                                    catch (err){
+                                        let msg = "file system error: " + err;
+                                        console.error(msg)
+                                        console.warn("Failed to get uploaded file. Trying to remove file from storage...");
+                                        fs.unlink(tmpPath)
+                                            .then(function(){
+                                                console.log("temporary file removed successfully.");
+                                            })
+                                            .catch(err => {
+                                                console.error("Failed to remove temporary file: " + err);
+                                            })
+                                    }
+                                }
+                                else {
+                                    console.warn("invalid temporary image file path. Copying dummy user image instead...")
+                                    // copy dummy user image to user directory
+                                    copyDummyImage();
+                                }
+                            })
+                            .catch(err => console.error(err))
+                    }
+                    else {
+                        // copy dummy user image to user directory
+                        copyDummyImage();
+                    }
 
-                function copyDummyImage(){
-                    // copies the dummy user image to user directory
-                    fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
-                        if (err) throw err;
-                        console.log('dummy image copied to new user');
-                    });
+                    function copyDummyImage(){
+                        // copies the dummy user image to user directory
+                        fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                            if (err) throw err;
+                            console.log('dummy image copied to new user');
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }
 
@@ -246,47 +268,61 @@ async function update(req, id, userParam) {
     if (user.username !== userParam.username && await User.findOne({ username: userParam.username }))
         throw new Error(`Username "${userParam.username}" is already taken`);
 
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    let critical = false;
 
+    //check if username was entered
+    if (userParam.username) {
+        critical = true;
+    }
     // hash password if it was entered
     if (userParam.password) {
         //TODO: Check if plaintext password is stored
         userParam.hash = await bcrypt.hash(userParam.password, 10);
+        critical = true;
+
     }
-
-    // copy userParam properties to user
-    Object.assign(user, userParam);
-
-    return user.save()
-        .then(user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userModify",
-                    key: "",
-                    fullKey: "",
-                    originalValue: "",
-                    value:  "",
-                    tag: "<OVERWRITE>"
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserWriteAccess(req.user, user, critical)
+            .then(result => {
+                // copy userParam properties to user
+                Object.assign(user, userParam);
+                user.save()
+                    .then(user => {
+                        resolve(user)
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userModify",
+                                key: "",
+                                fullKey: "",
+                                originalValue: "",
+                                value: "",
+                                tag: "<OVERWRITE>"
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => {
+                throw {status: 403, message: "forbidden: " + err}; //TODO: remove detailed error message after debugging to prevent leaking information on target user properties to attacker
+            })
+    })
 }
 
 /**
@@ -303,77 +339,85 @@ async function deleteKey(req, id, key, userParams) {
 
     // validate
     if (!user) throw new Error('User not found');
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserWriteAccess(req.user, user, false)
+            .then(result => {
+                // validate input
+                if (!key) throw new Error('no key given');
 
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+                let ojVal = undefined;
+                let logKey = key;
 
-    // validate input
-    if (!key) throw new Error('no key given');
-
-    let ojVal = undefined;
-    let logKey = key;
-
-    // check if key exists
-    if (!user.get(key)) {
-        console.warn("Trying to remove invalid key!");
-        return;
-    }
-
-    // check if key is in scheme
-    if(user.schema.path(key)!==undefined) {
-        // check if trying to delete required key
-        if (user.schema.path(key).isRequired) {
-            console.error('Trying to remove required key.');
-            return;
-        } else {
-
-        }
-    }
-    else {
-        console.warn("removing key which is not specified in scheme. Is this intended?")
-    }
-
-    // check if key references array element
-    if (Array.isArray(user.get(key).parentArray())){
-        var msg = "Error: Deleting array elements is no longer provided by this method.";
-        console.error(msg);
-        throw new Error(msg);
-    }
-    else {
-        let k = user.get(key);
-        ojVal = (k.value === undefined) ? k : k.value;
-        logKey = (k.title === undefined) ? key : k.title;
-        user.set(key, undefined, {strict: false} );
-    }
-    return user.save()
-        .then(user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userModify",
-                    key: logKey,
-                    fullKey: key,
-                    originalValue: ojVal,
-                    value:  "",
-                    tag:  "<DELETED>",
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
+                // check if key exists
+                if (!user.get(key)) {
+                    console.warn("Warning: Trying to remove invalid key.");
+                    return;
                 }
+
+                // check if key is in scheme
+                if (user.schema.path(key) !== undefined) {
+                    // check if trying to delete required key
+                    if (user.schema.path(key).isRequired) {
+                        // console.error('Trying to remove required key.');
+                        throw new Error('Error: Trying to remove required key.')
+                    } else {
+
+                    }
+                } else {
+                    console.warn("removing key which is not specified in scheme. Is this intended?")
+                }
+
+                // check if key references array element
+                if (Array.isArray(user.get(key).parentArray())) {
+                    var msg = "Error: Deleting array elements is no longer provided by this method.";
+                    console.error(msg);
+                    throw new Error(msg);
+                } else {
+                    let k = user.get(key);
+                    ojVal = (k.value === undefined) ? k : k.value;
+                    logKey = (k.title === undefined) ? key : k.title;
+                    user.set(key, undefined, {strict: false});
+                }
+                user.save()
+                    .then(user => {
+                        resolve(user)
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userModify",
+                                key: logKey,
+                                fullKey: key,
+                                originalValue: ojVal,
+                                value: "",
+                                tag: "<DELETED>",
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+
+            .catch(err => {
+                throw {status: 403, message: "forbidden"};
+            })
+    })
+
+
 }
 
 /**
@@ -397,7 +441,10 @@ async function deleteArrayElement(req, id, key, args) {
     if (!user) throw new Error('User not found');
 
     //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    let auth = await AuthService.checkUserWriteAccess(req.user, user, false);
+    if(!auth) {
+        throw {status: 403, message: "forbidden"};
+    }
 
     // validate input
     if (!key) throw new Error('no key given');
@@ -531,7 +578,6 @@ async function deleteArrayElement(req, id, key, args) {
  */
 async function getKey(id, key) {
     const user = await User.findById(id);
-
     // validate
     if (!user) throw new Error('User not found');
     // validate input
@@ -561,94 +607,101 @@ async function updateKey(req, id, key, value, userParams) {
     // validate
     if (!user) throw new Error('User not found');
 
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    let critical = (key === "password" || key === "username");
 
-    // validate input
-    if (!key) throw new Error('no key given');
-    if (!value) throw new Error('no value given');
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserWriteAccess(req.user, user, critical)
+            .then(result => {
+                // validate input
+                if (!key) throw new Error('no key given');
+                if (!value) throw new Error('no value given');
 
-    let ojVal = undefined;
-    let newVal = (value.value === undefined) ? value : value.value;
-    let logKey = (value.title === undefined) ? key : value.title;
+                let ojVal = undefined;
+                let newVal = (value.value === undefined) ? value : value.value;
+                let logKey = (value.title === undefined) ? key : value.title;
 
-    //check if array operation
-    if(userParams.isArray) {
+                //check if array operation
+                if (userParams.isArray) {
 
-        //get current array content. Usually, key refers to an indexed array element.
-        var array;
-        if (userParams.noIndex) {
-        }
-        else {
-            const keyPos = key.lastIndexOf(".");
-            const i = key.substring(keyPos+1);
-            key = key.substring(0,keyPos);
-        }
-        array = user.get(key);
-        // in-memory update.
-        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
+                    //get current array content. Usually, key refers to an indexed array element.
+                    var array;
+                    if (userParams.noIndex) {
+                    } else {
+                        const keyPos = key.lastIndexOf(".");
+                        const i = key.substring(keyPos + 1);
+                        key = key.substring(0, keyPos);
+                    }
+                    array = user.get(key);
+                    // in-memory update.
+                    // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
 
-        try {
-            if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
-            //check if array
-            //TODO: this does not work as intended. needs revision
-            var index = array.map(e => e._id.toString()).indexOf(value.id);
+                    try {
+                        if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
+                        //check if array
+                        //TODO: this does not work as intended. needs revision
+                        var index = array.map(e => e._id.toString()).indexOf(value.id);
 
-        }
-        catch (e) {
-            if (e instanceof TypeError) {
-                console.error("Exception:" + e);
-                console.error("Aborting operation to ensure data integrity.");
-                throw e;
-            } else {
-                console.error("Unhandled exception: " + e);
-                throw e;
-            }
-        }
-        if (index > -1) {
-            // updating existing object
-            ojVal = array[index];
-            array.splice(index, 1, value);
-        }
-        else {
-            // key not found, creating new entry
-            array.push(value);
-        }
-        user.set(key, array, {strict: false} );
-    }
-    else {
-        let k = user.get(key);
-        ojVal = (k.value === undefined) ? k : k.value;
-        user.set(key, value, {strict: false} );
-    }
-    return user.save()
-        .then( user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userModify",
-                    key: logKey,
-                    fullKey: key,
-                    originalValue: ojVal,
-                    value:  newVal,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
+                    } catch (e) {
+                        if (e instanceof TypeError) {
+                            console.error("Exception:" + e);
+                            console.error("Aborting operation to ensure data integrity.");
+                            throw e;
+                        } else {
+                            console.error("Unhandled exception: " + e);
+                            throw e;
+                        }
+                    }
+                    if (index > -1) {
+                        // updating existing object
+                        ojVal = array[index];
+                        array.splice(index, 1, value);
+                    } else {
+                        // key not found, creating new entry
+                        array.push(value);
+                    }
+                    user.set(key, array, {strict: false});
+                } else {
+                    let k = user.get(key);
+                    ojVal = (k.value === undefined) ? k : k.value;
+                    user.set(key, value, {strict: false});
                 }
+                user.save()
+                    .then(user => {
+                        resolve(user)
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userModify",
+                                key: logKey,
+                                fullKey: key,
+                                originalValue: ojVal,
+                                value: newVal,
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => {
+                throw {status: 403, message: "forbidden"};
+            })
+    })
+
 }
 
 /**
@@ -673,53 +726,63 @@ async function addQualification(req, id, qualificationObject,  args) {
     // validate
     if (!user) throw new Error('User not found');
 
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserWriteAccess(req.user, user, false)
+            .then(result => {
+                let errHeader = "Failed to add Qualification: ";
+                // validate input
+                if (qualificationObject === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
 
-    let errHeader = "Failed to add Qualification: ";
-        // validate input
-    if (qualificationObject === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
+                let ojVal = undefined;
+                let newVal = qualificationObject.qualification.name;
+                let logKey = qualificationObject.qualification.qualType;
 
-    let ojVal = undefined;
-    let newVal = qualificationObject.qualification.name;
-    let logKey = qualificationObject.qualification.qualType;
+                //get user qualification array
+                let qualArray = user.qualifications;
+                //validate array
+                if (!Array.isArray(qualArray)) throw new Error(errHeader + "Failed to read qualification array from user document. User document might be corrupted. Aborting Operation.")
 
-    //get user qualification array
-    let qualArray = user.qualifications;
-    //validate array
-    if(!Array.isArray(qualArray)) throw new Error(errHeader + "Failed to read qualification array from user document. User document might be corrupted. Aborting Operation.")
+                //add qualfication entry to qualification object array
+                qualArray.push(qualificationObject);
 
-    //add qualfication entry to qualification object array
-    qualArray.push(qualificationObject);
-
-    return user.save()
-        .then( user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userAddQualification",
-                    key: logKey,
-                    fullKey: "qualification",
-                    originalValue: ojVal,
-                    value:  newVal,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
+                user.save()
+                    .then(user => {
+                        resolve(user);
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userAddQualification",
+                                key: logKey,
+                                fullKey: "qualification",
+                                originalValue: ojVal,
+                                value: newVal,
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => {
+                throw {status: 403, message: "forbidden"};
+            })
+    })
+
+
 }
 
 /**
@@ -746,83 +809,89 @@ async function updateQualification(req, id, qualificationId, data, args) {
     // validate
     if (!user) throw new Error('User not found');
 
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserWriteAccess(req.user, user, false)
+            .then(result => {
+                let errHeader = "Failed to add Qualification: ";
+                // validate input
+                if (data === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
 
-    let errHeader = "Failed to add Qualification: ";
-    // validate input
-    if (data === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
+                let ojVal = undefined;
+                let newVal = data.qualification.name;
+                let logKey = data.qualification.qualType;
 
-    let ojVal = undefined;
-    let newVal = data.qualification.name;
-    let logKey = data.qualification.qualType;
+                var array = user.qualifications;
+                //validate array
+                if (!Array.isArray(array)) throw new Error(errHeader + "Failed to read qualification array from user document. User document might be corrupted. Aborting Operation.")
 
-   var array = user.qualifications;
-    //validate array
-    if(!Array.isArray(array)) throw new Error(errHeader + "Failed to read qualification array from user document. User document might be corrupted. Aborting Operation.")
+                // get current array content. Qualifications array is access by mongo ids.
+                // in-memory update.
+                // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
 
-    // get current array content. Qualifications array is access by mongo ids.
-    // in-memory update.
-    // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
-
-    try {
-        if (!Array.isArray(array)) throw new TypeError(`Failed to read qualifications array.`);
-        //check if array
-        var index = array.map(e => e._id.toString()).indexOf(qualificationId);
-    }
-    catch (e) {
-        if (e instanceof TypeError) {
-            console.error("Exception:" + e);
-            console.error("Aborting operation to ensure data integrity.");
-            throw e;
-        } else {
-            console.error("Unhandled exception: " + e);
-            throw e;
-        }
-    }
-    if (index > -1) {
-        // updating existing object
-        ojVal = array[index].qualification.name;
-        array.splice(index, 1, data);
-    }
-    else {
-        if (args.upsert) {
-            // key not found, creating new entry
-            array.push(data);
-        }
-        else throw new Error("Failed to update qualification entry: Invalid array id given");
-    }
-    let key = "qualifications";
-    user.set(key, array, {strict: false} );
-
-    return user.save()
-        .then( user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userUpdateQualification",
-                    key: logKey,
-                    fullKey: "qualification",
-                    originalValue: ojVal,
-                    value:  newVal,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
+                try {
+                    if (!Array.isArray(array)) throw new TypeError(`Failed to read qualifications array.`);
+                    //check if array
+                    var index = array.map(e => e._id.toString()).indexOf(qualificationId);
+                } catch (e) {
+                    if (e instanceof TypeError) {
+                        console.error("Exception:" + e);
+                        console.error("Aborting operation to ensure data integrity.");
+                        throw e;
+                    } else {
+                        console.error("Unhandled exception: " + e);
+                        throw e;
+                    }
                 }
+                if (index > -1) {
+                    // updating existing object
+                    ojVal = array[index].qualification.name;
+                    array.splice(index, 1, data);
+                } else {
+                    if (args.upsert) {
+                        // key not found, creating new entry
+                        array.push(data);
+                    } else throw new Error("Failed to update qualification entry: Invalid array id given");
+                }
+                let key = "qualifications";
+                user.set(key, array, {strict: false});
+
+                user.save()
+                    .then(user => {
+                        resolve(user)
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userUpdateQualification",
+                                key: logKey,
+                                fullKey: "qualification",
+                                originalValue: ojVal,
+                                value: newVal,
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => {
+                throw {status: 403, message: "forbidden"};
+            })
+    })
+
 }
 
 async function removeQualification(req, id, qualificationId, args) {
@@ -837,63 +906,75 @@ async function removeQualification(req, id, qualificationId, args) {
     const user = await User.findById(id);
     // validate
     if (!user) throw new Error('User not found');
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
-    // validate input
-    if (qualificationId === undefined ) throw new Error("qualification not found: undefined id")
-    //get current array content. Usually, qualificationId refers to corresponding id in the array.
-    // Otherwise, use the isIndex parameter to allow accessing array by index
-    var array = user.qualifications;
-    let logKey = "qualifications";
-    let fullKey = logKey;
-    let ojVal = "";
-    if (args.isIndex) {
-        //qualificationId is array index
-        let fullKey = logKey + "." + (qualificationId).toString();
-        let rmObj = removeByIndex(array, qualificationId);
-        array = rmObj.array;
-        ojVal = rmObj.object.qualification.name;
-    }
-    else {
-        //qualificationId is id
-        let fullKey = logKey + "/" + (qualificationId).toString();
-        let rmObj = removeById(array, qualificationId);
-        array = rmObj.array;
-        ojVal = rmObj.object.qualification.name;
-    }
 
-    let key = "qualifications";
-    let value = array;
-    user.set(key, value, {strict: false} );
+    return new Promise(function(resolve, reject) {
+        AuthService.checkUserWriteAccess(req.user, user, false)
+            .then( result=> {
 
-    return user.save()
-        .then( user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userRemoveQualification",
-                    key: logKey,
-                    fullKey: fullKey,
-                    originalValue: ojVal,
-                    value:  ojVal,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
+                // validate input
+                if (qualificationId === undefined ) throw new Error("qualification not found: undefined id")
+                //get current array content. Usually, qualificationId refers to corresponding id in the array.
+                // Otherwise, use the isIndex parameter to allow accessing array by index
+                var array = user.qualifications;
+                let logKey = "qualifications";
+                let fullKey = logKey;
+                let ojVal = "";
+                if (args.isIndex) {
+                    //qualificationId is array index
+                    let fullKey = logKey + "." + (qualificationId).toString();
+                    let rmObj = removeByIndex(array, qualificationId);
+                    array = rmObj.array;
+                    ojVal = rmObj.object.qualification.name;
                 }
+                else {
+                    //qualificationId is id
+                    let fullKey = logKey + "/" + (qualificationId).toString();
+                    let rmObj = removeById(array, qualificationId);
+                    array = rmObj.array;
+                    ojVal = rmObj.object.qualification.name;
+                }
+
+                let key = "qualifications";
+                let value = array;
+                user.set(key, value, {strict: false} );
+
+                user.save()
+                    .then( user => {
+                        resolve(user)
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userRemoveQualification",
+                                key: logKey,
+                                fullKey: fullKey,
+                                originalValue: ojVal,
+                                value:  ojVal,
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => {
+                throw {status: 403, message: "forbidden"};
+            })
+    })
+    //check write access
+
 
 }
 
@@ -944,52 +1025,65 @@ async function matchAny(matchString, args){
 
 async function addUserGroup(req, id, userGroupId){
     let user = await User.findById(id).select('-hash');
-
-    // validate
-    if (!user) throw new Error('User not found');
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "Fehler beim Hinzufügen des Nutzers: Sie haben keine Berechtigung, diesen Nutzer zu bearbeiten."};
-
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('UserGroup not found');
 
+    // validate
+    if (!user) throw new Error('User not found');
+
     return new Promise(function(resolve, reject){
-        //check if user already has userGroup assigned
-        if(user.userGroups.includes(userGroupId)){
-            console.log("User " + user.username + " already has UserGroup " + group.title + " assigned.");
-            resolve(user);
-        }
-        else {
-            user.userGroups.push(userGroupId);
-            user.save()
-                .then( user => {
-                    resolve(user);
-                    //create log
-                    let log = new Log({
-                        type: "modification",
-                        action: {
-                            objectType: "user",
-                            actionType: "modify",
-                            actionDetail: "userGroupAdd",
-                            key: "",
-                            value: group.title
-                        },
-                        authorizedUser: req.user,
-                        target: {
-                            targetType: "user",
-                            targetObject: user._id,
-                            targetObjectId: user._id,
-                            targetModel: "User",
-                        },
-                        httpRequest: {
-                            method: req.method,
-                            url: req.originalUrl,
+    //check access
+        AuthService.checkUserGroupWriteAccess(req.user, user, group)
+            .then(result => {
+                //get user acl
+                aclService.getUserACL(id, false)
+                    .then(userACL=> {
+                        //check if user already has userGroup assigned
+                        if(userACL.userGroups.includes(userGroupId)){
+                            console.log("User " + user.username + " already has UserGroup " + group.title + " assigned.");
+                            resolve(user);
+                        }
+                        else {
+                            userACL.userGroups.push(userGroupId);
+                            userACL.save()
+                                .then( userACL => {
+                                    console.log("user " + user.username + " has been assigned to group.");
+                                    resolve(user);
+                                    //create log
+                                    let log = new Log({
+                                        type: "modification",
+                                        action: {
+                                            objectType: "user",
+                                            actionType: "modify",
+                                            actionDetail: "userGroupAdd",
+                                            key: "",
+                                            value: group.title
+                                        },
+                                        authorizedUser: req.user,
+                                        target: {
+                                            targetType: "user",
+                                            targetObject: user._id,
+                                            targetObjectId: user._id,
+                                            targetModel: "User",
+                                        },
+                                        httpRequest: {
+                                            method: req.method,
+                                            url: req.originalUrl,
+                                        }
+                                    })
+                                    LogService.create(log).then().catch();
+                                })
+                                .catch(err => reject(err))
                         }
                     })
-                    LogService.create(log).then().catch();
-                })
-                .catch(err => reject(err))
-        }
+                    .catch(err => reject(err))
+        })
+        .catch(err=> {
+            reject({status: 403, message: "Fehler beim Hinzufügen des Nutzers: Sie haben keine Berechtigung, diesen Nutzer zu bearbeiten."});
+        })
+
+
+
     })
 }
 
@@ -1006,55 +1100,167 @@ async function removeUserGroup(req, id, userGroupId){
 
     // validate
     if (!user) throw new Error('User not found');
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
-
     let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('invalid user group');
 
-
-    //check if user has userGroup assigned
-    let index = user.userGroups.indexOf(userGroupId);
-
     return new Promise(function(resolve, reject){
-        //check if user has userGroup assigned
-        let index = user.userGroups.indexOf(userGroupId);
-        if(index > -1){
-            // remove group
-            user.userGroups.splice(index, 1);
-            user.save()
-                .then( user => {
-                    resolve(user);
-                    //create log
-                    let log = new Log({
-                        type: "modification",
-                        action: {
-                            objectType: "user",
-                            actionType: "modify",
-                            actionDetail: "userGroupDelete",
-                            key: "",
-                            value: group.title,
-                        },
-                        authorizedUser: req.user,
-                        target: {
-                            targetType: "user",
-                            targetObject: user._id,
-                            targetObjectId: user._id,
-                            targetModel: "User",
-                        },
-                        httpRequest: {
-                            method: req.method,
-                            url: req.originalUrl,
+    //check access
+        AuthService.checkUserGroupWriteAccess(req.user, user, group)
+            .then(result => {
+                //check if user has userGroup assigned
+                let index = user.userGroups.indexOf(userGroupId);
+                aclService.getUserACL(id, false)
+                    .then(userACL=> {
+                        //check if user has userGroup assigned
+                        let index = userACL.userGroups.indexOf(userGroupId);
+                        if(index > -1){
+                            // remove group
+                            userACL.userGroups.splice(index, 1);
+                            userACL.save()
+                                .then( user => {
+                                    resolve(user);
+                                    //create log
+                                    let log = new Log({
+                                        type: "modification",
+                                        action: {
+                                            objectType: "user",
+                                            actionType: "modify",
+                                            actionDetail: "userGroupDelete",
+                                            key: "",
+                                            value: group.title,
+                                        },
+                                        authorizedUser: req.user,
+                                        target: {
+                                            targetType: "user",
+                                            targetObject: user._id,
+                                            targetObjectId: user._id,
+                                            targetModel: "User",
+                                        },
+                                        httpRequest: {
+                                            method: req.method,
+                                            url: req.originalUrl,
+                                        }
+                                    })
+                                    LogService.create(log).then().catch();
+                                })
+                                .catch(err => reject(err))
+                        }
+                        else {
+                            console.log("User " + user.username + " is not part of group " + group.title);
+                            resolve(user);
                         }
                     })
-                    LogService.create(log).then().catch();
-                })
-                .catch(err => reject(err))
+                    .catch(err => reject(err));
+        })
+        .catch(err => {
+            reject(err)
+        })
+    })
+}
+
+/**
+ * adds user to group
+ * @param req {Object} express request
+ * @param id {ObjectId} user id
+ * @param target {ObjectId} target object id
+ * @param operationArray {String[]} array containing string represantations of operations to add. User enum authService.operations to get string representation.
+ * @returns {Promise<*>}
+ */
+
+async function addIndividualAccess(req, id, target, operationArray){
+    let user = await User.findById(id).select('-hash');
+    // validate
+    if (!user) throw new Error('User not found');
+    let operations;
+    //validate operation array
+    if (!Array.isArray(operationArray)) {
+        //test for single operation
+        if (typeof(operationArray) === "string"){
+            if (AuthService.checkIfValidOperation(operationArray)){
+                //single operation was entered
+                operations = [operationArray];
+            }
+            else {
+                //not a valid operation
+                throw new Error("invalid parameters: " + operationArray + " is not a valid operation.");
+            }
         }
         else {
-            console.log("User " + user.username + " is not part of group " + group.title);
-            resolve(user);
+            throw new Error("invalid parameters: Expected string or array of strings, but found: " + typeof(operationArray));
         }
+    }
+    else {
+        //array, but lets check if the operations are valid
+        operationArray.forEach(function(operation){
+            if(!AuthService.checkIfValidOperation(operation)) {
+                throw new Error("invalid parameters: " + operation + " is not a valid operation.");
+            }
+        })
+    }
+
+    //all good, lets go
+    return new Promise(function(resolve, reject){
+        //check access
+        //TODO: Finish this
+        AuthService.checkUserWriteAccess(req.user, user, false)
+            .then(result => {
+                //get user acl
+                aclService.getUserACL(id, false)
+                    .then(userACL=> {
+                        //check if user already has individual rights for this target
+                        let targetRights = userACL.individual.find(object => object.target.toString() === target.toString)
+                        if (targetRights === undefined){
+                            //create new entry
+                            let targetRights = {
+                                target: target,
+                                allowedOperations: operations,
+                            }
+                            userACL.individual.push(targetRights);
+                            console.log("User " + user.username + " has been granted access rights for target " + target.toString() + ": " + operations.toString());
+                        }
+                        else {
+                            //target entry exists
+                            //check if operations are already present
+
+                            if (targetRights.allowedOperation.includes())
+
+                        }
+
+                        userACL.save()
+                            .then( userACL => {
+                                console.log("user " + user.username + " has been assigned to group.");
+                                resolve(user);
+                                //create log
+                                let log = new Log({
+                                    type: "modification",
+                                    action: {
+                                        objectType: "user",
+                                        actionType: "modify",
+                                        actionDetail: "userGroupAdd",
+                                        key: "",
+                                        value: group.title
+                                    },
+                                    authorizedUser: req.user,
+                                    target: {
+                                        targetType: "user",
+                                        targetObject: user._id,
+                                        targetObjectId: user._id,
+                                        targetModel: "User",
+                                    },
+                                    httpRequest: {
+                                        method: req.method,
+                                        url: req.originalUrl,
+                                    }
+                                })
+                                LogService.create(log).then().catch();
+                            })
+                            .catch(err => reject(err))
+                    })
+                    .catch(err => reject(err))
+            })
+            .catch(err=> {
+                reject({status: 403, message: "Fehler beim Hinzufügen des Nutzers: Sie haben keine Berechtigung, diesen Nutzer zu bearbeiten."});
+            })
     })
 }
 
@@ -1068,52 +1274,57 @@ async function removeUserGroup(req, id, userGroupId){
 
 async function setUserRole(req, id, role, currentUser){
     let user = await User.findById(id).select('-hash');
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
-
     let validRoles = AuthService.roles;
     // validate
     if (!user) throw new Error('User not found');
-    if(typeof(role) === 'string'){
-        if(!validRoles.includes(role)){
+    if (typeof (role) === 'string') {
+        if (!validRoles.includes(role)) {
             throw new Error("invalid role name");
         }
+    } else {
+        throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof (role));
     }
-    else {
-        throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof(role));
-    }
-    //cant set role higher than user role
-    if (AuthService.rolesMap[role] > AuthService.rolesMap[currentUser.userRole]){
-        throw {status: 403, message: "insufficient access rights"};
-    }
-    //set new role
-    user.userRole = role;
-    return user.save()
-        .then(user => {
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "modify",
-                    actionDetail: "userRoleModify",
-                    key: "",
-                    value: role,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
+
+
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserRoleWriteAccess(req.user, user, role)
+            .then(result => {
+                //set new role
+                user.userRole = role;
+                user.save()
+                    .then(user => {
+                        resolve(user);
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "modify",
+                                actionDetail: "userRoleModify",
+                                key: "",
+                                value: role,
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => reject(err))
+    })
+
+
 }
 
 
@@ -1124,44 +1335,51 @@ async function setUserRole(req, id, role, currentUser){
  */
 async function _delete(req, id) {
 
-    let user = await User.findById(id).select("userRole");
-    //check write access
-    if(!AuthService.checkUserWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
+    let user = await User.findById(id);
 
-    // await User.findByIdAndRemove(id);
-    return User.findByIdAndRemove(id)
-        .then(function(user){
-            console.log("Deleted user with id: " + user._id);
-            //create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "user",
-                    actionType: "delete",
-                    actionDetail: "userDelete",
-                    key: user.id,
-                    originalValue: user.username,
-                    value: "",
-                    tag: "<DELETE>"
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "user",
-                    targetObject: user._id,
-                    targetObjectId: user._id,
-                    targetModel: "User",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
+    return new Promise(function(resolve, reject) {
+        //check write access
+        AuthService.checkUserDeleteAccess(req.user, user)
+            .then(result => {
+                // await User.findByIdAndRemove(id);
+                let deleteUser = User.findByIdAndRemove(id);
+                let deleteUserACL = UserACL.deleteOne({user: id});
+                Promise.all([deleteUser, deleteUserACL])
+                    .then(function (user) {
+                        resolve(user);
+                        console.log("Deleted user with id: " + user._id);
+                        //create log
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "user",
+                                actionType: "delete",
+                                actionDetail: "userDelete",
+                                key: user.id,
+                                originalValue: user.username,
+                                value: "",
+                                tag: "<DELETE>"
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "user",
+                                targetObject: user._id,
+                                targetObjectId: user._id,
+                                targetModel: "User",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log)
+                            .then()
+                            .catch()
+                        //TODO: update exisiting logs for user
+                    })
+                    .catch(err => reject(err))
             })
-            LogService.create(log)
-                .then()
-                .catch()
-            //TODO: update exisiting logs for user
-        })
-        .catch()
+    })
 }
 
 /*

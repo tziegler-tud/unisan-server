@@ -28,6 +28,7 @@ module.exports = {
     UserDataset: require('./userDatasetScheme'),
     Event: require('./eventScheme'),
     UserGroup: require('./userGroupScheme'),
+    UserACL: require('./userACLScheme'),
     Log: require('./logScheme'),
     Protocol: require('./protocolScheme'),
 };

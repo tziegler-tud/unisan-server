@@ -14,13 +14,17 @@ var UserACLSchema = new Schema({
         default: "member"
     },
     userGroups: [{
-        type: Schema.Types.ObjectId, ref: 'userGroup'
+        type: Schema.Types.ObjectId,
+        ref: "UserGroup",
     }],
-    individual: {
-        events: [{
-            type: Schema.Types.ObjectId, ref: 'Event'
-        }],
-    }
+    individual: [{
+        target: {
+            type: Schema.Types.ObjectId
+        },
+        allowedOperations: [{
+
+        }]
+    }],
 });
 
 UserACLSchema.set('toJSON', { virtuals: true });

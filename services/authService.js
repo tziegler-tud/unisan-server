@@ -1,7 +1,10 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
+const aclService = require("./aclService");
+
 const UserGroup = db.UserGroup;
+const UserACL = db.UserACL;
 const User = db.User;
 
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
@@ -21,6 +24,19 @@ let rolesEnum = {
     SUPERADMIN: "superadmin",
 }
 
+let groupsEnum = {
+    MEMBER: "member",
+    USERADMIN: "userAdmin",
+    EVENTADMIN: "eventAdmin",
+    ACLADMIN: "aclAdmin",
+    SYSADMIN: "systemAdmin"
+}
+
+let groupActionsEnum = {
+    GRANT: "grantGroup",
+    REVOKE: "revokeGroup",
+}
+
 let roles = [
     "protected",
     "member",
@@ -28,27 +44,78 @@ let roles = [
     "superadmin",
 ]
 
+let operations = {
+    user: {
+        READ: "readUser", //read all user documents
+        WRITE: "writeUser", //write all user documents
+        CREATE: "createUser", //create user
+        DELETE: "deleteUser", //delete user
+        READSELF: "readUserSelf", //read own user document
+        WRITESELF: "writeUserSelf", //write non-critical properties on own user docuemnt
+    },
+    events: {
+        READ: "readEvent",
+        WRITE: "writeEvent",
+        CREATE: "createEvent",
+        DELETE: "deleteEvent",
+    },
+    access: {
+        READUSERROLE: "readUserRole",
+        WRITEUSERROLE: "writeUserRole",
+
+        GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
+        REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
+
+        GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
+        REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
+
+        GRANTEVENTADMINRIGHTS: "grantEventRights", //grant event admin rights to other users
+        REVOKEEVENTADMINRIGHTS: "revokeEventRights", //revoke event admin rights from other users
+
+        GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
+        REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
+    },
+}
+
+let operationsAll = {
+        USERREAD: "readUser", //read all user documents
+        USERWRITE: "writeUser", //write all user documents
+        USERCREATE: "createUser", //create user
+        USERDELETE: "deleteUser", //delete user
+        USERREADSELF: "readUserSelf", //read own user document
+        USERWRITESELF: "writeUserSelf", //write non-critical properties on own user document
+
+        EVENTREAD: "readEvent",
+        EVENTWRITE: "writeEvent",
+        EVENTCREATE: "createEvent",
+        EVENTDELETE: "deleteEvent",
+
+        READUSERROLE: "readUserRole",
+        WRITEUSERROLE: "writeUserRole",
+
+        GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
+        REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
+
+        GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
+        REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
+
+        GRANTEVENTADMINRIGHTS: "grantEventRights", //grant event admin rights to other users
+        REVOKEEVENTADMINRIGHTS: "revokeEventRights", //revoke event admin rights from other users
+
+        GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
+        REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
+}
+
 let defaultMember = {
     title: "member",
     description: "Standardgruppe für Nutzer. Erlaubt grundlegenden Systemzugriff.",
     default: true,
+    type: "user",
     allowedOperations: [
-        {
-            method: "GET",
-            url: "/api/v1/usermod/current"
-        },
-        {
-            method: "GET",
-            url: "/unisams/user/view/*"
-        },
-        {
-            method: "POST",
-            url: "/api/v1/usermod/filter"
-        },
-        {
-            method: "GET",
-            url: "/api/v1/usermod/*"
-        }
+        operations.user.READ,
+        operations.user.READSELF,
+        operations.user.WRITESELF,
+        operations.events.READ,
     ],
 }
 
@@ -56,31 +123,14 @@ let defaultUserAdmin = {
     title: "userAdmin",
     description: "Nutzer erstellen, bearbeiten und löschen",
     default: true,
+    type: "useradmin",
     allowedOperations: [
-        {
-            method: "POST",
-            url: "/api/v1/usermod/create"
-        },
-        {
-            method: "DELETE",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "POST",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "PUT",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "GET",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "GET",
-            url: "/unisams/user/*"
-        }
+        operations.user.READ,
+        operations.user.WRITE,
+        operations.user.CREATE,
+        operations.user.DELETE,
+        operations.access.GRANTUSERGROUPS,
+        operations.access.REVOKEUSERGROUPS,
     ]
 }
 
@@ -88,39 +138,30 @@ let defaultEventAdmin = {
     title: "eventAdmin",
     description: "Events erstellen, bearbeiten und löschen",
     default: true,
+    type: "eventadmin",
     allowedOperations: [
-        {
+        operations.events.READ,
+        operations.events.CREATE,
+        operations.events.WRITE,
+        operations.events.DELETE,
+    ]
+}
 
-            method: "GET",
-            url: "/api/v1/eventmod/*"
-        },
-        {
+let defaultAclAdmin = {
+    title: "aclAdmin",
+    description: "Zugriffsrechte bearbeiten",
+    default: true,
+    type: "system",
+    allowedOperations: [
+        operations.access.READUSERROLE,
+        operations.access.WRITEUSERROLE,
 
-            method: "POST",
-            url: "/api/v1/eventmod/*"
-        },
-        {
-
-            method: "PUT",
-            url: "/api/v1/eventmod/*"
-        },
-        {
-
-            method: "DELETE",
-            url: "/api/v1/eventmod/*"
-        },
-        {
-            method: "GET",
-            url: "/unisams/events/*"
-        },
-        {
-            method: "POST",
-            url: "/unisams/events/*"
-        },
-        {
-            method: "GET",
-            url: "/unisams/user/*",
-        }
+        operations.access.GRANTUSERGROUPS,
+        operations.access.REVOKEUSERGROUPS,
+        operations.access.GRANTUSERADMINRIGHTS,
+        operations.access.REVOKEUSERADMINRIGHTS,
+        operations.access.GRANTEVENTADMINRIGHTS,
+        operations.access.REVOKEEVENTADMINRIGHTS,
     ]
 }
 
@@ -128,51 +169,37 @@ let defaultSysAdmin = {
     title: "systemAdmin",
     description: "Systemeinstellungen bearbeiten, Rechte vergeben",
     default: true,
+    type: "system",
     allowedOperations: [
-        {
+        operations.user.READ,
+        operations.user.READSELF,
+        operations.user.WRITESELF,
+        operations.events.READ,
 
-            method: "GET",
-            url: "/api/v1/groups/*"
-        },
-        {
+        operations.user.READ,
+        operations.user.WRITE,
+        operations.user.CREATE,
+        operations.user.DELETE,
+        operations.access.GRANTUSERGROUPS,
+        operations.access.REVOKEUSERGROUPS,
 
-            method: "POST",
-            url: "/api/v1/groups/*"
-        },
-        {
+        operations.events.READ,
+        operations.events.CREATE,
+        operations.events.WRITE,
+        operations.events.DELETE,
 
-            method: "PUT",
-            url: "/api/v1/groups/*"
-        },
-        {
+        operations.access.READUSERROLE,
+        operations.access.WRITEUSERROLE,
 
-            method: "DELETE",
-            url: "/api/v1/groups/*"
-        },
-        {
-            method: "GET",
-            url: "/unisams/settings*"
-        },
-        {
-            method: "POST",
-            url: "/unisams/settings*"
-        },
-        {
-            method: "POST",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "PUT",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "GET",
-            url: "/api/v1/usermod/*"
-        },
-        {
-            method: "GET",
-            url: "/unisams/user/*",
-        }
+        operations.access.GRANTUSERGROUPS,
+        operations.access.REVOKEUSERGROUPS,
+        operations.access.GRANTUSERADMINRIGHTS,
+        operations.access.REVOKEUSERADMINRIGHTS,
+        operations.access.GRANTEVENTADMINRIGHTS,
+        operations.access.REVOKEEVENTADMINRIGHTS,
+
+        operations.access.GRANTSYSTEMADMINRIGHTS,
+        operations.access.REVOKESYSTEMADMINRIGHTS
     ]
 }
 
@@ -180,6 +207,7 @@ let defaultGroups = [
     defaultMember,
     defaultUserAdmin,
     defaultEventAdmin,
+    defaultAclAdmin,
     defaultSysAdmin,
 ]
 
@@ -187,112 +215,381 @@ class AuthService {
     constructor() {
         console.log("initializing authentication service...\n");
         let self = this;
-        let init = new Promise(function(resolve, reject){
+        this.groups = defaultGroups;
+        this.operations = operations;
+
+        self.init = new Promise(function(resolve, reject){
             //might wanna do smt here later
-            self.verifyDefaultRoles().
-            then(function(result){
-                if(result) resolve();
-            })
-                .catch(function(err){
+            self.verifyDefaultRoles(true)
+                .then(result => {
+                    resolve(result);
+                })
+                .catch(err => {
                     reject(err)
                 })
-        });
-        init.then(function(resolve){
+        }).then(function(result){
             console.log("authentication service initialized succesfully.");
+        }).catch(err => {
+            let msg = "Authentication Service failed to initialize: Failed to verify default roles. Reason: "+ err;
+            console.error(msg);
+            process.exit(); //kill server
         })
+    }
+
+
+
+    auth (requestingUser, operation) {
+        return this.checkAllowedGroupOperation(requestingUser, operation);
     }
 
     /**
      *
-     * @param user {UserScheme} user object
-     * @param method {String} <["GET","POST","PUT","DELETE"]>
-     * @param url {String}
-     * @returns {Promise<boolean>} true if permission granted
+     * @param requestingUser {UserScheme} object or id of the requesting user
+     * @param operation {String} String representation of requested operation. Use static enum AuthService.operations to obtain string.
+     * @returns {Promise<Object|Error>}
      */
-    async checkUrlPermission(user, method, url){
-
-        //superadmin must not pass url permission test
-        if(user.userRole === rolesEnum.SUPERADMIN) return true;
-        //populate userGroups
-        await user.populate({
-            path: 'userGroups',
-        });
-        let userGroups = user.userGroups;
-        //check if url and method are part of userGroups
-        let authorizedGroup = userGroups.find(function(group){
-            return group.allowedOperations.some(function(op){
-                let allowedUrl = op.url;
-                //replace $currentUserName, $currentUserId by respective values
-                allowedUrl = allowedUrl.replace("$currentUserName", user.username);
-                allowedUrl = allowedUrl.replace("$currentUserId", user.id);
-                //transform url to regex to respect wildcard symbols
-                let regUrl = new RegExp('^' + allowedUrl.replace(/\/?\*/g, '.*') + '$');
-
-                //remove url parameters
-                let strippedUrl = url.replace(/\?.*/g, "");
-
-                return (op.method === method && regUrl.test(strippedUrl));
-            })
+    checkAllowedGroupOperation(requestingUser, operation) {
+        let self = this;
+        return new Promise(function(resolve, reject){
+            self.init
+                .then(result => {
+                    let id = typeof(requestingUser) === "string" ? requestingUser : requestingUser.id;
+                    // UserACL.findOne({user: id}).populate("userGroups")
+                    aclService.getUserACL(id, true)
+                        .then(function(userACL){
+                            //check if superadmin
+                            if (userACL.userRole === authService.rolesEnum.SUPERADMIN) {
+                                console.log("authoprized by role: " + userACL.userRole); //debug TODO: remove once done testing
+                                resolve({status: 200, message: "authorization successful"});
+                            }
+                            //check if a group allows the requested operation
+                            let authGroup;
+                            let allowed  = userACL.userGroups.some(function(group){
+                                let match = group.allowedOperations.includes(operation);
+                                if (match) {
+                                    authGroup = group;
+                                    return group;
+                                }
+                            })
+                            if (allowed) {
+                                console.log("authoritzed by group membership: " + authGroup.title); //debug TODO: remove once done testing
+                                resolve({status: 200, message: "authorization successful"})
+                            }
+                            else {
+                                //no access rights
+                                let err = self.createForbiddenError("authorization failed for operation "+ operation)
+                                reject(err)
+                            }
+                        })
+                        .catch(err => {
+                            let msg = "Error: Unable to get ACL assigned to requesting user. Details: "
+                            throw new Error(msg + err);
+                        })
+                })
+                .catch(err => {
+                    let msg = "Failed to perform operation: Authentication Service has not been initialized";
+                    reject(msg)
+                })
         })
-        if(authorizedGroup) {
-            console.log("authorized for operation: "+method + ":" + url + " by group membership: " + authorizedGroup.title);
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
+    checkRoleAccess (user, target){
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        //get user role
+        return new Promise(function(resolve, reject){
+            let userACL = aclService.getUserRole(user);
+            let targetACL = aclService.getUserRole(target);
+            Promise.all([userACL, targetACL])
+                .then(results => {
+                    let userRole = results[0];
+                    let targetRole = results[1];
+                    //superadmin is allowed to perform any operation
+                    if(userRole === rolesEnum.SUPERADMIN) resolve(userRole);
+                    //operations on protected user are not allowed
+                    if (targetRole === rolesEnum.PROTECTED) reject("Access denied. Reason: target role: " + rolesEnum.PROTECTED);
+                    //get user access level
+                    let al = rolesMap[userRole];
+                    //compare. must be greater or equal to allow operation
+                    let write = (al >= rolesMap[targetRole]);
 
-    //check if user has group
-    checkUserGroupName(user,groupname) {
-        let userGroups = user.userGroups;
-        return userGroups.some(group => group.title === groupname);
+                    if  (write) {
+                        resolve(userRole)
+                    }
+                    else {
+                        reject("Access denied. Reason: Insufficient access level.");
+                    }
+                })
+                .catch(err => {
+                    throw new Error(err);
+                })
+        })
     }
 
-    checkIfEdit(user, target, targetType){
-        let result = false;
-        //target can be user or event atm
-        switch(targetType){
-            case "user": {
-                result = this.checkUserWriteAccess(user, target)
-                break;
-            }
-            case "event": {
-                result = this.checkEventWriteAccess(user, target);
-                break;
-            }
-            default: {
-                console.warn("AuthService.checkIfEdit: invalid target type given.")
-                result = false;
-                break;
-            }
-        }
-        return result;
+    /**
+     * authorizes basic write access on user documents. dont use this for critical properties, e.g. passwords or username
+     *
+     * @param user {UserScheme} requesting user
+     * @param target {UserScheme} target user
+     * @param critical {Boolean} forwards to critical security check
+     * @returns {Promise<unknown>}
+     */
+    checkUserWriteAccess (user, target, critical) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        if (critical) return self.checkUserWriteAccessCritical(user, target);
 
+        return new Promise(function(resolve, reject){
+
+            if(target === "self" || user.id.toString() === target.id.toString()) {
+                //trying to write self
+                self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
+                    .then(result => {
+                        resolve(result)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            }
+            else {
+                //general user write access is required
+                self.checkAllowedGroupOperation(user, operations.user.WRITE)
+                    .then(group => {
+                        resolve(group)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            }
+        })
     }
 
-    checkIfCreate(user, target, targetType){
-        let result = false;
-        //target can be user or event atm
-        switch(targetType){
-            case "user": {
-                result = this.checkUserCreateAccess(user, target)
-                break;
-            }
-            case "event": {
-                result = this.checkEventCreateAccess(user, target);
-                break;
-            }
-            default: {
-                console.warn("AuthService.checkIfEdit: invalid target type given.")
-                result = false;
-                break;
-            }
-        }
-        return result;
+    /**
+     * authorizes critical write access on user documents. Use this for critical properties, e.g. passwords or username
+     *
+     * @param user {UserScheme} requesting user
+     * @param target {UserScheme} target user
+     * @returns {Promise<unknown>}
+     */
+    checkUserWriteAccessCritical (user, target) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
 
+        return new Promise(function(resolve, reject){
+
+            if(target === "self" || user.id.toString() === target.id.toString()) {
+                //trying to write self
+                self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
+                    .then(result => {
+                        resolve(result)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            }
+            else {
+                //general user write access is required
+                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
+                let accessLevel = self.checkRoleAccess(user, target);
+
+                Promise.all([writeAccess, accessLevel])
+                    .then(results => {
+                        let group = results[0];
+                        let accessLevel = results[1];
+                        console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
+                    })
+                    .catch(err =>{
+                        reject(err)
+                    })
+
+            }
+        })
     }
+
+    /**
+     * authorizes delete access on user documents.
+     *
+     * @param user {UserScheme} requesting user
+     * @param target {UserScheme} target user
+     * @returns {Promise<unknown>}
+     */
+    checkUserDeleteAccess (user, target) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+
+        return new Promise(function(resolve, reject){
+
+            if(target === "self" || user.id.toString() === target.id.toString()) {
+                //trying to delete self
+                self.checkAllowedGroupOperation(user, operations.user.DELETE)
+                    .then(result => {
+                        resolve(result)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            }
+            else {
+                //general user delete access is required
+                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.DELETE)
+                let accessLevel = self.checkRoleAccess(user, target);
+
+                Promise.all([writeAccess, accessLevel])
+                    .then(results => {
+                        let group = results[0];
+                        let accessLevel = results[1];
+                        console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
+                        resolve(user);
+                    })
+                    .catch(err =>{
+                        reject(err)
+                    })
+
+            }
+        })
+    }
+
+    checkUserGroupWriteAccess(user, target, group) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined || group === undefined) throw new Error("AuthService fail: invalid parameters given");
+        return new Promise(function(resolve, reject){
+            // check group type to determine required operation
+            let groupOperation = self.getRequiredGroupOperation(group.type, groupActionsEnum.GRANT);
+
+            if(target === "self" || user.id.toString() === target.id.toString()) {
+                //trying to write self
+                let writeSelf = self.checkAllowedGroupOperation(user, operations.user.WRITESELF);
+
+                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
+
+                    Promise.all([writeSelf, addGroup])
+                        .then(result => {
+                            resolve(result)
+                    })
+                        .catch(err => {
+                            reject(err)
+                    })
+            }
+            else {
+                //general user write access is required
+                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
+                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
+
+                Promise.all([writeAccess, addGroup])
+                    .then(result => {
+                        resolve(result)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+
+            }
+        })
+    }
+
+    checkUserRoleWriteAccess(user, target, role) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined || role === undefined) throw new Error("AuthService fail: invalid parameters given");
+        return new Promise(function(resolve, reject){
+            if(target === "self" || user.id.toString() === target.id.toString()) {
+                //trying to write self
+                aclService.getUserACL(user.id, true)
+                    .then(userACL => {
+                        //role write access is required
+                        let writeRoles = self.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE);
+                        let grantSelfIncrease;
+                        //can't increase own level unless systemadmin operations are allowed
+                        if (rolesMap[userACL.userRole] < rolesMap[role]){
+                            //trying to increase level
+                            grantSelfIncrease = self.checkAllowedGroupOperation(user, operations.access.GRANTUSERADMINRIGHTS);
+                        }
+                        else {
+                            grantSelfIncrease = new Promise(function(resolveInner, rejectInner){
+                                resolveInner(true);
+                            })
+                        }
+
+
+                        Promise.all([writeRoles, grantSelfIncrease])
+                            .then(result => {
+                                resolve(result)
+                            })
+                            .catch(err => {
+                                reject(err)
+                            })
+                    })
+                    .catch(err => reject(err))
+
+            }
+            else {
+                let userACL = aclService.getUserACL(user.id, true);
+                let targetACL = aclService.getUserACL(target.id, true);
+                Promise.all([userACL, targetACL])
+                    .then(results => {
+                        userACL = results[0];
+                        targetACL = results[1];
+                        //role write access is required
+                        self.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE)
+                                .then(result => {
+                                    //can't increase above own level
+                                    if (rolesMap[userACL.userRole] < rolesMap[role]){
+                                        reject(new Error("Cant increase target role to a higher access level than yourself."))
+                                    }
+                                    else resolve(result);
+                                })
+                                .catch(err =>{
+                                    reject(err)
+                                })
+                    })
+            }
+        })
+    }
+
+    /**
+     * authorizes basic write access on user documents. dont use this for critical properties, e.g. passwords or username
+     *
+     * @param user {UserScheme} requesting user
+     * @param target {ObjectId} event id
+     * @param operation {String} String representation of requested operation. Use static enum AuthService.operations to obtain string.
+     * @returns {Promise<unknown>}
+     */
+    checkIndividualAccess (user, target, operation) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+
+        return new Promise(function(resolve, reject){
+            aclService.getUserACL(user)
+                .then(userACL => {
+                    //try to find target in individuals
+                    let targetRights = userACL.individual.find(object => object.target.toString() === target.toString())
+                    if (targetRights === undefined){
+                        //no entry for target
+                        let err = self.createForbiddenError();
+                        reject(err)
+                    }
+                    else {
+                        //check operation
+                        let match = targetRights.allowedOperations.includes(operation);
+                        if (match) {
+                            resolve({status: 200, message: "Access granted."})
+                        }
+                        else {
+                            let err = self.createForbiddenError();
+                            reject(err)
+                        }
+                    }
+                })
+                .catch(err => {
+
+                })
+        })
+    }
+
 
 
     /**
@@ -303,103 +600,211 @@ class AuthService {
      * @returns {Boolean}
      */
     checkRequiredRole(user, requiredRole){
-        //superadmin is allowed to perform any operation
-        if(user.userRole === rolesEnum.SUPERADMIN) return true;
-        //get user access level
-        let al = rolesMap[user.userRole];
-        //compare. must be greater to allow operation
-        return (al >= rolesMap[requiredRole]);
+        let id = typeof(user)=== "string" ? user: user.id;
+        aclService.getUserACL(id)
+            .then(userACL => {
+                //superadmin is allowed to perform any operation
+                if(userACL.userRole === rolesEnum.SUPERADMIN) return true;
+                //get user access level
+                let al = rolesMap[userACL.userRole];
+                //compare. must be greater to allow operation
+                return (al >= rolesMap[requiredRole]);
+            })
+            .catch(err => {
+                throw new Error(err);
+            });
     }
 
     /**
-     * checks if allowed to create new user.
-     *
-     * @param user {UserScheme}
-     * @returns {Boolean}
+     * helper function to check if a given string refers to a valid operation
+     * @param operation {String} string representation of an operation.
+     * @returns {Boolean} true if valid
      */
-    checkUserCreateAccess(user){
-        //superadmin is allowed to perform any operation
-        if(user.userRole === rolesEnum.SUPERADMIN) return true;
-        //check if user is userAdmin
-        let group = this.checkUserGroupName(user, "userAdmin");
-        //check write access
-        return group;
-    }
-
-    /**
-     * checks if user has write access on target user. use this for user modifications
-     *
-     * @param user {UserScheme}
-     * @param target {UserScheme}
-     * @returns {Boolean}
-     */
-    checkUserWriteAccess(user, target){
-        //superadmin is allowed to perform any operation
-        if(user.userRole === rolesEnum.SUPERADMIN) return true;
-        //operations on protected user are not allowed
-        if (target.userRole === rolesEnum.PROTECTED) return false;
-        //get user access level
-        let al = rolesMap[user.userRole];
-        //compare. must be greater or equal to allow operation
-        let write = (al >= rolesMap[target.userRole]);
-
-        //check if user is userAdmin
-        let group = this.checkUserGroupName(user, "userAdmin");
-        //check write access
-        return (group && write);
-    }
-
-    /**
-     * checks if allowed to create new events.
-     *
-     * @param user {UserScheme}
-     * @returns {Boolean}
-     */
-    checkEventCreateAccess(user){
-        //superadmin is allowed to perform any operation
-        if(user.userRole === rolesEnum.SUPERADMIN) return true;
-        //check if user is userAdmin
-        let group = this.checkUserGroupName(user, "eventAdmin");
-        //check write access
-        return group;
-    }
-
-    /**
-     * checks if user has write access on target event. use this for event modifications
-     *
-     * @param user {UserScheme}
-     * @param target {EventScheme}
-     * @returns {Boolean}
-     */
-    checkEventWriteAccess(user, target){
-        //validate
-        //TODO: proper validation
-
-        //superadmin is allowed to perform any operation
-        // if(user.userRole === rolesEnum.SUPERADMIN) return true;
-        //user needs general role eventAdmin or specific eventAdmin role
-        //check group
-        if (this.checkUserGroupName(user,"eventAdmin")) return true;
-        //check admin array for user id
-        if (target.accessRights !== undefined)  {
-            if (target.accessRights.admin !== undefined) {
-                if (target.accessRights.admin.includes(user.id)){
-                    //user found. access granted
-                    return true;
-                }
-            }
+    checkIfValidOperation(operation){
+        for (const [key, value] of Object.entries(operations)) {
+            if (Object.values(value).includes(operation)) return true;
         }
         return false;
     }
 
-    async verifyDefaultRoles(){
-        return true;
+
+    /**
+     *
+     * verifies that the db contains the default roles
+     *
+     * @param {Boolean} repair
+     * @returns {Promise<unknown>}
+     */
+    verifyDefaultRoles(repair){
+        let self = this;
+        //run this on initialization of service
+        //checks if the default groups are correctly contained in the database, and repairs them if not
+        return new Promise(function(resolveMain, rejectMain){
+            let promiseArray = [];
+            self.groups.forEach(group => {
+                //create nested promise
+                promiseArray.push(new Promise(function(resolve, reject){
+                    //check each group
+                    UserGroup.find({title: group.title})
+                        .then(dbGroup => {
+                            //check if more than one group was returned
+                            if (Array.isArray(dbGroup)){
+                                if (dbGroup.length > 1) {
+                                    let msg = "Failed to verify default group: " + group.title + "/ Reason: Group title is not unique. Please fix manually."
+                                    // console.error(msg);
+                                    reject(msg);
+                                }
+                                else {
+                                    dbGroup = dbGroup[0];
+                                }
+                            }
+                            if(verifyData(dbGroup, group)) {
+                                //group verified successfully
+                                group.dbRef = dbGroup.id;
+                                resolve();
+                            }
+                            else {
+                                let msg = "Failed to verify integrity of default group:" + group.title;
+                                //verification failed.
+                                //if repair parameter is set, try to repair. else fail
+                                if (repair){
+                                    console.warn(msg);
+                                    console.log("Trying to repair default group...");
+                                    //move current entry to new Group
+                                    let bakGroup = {};
+                                    Object.assign(bakGroup, dbGroup);
+                                    delete bakGroup.id;
+                                    bakGroup.title = "BACKUP: " + dbGroup.title;
+                                    let bak = new UserGroup(bakGroup);
+                                    bak.save()
+                                        .then()
+                                        .catch()
+                                    dbGroup.default = group.default;
+                                    dbGroup.type = group.type;
+                                    dbGroup.allowedOperations = group.allowedOperations;
+                                    dbGroup.markModified('allowedOperations');
+                                    dbGroup.save()
+                                        .then(result => {
+                                            let msg = "Default group restored."
+                                            console.log(msg);
+                                            resolve(dbGroup);
+                                        })
+                                        .catch(err => {
+                                            let msg = "Unable to repair default group. Aborting. Reason: " + err;
+                                            // console.error(msg)
+                                            reject(msg);
+                                        })
+
+                                }
+                                else {
+                                    let err = msg
+                                    reject(err);
+                                }
+                            }
+
+                        })
+                        .catch(err => {
+                            console.warn("Unable to find default group in Database.")
+                            if(repair) {
+                                console.log("Trying to repair default group...");
+                                let dbGroup = new UserGroup(group)
+                                dbGroup.save()
+                                    .then(result => {
+                                        let msg = "Default group added to database."
+                                        console.log(msg);
+                                        resolve(msg);
+                                    })
+                                    .catch(err => {
+                                        let msg = "Unable to add default group to database. Aborting. Reason: " + err;
+                                        // console.error(msg)
+                                        reject(msg);
+                                    })
+
+                            }
+                        })
+                })
+                    // .then(result=> {
+                    //     console.log(result);
+                    // })
+                    .catch(err => {
+                        console.error(err);
+                        rejectMain(err);
+                    })
+                )
+
+            })
+            //all default groups verified
+            Promise.all(promiseArray)
+                .then(resultArray => {
+                    resolveMain(resultArray)
+                })
+                .catch(err => {
+                  reject(err);
+                })
+        })
+        function verifyData(dbGroup, group) {
+            let verified = true;
+            //check title
+            if (dbGroup.title !== group.title) verified = false;
+            //don't check description, this is allowed to be changed by sysadmin
+
+            //check type
+            if (dbGroup.type !== group.type) verified = false;
+
+            //check default flag
+            if (dbGroup.default !== group.default) verified = false;
+            //check operations
+            if (JSON.stringify(group.allowedOperations) !== JSON.stringify(dbGroup.allowedOperations)){
+                verified = false;
+            }
+            return verified;
+        }
 
     }
+
+    /**
+     * resolves the required operation for group modifications.
+     * @param group {String} string identifier, equals to group type (["user","useradmin","eventadmin","system"])
+     * @param action {groupActionsEnum} Grant or revoke
+     * @returns {string}
+     */
+    getRequiredGroupOperation (type, action) {
+        if (type === undefined || action === undefined) {
+            throw new Error("Authenrication Serive fail: Invalid parameters given")
+        }
+        switch (type) {
+            case "user":
+                return (action ===  groupActionsEnum.GRANT) ? operations.access.GRANTUSERGROUPS : operations.access.REVOKEUSERGROUPS;
+
+            case "useradmin":
+                return (action ===  groupActionsEnum.GRANT) ? operations.access.GRANTUSERADMINRIGHTS : operations.access.REVOKEUSERADMINRIGHTS;
+
+            case "eventadmin":
+                return (action ===  groupActionsEnum.GRANT) ? operations.access.GRANTEVENTADMINRIGHTS : operations.access.REVOKEEVENTADMINRIGHTS;
+
+            case "system":
+                return (action ===  groupActionsEnum.GRANT) ? operations.access.GRANTSYSTEMADMINRIGHTS : operations.access.REVOKESYSTEMADMINRIGHTS;
+
+            default:
+                return (action ===  groupActionsEnum.GRANT) ? operations.access.GRANTUSERGROUPS : operations.access.REVOKEUSERGROUPS;
+        }
+
+    }
+
+    createForbiddenError (optMessage) {
+        if (optMessage !== undefined && typeof(optMessage) === "string") {
+            console.log("403: " + optMessage);
+        }
+        return {name : "ForbiddenError", status: 403, message : "Access denied"};
+    }
+
 }
+
+
 
 let authService = new AuthService()
 authService.roles = roles;
+authService.operations = operations;
 authService.rolesEnum = rolesEnum;
 authService.rolesMap = rolesMap;
 module.exports = authService;

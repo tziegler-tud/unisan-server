@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
 const UserService = require("./userService");
+const aclService = require("./aclService");
 
 const UserGroup = db.UserGroup;
 
@@ -46,7 +47,9 @@ async function getByTitle(title) {
  * @param {UserGroup} groupObject
  */
 async function create(req, groupObject, args) {
-    // create qualification document
+    // create group document
+    let data = groupObject;
+    groupObject.default = false;
     const group = new UserGroup(groupObject);
     // save in database
     return group.save();
@@ -57,33 +60,66 @@ async function create(req, groupObject, args) {
  * Updates an existing group
  * @param {number} id groupId
  * @param {UserGroup} groupObject
+ * @param {Boolean} allowDefaultOverwrite
  */
-async function update(id, groupObject) {
-    const group = await UserGroup.findById(id);
-    // validate
-    if (group == null) throw new Error('Group not found');
-    // copy qualParam properties to qualification document
-    Object.assign(group, groupObject);
-    return group.save();
+async function update(id, groupObject, allowDefaultOverwrite) {
+    if (allowDefaultOverwrite === undefined) allowDefaultOverwrite = false;
+    return new Promise(function(resolve, reject){
+        let msg = "Failed to update group: ";
+        const group = UserGroup.findById(id)
+            .then(result => {
+                // validate
+                if (group.default && !allowDefaultOverwrite) reject(msg + "Overwriting default roles is not allowed.")
+                // copy qualParam properties to qualification document
+                Object.assign(group, groupObject);
+                group.save()
+                    .then(result=>{
+                        resolve(result);
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            })
+            .catch(err => {
+                reject(msg + err)
+            })
+
+    })
+
 }
 
 /**
  * Deletes a group
  * @param {Object} req request object
  * @param {number} id The id of the group to delete
+ * @param {Boolean} allowDefaultOverwrite
  */
-async function _delete(req, id) {
+async function _delete(req, id, allowDefaultOverwrite) {
+    if (allowDefaultOverwrite === undefined) allowDefaultOverwrite = false;
     return new Promise(function(resolve, reject){
-        removeGroupFromAllUser(req, id)
-            .then(function(result){
-                UserGroup.findByIdAndRemove(id)
-                    .then(function(result){
-                        resolve(result);
-                    })
+        let msg = "Failed to delete group: ";
+        //check if default
+        UserGroup.findById(id)
+            .then(group => {
+                if(group.default && !allowDefaultOverwrite) reject(msg + "Deleting default roles is not allowed.")
+                else {
+                    removeGroupFromAllUser(req, id)
+                        .then(function(result){
+                            UserGroup.findByIdAndRemove(id)
+                                .then(function(result){
+                                    resolve(result);
+                                })
+                                .catch(err => {
+                                    reject(msg + err);
+                                })
+                        })
+                        .catch(function(err){
+                            reject(msg + err)
+                        });
+                }
+
             })
-            .catch(function(err){
-                reject(err)
-            });
+
     })
 
 }
@@ -228,18 +264,44 @@ async function getAssignedUser(id) {
                     return;
                 }
 
-                //query userService for user with this group assigned
-                let args = {
-                    filter: {
-                        filter: "userGroups",
-                        value: id
-                    }
+                else {
+                    //query aclService to retrieve all acl documents
+                    let args = {
+                            filter: {
+                                filter: "userGroups",
+                                value: id
+                            }
+                        }
+                    aclService.getAllFiltered(args)
+                        .then(aclArray => {
+                            //strip array from everything but user ids
+                            let idArray = aclArray.map(acl => {
+                                return acl.user;
+                            })
+                            //resolve users
+                            UserService.getManyById(idArray)
+                                .then(result => {
+                                    resolve(result)
+                                })
+                                .catch(err => {
+                                    reject(err)
+                                })
+                        })
+
                 }
-                UserService.getAllFiltered(args)
-                    .then(function(userArray){
-                        resolve(userArray);
-                    })
-                    .catch(err => reject(err))
+
+                // //query userService for user with this group assigned
+                // let args = {
+                //     filter: {
+                //         filter: "userGroups",
+                //         value: id
+                //     }
+                // }
+                // UserService.getAllFiltered(args)
+                //     .then(function(userArray){
+                //         resolve(userArray);
+                //     })
+                //     .catch(err => reject(err))
             })
             .catch(function (err) {
                 reject(err);

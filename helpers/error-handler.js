@@ -61,7 +61,7 @@ function apiErrorHandler(err, req, res, next) {
 
     if (err.name === 'ForbiddenError' || err.status === 403) {
         // trying to access protected resource
-        return res.status(403).json(err);
+        return res.status(403).json({message: err.message});
     }
 
     if (err.name === 'NotFoundError' || err.status === 404) {

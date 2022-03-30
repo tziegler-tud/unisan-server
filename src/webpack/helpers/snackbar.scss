@@ -1,4 +1,6 @@
 @use "@material/snackbar/mdc-snackbar";
+@use '@material/button/mdc-button';
+@use '@material/button';
 
 
 @import "~material-icons-font/material-icons-font.css";
@@ -10,6 +12,8 @@
 
 .mdc-snackbar {
   .mdc-snackbar__action {
+    color: #f5f5f5;
+    outline: 1px solid #f5f5f5;
     display: none;
   }
   &.show-action {

@@ -3,9 +3,10 @@ const db = require('../schemes/mongo');
 const AuthService = require("./authService");
 const Log = require("../utils/log");
 const LogService = require("./logService");
+const userService = require("./userService");
 
 const UserGroup = db.UserGroup;
-const UserACL = db.userACL;
+const UserACL = db.UserACL;
 const User = db.User;
 
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
@@ -34,6 +35,7 @@ let roles = [
 
 module.exports = {
     getAll,
+    getAllFiltered,
     createUserACL,
     getUserACL,
     getUserRole,
@@ -43,6 +45,7 @@ module.exports = {
     remove,
     update,
 
+    rebuildFromUserData,
 };
 
 
@@ -52,18 +55,63 @@ async function getAll (req) {
 }
 
 
-async function getUserACL (req, userid) {
+/**
+ *
+ * @param args
+ * @returns {Promise<[User]>}
+ */
+async function getAllFiltered(args){
+    let defaults = {
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
+
+    let filter = args.filter;
+    let sort= args.sort;
+    let query;
+    if (filter===undefined || filter.filter === undefined || filter.value === undefined) {
+        query = UserACL.find();
+    }
+    else {
+        let filterObj = {};
+        filterObj[filter.filter] = filter.value;
+        query = UserACL.find(filterObj);
+    }
+
+    if(sort === undefined) {
+        return query;
+    }
+    else {
+        return query.sort(sort);
+    }
+}
+
+
+async function getUserACL (userid, populateGroups) {
+    if (populateGroups === undefined) populateGroups = true;
+    if (typeof(userid) !== "string") {
+        //try if user object
+        if(typeof(userid.id) === "string") userid = userid.id;
+        else throw new Error("invalid parameter given");
+    }
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.find({user: userid});
+    let userACL;
+    if (populateGroups) {
+        userACL = await UserACL.findOne({user: userid}).populate("userGroups");
+    }
+    else {
+        userACL = await UserACL.findOne({user: userid});
+    }
+
 
     // validate
     if (!user) throw new Error('User not found');
     if (!userACL) throw new Error('User AccessControlList not found');
     //check write access
-    if(!AuthService.checkUserRightsReadAccess(req.user, user)) {
+    // if(!AuthService.checkUserRightsReadAccess(req.user, user)) {
         //reject({status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."})
-        throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
-    }
+        // throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
+    // }
     return userACL;
 }
 
@@ -108,19 +156,23 @@ async function createUserACL (req, userid, data, overwrite) {
 }
 
 
-async function getUserRole (req, userid) {
+async function getUserRole (userid) {
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.find({user: userid});
+    let userACL = await UserACL.findOne({user: userid});
 
     // validate
     if (!user) throw new Error('User not found');
     if (!userACL) throw new Error('User AccessControlList not found');
-    //check write access
-    if(!AuthService.checkUserRightsReadAccess(req.user, user)) {
-        //reject({status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."})
-        throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
-    }
+
     return userACL.userRole;
+    //check write access
+    // AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.access.READUSERROLE)
+    //     .then(result=>{
+    //         return userACL.userRole;
+    //     })
+    //     .catch(err => {
+    //         throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
+    //     })
 }
 
 
@@ -185,115 +237,13 @@ async function setUserRole (req, userid, role) {
 
 
 async function addUserGroup(req, userid, userGroupId){
-    let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.find({user: userid});
-
-    // validate
-    if (!user) throw new Error('User not found');
-    if (!userACL) throw new Error('User AccessControlList not found');
-    //check write access
-    if(!AuthService.checkUserRightsWriteAccess(req.user, user)) throw {status: 403, message: "Fehler beim Bearbeiten des Nutzers: Sie haben keine Berechtigung, die Rechte dieses Nutzers zu bearbeiten."};
-
-    let group = await UserGroup.findById(userGroupId);
-    if (!group) throw new Error('UserGroup not found');
-
-    return new Promise(function(resolve, reject){
-        //check if user already has userGroup assigned
-        if(userACL.userGroups.includes(userGroupId)){
-            console.log("User " + user.username + " already has UserGroup " + group.title + " assigned.");
-            resolve(userACL);
-        }
-        else {
-            userACL.userGroups.push(userGroupId);
-            userACL.save()
-                .then( user => {
-                    resolve(userACL);
-                    //create log
-                    let log = new Log({
-                        type: "modification",
-                        action: {
-                            objectType: "user",
-                            actionType: "modify",
-                            actionDetail: "userGroupAdd",
-                            key: "",
-                            value: group.title
-                        },
-                        authorizedUser: req.user,
-                        target: {
-                            targetType: "user",
-                            targetObject: user._id,
-                            targetObjectId: user._id,
-                            targetModel: "User",
-                        },
-                        httpRequest: {
-                            method: req.method,
-                            url: req.originalUrl,
-                        }
-                    })
-                    LogService.create(log).then().catch();
-                })
-                .catch(err => reject(err))
-        }
-    })
+    //implement by userService
+    return userService.addUserGroup(req,userid,userGroupId)
 }
 
 async function removeUserGroup(req, id, userGroupId){
-    let user = await User.findById(id).select('-hash');
-    let userACL = await UserACL.find({user: id});
-
-    // validate
-    if (!user) throw new Error('User not found');
-    if (!userACL) throw new Error('User AccessControlList not found');
-    //check write access
-    if(!AuthService.checkUserRightsWriteAccess(req.user, user)) throw {status: 403, message: "forbidden"};
-
-    let group = await UserGroup.findById(userGroupId);
-    if (!group) throw new Error('invalid user group');
-
-
-    //check if user has userGroup assigned
-    let index = userACL.userGroups.indexOf(userGroupId);
-
-    return new Promise(function(resolve, reject){
-        //check if user has userGroup assigned
-        let index = userACL.userGroups.indexOf(userGroupId);
-        if(index > -1){
-            // remove group
-            userACL.userGroups.splice(index, 1);
-            userACL.save()
-                .then( user => {
-                    resolve(user);
-                    //create log
-                    let log = new Log({
-                        type: "modification",
-                        action: {
-                            objectType: "user",
-                            actionType: "modify",
-                            actionDetail: "userGroupDelete",
-                            key: "",
-                            value: group.title,
-                        },
-                        authorizedUser: req.user,
-                        target: {
-                            targetType: "user",
-                            targetObject: user._id,
-                            targetObjectId: user._id,
-                            targetModel: "User",
-                        },
-                        httpRequest: {
-                            method: req.method,
-                            url: req.originalUrl,
-                        }
-                    })
-                    LogService.create(log).then().catch();
-                })
-                .catch(err => reject(err))
-        }
-        else {
-            console.log("Failed to remove user from group: User " + user.username + " is not part of group " + group.title);
-            resolve(userACL);
-        }
-    })
+    //implemented by userService
+    return userService.removeUserGroup(req, id, userGroupId);
 }
 
 async function remove(req, id) {
@@ -301,5 +251,81 @@ async function remove(req, id) {
 }
 
 async function update(req, id, data) {
-    return false;
+
+    const user = await User.findById(id);
+    const userACL = await UserACL.find({user:id});
+
+    // validate
+    if (!user) throw new Error('ACL modification error: assigned user not found.');
+    if (!userACL) throw new Error('ACL modification error: no acl object found.');
+
+    // copy data to object
+    Object.assign(userACL, data);
+
+    return userACL.save()
+        .then( userACL => {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "acl",
+                    actionType: "modify",
+                    actionDetail: "aclModify",
+                    key: "",
+                    fullKey: "",
+                    originalValue: "",
+                    value:  "",
+                    tag: "<OVERWRITE>"
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "ACL",
+                    targetObject: userACL._id,
+                    targetObjectId: userACL._id,
+                    targetModel: "ACL",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+    })
+        .catch(err => {
+            throw new Error('ACL modification error: Error writing acl to database. Details: ' + err);
+        })
+}
+
+async function rebuildFromUserData(req){
+    //helper function to transform existing data to new scheme for one-time use.
+    //do not expose this function in production
+
+    //get all user
+    // let userArray = await userService.getAll();
+    let userArray = await User.find().populate({
+        path: 'userGroups',
+        select: 'title description',
+    });
+    userArray.forEach(user => {
+        let id = user.id;
+        //find user role
+        let role = user.userRole;
+        //groups
+        let groups = [];
+        user.userGroups.forEach(group => {
+            groups.push(group.id)
+        });
+
+        let oj = {
+            user: id,
+            userRole: role,
+            userGroups: [],
+            individual: {
+                events: []
+            }
+        };
+        //build acl
+        let userACL = new UserACL(oj);
+        userACL.save();
+    })
 }

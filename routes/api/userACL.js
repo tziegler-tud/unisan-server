@@ -16,13 +16,18 @@ app.use(bodyParser.json());
 //hooked at /api/v1/acl
 
 // routes
+router.post("/rebuildFromData", rebuildFromUserData);
+
 router.get('/', getAll);
 router.get('/:id', getUserACL);
 router.post('/:id', createUserACL);
-router.put('/:id', updateACL);
+router.put('/:id', updateUserACL);
 router.delete('/:id', deleteACL);
 router.post('/addGroup/:id', addGroup);
 router.delete('/removeGroup/:id', removeGroup);
+
+
+
 
 function getAll(req, res, next){
     aclService.getAll()
@@ -39,6 +44,12 @@ function getUserACL(req, res, next){
 
 function createUserACL(req, res, next){
     aclService.createUserACL(req.params.id)
+        .then(result => res.json(result))
+        .catch(err => next(err));
+}
+
+function updateUserACL(req, res, next){
+    aclService.update(req, req.params.id, req.body)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
@@ -61,6 +72,11 @@ function removeGroup(req, res, next){
         .catch(err => next(err));
 }
 
+function rebuildFromUserData(req, res, next){
+    aclService.rebuildFromUserData()
+        .then(result => res.json(result))
+        .catch(err => next(err))
+}
 
 
 module.exports = router;

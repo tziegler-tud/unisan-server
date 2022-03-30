@@ -81,12 +81,19 @@ block content
                                                                         span.userinfo-item-label.userinfo-attribute-name Username:
                                                                     .item-property.userkey-entry-value
                                                                         span.userinfo-item-label= exploreUser.username
+
                                                             li.userinfo-item.user-entry.userkey-entry
                                                                 a.inner()
                                                                     .item-property.userkey-entry-title
                                                                         span.userinfo-item-label.userinfo-attribute-name id:
                                                                     .item-property.userkey-entry-value
                                                                         span.userinfo-item-label= exploreUser.id
+                                                            li.userinfo-item.user-entry.userkey-entry
+                                                                a.inner()
+                                                                    .item-property.userkey-entry-title
+                                                                        span.userinfo-item-label.userinfo-attribute-name Rolle:
+                                                                    .item-property.userkey-entry-value
+                                                                        span.userinfo-item-label= userrole
 
 
                                                     .userinfo-sectionheader
@@ -185,8 +192,8 @@ block content
                                                             li.user-entry.noSelect.borderBottom
                                                                 .inner
                                                                     .item-property Gruppe
-                                                            if exploreUserDocument.userGroups
-                                                                each val in exploreUserDocument.userGroups
+                                                            if usergroups
+                                                                each val in usergroups
                                                                     li.user-entry
                                                                         a.inner()
                                                                             .item-property= val.title

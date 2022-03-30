@@ -25,7 +25,7 @@ var fs = require('fs-extra');
 const upload = require(appRoot + "/config/multer");
 
 function checkUrlAccess(req, res, next){
-    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.auth(req.user,req.method,req.originalUrl)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");
@@ -41,7 +41,7 @@ function checkUrlAccess(req, res, next){
 
 function checkEventEditRights(req, res, next){
     // check group permissions
-    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.auth(req.user, AuthService.operations.events.WRITE)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");
@@ -52,7 +52,7 @@ function checkEventEditRights(req, res, next){
                 eventService.getById(req.params.id)
                     .then(ev => {
                         if (ev) {
-                            if (AuthService.checkIfEdit(req.user, ev, "event")) {
+                            if (AuthService.checkEventWriteAccess(req.user, ev, "event")) {
                                 console.log("authorization successful!");
                                 next();
                             }

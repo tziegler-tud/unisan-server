@@ -5,6 +5,8 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const userService = require('../../services/userService');
 const AuthService = require('../../services/authService');
+const aclService = require('../../services/aclService');
+
 
 
 var app = express();
@@ -20,7 +22,7 @@ const baseUrl = "/unisams/user";
 
 // routes
 router.get('/', getAll);
-router.get('/addUser', checkUrlAccess, addUser);
+router.get('/addUser', addUser);
 
 
 /*
@@ -37,16 +39,16 @@ router.get('/:username/logs', userLogs);
 router.get('/:username/settings', userSettings);
 router.get('/:username/roles', userRoles);
 router.get('/:username/events', userEvents);
-
-/**
- * legacy routes
- */
-router.get('/edit/:username', checkUrlAccess, editUserLegacy);
-
-router.get('/view/:username', viewUserLegacy);
-router.get('/view/:username/logs', userLogsLegacy);
-router.get('/edit/:username/settings', userSettingsLegacy);
-router.get('/view/:username/events', userEventsLegacy);
+//
+// /**
+//  * legacy routes
+//  */
+// router.get('/edit/:username', editUserLegacy);
+//
+// router.get('/view/:username', viewUserLegacy);
+// router.get('/view/:username/logs', userLogsLegacy);
+// router.get('/edit/:username/settings', userSettingsLegacy);
+// router.get('/view/:username/events', userEventsLegacy);
 
 module.exports = router;
 
@@ -74,71 +76,91 @@ function checkUrlAccess(req, res, next){
 
 /* GET home page. */
 function getAll(req, res, next) {
-    var userList = {};
-    userService.getAll()
-        .then(users => {
-            userList = users;
-            res.render("unisams/user/user", {title: "user managment - uniSams",
-                user: req.user._doc,
-                userList: userList
-            })
+    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.READ)
+        .then(result => {
+            var userList = {};
+            userService.getAll()
+                .then(users => {
+                    userList = users;
+                    res.render("unisams/user/user", {title: "user managment - uniSams",
+                        user: req.user._doc,
+                        userList: userList
+                    })
+                })
+                .catch(err => {
+                    next(err);
+                })
         })
-        .catch(err => {
-            next(err);
-        })
+        .catch(err => next(err));
 }
 
 function addUser(req, res, next) {
-    res.render("unisams/user/addUser", {
-        title: "create user - uniSams",
-        user: req.user._doc
-    })
+    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.CREATE)
+        .then(result => {
+            res.render("unisams/user/addUser", {
+                title: "create user - uniSams",
+                user: req.user._doc
+            })
+        })
+        .catch(err =>  next(err))
+
 }
 
 function profile(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, user, "user");
-                if (edit) {
-                    res.render("unisams/user/editUser", {
-                        user: req.user._doc,
-                        title: user.username,
-                        exploreUser: user,
-                        exploreUserDocument: user._doc,
-                        refurl: req.params.username,
-                    })
-                }
-                else {
-                    res.render("unisams/user/profile", {
-                        user: req.user._doc,
-                        title: user.username,
-                        exploreUser: user,
-                        exploreUserDocument: user._doc,
-                        refurl: req.params.username,
-                        allowedit: edit,
-                    })
-                }
+    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.READ)
+        .then(result => {
+            userService.getByUsername(req.params.username)
+                .then(user => {
+                    aclService.getUserACL(user.id, true)
+                        .then(userACL => {
+                            if (user) {
+                                AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
+                                    .then(result => {
+                                        res.render("unisams/user/editUser", {
+                                            user: req.user._doc,
+                                            userrole: userACL.userRole,
+                                            usergroups: userACL.userGroups,
+                                            title: user.username,
+                                            exploreUser: user,
+                                            exploreUserDocument: user._doc,
+                                            refurl: req.params.username,
+                                        })
+                                    })
+                                    .catch(err=> {
+                                        res.render("unisams/user/profile", {
+                                            user: req.user._doc,
+                                            userrole: userACL.userRole,
+                                            usergroups: userACL.userGroups,
+                                            title: user.username,
+                                            exploreUser: user,
+                                            exploreUserDocument: user._doc,
+                                            refurl: req.params.username,
+                                            allowedit: false,
+                                        })
+                                    })
 
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
+                            }
+                            else {
+                                // try if id was given
+                                userService.getById(req.params.username)
+                                    .then(user => {
+                                        if (user) {
+                                            var newPath = req.originalUrl.replace(user.id, user.username);
+                                            res.redirect(newPath);
+                                        } else {
+                                            //give up
+                                            res.send("user not found");
+                                        }
+                                    })
+                                    .catch(err=> next(err));
+                            }
+                        })
+                        .catch(err=> next(err));
+                        })
+                        .catch(err => next(err))
+
         })
-        .catch(err=> next(err));
-
+        .catch(err => next(err))
 }
 
 function userLogs(req, res, next) {
@@ -146,17 +168,20 @@ function userLogs(req, res, next) {
         .then(user => {
             if (user) {
                 //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, user, "user");
-                res.render("unisams/user/logs", {
-                    user: req.user._doc,
-                    generalData: req.user._doc.generalData,
-                    customData: req.user._doc.customData,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username,
-                    allowedit: edit,
-                })
+                let edit = AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
+                    .then(result => {
+                        res.render("unisams/user/logs", {
+                            user: req.user._doc,
+                            generalData: req.user._doc.generalData,
+                            customData: req.user._doc.customData,
+                            title: user.username,
+                            exploreUser: user,
+                            exploreUserDocument: user._doc,
+                            refurl: req.params.username,
+                            allowedit: edit,
+                        })
+                    })
+                    .catch(err => next(err))
             }
             else {
                 // try if id was given
@@ -179,38 +204,57 @@ function userLogs(req, res, next) {
 
 
 function userEvents(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, user, "user");
-                res.render("unisams/user/events", {
-                    user: req.user._doc,
-                    generalData: req.user._doc.generalData,
-                    customData: req.user._doc.customData,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username,
-                    allowedit: edit,
+    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.READ)
+        .then(result => {
+            userService.getByUsername(req.params.username)
+                .then(user => {
+                    if (user) {
+                        //check if editing this user is allowed
+                        AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
+                            .then(result => {
+                                res.render("unisams/user/events", {
+                                    user: req.user._doc,
+                                    generalData: req.user._doc.generalData,
+                                    customData: req.user._doc.customData,
+                                    title: user.username,
+                                    exploreUser: user,
+                                    exploreUserDocument: user._doc,
+                                    refurl: req.params.username,
+                                    allowedit: true,
+                                })
+                            })
+                            .catch(err=> {
+                                res.render("unisams/user/events", {
+                                    user: req.user._doc,
+                                    generalData: req.user._doc.generalData,
+                                    customData: req.user._doc.customData,
+                                    title: user.username,
+                                    exploreUser: user,
+                                    exploreUserDocument: user._doc,
+                                    refurl: req.params.username,
+                                    allowedit: false
+                                })
+                            })
+                    }
+                    else {
+                        // try if id was given
+                        userService.getById(req.params.username)
+                            .then(user => {
+                                if (user) {
+                                    var newPath = req.originalUrl.replace(user.id, user.username);
+                                    res.redirect(newPath);
+                                } else {
+                                    //give up
+                                    res.send("user not found");
+                                }
+                            })
+                            .catch(err=> next(err));
+                    }
                 })
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
+                .catch(err => next(err));
         })
-        .catch(err => next(err));
+        .catch(err => next(err))
+
 
 }
 
@@ -219,21 +263,22 @@ function userSettings(req, res, next) {
         .then(user => {
             if (user) {
                 //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, user, "user");
-                if(edit){
-                    res.render("unisams/user/settings", {
-                        user: req.user._doc,
-                        title: user.username + " | Einstellungen",
-                        exploreUser: user,
-                        exploreUserDocument: user._doc,
-                        refurl: req.params.username,
-                        allowedit: edit
+                AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
+                    .then(result => {
+                        res.render("unisams/user/settings", {
+                            user: req.user._doc,
+                            title: user.username + " | Einstellungen",
+                            exploreUser: user,
+                            exploreUserDocument: user._doc,
+                            refurl: req.params.username,
+                            allowedit: edit
+                        })
                     })
-                }
-                else {
-                    var newPath = baseUrl + "/" + user.username;
-                    res.redirect(newPath);
-                }
+                    .catch(err=> {
+                        var newPath = baseUrl + "/" + user.username;
+                        res.redirect(newPath);
+                    })
+
             }
             else {
                 // try if id was given
@@ -258,21 +303,21 @@ function userRoles(req, res, next) {
         .then(user => {
             if (user) {
                 //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, user, "user");
-                if(edit){
-                    res.render("unisams/user/roles", {
-                        user: req.user._doc,
-                        title: user.username + " | Rechte & Rollen",
-                        exploreUser: user,
-                        exploreUserDocument: user.toJSON(),
-                        refurl: req.params.username,
-                        allowedit: edit
+                AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
+                    .then(result => {
+                        res.render("unisams/user/roles", {
+                            user: req.user._doc,
+                            title: user.username + " | Rechte & Rollen",
+                            exploreUser: user,
+                            exploreUserDocument: user.toJSON(),
+                            refurl: req.params.username,
+                            allowedit: edit
+                        })
                     })
-                }
-                else {
-                    var newPath = baseUrl + "/" + user.username;
-                    res.redirect(newPath);
-                }
+                    .catch(err=> {
+                        var newPath = baseUrl + "/" + user.username;
+                        res.redirect(newPath);
+                    })
             }
             else {
                 // try if id was given
