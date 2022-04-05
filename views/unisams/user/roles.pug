@@ -83,7 +83,7 @@ block content
 
                                                         - var combinedKey = "userRole"
                                                         - var keyTitle = "Rolle"
-                                                        - var value = exploreUserDocument.userRoleString
+                                                        - var value = exploreUserDocument.userRole
                                                         li.user-entry.userrole-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
                                                             a.inner()
                                                                 .item-property.userkey-entry-title
@@ -103,11 +103,12 @@ block content
                                                         li.user-entry.noSelect.borderBottom
                                                             .inner
                                                                 .item-property Gruppe
-                                                        if exploreUserDocument.userGroups
-                                                            each val in exploreUserDocument.userGroups
+                                                        if usergroups
+                                                            each val in usergroups
                                                                 li.user-entry
                                                                     a.inner()
                                                                         .item-property= val.title
+                                                                        .item-property= val.description
 
                             #profilemanagment-menu.subpage-menu
                                 #btn01.subpage-menu-btn

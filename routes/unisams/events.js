@@ -26,7 +26,7 @@ auth = function(req, res, next){
 };
 
 function checkUrlAccess(req, res, next){
-    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.auth(req.user,AuthService.operations.events.READ)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");
@@ -40,48 +40,116 @@ function checkUrlAccess(req, res, next){
         .catch(err => next(err))
 }
 
+
+
+function checkEventReadRights(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.events.READ)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
 function checkEventEditRights(req, res, next){
     // check group permissions
-    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
-        .then(function(result){
-            if(result){
-                console.log("authorization successful!");
-                next();
-            }
-            else {
+    AuthService.auth(req.user, AuthService.operations.events.WRITE)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            // check individual rights
+            eventService.getById(req.params.id)
+                .then(ev => {
+                    if (ev) {
+                        AuthService.checkEventWriteAccess(req.user, ev, false)
+                            .then(result => {
+                                console.log("authorization successful!");
+                                next();
+                            })
+                            .catch(err => {
+                                // eventually fail
+                                console.log("authorization failed!");
+                                next({status:403, message: "forbidden"});
+                            })
+                    }
+                })
+                .catch(err => next(err));
+        })
+}
+
+function checkEventEditRightsPromise(req, res, next){
+    // check group permissions
+    return new Promise(function(resolve, reject) {
+        AuthService.auth(req.user, AuthService.operations.events.WRITE)
+            .then(function(result) {
+                resolve();
+            })
+            .catch(err => {
                 // check individual rights
                 eventService.getById(req.params.id)
                     .then(ev => {
                         if (ev) {
-                            if (AuthService.checkIfEdit(req.user, ev, "event")) {
-                                console.log("authorization successful!");
-                                next();
-                            }
-                            else {
-                                // eventually fail
-                                console.log("authorization failed!");
-                                next({status:403, message: "forbidden"});
-                            }
+                            AuthService.checkEventWriteAccess(req.user, ev, false)
+                                .then(result => {
+                                    resolve();
+                                })
+                                .catch(err => {
+                                    reject();
+                                })
                         }
                     })
-                    .catch(err => next(err));
-            }
+                    .catch(err => reject());
+            })
+    });
+}
+
+
+
+function checkParticipantAccess (req, res, next) {
+    //check if trying to add self
+    if (req.user.id === req.body.userId) {
+        //allow operation
+        next()
+    }
+    else {
+        //if not modifying self, editing rights are required
+        req.params.id = req.body.id;
+        checkEventEditRights(req, res, next);
+    }
+}
+
+function allowCreateEvent(req, res, next) {
+    AuthService.auth(req.user, AuthService.operations.events.CREATE)
+        .then(result =>{
+            next();
         })
-        .catch(err => next(err))
+        .catch(err => {
+            // eventually fail
+            console.log("authorization failed!");
+            next({status:403, message: "forbidden"});
+        })
 }
 
 
 // routes
+//check url access by user group
+router.use('/*', auth);
+// routes
+router.get('/', checkEventReadRights, getAll);
+
+router.get('/addEvent', allowCreateEvent, addEvent);
 
 router.get('/edit/:id', auth, checkEventEditRights, editEvent);
-//check url access by user group
-router.use('/*', auth, checkUrlAccess);
-// routes
-router.get('/', getAll);
-router.get('/addEvent', addEvent);
+router.get('/view/:id/logs', checkEventEditRights, eventLogs);
+
+router.get('/view/*', checkEventReadRights)
 router.get('/view/:id', viewEvent);
 router.get('/view/:id/participants', eventParticipants);
-router.get('/view/:id/logs', eventLogs);
 router.get('/view/:id/files/:filename', eventFileDownloader);
 
 
@@ -116,14 +184,25 @@ function viewEvent(req, res, next) {
         .then(ev => {
             if (ev) {
                 //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, ev, "event");
-                res.render("unisams/events/viewEvent", {
-                    user: req.user._doc,
-                    title: ev.title.value,
-                    exploreEvent: ev,
-                    refurl: req.params.id,
-                    allowedit: edit,
-                })
+                checkEventEditRightsPromise(req, res, next)
+                    .then(result => {
+                        res.render("unisams/events/viewEvent", {
+                            user: req.user._doc,
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            refurl: req.params.id,
+                            allowedit: true,
+                        })
+                    })
+                    .catch(err => {
+                        res.render("unisams/events/viewEvent", {
+                            user: req.user._doc,
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            refurl: req.params.id,
+                            allowedit: false,
+                        })
+                    })
             }
         })
         .catch(err => next(err));
@@ -150,17 +229,27 @@ function eventParticipants(req, res, next) {
             if (ev) {
                 //check if editing this user is allowed
                 let url = "unisams/events/participants";
-                let edit = AuthService.checkIfEdit(req.user, ev, "event");
-                if (edit) {
-                    url = "unisams/events/editParticipants"
-                }
-                res.render(url, {
-                    user: req.user.toJSON(),
-                    title: ev.title.value,
-                    exploreEvent: ev,
-                    exploreEventDocument: ev._doc,
-                    allowedit: edit,
-                })
+                checkEventEditRightsPromise(req, res, next)
+                    .then(result => {
+                        url = "unisams/events/editParticipants";
+                        res.render(url, {
+                            user: req.user.toJSON(),
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            exploreEventDocument: ev._doc,
+                            allowedit: true,
+                        })
+                    })
+                    .catch(err => {
+                        let url = "unisams/events/participants";
+                        res.render(url, {
+                            user: req.user.toJSON(),
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            exploreEventDocument: ev._doc,
+                            allowedit: false,
+                        })
+                    })
             }
         })
         .catch(err => next(err));

@@ -66,6 +66,9 @@ let operations = {
         GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
         REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
 
+        GRANTEVENTCONTROL: "grantEventControl",
+        REVOKEEVENTCONTROL: "revokeEventControl",
+
         GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
         REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
 
@@ -144,6 +147,8 @@ let defaultEventAdmin = {
         operations.events.CREATE,
         operations.events.WRITE,
         operations.events.DELETE,
+        operations.access.GRANTEVENTCONTROL,
+        operations.access.REVOKEEVENTCONTROL,
     ]
 }
 
@@ -155,6 +160,9 @@ let defaultAclAdmin = {
     allowedOperations: [
         operations.access.READUSERROLE,
         operations.access.WRITEUSERROLE,
+
+        operations.access.GRANTEVENTCONTROL,
+        operations.access.REVOKEEVENTCONTROL,
 
         operations.access.GRANTUSERGROUPS,
         operations.access.REVOKEUSERGROUPS,
@@ -190,6 +198,9 @@ let defaultSysAdmin = {
 
         operations.access.READUSERROLE,
         operations.access.WRITEUSERROLE,
+
+        operations.access.GRANTEVENTCONTROL,
+        operations.access.REVOKEEVENTCONTROL,
 
         operations.access.GRANTUSERGROUPS,
         operations.access.REVOKEUSERGROUPS,
@@ -336,12 +347,15 @@ class AuthService {
     checkUserWriteAccess (user, target, critical) {
         let self = this;
         //validate
-        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        if (user === undefined) throw new Error("AuthService fail: invalid parameters given");
+        if (target === undefined) target = "other";
+        let targetId = target;
+        if (target.id !== undefined) targetId = target.id;
         if (critical) return self.checkUserWriteAccessCritical(user, target);
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === target.id.toString()) {
+            if(target === "self" || user.id.toString() === targetId.toString()) {
                 //trying to write self
                 self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
                     .then(result => {
@@ -375,10 +389,12 @@ class AuthService {
         let self = this;
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        let targetId = target;
+        if (target.id !== undefined) targetId = target.id;
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === target.id.toString()) {
+            if(target === "self" || user.id.toString() === targetId.toString()) {
                 //trying to write self
                 self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
                     .then(result => {
@@ -418,10 +434,12 @@ class AuthService {
         let self = this;
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        let targetId = target;
+        if (target.id !== undefined) targetId = target.id;
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === target.id.toString()) {
+            if(target === "self" || user.id.toString() === targetId.toString()) {
                 //trying to delete self
                 self.checkAllowedGroupOperation(user, operations.user.DELETE)
                     .then(result => {
@@ -451,43 +469,80 @@ class AuthService {
         })
     }
 
-    checkUserGroupWriteAccess(user, target, group) {
+    /**
+     *
+     * @param user {User} requesting user
+     * @param target {ObjectId | User} target user
+     * @param group {UserGroup} group to be added or revoked
+     * @param grant {Boolean} grant = true, revoke = false
+     * @returns {Promise<unknown>}
+     */
+    async checkUserGroupWriteAccess(user, target, group, grant) {
         let self = this;
         //validate
-        if (user === undefined || target === undefined || group === undefined) throw new Error("AuthService fail: invalid parameters given");
-        return new Promise(function(resolve, reject){
-            // check group type to determine required operation
-            let groupOperation = self.getRequiredGroupOperation(group.type, groupActionsEnum.GRANT);
+        if (user === undefined || target === undefined || group === undefined || group.type === undefined) throw new Error("AuthService fail: invalid parameters given");
+        let targetId = target;
+        if (target.id !== undefined) targetId = target.id;
 
-            if(target === "self" || user.id.toString() === target.id.toString()) {
-                //trying to write self
-                let writeSelf = self.checkAllowedGroupOperation(user, operations.user.WRITESELF);
+        let granting = (grant === undefined || grant) ? groupActionsEnum.GRANT : groupActionsEnum.REVOKE;
+        let groupOperation = self.getRequiredGroupOperation(group.type, granting);
 
-                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
 
-                    Promise.all([writeSelf, addGroup])
-                        .then(result => {
-                            resolve(result)
-                    })
-                        .catch(err => {
-                            reject(err)
-                    })
-            }
-            else {
-                //general user write access is required
-                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
-                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
+        if(target === "self" || user.id.toString() === targetId.toString()) {
+            //trying to write self
+            let writeSelf = self.checkAllowedGroupOperation(user, operations.user.WRITESELF);
 
-                Promise.all([writeAccess, addGroup])
+            let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
+
+                Promise.all([writeSelf, addGroup])
                     .then(result => {
-                        resolve(result)
-                    })
+                        return(result)
+                })
                     .catch(err => {
-                        reject(err)
-                    })
+                        throw err
+                })
+        }
+        else {
+            //general user write access is required
+            let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
+            let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
 
-            }
-        })
+            Promise.all([writeAccess, addGroup])
+                .then(result => {
+                    return(result)
+                })
+                .catch(err => {
+                    throw err
+                })
+
+        }
+    }
+
+    /**
+     * authorizes basic write access on target document. dont use this for critical properties, e.g. passwords or username
+     *
+     * @param user {UserScheme} requesting user
+     * @param target {UserScheme} target user
+     * @param targetType {String} target type identifier
+     * @param critical {Boolean} forwards to critical security check
+     * @returns {Promise<unknown>}
+     */
+    checkTargetWriteAccess (user, target, targetType, critical) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        // if (critical) return self.checkTargetWriteAccessCritical(user, target);
+
+        switch(targetType) {
+            case "user":
+                return self.checkUserWriteAccess(user, target, critical);
+            case "event":
+                return self.checkEventWriteAccess(user, target, critical);
+            default:
+                return new Promise(function(resolve, reject) {
+                    reject("Failed to authorize write access on target: unknown target type.");
+                })
+        }
     }
 
     checkUserRoleWriteAccess(user, target, role) {
@@ -550,6 +605,39 @@ class AuthService {
     }
 
     /**
+     * authorizes basic write access on event documents.
+     *
+     * @param user {UserScheme} requesting user
+     * @param target {EventScheme} target event
+     * @param critical {Boolean} forwards to critical security check
+     * @returns {Promise<unknown>}
+     */
+    checkEventWriteAccess (user, target, critical) {
+        let self = this;
+        //validate
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+        // if (critical) return self.checkEventWriteAccessCritical(user, target);
+
+        return new Promise(function(resolve, reject){
+            //general user write access is required
+            self.checkAllowedGroupOperation(user, operations.events.WRITE)
+                .then(group => {
+                    resolve(group)
+                })
+                .catch(err => {
+                    //try individual rights
+                    self.checkIndividualAccess(user, target, operations.events.WRITE)
+                        .then(result => {
+                            resolve(result);
+                        })
+                        .catch(err => {
+                            reject(err)
+                        })
+                })
+        })
+    }
+
+    /**
      * authorizes basic write access on user documents. dont use this for critical properties, e.g. passwords or username
      *
      * @param user {UserScheme} requesting user
@@ -566,7 +654,7 @@ class AuthService {
             aclService.getUserACL(user)
                 .then(userACL => {
                     //try to find target in individuals
-                    let targetRights = userACL.individual.find(object => object.target.toString() === target.toString())
+                    let targetRights = userACL.individual.events.find(object => object.target.toString() === target.toString())
                     if (targetRights === undefined){
                         //no entry for target
                         let err = self.createForbiddenError();
@@ -764,9 +852,9 @@ class AuthService {
 
     /**
      * resolves the required operation for group modifications.
-     * @param group {String} string identifier, equals to group type (["user","useradmin","eventadmin","system"])
+     * @param type {String} string identifier, equals to group type (["user","useradmin","eventadmin","system"])
      * @param action {groupActionsEnum} Grant or revoke
-     * @returns {string}
+     * @returns {string} Operation
      */
     getRequiredGroupOperation (type, action) {
         if (type === undefined || action === undefined) {

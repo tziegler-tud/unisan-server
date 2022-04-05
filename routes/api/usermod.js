@@ -4,6 +4,7 @@ const userService = require('../../services/userService');
 const uploadService = require('../../services/uploadService');
 const authService = require('../../services/authService');
 const LogService = require('../../services/logService');
+const GroupService = require('../../services/userGroupService');
 const aclService = require('../../services/aclService');
 const Log = require('../../utils/log');
 
@@ -11,6 +12,7 @@ var path = require('path');
 var fs = require('fs-extra');
 
 const upload = require(appRoot + "/config/multer");
+const AuthService = require("../../services/authService");
 
 
 
@@ -191,7 +193,7 @@ function getByName(req, res, next) {
 
 function update(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.WRITE)
+    authService.checkUserWriteAccess(req.user, req.params.id, true)
         .then(result => {
             userService.update(req, req.params.id, req.body)
                 .then(() => res.json({}))
@@ -216,21 +218,29 @@ function getKey(req, res, next) {
 }
 
 function updateKey(req, res, next) {
+    if(req.params.id === undefined || req.body.key === undefined || req.body.value === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
     //auth
-    authService.auth(req.user, authService.operations.user.WRITE)
-        .then(result => {
-            userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
-                .then((result) => res.json({result}))
-                .catch(err => next(err));
-        })
-        .catch(err =>{
-            next(err);
-        })
+    else {
+        let critical = (req.body.key === "password" || req.body.key === "username");
+        authService.checkUserWriteAccess(req.user, req.params.id, critical)
+            .then(result => {
+                userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
+                    .then((result) => res.json({result}))
+                    .catch(err => next(err));
+            })
+            .catch(err =>{
+                next(err);
+            })
+    }
+
 }
 
 function addQualification(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.WRITE)
+    authService.checkUserWriteAccess(req.user, req.params.id, false)
         .then(result => {
             userService.addQualification(req, req.params.id, req.body.data, req.body.args)
                 .then((result) => res.json({result}))
@@ -243,7 +253,7 @@ function addQualification(req, res, next) {
 
 function updateQualification(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.WRITE)
+    authService.checkUserWriteAccess(req.user, req.params.id, false)
         .then(result => {
             userService.updateQualification(req, req.params.id, req.body.id, req.body.data, req.body.args)
                 .then((result) => res.json({result}))
@@ -256,7 +266,7 @@ function updateQualification(req, res, next) {
 
 function removeQualification(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.WRITE)
+    authService.checkUserWriteAccess(req.user, req.params.id, false)
         .then(result => {
             userService.removeQualification(req, req.params.id, req.body.id, req.body.args)
                 .then((result) => res.json({result}))
@@ -268,24 +278,31 @@ function removeQualification(req, res, next) {
 }
 
 function deleteKey(req, res, next) {
+    if(req.params.id === undefined || req.body.key === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
     //auth
-    authService.auth(req.user, authService.operations.user.WRITE)
-        .then(result => {
-            if(req.body.isArray){
-                userService.deleteArrayElement(req, req.params.id, req.body.key, req.body.args)
-                    .then(() => res.json({}))
-                    .catch(err => next(err));
+    else {
+        let critical = (req.body.key === "password" || req.body.key === "username");
+        //auth
+        authService.checkUserWriteAccess(req.user, req.params.id, critical)
+            .then(result => {
+                if (req.body.isArray) {
+                    userService.deleteArrayElement(req, req.params.id, req.body.key, req.body.args)
+                        .then(() => res.json({}))
+                        .catch(err => next(err));
 
-            }
-            else {
-                userService.deleteKey(req, req.params.id, req.body.key, req.body.args)
-                    .then(() => res.json({}))
-                    .catch(err => next(err));
-            }
-        })
-        .catch(err =>{
-            next(err);
-        })
+                } else {
+                    userService.deleteKey(req, req.params.id, req.body.key, req.body.args)
+                        .then(() => res.json({}))
+                        .catch(err => next(err));
+                }
+            })
+            .catch(err => {
+                next(err);
+            })
+    }
 }
 
 function matchAny(req, res, next){
@@ -305,43 +322,66 @@ function matchAny(req, res, next){
 }
 
 function addUserGroup(req, res, next){
-    authService.auth(req.user, authService.operations.access.GRANTUSERGROUPS)
-        .then(result => {
-            userService.addUserGroup(req, req.params.id, req.body.userGroupId)
-                .then(function(user) {
-                    res.json(user);
+    //validate
+    if(req.params.id === undefined || req.body.userGroupId === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    //get user group form id
+    GroupService.getById(req.body.userGroupId)
+        .then(group => {
+            authService.checkUserGroupWriteAccess(req.user, req.params.id, group, true)
+                .then(result => {
+                    userService.addUserGroup(req, req.params.id, group)
+                        .then(function(user) {
+                            res.json(user);
+                        })
+                        .catch(err => {
+                            next(err)
+                        });
                 })
-                .catch(err => {
-                    next(err)
-                });
+                .catch(err =>{
+                    next(err);
+                })
         })
-        .catch(err =>{
-            next(err);
-        })
+        .catch(err => next(err))
+
 
 }
 
 function removeUserGroup(req, res, next){
-    authService.auth(req.user, authService.operations.access.REVOKEUSERGROUPS)
-        .then(result => {
-            userService.removeUserGroup(req, req.params.id, req.body.userGroupId)
-                .then(function(user) {
-                    res.json(user);
+    //validate
+    if(req.params.id === undefined || req.body.userGroupId === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    //get user group form id
+    GroupService.getById(req.body.userGroupId)
+        .then(group => {
+            authService.checkUserGroupWriteAccess(req.user, req.params.id, group, false)
+                .then(result => {
+                    userService.removeUserGroup(req, req.params.id, req.body.userGroupId)
+                        .then(function (user) {
+                            res.json(user);
+                        })
+                        .catch(err => next(err));
                 })
-                .catch(err => next(err));
+                .catch(err => {
+                    next(err);
+                })
         })
-        .catch(err =>{
-            next(err);
-        })
-
+        .catch(err => next(err))
 }
 
 function setUserRole(req, res, next){
-    authService.auth(req.user, authService.operations.access.WRITEUSERROLE)
+    //validate
+    if(req.params.id === undefined || req.body.role === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    AuthService.checkUserRoleWriteAccess(req.user, req.params.id, req.body.role)
         .then(result => {
-            //get user list
-            //setting user roles requires superadmin or admin role on acting user
-            userService.setUserRole(req, req.params.id, req.body.role, req.user)
+            userService.setUserRole(req, req.params.id, req.body.role)
                 .then(function(result){
                     res.status(200).json({success: true});
                 })
@@ -350,11 +390,10 @@ function setUserRole(req, res, next){
         .catch(err =>{
             next(err);
         })
-
 }
 
 function _delete(req, res, next) {
-    authService.auth(req.user, authService.operations.user.DELETE)
+    authService.checkUserDeleteAccess(req.user, req.params.id)
         .then(result => {
             userService.delete(req, req.params.id)
                 .then(() => res.json({}))
@@ -366,35 +405,40 @@ function _delete(req, res, next) {
 }
 
 function addGroupToAllUser(req, res, next){
-    authService.auth(req.user, authService.operations.access.GRANTUSERGROUPS)
-        .then(result => {
+    //validate
+    if(req.body.userGroupId === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    //get user group form id
+    GroupService.getById(req.body.userGroupId)
+        .then(group => {
             //get user list
             userService.getAll()
-                .then(function(userlist){
+                .then(function (userlist) {
                     let promiseArray = [];
-                    userlist.forEach(function(user){
-                        promiseArray.push(new Promise(function(resolve, reject){
-                            userService.addUserGroup(req, user.id, req.body.userGroupId)
-                                .then(user=> {
-                                    resolve();
-                                })
-                                .catch(function(err){
-                                    console.log("user not found.");
-                                    reject();
+                    userlist.forEach(function (user) {
+                        promiseArray.push(new Promise(function (resolve, reject) {
+                            authService.checkUserGroupWriteAccess(req.user, user, group, true)
+                                .then(result => {
+                                    userService.addUserGroup(req, user.id, group)
+                                        .then(user => {
+                                            resolve();
+                                        })
+                                        .catch(function (err) {
+                                            console.log("user not found.");
+                                            reject();
+                                        })
                                 })
                         }))
                     })
                     Promise.all(promiseArray)
-                        .then(resultArray =>{
+                        .then(resultArray => {
                             res.status(200).json({});
                         })
                         .catch(err => next(err))
                 })
-                .catch(err=>next(err))
+                .catch(err => next(err))
         })
-        .catch(err =>{
-            next(err);
-        })
-
-
+        .catch(err => next(err));
 }

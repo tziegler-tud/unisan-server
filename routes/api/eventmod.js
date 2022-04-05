@@ -39,35 +39,49 @@ function checkUrlAccess(req, res, next){
         .catch(err => next(err))
 }
 
+
+
+function checkEventReadRights(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.events.READ)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
 function checkEventEditRights(req, res, next){
     // check group permissions
     AuthService.auth(req.user, AuthService.operations.events.WRITE)
-        .then(function(result){
-            if(result){
-                console.log("authorization successful!");
-                next();
-            }
-            else {
-                // check individual rights
-                eventService.getById(req.params.id)
-                    .then(ev => {
-                        if (ev) {
-                            if (AuthService.checkEventWriteAccess(req.user, ev, "event")) {
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            // check individual rights
+            eventService.getById(req.params.id)
+                .then(ev => {
+                    if (ev) {
+                        AuthService.checkEventWriteAccess(req.user, ev, false)
+                            .then(result => {
                                 console.log("authorization successful!");
                                 next();
-                            }
-                            else {
+                            })
+                            .catch(err => {
                                 // eventually fail
                                 console.log("authorization failed!");
                                 res.status(403).send();
-                            }
-                        }
-                    })
-                    .catch(err => next(err));
-            }
+                            })
+                    }
+                })
+                .catch(err => next(err));
         })
-        .catch(err => next(err))
 }
+
+
 function checkParticipantAccess (req, res, next) {
     //check if trying to add self
     if (req.user.id === req.body.userId) {
@@ -82,14 +96,15 @@ function checkParticipantAccess (req, res, next) {
 }
 
 function allowCreateEvent(req, res, next) {
-    if(AuthService.checkEventCreateAccess(req.user)) {
-        next();
-    }
-    else {
-        // eventually fail
-        console.log("authorization failed!");
-        res.status(403).send();
-    }
+    AuthService.auth(req.user, AuthService.operations.events.CREATE)
+        .then(result =>{
+            next();
+        })
+        .catch(err => {
+            // eventually fail
+            console.log("authorization failed!");
+            res.status(403).send();
+        })
 }
 
 
@@ -140,7 +155,7 @@ router.post('/changeParticipant', checkEventEditRights, changeParticipant);
 
 
 //viewing. needs general url access
-router.get("/*", checkUrlAccess);
+router.get("/*", checkEventReadRights);
 router.get('/', getAll);
 router.get('/:id/populateParticipants', populateParticipants);
 router.get('/:id/files/:filename', eventFileDownloader);
