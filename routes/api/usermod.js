@@ -90,10 +90,12 @@ function checkAdminRights(req, res, next){
 
 //check url access by user group
 // router.use('/*', checkUrlAccess);
+router.get('/clearDocuments', clearUserDocuments)
 
 router.post('/create', create);
 router.get('/', getAll);
 router.post('/filter', matchAny);
+router.post('/filterByGroup', filterByGroup);
 router.get('/current', getCurrent);
 router.get('/getByName/:username', getByName);
 router.get('/:id', getById);
@@ -321,6 +323,22 @@ function matchAny(req, res, next){
         })
 }
 
+function filterByGroup(req, res, next){
+    //auth
+    authService.auth(req.user, authService.operations.user.READ)
+        .then(result => {
+            if (req.body.filter === undefined) req.body.filter = "";
+            userService.filterByGroup(req.body.filter, req.body.groupId, req.body.args)
+                .then(function(userlist) {
+                    res.json(userlist);
+                })
+                .catch(err => next(err));
+        })
+        .catch(err =>{
+            next(err);
+        })
+}
+
 function addUserGroup(req, res, next){
     //validate
     if(req.params.id === undefined || req.body.userGroupId === undefined) {
@@ -441,4 +459,12 @@ function addGroupToAllUser(req, res, next){
                 .catch(err => next(err))
         })
         .catch(err => next(err));
+}
+
+function clearUserDocuments(req, res, next){
+    userService.clearDocuments()
+        .then(function(result) {
+            res.status(200).send();
+        })
+        .catch(err => next(err))
 }

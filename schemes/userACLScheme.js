@@ -25,6 +25,16 @@ var UserACLSchema = new Schema({
     },
 });
 
+UserACLSchema.virtual('userRoleString').get(function() {
+    let rolesMap = {
+        "protected": "Gesperrt",
+        "member": "Nutzer",
+        "admin": "Administrator",
+        "superadmin": "Super-Administrator",
+    }
+    return rolesMap[this.userRole];
+});
+
 UserACLSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('UserACL', UserACLSchema);

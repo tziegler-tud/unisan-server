@@ -139,14 +139,6 @@ var UserSchema = new Schema({
         type: Boolean,
         default: true
     },
-    userGroups: [{
-        type: Schema.Types.ObjectId,
-        ref: "UserGroup",
-    }],
-    userRole: {
-        type: String,
-        default: "member"
-    },
     createdDate: {
         type: Date,
         default: Date.now
@@ -175,15 +167,7 @@ UserSchema.virtual('name').get(function() {
     return (this.generalData.firstName.value + " " + this.generalData.lastName.value);
 });
 
-UserSchema.virtual('userRoleString').get(function() {
-    let rolesMap = {
-        "protected": "Gesperrt",
-        "member": "Nutzer",
-        "admin": "Administrator",
-        "superadmin": "Super-Administrator",
-    }
-    return rolesMap[this.userRole];
-});
+
 
 
 UserSchema.virtual('contactDefault').get(function() {

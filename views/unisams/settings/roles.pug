@@ -29,10 +29,11 @@ block content
                         #content1-text.sec-content
                             .subpage-options
                             .subpage-content
-                                ul.userlist.itemlist
-                                    li.user-entry.noSelect.borderBottom
+                                ul.userlist.itemlist.row-items-3
+                                    li.user-entry.grouplist-entry.noSelect.borderBottom
                                         .inner
                                             .item-property Bezeichnung
+                                            div Standard-Rolle
                                             .item-property Beschreibung
 
 
@@ -40,6 +41,12 @@ block content
                                         li.user-entry.grouplist-entry(id= "groupId"+ group.id data-groupId= group.id)
                                             a.inner(href="/unisams/settings/roles/" + group.id)
                                                 .item-property= group.title
+                                                if group.default
+                                                    div
+                                                        input(type="checkbox" disabled checked)
+                                                else
+                                                    div
+                                                        input(type="checkbox" disabled)
                                                 .item-property= group.description
                                                 .clear
 

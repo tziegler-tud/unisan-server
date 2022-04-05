@@ -36,6 +36,7 @@ let roles = [
 module.exports = {
     getAll,
     getAllFiltered,
+    getManyByUserId,
     createUserACL,
     getUserACL,
     getUserRole,
@@ -57,7 +58,11 @@ async function getAll (req) {
 
 /**
  *
- * @param args
+ * @param args {Object}
+ * @param args.sort {String} property to sort
+ * @param args.filter {Object} filter object
+ * @param args.filter.filter {String} field name to filter
+ * @param args.filter.value {String} value to filter. Accepts mongo syntax
  * @returns {Promise<[User]>}
  */
 async function getAllFiltered(args){
@@ -84,6 +89,17 @@ async function getAllFiltered(args){
     else {
         return query.sort(sort);
     }
+}
+
+/**
+ * Returns all acl documents corresponding to the given array of user ids.
+ */
+async function getManyByUserId(idArray) {
+    return UserACL.find({
+        'user': {
+            $in: idArray
+        }
+    })
 }
 
 

@@ -116,6 +116,14 @@ ul.itemlist {
 
   font-weight: lighter;
 
+  &.row-items-3 {
+    li {
+      .inner {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+  }
+  
   li {
 
     flex: 1 1 auto;

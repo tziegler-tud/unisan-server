@@ -119,18 +119,19 @@ var addUser  = new ContentHandler("addUserToGroup",
 
                     let handleData = {};
                     let data = {
+                        groupId: groupId,
                         filter: filter,
                         args: {
                             sort: "generalData.lastName.value",
                             filter: {
-                                filter: "userGroups",
-                                value: {$nin: [groupId]},
-                            }
+
+                            },
+                            invert: true
                         }
                     };
                     //get user list from server
                     $.ajax({
-                        url: "/api/v1/usermod/filter",
+                        url: "/api/v1/usermod/filterByGroup",
                         type: 'POST',
                         contentType: "application/json; charset=UTF-8",
                         dataType: 'json',

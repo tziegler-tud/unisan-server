@@ -32,9 +32,12 @@ module.exports = {
     removeQualification,
     delete: _delete,
     matchAny,
+    filterByGroup,
     addUserGroup,
     removeUserGroup,
     setUserRole,
+
+    clearDocuments,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -95,10 +98,7 @@ async function getAllFiltered(args){
  */
 async function getById(id) {
     //populate userGroups
-    return User.findById(id).select('-hash').populate({
-            path: 'userGroups',
-            select: 'title description',
-        });
+    return User.findById(id).select('-hash');
 
 }
 
@@ -107,10 +107,7 @@ async function getById(id) {
  * @param {string} username The username to search for
  */
 async function getByUsername(username) {
-    return User.findOne({username: username}).select('-hash').populate({
-        path: 'userGroups',
-        select: 'title description',
-    })
+    return User.findOne({username: username}).select('-hash');
 }
 
 /**
@@ -126,10 +123,7 @@ async function getByUsernameWithHash(username, populate) {
     }
 
     else {
-        return User.findOne({username: username}).populate({
-            path: 'userGroups',
-            select: 'title description',
-        })
+        return User.findOne({username: username}); //nothing to populate rn, but we will leave this here just in case
     }
 }
 
@@ -921,7 +915,12 @@ async function removeQualification(req, id, qualificationId, args) {
 /**
  *
  * @param matchString
- * @param args
+ * @param args {Object}
+ * @param args.sort {String} optional property to sort
+ * @param args.filter {Object} filter object
+ * @param args.filter.filter {String} property to filter for
+ * @param args.filter.value {String} filter value. Accepts mongo syntax
+ *
  * @returns {Promise<Query|*|number>}
  */
 async function matchAny(matchString, args){
@@ -952,6 +951,59 @@ async function matchAny(matchString, args){
 
 
     return userlist;
+}
+
+
+/**
+ *
+ * @param matchString {String}
+ * @param groupId {ObjectId} group id
+ * @param args {Object} function arguments
+ * @param args.sort {String} property to sort for
+ * @param args.invert {Boolean} inverts selection, i.e. returns user that are not part of group
+ * @param args.filter {Object} additional filters
+ * @returns {Promise<Query|*|number>}
+ */
+async function filterByGroup(matchString, groupId, args){
+
+    if (args === undefined) args = {}
+    let defaultArgs = {sort: "username", invert: false, filter: undefined};
+    args = Object.assign(defaultArgs, args);
+    //matches a given string username, firstname and lastname + membership of given group
+    //if filter is empty, return all results
+    let filter = args.filter;
+
+    if (groupId === undefined) {
+        //fall back to standard filtering
+        return matchAny(matchString, args);
+    }
+    //retrieve filtered userlist
+    return new Promise (function(resolve, reject){
+        matchAny(matchString, args)
+            .then(userlist => {
+                //get user acls
+                let idArray = userlist.map(user => user._id);
+                aclService.getManyByUserId(idArray)
+                    .then(aclList => {
+                        let filteredList = userlist.filter(user => {
+                            //find user acl in list
+                            let userAcl = aclList.find(userAcl => userAcl.user.toString() === user.id.toString())
+                            if (userAcl === undefined) return false
+                            let isMember = userAcl.userGroups.includes(groupId)
+                            if (args.invert) return !isMember
+                            else return isMember;
+                        })
+                        resolve(filteredList)
+
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            })
+            .catch(err => {
+                reject(err)
+            })
+    })
 }
 
 /**
@@ -1426,5 +1478,20 @@ function checkFileExists(path) {
         fs.access(path, fs.constants.F_OK, error => {
             resolve(!error);
         })
+    })
+}
+
+
+function clearDocuments(){
+    //remove usergroup and userrole
+    return new Promise(function(resolve, reject){
+        User.find()
+            .then(userlist => {
+                userlist.forEach(user => {
+                    User.updateOne({_id: user._id}, {$unset: {userRole: 1, userGroups: 1 }})
+                })
+                resolve();
+            })
+            .catch(err => reject(err))
     })
 }
