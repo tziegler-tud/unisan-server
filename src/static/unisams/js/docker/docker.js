@@ -14,6 +14,7 @@
      * @property {string} containerSelector - dom id matching the wrapper for the docker to be build inside
      * @property {string} activeContainer - dom id matching the currently active docker container element.
      * @property {string} activeElementId - dom id matching the currently active docker element.
+     * @property {Object} context - json object passed to the templating engine
      */
 
 
@@ -39,8 +40,25 @@
 
         this.topBarHeight = 100; //default
 
+        //build access table
+        let access = {
+            user: {
+                show: false,
+                add: false,
+            },
+            events: {
+                show: false,
+                add: false,
+            },
+            apps: {
+                protocol: false,
+            }
+        }
+
         // build templating context
-        let context = {};
+        let context = {
+            docker: dockerArgs.context
+        }
         let self = this;
         // render container template
 
@@ -226,6 +244,7 @@
         args.containerSelector = args.containerSelector !== undefined ? args.containerSelector : 'docker-wrapper';
         args.activeContainer = args.activeContainer !== undefined ? args.activeContainer : undefined;
         args.activeElementId = args.activeElementId !== undefined ? args.activeElementId : undefined;
+        args.context = args.context !== undefined ? args.context : {};
 
         return args;
     };

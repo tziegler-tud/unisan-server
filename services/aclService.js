@@ -345,3 +345,44 @@ async function rebuildFromUserData(req){
         userACL.save();
     })
 }
+
+/**
+ *
+ * @param userid {ObjectId}
+ * @returns {Promise<void>}
+ */
+async function buildDockerObject(userid) {
+    const user = await User.findById(userid);
+
+    //enumerate all allowed operations
+    const userACL = await getUserACL(userid, true);
+    let opArray = []
+    userACL.userGroups.forEach(group => {
+        group.allowedOperations.forEach(operation => {
+            if (!opArray.includes(operation)) opArray.push(operation);
+        })
+    })
+
+
+
+    //map operations to docker arguments
+    let docker = {
+        user: {
+            read: opArray.includes(AuthService.operations.user.READ),
+            write: opArray.includes(AuthService.operations.user.WRITE),
+            create: opArray.includes(AuthService.operations.user.CREATE),
+            delete: opArray.includes(AuthService.operations.user.DELETE),
+        },
+        events: {
+            show: opArray.includes(AuthService.operations.events.READ),
+            edit: opArray.includes(AuthService.operations.events.WRITE),
+            add: opArray.includes(AuthService.operations.events.CREATE),
+            delete: opArray.includes(AuthService.operations.events.DELETE),
+        },
+        apps: {
+            protocol: true,
+        }
+    }
+
+
+}

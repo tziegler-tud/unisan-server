@@ -114,6 +114,8 @@ function profile(req, res, next) {
                     aclService.getUserACL(user.id, true)
                         .then(userACL => {
                             if (user) {
+                                //build docker arguments
+                                let docker = userACL.docker;
                                 AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
                                     .then(result => {
                                         res.render("unisams/user/editUser", {
@@ -124,6 +126,7 @@ function profile(req, res, next) {
                                             exploreUser: user,
                                             exploreUserDocument: user._doc,
                                             refurl: req.params.username,
+                                            docker: docker,
                                             allowedit: true,
                                         })
                                     })
@@ -136,6 +139,7 @@ function profile(req, res, next) {
                                             exploreUser: user,
                                             exploreUserDocument: user._doc,
                                             refurl: req.params.username,
+                                            docker: docker,
                                             allowedit: false,
                                         })
                                     })
