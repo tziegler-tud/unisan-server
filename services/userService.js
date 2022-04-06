@@ -1045,6 +1045,7 @@ async function addUserGroup(req, id, userGroup){
                 }
                 else {
                     userACL.userGroups.push(userGroupId);
+                    //userACL.docker = aclService.buildDockerObject(userACL)
                     userACL.save()
                         .then( userACL => {
                             console.log("user " + user.username + " has been assigned to group.");
@@ -1098,7 +1099,6 @@ async function removeUserGroup(req, id, userGroupId){
 
     return new Promise(function(resolve, reject){
         //check if user has userGroup assigned
-        let index = user.userGroups.indexOf(userGroupId);
         aclService.getUserACL(id, false)
             .then(userACL=> {
                 //check if user has userGroup assigned
@@ -1106,6 +1106,7 @@ async function removeUserGroup(req, id, userGroupId){
                 if(index > -1){
                     // remove group
                     userACL.userGroups.splice(index, 1);
+                    //userACL.docker = aclService.buildDockerObject(userACL)
                     userACL.save()
                         .then( user => {
                             resolve(user);

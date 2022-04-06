@@ -45,7 +45,6 @@ module.exports = {
     removeUserGroup,
     remove,
     update,
-
     rebuildFromUserData,
 };
 
@@ -165,6 +164,7 @@ async function createUserACL (req, userid, data, overwrite) {
         console.log("creating new acl for user " + userid);
         let aclObj = data;
         aclObj.user = userid;
+        aclObj.docker = {}
         const userACL = new UserACL(aclObj);
         return aclObj.save();
     }
@@ -200,54 +200,56 @@ async function setUserRole (req, userid, role) {
     if (!user) throw new Error('User not found');
     if (!userACL) throw new Error('AccessControlList not found');
     //check write access
-    if(!AuthService.checkUserRightsWriteAccess(req.user, user)) {
-        //reject({status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."})
-        throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
-    }
-    else {
-        let validRoles = AuthService.roles;
-        // validate
-        if(typeof(role) === 'string'){
-            if(!validRoles.includes(role)){
-                throw new Error("invalid role name");
+    AuthService.auth(req.user, AuthService.operations.access.WRITEUSERROLE)
+        .then(result=>{
+            let validRoles = AuthService.roles;
+            // validate
+            if(typeof(role) === 'string'){
+                if(!validRoles.includes(role)){
+                    throw new Error("invalid role name");
+                }
             }
-        }
-        else {
-            throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof(role));
-        }
-        //cant set role higher than acting user role
-        if (AuthService.rolesMap[role] > AuthService.rolesMap[req.user.userRole]){
-            throw {status: 403, message: "insufficient access rights"};
-        }
-        //set new role
-        userACL.userRole = role;
-        return userACL.save()
-            .then(user => {
-                //create log
-                let log = new Log({
-                    type: "modification",
-                    action: {
-                        objectType: "user",
-                        actionType: "modify",
-                        actionDetail: "userRoleModify",
-                        key: "",
-                        value: role,
-                    },
-                    authorizedUser: req.user,
-                    target: {
-                        targetType: "user",
-                        targetObject: user._id,
-                        targetObjectId: user._id,
-                        targetModel: "User",
-                    },
-                    httpRequest: {
-                        method: req.method,
-                        url: req.originalUrl,
-                    }
+            else {
+                throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof(role));
+            }
+            //cant set role higher than acting user role
+            if (AuthService.rolesMap[role] > AuthService.rolesMap[req.user.userRole]){
+                throw {status: 403, message: "insufficient access rights"};
+            }
+            //set new role
+            userACL.userRole = role;
+            return userACL.save()
+                .then(user => {
+                    //create log
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "user",
+                            actionType: "modify",
+                            actionDetail: "userRoleModify",
+                            key: "",
+                            value: role,
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "user",
+                            targetObject: user._id,
+                            targetObjectId: user._id,
+                            targetModel: "User",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    LogService.create(log).then().catch();
                 })
-                LogService.create(log).then().catch();
-            })
-    }
+
+        })
+        .catch(err => {
+            throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
+        })
+
 
 }
 
@@ -344,45 +346,4 @@ async function rebuildFromUserData(req){
         let userACL = new UserACL(oj);
         userACL.save();
     })
-}
-
-/**
- *
- * @param userid {ObjectId}
- * @returns {Promise<void>}
- */
-async function buildDockerObject(userid) {
-    const user = await User.findById(userid);
-
-    //enumerate all allowed operations
-    const userACL = await getUserACL(userid, true);
-    let opArray = []
-    userACL.userGroups.forEach(group => {
-        group.allowedOperations.forEach(operation => {
-            if (!opArray.includes(operation)) opArray.push(operation);
-        })
-    })
-
-
-
-    //map operations to docker arguments
-    let docker = {
-        user: {
-            read: opArray.includes(AuthService.operations.user.READ),
-            write: opArray.includes(AuthService.operations.user.WRITE),
-            create: opArray.includes(AuthService.operations.user.CREATE),
-            delete: opArray.includes(AuthService.operations.user.DELETE),
-        },
-        events: {
-            show: opArray.includes(AuthService.operations.events.READ),
-            edit: opArray.includes(AuthService.operations.events.WRITE),
-            add: opArray.includes(AuthService.operations.events.CREATE),
-            delete: opArray.includes(AuthService.operations.events.DELETE),
-        },
-        apps: {
-            protocol: true,
-        }
-    }
-
-
 }

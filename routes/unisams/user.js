@@ -60,7 +60,7 @@ function legacyRedirect(req, res, next) {
 
 
 function checkUrlAccess(req, res, next){
-    AuthService.checkUrlPermission(req.user,req.method,req.originalUrl)
+    AuthService.auth(req.user,AuthService.operations.user.READ)
         .then(function(result){
             if(result){
                 console.log("authorization successful!");

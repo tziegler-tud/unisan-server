@@ -57,7 +57,8 @@
 
         // build templating context
         let context = {
-            docker: dockerArgs.context
+            docker: {},
+            dockerContext: dockerArgs.context
         }
         let self = this;
         // render container template
@@ -84,47 +85,57 @@
                 });
 
             var buildDocker = function(user){
-                var domElementsPromise = new Promise(function(){});
+                //get user acl
+                let aclPromise = $.get("/api/v1/acl/current");
+
+                var domElementsPromise = new Promise(function(resolve, reject){});
                 //render docker content depending on device
                 //desktop/tablet: render static docker
                 if(!phone.matches) {
-                    domElementsPromise = $.get('/static/unisams/js/docker/templates/docker-desktop.hbs', function (data) {
-                        var template = Handlebars.compile(data);
-                        $(self.innerContainer).append(template(context));
-                    });
+                    domElementsPromise = $.get('/static/unisams/js/docker/templates/docker-desktop.hbs')
                 }
                 else {
                     domElementsPromise = new common.Drawer({user: user});
-                    //enable drawer
-                    document.getElementById("docker-top-btn").addEventListener("click", function() {
-                        window.drawer.open = !window.drawer.open;
-                    })
-
                 }
-                domElementsPromise.then(function(){
-                    let topBarElement = $(self.innerContainer).find("#docker-top").first();
-                    self.topBarHeight = $(topBarElement).innerHeight();
-                    //initially setup dom elements
-                    const container = document.getElementById(dockerArgs.activeContainer);
-                    const el = document.getElementById(dockerArgs.activeElementId);
-                    if (el) activateElement(container, el);
+                Promise.all([aclPromise, domElementsPromise])
+                    .then(function(values){
+                        let userACL = values[0];
+                        let domElements = values[1];
 
-                    self.elementContainer = findElementContainer();
-                    initEventHandlers(self);
+                        if(!phone.matches) {
+                            context.docker = userACL.docker;
+                            var template = Handlebars.compile(domElements);
+                            $(self.innerContainer).append(template(context));
+                        }
+                        else {
+                            //enable drawer
+                            document.getElementById("docker-top-btn").addEventListener("click", function() {
+                                window.drawer.open = !window.drawer.open;
+                            })
+                        }
+                        let topBarElement = $(self.innerContainer).find("#docker-top").first();
+                        self.topBarHeight = $(topBarElement).innerHeight();
+                        //initially setup dom elements
+                        const container = document.getElementById(dockerArgs.activeContainer);
+                        const el = document.getElementById(dockerArgs.activeElementId);
+                        if (el) activateElement(container, el);
 
-                    //enable subpages
-                    self.subpagesEnabled = true;
-                    self.ready = true;
-                    self.resolveObserver(true);
+                        self.elementContainer = findElementContainer();
+                        initEventHandlers(self);
 
-                    //add settings subpage to all users for now
-                    //TODO: settings subpage should only be visible for users with appropriate access rights
-                    self.addDockerSubPage("settings", {id: "DockerSettingsContainer"}, {position: {place: "first"}})
+                        //enable subpages
+                        self.subpagesEnabled = true;
+                        self.ready = true;
+                        self.resolveObserver(true);
+
+                        //add settings subpage to all users for now
+                        //TODO: settings subpage should only be visible for users with appropriate access rights
+                        self.addDockerSubPage("settings", {id: "DockerSettingsContainer"}, {position: {place: "first"}})
 
                 })
                     .catch(function(){
                         console.error("failed to create drawer");
-                        rejectReady();
+                        //rejectReady();
                     })
             }
         });

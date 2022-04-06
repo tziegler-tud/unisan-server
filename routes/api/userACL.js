@@ -5,6 +5,7 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 const userGroupService = require("../../services/userGroupService");
 const aclService = require("../../services/aclService");
+const authService = require("../../services/authService");
 
 var app = express();
 
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 router.post("/rebuildFromData", rebuildFromUserData);
 
 router.get('/', getAll);
+router.get('/current', getCurrentAcl);
 router.get('/:id', getUserACL);
 router.post('/:id', createUserACL);
 router.put('/:id', updateUserACL);
@@ -39,6 +41,18 @@ function getUserACL(req, res, next){
     aclService.getUserACL(req.params.id)
         .then(result => res.json(result))
         .catch(err => next(err));
+}
+
+function getCurrentAcl(req, res, next){
+    authService.auth(req.user, authService.operations.user.READSELF)
+        .then(result => {
+            aclService.getUserACL(req.user.id, false)
+                .then(userACL => userACL ? res.json(userACL) : res.sendStatus(404))
+                .catch(err => next(err));
+        })
+        .catch(err =>{
+            next(err);
+        })
 }
 
 
