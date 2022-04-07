@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 
 // routes
 router.post("/rebuildFromData", rebuildFromUserData);
-router.post("rebuildNew", rebuildUserAcls)
+router.post("/rebuildNew", rebuildUserAcls)
 
 router.get('/', getAll);
 router.get('/current', getCurrentAcl);
