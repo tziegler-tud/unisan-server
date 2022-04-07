@@ -18,6 +18,7 @@ app.use(bodyParser.json());
 
 // routes
 router.post("/rebuildFromData", rebuildFromUserData);
+router.post("rebuildNew", rebuildUserAcls)
 
 router.get('/', getAll);
 router.get('/current', getCurrentAcl);
@@ -88,6 +89,12 @@ function removeGroup(req, res, next){
 
 function rebuildFromUserData(req, res, next){
     aclService.rebuildFromUserData()
+        .then(result => res.json(result))
+        .catch(err => next(err))
+}
+
+function rebuildUserAcls(req, res, next){
+    aclService.rebuildFresh()
         .then(result => res.json(result))
         .catch(err => next(err))
 }

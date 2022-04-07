@@ -46,6 +46,7 @@ module.exports = {
     remove,
     update,
     rebuildFromUserData,
+    rebuildFresh,
 };
 
 
@@ -345,5 +346,51 @@ async function rebuildFromUserData(req){
         //build acl
         let userACL = new UserACL(oj);
         userACL.save();
+    })
+}
+
+async function rebuildFresh(req){
+    //helper function to transform existing data to new scheme for one-time use.
+    //do not expose this function in production
+
+    //get all user
+    // let userArray = await userService.getAll();
+    let userArray = await User.find();
+    userArray.forEach(user => {
+        let id = user.id;
+        //groups
+        let groups = [];
+
+        let oj = {
+            user: id,
+            userRole: "member",
+            userGroups: [],
+            individual: {
+                events: []
+            }
+        };
+        //try to find existing acl
+        UserACL.findOne({user: id})
+            .then(user => {
+                if (user) {
+                    //just ignore existing for now
+
+                    //delete and rebuild
+                    // UserACL.deleteOne({user: id})
+                    //     .then(result => {
+                    //         let userACL = new UserACL(oj);
+                    //         userACL.save();
+                    //     })
+                }
+                else {
+                    //build acl
+                    let userACL = new UserACL(oj);
+                    return userACL.save();
+                }
+            })
+            .catch(err => {
+                let userACL = new UserACL(oj);
+                return userACL.save();
+            })
     })
 }
