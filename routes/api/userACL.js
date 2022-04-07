@@ -57,7 +57,7 @@ function getCurrentAcl(req, res, next){
 
 
 function createUserACL(req, res, next){
-    aclService.createUserACL(req.params.id)
+    aclService.createUserACL(req, req.params.id, req.body.data, req.body.overwrite)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
