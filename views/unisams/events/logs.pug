@@ -6,6 +6,7 @@ block page_includes
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventLogs";
+        window.allowedit =#{allowedit};
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/events/logs.css')
@@ -43,14 +44,5 @@ block content
                             .clear
                         #content1-text.sec-content.border-top.userlogs-container.logs-container
                             .subpage-content
-                                .itemlist-header-container
-                                    ul#loglist-top.loglist-top.itemlist.common-list.list-view.border
-                                        li.noSelect.rowHeading
-                                            .inner
-                                                .item-property Datum
-                                                .item-property Nutzer
-                                                .item-property Art
-                                                .item-property Beschreibung
-
                                 .itemlist-content-container
                                     #loglist-container.loglist-container

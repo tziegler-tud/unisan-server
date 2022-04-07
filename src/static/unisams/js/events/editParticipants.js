@@ -25,8 +25,8 @@ $(document).ready (function () {
 
     function buildPage(event) {
 
-        window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", event);
+        // window.DockerElement = new docker.Docker(window.dockerArgs);
+        window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 

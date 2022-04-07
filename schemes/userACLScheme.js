@@ -68,6 +68,13 @@ UserACLSchema.methods.updateDockerObject = function(){
                 },
                 apps: {
                     protocol: true,
+                },
+                settings: {
+                    logs: opArray.includes(authEnums.operations.settings.LOGS),
+                    events: opArray.includes(authEnums.operations.settings.EVENTS),
+                    user: opArray.includes(authEnums.operations.settings.USER),
+                    groups: opArray.includes(authEnums.operations.settings.GOUPS),
+                    system: opArray.includes(authEnums.operations.settings.SYSTEM),
                 }
             }
             self.docker = docker;

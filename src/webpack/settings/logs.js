@@ -9,7 +9,7 @@ let logs = {
             //debug line, remove before flight
             console.log("loading js module: settings.logs");
 
-            window.DockerElement = new docker.Docker(window.dockerArgs);
+            // window.DockerElement = new docker.Docker(window.dockerArgs);
             var sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
             //get logs
@@ -23,7 +23,7 @@ let logs = {
                         height: "full",
                         sorting: {
                             property: "timestamp",
-                            direction: 1,
+                            direction: -1,
                         }
                     }
                     let callback = {

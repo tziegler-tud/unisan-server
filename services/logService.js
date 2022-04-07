@@ -30,7 +30,7 @@ async function getAll() {
     let logs = await dbLog.find().populate({
         path: 'authorizedUser',
         select: 'generalData username',
-    });
+    }).sort({"timestamp": -1});
     return logs;
 }
 
@@ -42,7 +42,7 @@ async function getById(id) {
     return dbLog.findById(id).populate({
         path: 'authorizedUser',
         select: 'generalData username',
-    })
+    }).sort({"timestamp": -1});
 }
 
 
@@ -74,7 +74,7 @@ async function getTargetLogs(target, logType){
         }).populate({
             path: 'target.targetObject',
             select: "username"
-        });
+        }).sort({"timestamp": -1});
     }
     dbLog.find({logType: logType, "target.targetObject": target.id}).populate({
         path: 'authorizedUser',
@@ -82,7 +82,7 @@ async function getTargetLogs(target, logType){
     }).populate({
         path: 'target.targetObject',
         select: "username"
-    });
+    }).sort({"timestamp": -1});
 }
 
 /**
@@ -101,7 +101,7 @@ async function getTargetLogsById(targetId, logType){
         }).populate({
             path: 'target.targetObject',
             select: "username"
-        });
+        }).sort({"timestamp": -1});
     }
     return dbLog.find({logType: logType, "target.targetObject": targetId}).populate({
         path: 'authorizedUser',
@@ -109,7 +109,7 @@ async function getTargetLogsById(targetId, logType){
     }).populate({
         path: 'target.targetObject',
         select: "username"
-    });
+    }).sort({"timestamp": -1});
 }
 
 async function getEventLogs(event, type){

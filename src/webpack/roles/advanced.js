@@ -104,6 +104,25 @@ let advanced = {
             const dialogAddToAll = new lidl.Dialog(token2, ".addToAllButton", 'confirmDelete', addToAllContent, addToAllArgs);
             lidlRTO.objectManager.addObject(dialogAddToAll, token2);
 
+            const removeFromAllContent = {
+                title: "Gruppe allen Nutzern zuweisen",
+                message: "Alle Nutzer werden aus dieser Gruppe entfernt. Fortfahren?",
+                titleArg: "",
+                messageArg: ""
+            };
+
+            var removeFromAllArgs = {
+                id: groupId,
+                callback: {
+                    onConfirm: function () {
+                        groupActions.removeGroupFromAllUser(groupId);
+                    }
+                }
+            };
+
+            var token3 = lidlRTO.objectManager.createNewObjectToken();
+            const dialogRemoveFromAll = new lidl.Dialog(token3, ".removeFromAllButton", 'confirmDelete', removeFromAllContent, removeFromAllArgs);
+            lidlRTO.objectManager.addObject(dialogAddToAll, token3);
         });
     }
 }

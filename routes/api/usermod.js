@@ -119,6 +119,7 @@ router.delete('/:id', _delete);
 router.post('/addUserGroup/:id', addUserGroup);
 router.post('/removeUserGroup/:id', removeUserGroup);
 router.post('/addGroupToAllUser', addGroupToAllUser);
+router.post('/removeGroupFromAllUser', removeGroupFromAllUser);
 
 //role modification requires highest access rights
 router.all("/*", checkAdminRights);
@@ -445,6 +446,45 @@ function addGroupToAllUser(req, res, next){
                                         })
                                         .catch(function (err) {
                                             console.log("user not found.");
+                                            reject();
+                                        })
+                                })
+                        }))
+                    })
+                    Promise.all(promiseArray)
+                        .then(resultArray => {
+                            res.status(200).json({});
+                        })
+                        .catch(err => next(err))
+                })
+                .catch(err => next(err))
+        })
+        .catch(err => next(err));
+}
+
+function removeGroupFromAllUser(req, res, next){
+    //validate
+    if(req.body.userGroupId === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    //get user group form id
+    GroupService.getById(req.body.userGroupId)
+        .then(group => {
+            //get user list
+            userService.getAll()
+                .then(function (userlist) {
+                    let promiseArray = [];
+                    userlist.forEach(function (user) {
+                        promiseArray.push(new Promise(function (resolve, reject) {
+                            authService.checkUserGroupWriteAccess(req.user, user, group, false)
+                                .then(result => {
+                                    userService.removeUserGroup(req, user.id, group)
+                                        .then(user => {
+                                            resolve();
+                                        })
+                                        .catch(function (err) {
+                                            console.log("Failed to remove group from user "+ user.username);
                                             reject();
                                         })
                                 })

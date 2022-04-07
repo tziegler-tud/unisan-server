@@ -60,8 +60,8 @@ $(document).ready (function () {
 
     function buildPage(user, event) {
 
-        window.DockerElement = new docker.Docker(window.dockerArgs);
-        let eventDockerPageId = window.DockerElement.addDockerSubPage("event", event, {});
+        // window.DockerElement = new docker.Docker(window.dockerArgs);
+        let eventDockerPageId = window.DockerElement.addDockerSubPage("eventEdit", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 

@@ -39,15 +39,16 @@ block content
                                         .userprofile-heading-container
                                             h3.limitCharacters=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
                                             .userprofile-dropdown.dropdown-menu
-                                                .dropdown-btn
-                                                    svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                                                    .dropdown-container
-                                                        if allowedit
-                                                            .dropdown-entry
-                                                                a.before-icon.icon-edit(href="/unisams/user/edit/"+refurl) Akte bearbeiten
-                                                            .dropdown-entry.dropdown-entry-disabled.has-tooltip
-                                                                a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
-                                                                span.tooltip Bearbeitung aktivieren, um Mitglied zu entfernen
+                                                if allowedit
+                                                    .dropdown-btn
+                                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                                        .dropdown-container
+                                                            if allowedit
+                                                                .dropdown-entry
+                                                                    a.before-icon.icon-edit(href="/unisams/user/edit/"+refurl) Akte bearbeiten
+                                                                .dropdown-entry.dropdown-entry-disabled.has-tooltip
+                                                                    a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreUser.id, data-userid=exploreUser.id) Mitglied löschen
+                                                                    span.tooltip Bearbeitung aktivieren, um Mitglied zu entfernen
                                             .clear
                                     .clear
                         #content1-text.sec-content
@@ -82,18 +83,6 @@ block content
                                                                     .item-property.userkey-entry-value
                                                                         span.userinfo-item-label= exploreUser.username
 
-                                                            li.userinfo-item.user-entry.userkey-entry
-                                                                a.inner()
-                                                                    .item-property.userkey-entry-title
-                                                                        span.userinfo-item-label.userinfo-attribute-name id:
-                                                                    .item-property.userkey-entry-value
-                                                                        span.userinfo-item-label= exploreUser.id
-                                                            li.userinfo-item.user-entry.userkey-entry
-                                                                a.inner()
-                                                                    .item-property.userkey-entry-title
-                                                                        span.userinfo-item-label.userinfo-attribute-name Rolle:
-                                                                    .item-property.userkey-entry-value
-                                                                        span.userinfo-item-label= userrole
 
 
                                                     .userinfo-sectionheader
@@ -180,23 +169,6 @@ block content
                                                     .userinfo-sectionheader
                                                         span Qualifikationen
                                                     div#qualification-list
-
-
-                                        #tab-userinfo-role.userinfo-inner
-                                            .userinfo-section.userinfo-card.card-full.userwidget-description
-                                                .userinfo-section-inner
-                                                    .userinfo-sectionheader
-                                                        span Rollen
-                                                    div
-                                                        ul.userlist.itemlist.userinfo-itemList.qualificationList.border
-                                                            li.user-entry.noSelect.borderBottom
-                                                                .inner
-                                                                    .item-property Gruppe
-                                                            if usergroups
-                                                                each val in usergroups
-                                                                    li.user-entry
-                                                                        a.inner()
-                                                                            .item-property= val.title
 
                                         //#tab-userinfo-other.userinfo-inner
                                         //    .userinfo-section.userinfo-card.card-full.userwidget-description

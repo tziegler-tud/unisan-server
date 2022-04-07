@@ -216,7 +216,8 @@ function editEvent(req, res, next) {
                     user: req.user._doc,
                     title: event.title.value,
                     exploreEvent: event,
-                    refurl: req.params.id
+                    refurl: req.params.id,
+                    allowedit: true,
                 })
             }
         })
@@ -265,6 +266,7 @@ function eventLogs(req, res, next) {
                     title: ev.title.value,
                     exploreEvent: ev,
                     exploreEventDocument: ev._doc,
+                    allowedit: true
                 })
             }
         })

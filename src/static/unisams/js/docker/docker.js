@@ -40,20 +40,8 @@
 
         this.topBarHeight = 100; //default
 
-        //build access table
-        let access = {
-            user: {
-                show: false,
-                add: false,
-            },
-            events: {
-                show: false,
-                add: false,
-            },
-            apps: {
-                protocol: false,
-            }
-        }
+        this.dockerContext = dockerArgs.context;
+        this.dockerAcl = {}
 
         // build templating context
         let context = {
@@ -102,8 +90,10 @@
                         let userACL = values[0];
                         let domElements = values[1];
 
+                        self.dockerAcl = userACL.docker;
+                        context.docker = userACL.docker;
+
                         if(!phone.matches) {
-                            context.docker = userACL.docker;
                             var template = Handlebars.compile(domElements);
                             $(self.innerContainer).append(template(context));
                         }
@@ -453,9 +443,10 @@
      * @param {Object} data - JSON containing data for template rendering
      * @param {Object} options - overwrite [bool]: replace existing subpages if id matches, position: {place: ["fixed", "auto", "first", "last", "beforeMain"], group: <Number>}
      * @param {Number} [id] - (Optional) set id for the new subpage. Fails if id exists without the overwrite option
+     * @param dockerAcl {Object} - (Optional) json containing meta-data for template rendering
      * @returns {*}
      */
-    docker.Docker.prototype.addDockerSubPage = function(type, data, options, id){
+    docker.Docker.prototype.addDockerSubPage = function(type, data, options, id, dockerAcl){
         var self = this;
         let defaultOptions = {
             overwrite: false,
@@ -464,6 +455,7 @@
                 group: 0,
             },
         }
+        if (dockerAcl === undefined) dockerAcl = {};
         options = Object.assign({}, defaultOptions, options);
         // build context
         var context = {};
@@ -548,6 +540,8 @@
         function appendContent(template, context) {
             self.notifyWhenReady()
                 .then(function() {
+                    context.docker = self.dockerAcl;
+                    Object.assign(context.docker, dockerAcl); //subpage specific acl
                     var subpageContainer = document.getElementById("docker-subPage-container");
                     //create new wrapper
                     let subpageWrapper = document.createElement("div");

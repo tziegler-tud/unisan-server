@@ -50,7 +50,7 @@ $(document).ready (function () {
 
     function buildPage(user, event) {
 
-        window.DockerElement = new docker.Docker(window.dockerArgs);
+        // window.DockerElement = new docker.Docker(window.dockerArgs);
         let eventDockerPageId = window.DockerElement.addDockerSubPage("event", event, {});
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click");

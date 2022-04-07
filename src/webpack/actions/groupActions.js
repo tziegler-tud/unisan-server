@@ -81,6 +81,23 @@ var groupActions = {
         });
     },
 
+    removeGroupFromAllUser: function(userGroupId, args) {
+        let jsonData = {
+            userGroupId: userGroupId,
+            args: args,
+        }
+        $.ajax({
+            url: "/api/v1/usermod/removeGroupFromAllUser",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                location.replace("/unisams/settings/roles/"+userGroupId)
+            }
+        });
+    },
+
     addPermission: function(userGroupId, data, args) {
         let jsonData = {
             userGroupId: userGroupId,

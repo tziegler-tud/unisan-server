@@ -3,12 +3,16 @@ extends ../layout
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/settings/logs.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/settings/settings.css')
-    script(src="/static/unisams/js/settings.js")
-    script(src="/static/unisams/js/settings/logs.js")
+    script(src="/dist/settings.js")
 
 
 
     script.
+        //used to tell the bundled js which modules to load.
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["logs"],
+        };
         window.dockerArgs.activeContainer = "settingsContainer";
         window.dockerArgs.activeElementId = "settingsLogs";
 

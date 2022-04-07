@@ -1085,16 +1085,29 @@ async function addUserGroup(req, id, userGroup){
  * removes user from group
  * @param req {Object} express request
  * @param id user id
- * @param userGroupId id of group the user should be removed from
+ * @param userGroup {String | Object} id of group the user should be removed from
  * @returns {Promise<*>}
  */
 
-async function removeUserGroup(req, id, userGroupId){
+async function removeUserGroup(req, id, userGroup){
     let user = await User.findById(id).select('-hash');
 
+    let userGroupId, group;
+    //check group argument
+    if (typeof (userGroup) === "string") {
+        //id given
+        userGroupId = userGroup;
+        group = await UserGroup.findById(userGroup);
+    }
+    else {
+        if (userGroup.id !== undefined) {
+            //group given
+            userGroupId = userGroup.id;
+            group = userGroup;
+        }
+    }
     // validate
     if (!user) throw new Error('User not found');
-    let group = await UserGroup.findById(userGroupId);
     if (!group) throw new Error('invalid user group');
 
     return new Promise(function(resolve, reject){
@@ -1102,7 +1115,9 @@ async function removeUserGroup(req, id, userGroupId){
         aclService.getUserACL(id, false)
             .then(userACL=> {
                 //check if user has userGroup assigned
-                let index = userACL.userGroups.indexOf(userGroupId);
+                let index = userACL.userGroups.findIndex(g => {
+                    return g.toString() === userGroupId
+                });
                 if(index > -1){
                     // remove group
                     userACL.userGroups.splice(index, 1);

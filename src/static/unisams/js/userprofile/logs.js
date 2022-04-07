@@ -43,7 +43,7 @@ $(document).ready (function () {
                     height: "full",
                     sorting: {
                         property: "timestamp",
-                        direction: 1,
+                        direction: -1,
                     }
                 }
                 let callback = {

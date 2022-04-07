@@ -304,32 +304,23 @@ function userSettings(req, res, next) {
 }
 
 function userRoles(req, res, next) {
-    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.READ)
+    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
         .then(result => {
             userService.getByUsername(req.params.username)
                 .then(user => {
                     aclService.getUserACL(user.id, true)
                         .then(userACL => {
                             if (user) {
-
-                                //check if editing this user is allowed
-                                AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
-                                    .then(result => {
-                                        res.render("unisams/user/roles", {
-                                            user: req.user._doc,
-                                            title: user.username + " | Rechte & Rollen",
-                                            exploreUser: user,
-                                            exploreUserDocument: user.toJSON(),
-                                            userrole: userACL.userRole,
-                                            usergroups: userACL.userGroups,
-                                            refurl: req.params.username,
-                                            allowedit: true
-                                        })
-                                    })
-                                    .catch(err => {
-                                        var newPath = baseUrl + "/" + user.username;
-                                        res.redirect(newPath);
-                                    })
+                                res.render("unisams/user/roles", {
+                                    user: req.user._doc,
+                                    title: user.username + " | Rechte & Rollen",
+                                    exploreUser: user,
+                                    exploreUserDocument: user.toJSON(),
+                                    userrole: userACL.userRole,
+                                    usergroups: userACL.userGroups,
+                                    refurl: req.params.username,
+                                    allowedit: true
+                                })
                             } else {
                                 // try if id was given
                                 userService.getById(req.params.username)

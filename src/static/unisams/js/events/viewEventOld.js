@@ -52,7 +52,7 @@ $(document).ready (function () {
 
         let page = new window.eventPage.EventPage();
 
-        window.DockerElement = new docker.Docker(window.dockerArgs);
+        // window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", event);
 
         let callback = {

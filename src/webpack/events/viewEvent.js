@@ -57,8 +57,8 @@ $(document).ready (function () {
 
         let page = new window.eventPage.EventPage();
 
-        window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", event);
+        // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
+        window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
 
         const list = new MDCList(document.querySelector('.mdc-list'));
         const listItemRipples = list.listElements.map((listItemEl) => new MDCRipple(listItemEl));

@@ -78,35 +78,13 @@ let operations = {
         GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
     },
-}
-
-let operationsAll = {
-        USERREAD: "readUser", //read all user documents
-        USERWRITE: "writeUser", //write all user documents
-        USERCREATE: "createUser", //create user
-        USERDELETE: "deleteUser", //delete user
-        USERREADSELF: "readUserSelf", //read own user document
-        USERWRITESELF: "writeUserSelf", //write non-critical properties on own user document
-
-        EVENTREAD: "readEvent",
-        EVENTWRITE: "writeEvent",
-        EVENTCREATE: "createEvent",
-        EVENTDELETE: "deleteEvent",
-
-        READUSERROLE: "readUserRole",
-        WRITEUSERROLE: "writeUserRole",
-
-        GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
-        REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
-
-        GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
-        REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
-
-        GRANTEVENTADMINRIGHTS: "grantEventRights", //grant event admin rights to other users
-        REVOKEEVENTADMINRIGHTS: "revokeEventRights", //revoke event admin rights from other users
-
-        GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
-        REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
+    settings: {
+        LOGS: "manageSystemLogs",
+        EVENTS: "manageEventSettings",
+        USER: "manageUserSettings",
+        GOUPS: "manageGroupSettings",
+        SYSTEM: "manageSystemSettings",
+    }
 }
 
 let defaultMember = {
@@ -134,6 +112,8 @@ let defaultUserAdmin = {
         operations.user.DELETE,
         operations.access.GRANTUSERGROUPS,
         operations.access.REVOKEUSERGROUPS,
+
+        operations.settings.USER,
     ]
 }
 
@@ -149,6 +129,8 @@ let defaultEventAdmin = {
         operations.events.DELETE,
         operations.access.GRANTEVENTCONTROL,
         operations.access.REVOKEEVENTCONTROL,
+
+        operations.settings.EVENTS,
     ]
 }
 
@@ -170,6 +152,8 @@ let defaultAclAdmin = {
         operations.access.REVOKEUSERADMINRIGHTS,
         operations.access.GRANTEVENTADMINRIGHTS,
         operations.access.REVOKEEVENTADMINRIGHTS,
+
+        operations.settings.GOUPS,
     ]
 }
 
@@ -210,7 +194,14 @@ let defaultSysAdmin = {
         operations.access.REVOKEEVENTADMINRIGHTS,
 
         operations.access.GRANTSYSTEMADMINRIGHTS,
-        operations.access.REVOKESYSTEMADMINRIGHTS
+        operations.access.REVOKESYSTEMADMINRIGHTS,
+
+        operations.settings.EVENTS,
+        operations.settings.USER,
+        operations.settings.LOGS,
+        operations.settings.GOUPS,
+        operations.settings.SYSTEM,
+
     ]
 }
 

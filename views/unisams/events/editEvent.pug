@@ -5,7 +5,6 @@ block page_includes
     script(src="/static/unisams/js/actions.js")
     script(src="/static/unisams/js/eventActions.js")
 
-    //script(src="/static/unisams/js/events/editEvent.js")
     script(src="/dist/editEvent.js")
     script(src="/static/unisams/js/events/event.js")
     script(src="/static/unisams/js/editableTextField.js")
@@ -32,6 +31,7 @@ block page_includes
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventDetail";
+        window.allowedit =#{allowedit};
 
 block content
     #wrapper

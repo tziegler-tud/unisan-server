@@ -27,8 +27,14 @@
     var init = function(self) {
         let container = $(self.containerSelector);
         let trigger = $(self.triggerSelector);
-        lidl.assert(container);
-        lidl.assert(trigger);
+        try {
+            lidl.assert(container);
+            lidl.assert(trigger);
+        }
+        catch(e) {
+            console.error("Failed to build Dropdown menu. Reason: " + e)
+        }
+
 
         self.container = container;
         self.trigger = trigger;

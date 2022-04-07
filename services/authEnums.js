@@ -67,6 +67,13 @@ let operations = {
         GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
     },
+    settings: {
+        LOGS: "manageSystemLogs",
+        EVENTS: "manageEventSettings",
+        USER: "manageUserSettings",
+        GOUPS: "manageGroupSettings",
+        SYSTEM: "manageSystemSettings",
+    }
 }
 
 let operationsAll = {

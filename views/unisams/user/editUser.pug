@@ -73,23 +73,6 @@ block content
                                                                     .item-property.userkey-entry-value
                                                                         span= value
                                                                     .clear
-                                                            - var combinedKey = "id"
-                                                            - var keyTitle = "id"
-                                                            - var value = exploreUser.id
-                                                            li.user-entry.noSelect.cursor-default(id="userkey-" +combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                                a.inner()
-                                                                    .item-property.userkey-entry-title
-                                                                        span= keyTitle
-                                                                    .item-property.userkey-entry-value.has-tooltip.cursor-notAllowed
-                                                                        span= value
-                                                                        span.tooltip Id kann nicht verändert werden.
-                                                                    .clear
-                                                            li.userinfo-item.user-entry.userkey-entry
-                                                                a.inner()
-                                                                    .item-property.userkey-entry-title
-                                                                        span.userinfo-item-label.userinfo-attribute-name Rolle:
-                                                                    .item-property.userkey-entry-value
-                                                                        span.userinfo-item-label= userrole
 
                                                     .userinfo-sectionheader
                                                         span Allgemeine Daten
@@ -200,23 +183,6 @@ block content
                                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                             span Hinzufügen
                                                             .clear
-
-                                        #tab-userinfo-role.userinfo-inner
-                                            .userinfo-section.userinfo-card.card-full.userwidget-description
-                                                .userinfo-section-inner
-                                                    .userinfo-sectionheader
-                                                        span Rollen
-                                                    div
-                                                        ul.userlist.itemlist.userinfo-itemList.qualificationList.border
-                                                            li.user-entry.noSelect.borderBottom
-                                                                .inner
-                                                                    .item-property Gruppe
-                                                            if usergroups
-                                                                each val in usergroups
-                                                                    li.user-entry
-                                                                        a.inner()
-                                                                            .item-property= val.title
-                                                                            .item-property= val.description
 
                             #profilemanagment-menu.subpage-menu
                                 #btn01.subpage-menu-btn
