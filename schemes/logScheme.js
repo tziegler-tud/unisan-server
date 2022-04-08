@@ -63,12 +63,12 @@ var LogSchema = new Schema({
         targetModel: {
             type: String,
             required: true,
-            enum: ['User', 'Event'],
+            enum: ['User', 'Event',  "UserGroup"],
         },
         targetState: {
             type: String,
             enum: ['ACTIVE', 'DELETED']
-        }
+        },
     },
     timestamp: {
         type: Date,
@@ -108,7 +108,7 @@ LogSchema.virtual('description').get(function() {
 
         //validate
         let deleted = false;
-        if (this.target.targetObject === undefined || this.target.targetObject === null) {
+        if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
             let str = "<DELETED>";
             deleted = true;
             this.target.targetObject = {id: str + this.target.targetObjectId, username: str +this.target.targetObjectId};
@@ -249,7 +249,7 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userGroupDelete":
-                fullDescription.en = "user " + authorizedUser + " removed user : " + target +" to group " + this.action.value;
+                fullDescription.en = "user " + authorizedUser + " removed user : " + target +" from group " + this.action.value;
                 fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " von Gruppe " + this.action.value + " entfernt";
 
                 shortDescription.en = authorizedUser + " removed " + target + " from " + this.action.value;
@@ -281,7 +281,7 @@ LogSchema.virtual('description').get(function() {
     if (this.target.targetModel === "Event"){
         //validate
         let deleted = false;
-        if (this.target.targetObject === undefined || this.target.targetObject === null) {
+        if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
             let str = "<DELETED>";
             deleted = true;
             this.target.targetObject = {id: str + this.target.targetObjectId, title: {value: str +this.target.targetObjectId}};
@@ -403,6 +403,90 @@ LogSchema.virtual('description').get(function() {
         }
     }
 
+    if (this.target.targetModel === "UserGroup") {
+        //validate
+        let deleted = false;
+        if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
+            let str = "<DELETED>";
+            deleted = true;
+            this.target.targetObject = {
+                id: str + this.target.targetObjectId,
+                title: str + this.target.targetObjectId
+            };
+        }
+        let target = this.populated("target.targetObject") ? this.target.targetObject.title : this.action.key;
+        let targetGroup;
+        let permission = this.action.value;
+        switch (this.action.actionDetail) {
+            case "groupAdd":
+                fullDescription.en = "user " + authorizedUser + " created new userGroup: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat eine neue Gruppe erstellt: " + target;
+
+                shortDescription.en = authorizedUser + " created userGroup: " + target;
+                shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' erstellt";
+
+                actionDescription.en = "created userGroup: " + target;
+                actionDescription.de = target + "erstellt";
+
+                minDescription = this.action.value;
+                logType = "Gruppe erstellt";
+                break;
+            case "groupRemove":
+                fullDescription.en = "user " + authorizedUser + " removed userGroup: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat eine Gruppe entfernt: " + target;
+
+                shortDescription.en = authorizedUser + " removed userGroup: " + target;
+                shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' entfernt";
+
+                actionDescription.en = "removed userGroup: " + target;
+                actionDescription.de = target + "entfernt";
+
+                minDescription = this.action.value;
+                logType = "Gruppe entfernt";
+                break;
+            case "groupModify":
+                fullDescription.en = "user " + authorizedUser + " changed userGroup: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat eine Gruppe geändert: " + target;
+
+                shortDescription.en = authorizedUser + " changed userGroup: " + target;
+                shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' geändert";
+
+                actionDescription.en = "changed userGroup: " + target;
+                actionDescription.de = target + "geändert";
+
+                minDescription = this.action.value;
+                logType = "Gruppe geändert";
+                break;
+            case "groupAddPermission":
+                fullDescription.en = "user " + authorizedUser + " added permission: " + permission + "to userGroup: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Berechtigung zu Gruppe " + target + " hinzugefügt: " + permission;
+
+                shortDescription.en = authorizedUser + " added permission: " + permission + " to " + target;
+                shortDescription.de = authorizedUser + " hat Berechtigung'" + permission + "' zu " + target + "hinzugefügt";
+
+                actionDescription.en = target + ":added permission: " + permission;
+                actionDescription.de = target + " Berechtigung hinzugefügt: " + permission;
+
+                minDescription = this.action.value;
+                logType = "Berechtigung hinzugefügt";
+                break;
+            case "groupRemovePermission":
+                fullDescription.en = "user " + authorizedUser + " removed permission: " + permission + "to userGroup: " + target;
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Berechtigung von Gruppe " + target + " entfernt: " + permission;
+
+                shortDescription.en = authorizedUser + " removed permission: " + permission + " to " + target;
+                shortDescription.de = authorizedUser + " hat Berechtigung'" + permission + "' von " + target + "entfernt";
+
+                actionDescription.en = target + ":removed permission: " + permission;
+                actionDescription.de = target + " Berechtigung entfernt: " + permission;
+
+                minDescription = this.action.value;
+                logType = "Berechtigung entfernt";
+                break;
+        }
+    }
+
+
 
     let description = {
         fullDescription: fullDescription,
@@ -432,6 +516,8 @@ LogSchema.virtual('target.title').get(function() {
                     return oj.username;
                 case "Event":
                     return oj.title.value;
+                case "UserGroup":
+                    return oj.title;
             }
         }
     }
@@ -450,6 +536,13 @@ LogSchema.post('find', async function(docs) {
                 await doc.populate({
                     path: "target.targetObject",
                     model: "Event",
+                    select: "title",
+                });
+                break;
+            case "UserGroup":
+                await doc.populate({
+                    path: "target.targetObject",
+                    model: "UserGroup",
                     select: "title",
                 });
                 break;

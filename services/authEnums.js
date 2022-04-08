@@ -49,6 +49,9 @@ let operations = {
         DELETE: "deleteEvent",
     },
     access: {
+        READACL: "readAcl",
+        WRITEACL: "writeAcl",
+
         READUSERROLE: "readUserRole",
         WRITEUSERROLE: "writeUserRole",
 
@@ -76,39 +79,9 @@ let operations = {
     }
 }
 
-let operationsAll = {
-    USERREAD: "readUser", //read all user documents
-    USERWRITE: "writeUser", //write all user documents
-    USERCREATE: "createUser", //create user
-    USERDELETE: "deleteUser", //delete user
-    USERREADSELF: "readUserSelf", //read own user document
-    USERWRITESELF: "writeUserSelf", //write non-critical properties on own user document
-
-    EVENTREAD: "readEvent",
-    EVENTWRITE: "writeEvent",
-    EVENTCREATE: "createEvent",
-    EVENTDELETE: "deleteEvent",
-
-    READUSERROLE: "readUserRole",
-    WRITEUSERROLE: "writeUserRole",
-
-    GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
-    REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
-
-    GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
-    REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
-
-    GRANTEVENTADMINRIGHTS: "grantEventRights", //grant event admin rights to other users
-    REVOKEEVENTADMINRIGHTS: "revokeEventRights", //revoke event admin rights from other users
-
-    GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
-    REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
-}
-
 module.exports.rolesMap = rolesMap;
 module.exports.rolesEnum = rolesEnum;
 module.exports.groupsEnum = groupsEnum;
 module.exports.groupActionsEnum = groupActionsEnum;
 module.exports.roles = roles;
 module.exports.operations = operations;
-module.exports.operationsAll = operationsAll;

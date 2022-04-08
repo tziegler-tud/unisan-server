@@ -1,3 +1,4 @@
+const Mongoose = require('mongoose')
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
@@ -60,6 +61,9 @@ let operations = {
         DELETE: "deleteEvent",
     },
     access: {
+        READACL: "readAcl",
+        WRITEACL: "writeAcl",
+
         READUSERROLE: "readUserRole",
         WRITEUSERROLE: "writeUserRole",
 
@@ -77,6 +81,12 @@ let operations = {
 
         GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
+    },
+    groups: {
+        READ: "readGroups",
+        WRITE: "writeGroups",
+        CREATE: "createGroups",
+        DELETE: "deleteGroups",
     },
     settings: {
         LOGS: "manageSystemLogs",
@@ -112,6 +122,8 @@ let defaultUserAdmin = {
         operations.user.DELETE,
         operations.access.GRANTUSERGROUPS,
         operations.access.REVOKEUSERGROUPS,
+
+        operations.access.READACL,
 
         operations.settings.USER,
     ]
@@ -153,6 +165,14 @@ let defaultAclAdmin = {
         operations.access.GRANTEVENTADMINRIGHTS,
         operations.access.REVOKEEVENTADMINRIGHTS,
 
+        operations.access.READACL,
+        operations.access.WRITEACL,
+
+        operations.groups.READ,
+        operations.groups.WRITE,
+        operations.groups.CREATE,
+        operations.groups.DELETE,
+
         operations.settings.GOUPS,
     ]
 }
@@ -180,6 +200,9 @@ let defaultSysAdmin = {
         operations.events.WRITE,
         operations.events.DELETE,
 
+        operations.access.READACL,
+        operations.access.WRITEACL,
+
         operations.access.READUSERROLE,
         operations.access.WRITEUSERROLE,
 
@@ -195,6 +218,11 @@ let defaultSysAdmin = {
 
         operations.access.GRANTSYSTEMADMINRIGHTS,
         operations.access.REVOKESYSTEMADMINRIGHTS,
+
+        operations.groups.READ,
+        operations.groups.WRITE,
+        operations.groups.CREATE,
+        operations.groups.DELETE,
 
         operations.settings.EVENTS,
         operations.settings.USER,
@@ -641,12 +669,23 @@ class AuthService {
         let self = this;
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
-
+        let targetId;
+        if (!Mongoose.isObjectIdOrHexString(target)) {
+            //try if object was given
+            if (Mongoose.isObjectIdOrHexString(target.id)) {
+                targetId = target.id;
+            }
+        }
+        else {
+            targetId = target;
+        }
         return new Promise(function(resolve, reject){
             aclService.getUserACL(user)
                 .then(userACL => {
                     //try to find target in individuals
-                    let targetRights = userACL.individual.events.find(object => object.target.toString() === target.toString())
+                    let targetRights = userACL.individual.events.find(object => {
+                        return object.target.toString() === targetId.toString()
+                    })
                     if (targetRights === undefined){
                         //no entry for target
                         let err = self.createForbiddenError();
@@ -701,6 +740,7 @@ class AuthService {
      * @returns {Boolean} true if valid
      */
     checkIfValidOperation(operation){
+        if (operation === undefined || operation === null) return false;
         for (const [key, value] of Object.entries(operations)) {
             if (Object.values(value).includes(operation)) return true;
         }
@@ -755,6 +795,8 @@ class AuthService {
                                     Object.assign(bakGroup, dbGroup);
                                     delete bakGroup.id;
                                     bakGroup.title = "BACKUP: " + dbGroup.title;
+                                    bakGroup.type = "system";
+                                    bakGroup.default = false;
                                     let bak = new UserGroup(bakGroup);
                                     bak.save()
                                         .then()

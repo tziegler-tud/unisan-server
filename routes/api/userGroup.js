@@ -4,6 +4,7 @@ const passport = require('passport');
 var router = express.Router();
 const bodyParser = require("body-parser");
 const userGroupService = require("../../services/userGroupService");
+const AuthService = require("../../services/authService");
 
 var app = express();
 
@@ -14,16 +15,78 @@ app.use(bodyParser.json());
 
 //hooked at /api/v1/groups
 
+function checkRead(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.groups.READ)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function checkWrite(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.groups.WRITE)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+
+function checkCreate(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.groups.CREATE)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+
+function checkDelete(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.groups.DELETE)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+
+function checkReadAssigned(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.access.READACL)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
 // routes
-router.get('/', getUserGroups);
-router.post('', createGroup);
-router.put('/:id', updateGroup);
-router.delete('/:id', deleteGroup);
-router.get('/:id', getGroup);
-router.get("/assigned/:id", getAssignedUser);
-router.post('/addPermission/:id', addGroupPermission);
-router.post('/updatePermission/:id', updateGroupPermission);
-router.delete('/removePermission/:id', removeGroupPermission);
+router.get('/', checkRead, getUserGroups);
+router.post('', checkCreate, createGroup);
+router.put('/:id', checkWrite, updateGroup);
+router.delete('/:id', checkDelete, deleteGroup);
+router.get('/:id', checkRead, getGroup);
+router.get("/assigned/:id", checkReadAssigned, getAssignedUser);
+router.post('/addPermission/:id', checkWrite, addGroupPermission);
+router.delete('/removePermission/:id', checkWrite, removeGroupPermission);
 
 function getUserGroups(req, res, next){
     userGroupService.getAll()
@@ -38,13 +101,13 @@ function createGroup(req, res, next){
 }
 
 function updateGroup(req, res, next){
-    userGroupService.update(req.params.id, req.body)
+    userGroupService.update(req, req.params.id, req.body, false)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
 
 function deleteGroup(req, res, next){
-    userGroupService._delete(req, req.params.id)
+    userGroupService._delete(req, req.params.id, false)
         .then(function(result) {
             res.status(200).send()
         })
@@ -60,19 +123,13 @@ function getGroup(req, res, next){
 }
 
 function addGroupPermission(req, res, next){
-    userGroupService.addPermission(req.params.id, req.body.method, req.body.url)
-        .then(result => res.json(result))
-        .catch(err => next(err));
-}
-
-function updateGroupPermission(req, res, next){
-    userGroupService.updatePermission(req.params.id, req.body.currentMethod, req.body.currentUrl, req.body.newMethod, req.body.newUrl)
+    userGroupService.addPermission(req, req.params.id, req.body.operation, false)
         .then(result => res.json(result))
         .catch(err => next(err));
 }
 
 function removeGroupPermission(req, res, next){
-    userGroupService.removePermission(req.params.id, req.body.method, req.body.url)
+    userGroupService.removePermission(req, req.params.id, req.body.operation, false)
         .then(result => res.json(result))
         .catch(err => next(err));
 }

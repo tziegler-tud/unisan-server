@@ -67,10 +67,7 @@ let advanced = {
                 addDBKey_sidebar.addContent('updateGroupPath', {
                         group: group,
                         groupId: groupId,
-                        permission: {
-                            method: e.currentTarget.dataset.method,
-                            url: e.currentTarget.dataset.url,
-                        },
+                        operation: e.currentTarget.dataset.operation,
                         callback: {
                             onConfirm: function (id, data, args) {
                                 groupActions.updatePermission(id, data, args);

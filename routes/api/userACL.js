@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const userGroupService = require("../../services/userGroupService");
 const aclService = require("../../services/aclService");
 const authService = require("../../services/authService");
+const AuthService = require("../../services/authService");
 
 var app = express();
 
@@ -17,18 +18,67 @@ app.use(bodyParser.json());
 //hooked at /api/v1/acl
 
 // routes
+//debug functions, remove for production TODO: remove before production
 router.post("/rebuildFromData", rebuildFromUserData);
 router.post("/rebuildNew", rebuildUserAcls)
 
-router.get('/', getAll);
+router.get('/', checkRead, getAll);
 router.get('/current', getCurrentAcl);
-router.get('/:id', getUserACL);
-router.post('/:id', createUserACL);
-router.put('/:id', updateUserACL);
-router.delete('/:id', deleteACL);
-router.post('/addGroup/:id', addGroup);
-router.delete('/removeGroup/:id', removeGroup);
+router.get('/:id', checkRead, getUserACL);
+router.post('/:id', checkWrite, createUserACL);
+router.put('/:id', checkWrite, updateUserACL);
+router.delete('/:id', checkWrite, deleteACL);
+// router.post('/addGroup/:id', addGroup);
+// router.delete('/removeGroup/:id',removeGroup);
 
+
+function checkRead(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.access.READACL)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function checkReadRole(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.access.READUSERROLE)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function checkWriteRole(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.access.WRITEUSERROLE)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function checkWrite(req, res, next){
+    // check group permissions
+    AuthService.auth(req.user, AuthService.operations.access.WRITEACL)
+        .then(function(result) {
+            console.log("authorization successful!");
+            next();
+        })
+        .catch(err => {
+            next(err);
+        })
+}
 
 
 

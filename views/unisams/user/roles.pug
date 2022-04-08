@@ -109,6 +109,21 @@ block content
                                                                     a.inner()
                                                                         .item-property= val.title
                                                                         .item-property= val.description
+                                    #tab-userinfo-individual.userinfo-inner
+                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                            .userinfo-section-inner
+                                                .userinfo-sectionheader
+                                                    span Events
+                                                div
+                                                    ul.userlist.itemlist.userinfo-itemList.qualificationList.border
+                                                        li.user-entry.noSelect.borderBottom
+                                                            .inner
+                                                                .item-property Event
+                                                        if individual
+                                                            each val in individual.events
+                                                                li.user-entry
+                                                                    a.inner()
+                                                                        .item-property= val
 
                             #profilemanagment-menu.subpage-menu
                                 #btn01.subpage-menu-btn

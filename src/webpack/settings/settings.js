@@ -1,6 +1,8 @@
 //load settings modules
 import {logs} from "./logs.js";
 import {groups} from "./groups.js";
+import {user} from "./user.js";
+import {events} from "./events.js";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
@@ -17,7 +19,17 @@ $(document).ready(function () {
         title: "groups",
         loader: groups,
     };
-    loaders.push(logsLoader, groupsLoader);
+
+    let userLoader = {
+        title: "user",
+        loader: user,
+    };
+
+    let eventsLoader = {
+        title: "events",
+        loader: events,
+    };
+    loaders.push(logsLoader, groupsLoader, userLoader, eventsLoader);
 
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;

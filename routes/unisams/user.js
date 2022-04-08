@@ -316,8 +316,10 @@ function userRoles(req, res, next) {
                                     title: user.username + " | Rechte & Rollen",
                                     exploreUser: user,
                                     exploreUserDocument: user.toJSON(),
+                                    userACL: userACL,
                                     userrole: userACL.userRole,
                                     usergroups: userACL.userGroups,
+                                    individual: userACL.individual,
                                     refurl: req.params.username,
                                     allowedit: true
                                 })

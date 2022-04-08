@@ -14,6 +14,7 @@ module.exports = {
     getById,
     create,
     delete: _delete,
+    deleteAll: _deleteAll,
     getTargetLogs,
     getTargetLogsById,
     addModelUser,
@@ -27,11 +28,10 @@ module.exports = {
  * Gets all log entries
  */
 async function getAll() {
-    let logs = await dbLog.find().populate({
+    return dbLog.find().populate({
         path: 'authorizedUser',
         select: 'generalData username',
     }).sort({"timestamp": -1});
-    return logs;
 }
 
 /**
@@ -76,13 +76,15 @@ async function getTargetLogs(target, logType){
             select: "username"
         }).sort({"timestamp": -1});
     }
-    dbLog.find({logType: logType, "target.targetObject": target.id}).populate({
-        path: 'authorizedUser',
-        select: 'generalData username',
-    }).populate({
-        path: 'target.targetObject',
-        select: "username"
-    }).sort({"timestamp": -1});
+    else {
+        return dbLog.find({logType: logType, "target.targetObject": target.id}).populate({
+            path: 'authorizedUser',
+            select: 'generalData username',
+        }).populate({
+            path: 'target.targetObject',
+            select: "username"
+        }).sort({"timestamp": -1});
+    }
 }
 
 /**
@@ -127,9 +129,17 @@ async function _delete(req, id) {
     // validate
     if (!log) throw new Error('Log not found');
     //check write access
-    if(!AuthService.checkRequiredRole(req.user, AuthService.rolesEnum.SUPERADMIN)) throw {status: 403, message: "forbidden"};
     await dbLog.findByIdAndRemove(id);
     return true;
+}
+
+/**
+ * Deletes a log entry
+ * @param req {Object} express request
+ * @param {number} id id of log to delete
+ */
+async function _deleteAll() {
+    return dbLog.deleteMany()
 }
 
 

@@ -20,8 +20,13 @@ var UserACLSchema = new Schema({
     }],
     individual: {
         events: [{
-            type: Schema.Types.ObjectId,
-            ref: "Event",
+            target: {
+                type: Schema.Types.ObjectId,
+                ref: "Event",
+            },
+            allowedOperations: [{
+                type: String,
+            }]
         }],
     },
     docker: {},

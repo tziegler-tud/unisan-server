@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 const AuthService = require('./authService');
 const LogService = require("./logService");
+const UserService = require("./userService");
 const Log = require('../utils/log');
 
 
@@ -369,6 +370,11 @@ async function addParticipant(req, id, userId, args) {
         role: role,
     }
 
+    let operationsArray = [
+          AuthService.operations.events.READ,
+          AuthService.operations.events.WRITE,
+    ]
+
     // check if user is already registered as participant
     try {
         //check if user is registered
@@ -387,6 +393,7 @@ async function addParticipant(req, id, userId, args) {
             throw e;
         }
     }
+    var log;
 
     if (index > -1) {
         // user already registered.
@@ -396,10 +403,50 @@ async function addParticipant(req, id, userId, args) {
         }
         else {
             //overwrite
-            event.participants.splice(index, 1, data);
-            if(role === "admin") {
-                addEventAdmin(event, user);
+
+            //check if user was admin
+            if(event.participants[index].role === "admin"){
+                removeEventAdmin(req,event,user)
+                    .then(result => {
+                        // console.log("individual access rights removed from user "+ user.username);
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
             }
+            event.participants.splice(index, 1, data);
+
+            if(role === "admin") {
+                addEventAdmin(req, event, user, operationsArray)
+                    .then(result => {
+                        console.log("individual access rights added to user "+ user.username);
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+            }
+
+            log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "event",
+                    actionType: "modify",
+                    actionDetail: "eventChangeParticipantRole",
+                    key: user.username,
+                    value:  role,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "event",
+                    targetObject: event._id,
+                    targetObjectId: event._id,
+                    targetModel: "Event",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
         }
 
     }
@@ -407,10 +454,15 @@ async function addParticipant(req, id, userId, args) {
         // push user to participants array
         event.participants.push(data);
         if(role === "admin") {
-            addEventAdmin(event, user);
+            addEventAdmin(req, event, user, operationsArray)
+                .then(result => {
+                    console.log("individual access rights added to user "+ user.username);
+                })
+                .catch(err => {
+                    console.error(err)
+                })
         }
-        //create log
-        let log = new Log({
+        log = new Log({
             type: "modification",
             action: {
                 objectType: "event",
@@ -431,10 +483,16 @@ async function addParticipant(req, id, userId, args) {
                 url: req.originalUrl,
             }
         })
-        LogService.create(log).then().catch();
+
     }
 
-    await event.save();
+    return event.save()
+        .then(result => {
+            //create log
+            LogService.create(log).then().catch();
+        })
+
+
 }
 
 /**
@@ -472,6 +530,15 @@ async function removeParticipant(req, id, userId, args) {
     }
 
     if (index > -1) {
+        if(event.participants[index].role === "admin"){
+            removeEventAdmin(req,event,user)
+                .then(result => {
+                    console.log("individual access rights removed from user "+ user.username);
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        }
         // user found. removing
         event.participants.splice(index, 1);
         //create log
@@ -513,8 +580,6 @@ async function removeParticipant(req, id, userId, args) {
 async function _delete(req, id) {
     // await Event.findByIdAndRemove(id);
     let event = await Event.findById(id);
-    //check write access
-    if(!AuthService.checkEventWriteAccess(req.user, event)) throw {status: 403, message: "forbidden"};
 
     // await User.findByIdAndRemove(id);
     Event.findByIdAndRemove(id)
@@ -726,14 +791,10 @@ async function removeFileReference(req, event, filename, args) {
 }
 
 
-function addEventAdmin(event, user) {
-    if (event.accessRights.admin.includes(user.id)){
-        //already admin. skip
-    }
-    else {
-        //add to admin array
-        event.accessRights.admin.push(user.id);
-    }
-    return event;
+async function addEventAdmin(req, event, user, operationsArray) {
+    return UserService.addIndividualEventAccess(req, user.id, event.id, operationsArray)
 }
 
+async function removeEventAdmin(req, event, user) {
+    return UserService.removeIndividualEventAccess(req, user.id, event.id)
+}

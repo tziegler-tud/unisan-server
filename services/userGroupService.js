@@ -3,6 +3,9 @@ const db = require('../schemes/mongo');
 
 const UserService = require("./userService");
 const aclService = require("./aclService");
+const AuthService = require("./authService");
+const Log = require("../utils/log");
+const LogService = require("./logService");
 
 const UserGroup = db.UserGroup;
 
@@ -15,7 +18,6 @@ module.exports = {
     create,
     _delete,
     addPermission,
-    updatePermission,
     removePermission,
     getAssignedUser,
 };
@@ -44,7 +46,9 @@ async function getByTitle(title) {
 
 /**
  * Creates a new group from qualified JSON object
+ * @param {Object} req request object
  * @param {UserGroup} groupObject
+ * @þaram {Object} args
  */
 async function create(req, groupObject, args) {
     // create group document
@@ -52,17 +56,43 @@ async function create(req, groupObject, args) {
     groupObject.default = false;
     const group = new UserGroup(groupObject);
     // save in database
-    return group.save();
+    return group.save()
+        .then(result => {
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "userGroup",
+                    actionType: "add",
+                    actionDetail: "groupAdd",
+                    key: group.title,
+                    value: "",
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "userGroup",
+                    targetObject: group._id,
+                    targetObjectId: group._id,
+                    targetModel: "UserGroup",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        })
 }
 
 
 /**
  * Updates an existing group
+ *
+ * @param {Object} req request object
  * @param {number} id groupId
  * @param {UserGroup} groupObject
- * @param {Boolean} allowDefaultOverwrite
+ * @param {Boolean} allowDefaultOverwrite must be true to modify default groups
  */
-async function update(id, groupObject, allowDefaultOverwrite) {
+async function update(req, id, groupObject, allowDefaultOverwrite) {
     if (allowDefaultOverwrite === undefined) allowDefaultOverwrite = false;
     return new Promise(function(resolve, reject){
         let msg = "Failed to update group: ";
@@ -73,8 +103,30 @@ async function update(id, groupObject, allowDefaultOverwrite) {
                 // copy qualParam properties to qualification document
                 Object.assign(group, groupObject);
                 group.save()
-                    .then(result=>{
+                    .then(group=>{
                         resolve(result);
+                        let log = new Log({
+                            type: "modification",
+                            action: {
+                                objectType: "userGroup",
+                                actionType: "modify",
+                                actionDetail: "groupModify",
+                                key: group.title,
+                                value: "",
+                            },
+                            authorizedUser: req.user,
+                            target: {
+                                targetType: "userGroup",
+                                targetObject: undefined,
+                                targetObjectId: group._id,
+                                targetModel: "UserGroup",
+                            },
+                            httpRequest: {
+                                method: req.method,
+                                url: req.originalUrl,
+                            }
+                        })
+                        LogService.create(log).then().catch();
                     })
                     .catch(err => {
                         reject(err)
@@ -92,7 +144,7 @@ async function update(id, groupObject, allowDefaultOverwrite) {
  * Deletes a group
  * @param {Object} req request object
  * @param {number} id The id of the group to delete
- * @param {Boolean} allowDefaultOverwrite
+ * @param {Boolean} allowDefaultOverwrite must be true to modify default groups
  */
 async function _delete(req, id, allowDefaultOverwrite) {
     if (allowDefaultOverwrite === undefined) allowDefaultOverwrite = false;
@@ -108,6 +160,30 @@ async function _delete(req, id, allowDefaultOverwrite) {
                             UserGroup.findByIdAndRemove(id)
                                 .then(function(result){
                                     resolve(result);
+                                    let log = new Log({
+                                        type: "modification",
+                                        action: {
+                                            objectType: "userGroup",
+                                            actionType: "delete",
+                                            actionDetail: "groupRemove",
+                                            key: group.title,
+                                            value: "",
+                                            tag: "<DELETE>"
+                                        },
+                                        authorizedUser: req.user,
+                                        target: {
+                                            targetType: "userGroup",
+                                            targetObject: group._id,
+                                            targetObjectId: group._id,
+                                            targetModel: "UserGroup",
+                                            targetState: "DELETED"
+                                        },
+                                        httpRequest: {
+                                            method: req.method,
+                                            url: req.originalUrl,
+                                        }
+                                    })
+                                    LogService.create(log).then().catch();
                                 })
                                 .catch(err => {
                                     reject(msg + err);
@@ -126,121 +202,76 @@ async function _delete(req, id, allowDefaultOverwrite) {
 
 /**
  * adds a permission to a group
+ * @param {Object} req request object
  * @param {number} id group id
- * @param {String} method String denoting the html request method <["GET","POST","PUT","DELETE", "ALL"]>
- * @param {String} url  the url for which the rule applies
+ * @param {String} newOperation operation string. use authEnums
+ * @param {Boolean} allowDefaultOverwrite must be true to modify default groups
  */
 
-async function addPermission(id, method, url) {
+async function addPermission(req, id, newOperation, allowDefaultOverwrite) {
+    let errmsg = "Failed to update Group operation. "
     const group = await UserGroup.findById(id);
-    let methods = ["GET", "POST", "PUT", "DELETE", "ALL"];
     // validate
     if (group == null) throw new Error('Group not found');
-    if(!methods.includes(method)) {
-        console.log("invalid method. Aborting...");
-        throw new Error('Invalid method');
+    if (group.default && !allowDefaultOverwrite) {
+        throw new Error(errmsg + "Reason: Modifying default groups is not allowed.")
     }
-    if(typeof url === 'string') {
-        var reg = new RegExp(/^[^\/]+\/[^\/].*$|^\/[^\/].*$/gmi);
-        if (!reg.test(url)){
-            throw new Error("invalid url");
-        }
-    }
-    else {
-        throw new Error("url not a string");
+    if(!AuthService.checkIfValidOperation(newOperation)){
+        throw new Error(errmsg + "Reason: Invalid Operation")
     }
 
-    let permissionObject = {
-        method: method,
-        url: url,
-    };
-    group.allowedOperations.push(permissionObject);
-    await group.save();
-    return group;
-}
-
-/**
- * updates a permission
- * @param {number} id group id
- * @param {String} currentMethod String denoting the html request method to be updated
- * @param {String} currentUrl  the url to be updated
- * @param {String} newMethod String denoting the updated html request method <["GET","POST","PUT","DELETE", "ALL"]>
- * @param {String} newUrl  the updated url for which the rule applies
- */
-
-async function updatePermission(id, currentMethod, currentUrl, newMethod, newUrl) {
-    const group = await UserGroup.findById(id);
-    let methods = ["GET", "POST", "PUT", "DELETE", "ALL"];
-    // validate
-    if (group == null) throw new Error('Group not found');
-    if(!methods.includes(newMethod)) {
-        console.log("invalid method. Aborting...");
-        throw new Error('Invalid method');
-    }
-    if(typeof newUrl === 'string') {
-        var reg = new RegExp(/^[^\/]+\/[^\/].*$|^\/[^\/].*$/gmi);
-        if (!reg.test(newUrl)){
-            throw new Error("invalid url");
-        }
-    }
-    else {
-        throw new Error("url not a string");
-    }
-
-    let permissionObject = {
-        method: newMethod,
-        url: newUrl,
-    };
-
-    //find object in array
-    let index = group.allowedOperations.findIndex(function(v){
-        return (v.method === currentMethod && v.url === currentUrl);
-    });
-
-    if (index > -1){
-        //remove
-        group.allowedOperations[index] = permissionObject;
-    }
-    else {
-        throw new Error("operation not found.")
-    }
-    return group.save();
+    group.allowedOperations.push(newOperation);
+    return group.save()
+        .then(group => {
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "userGroup",
+                    actionType: "modify",
+                    actionDetail: "groupAddPermission",
+                    key: group.title,
+                    value: newOperation,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "userGroup",
+                    targetObject: group._id,
+                    targetObjectId: group._id,
+                    targetModel: "UserGroup",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        })
 }
 
 /**
  * removes a permission
+ * @param {Object} req request object
  * @param {number} id group id
- * @param {String} method String denoting the html request method <["GET","POST","PUT","DELETE"]>
- * @param {String} url  the url for which the rule applies
+ * @param {String} operation operation string. use authEnums
+ * @param {Boolean} allowDefaultOverwrite must be true to modify default groups
  */
 
-async function removePermission(id, method, url) {
+async function removePermission(req, id, operation, allowDefaultOverwrite) {
+    let errmsg = "Failed to update Group operation. "
     const group = await UserGroup.findById(id);
-    let methods = ["GET", "POST", "PUT", "DELETE", "ALL"];
     // validate
     if (group == null) throw new Error('Group not found');
-    if(!methods.includes(method)) {
-        console.log("invalid method. Aborting...");
-        throw new Error('Invalid method');
-    }
-    if(typeof url === 'string') {
-        var reg = new RegExp(/^[^\/]+\/[^\/].*$|^\/[^\/].*$/gmi);
-        if (!reg.test(url)){
-            throw new Error("invalid url");
-        }
-    }
-    else {
-        throw new Error("url not a string");
+    if (group.default && !allowDefaultOverwrite) {
+        throw new Error(errmsg + "Reason: Modifying default groups is not allowed.")
     }
 
-    let permissionObject = {
-        method: method,
-        url: url,
-    };
+    if(!AuthService.checkIfValidOperation(operation)){
+        throw new Error(errmsg + "Reason: Invalid Operation")
+    }
 
     //find object in array
     let index = group.allowedOperations.findIndex(function(v){
-        return (v.method === method && v.url === url);
+        return (v === operation);
     });
 
     if (index > -1){
@@ -250,7 +281,31 @@ async function removePermission(id, method, url) {
     else {
         throw new Error("operation not found.")
     }
-    return group.save();
+    return group.save()
+        .then(group => {
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "userGroup",
+                    actionType: "modify",
+                    actionDetail: "groupRemovePermission",
+                    key: group.title,
+                    value: operation,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "userGroup",
+                    targetObject: group._id,
+                    targetObjectId: group._id,
+                    targetModel: "UserGroup",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
+                }
+            })
+            LogService.create(log).then().catch();
+        })
 }
 
 async function getAssignedUser(id) {

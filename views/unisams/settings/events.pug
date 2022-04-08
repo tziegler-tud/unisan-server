@@ -1,0 +1,38 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
+    script(src="/static/unisams/js/qualificationActions.js")
+    //script(src="/static/unisams/js/settings.js")
+    script(src="/dist/settings.js")
+
+
+
+    script.
+        //used to tell the bundled js which modules to load.
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["events"],
+        };
+        window.dockerArgs.activeContainer = "settingsContainer";
+        window.dockerArgs.activeElementId = "settingsEvents";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            h3 Einstellungen: Events
+                        #content1-text.sec-content
+                            .subpage-options
+                            .subpage-content
+
+                            #usermanagment-menu.subpage-menu
+                                #btn01.subpage-menu-btn
+
+
+
+

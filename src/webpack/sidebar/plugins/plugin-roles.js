@@ -225,8 +225,7 @@ let addGroupPath = new ContentHandler("addGroupPath",
                 sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
                 sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
                     let data = {
-                        url: $("#changeGroupForm-url").val(),
-                        method: $("#changeGroupForm-method").val(),
+                        operation: $("#changeGroupForm-operation").val(),
                     };
                     onConfirm(groupId, data);
                 }.bind(args));
@@ -241,14 +240,14 @@ let updateGroupPath = new ContentHandler("updateGroupPath",
         var onConfirm = args.callback.onConfirm;
         var onDelete = args.callback.onDelete;
         var corrupted = false;
-        var currentPermission = args.permission;
+        var currentOperation = args.operation;
 
         var res = {};
 
         getDataFromServer("/api/v1/groups/"+ groupId,function(context){
             res.group = context;
             res.groupId = groupId;
-            res.permission = currentPermission
+            res.operation = currentOperation
             action(res)
         });
 
@@ -258,23 +257,23 @@ let updateGroupPath = new ContentHandler("updateGroupPath",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                $("#changeGroupForm-method").val(context.permission.method);
+                //TODO: remove dummy and implement
+                //usergroups might compromise auth. needs further work
+                //dummy until resolved
+                var opt = document.createElement('option');
+                opt.value = context.operation;
+                opt.innerHTML = context.operation;
+                document.getElementById("changeGroupForm-operation").appendChild(opt);
+
+                $("#changeGroupForm-operation").val(context.operation);
 
                 sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
-                    let data = {
-                        url: $("#changeGroupForm-url").val(),
-                        method: $("#changeGroupForm-method").val(),
-                        current: currentPermission,
-                    };
-                    onConfirm(groupId, data);
-                }.bind(args));
 
                 sidebar.registerButton (sidebar, ".sidebar-delete", function(){
 
                     if (corrupted) {
                     }
-                    onDelete(groupId, currentPermission);
+                    onDelete(groupId, currentOperation);
                 }.bind(args));
             });
         };

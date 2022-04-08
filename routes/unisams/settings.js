@@ -46,7 +46,7 @@ function database (req, res, next) {
     qualificationService.getAll()
         .then(quals => {
             qualList = quals;
-            res.render("unisams/settings/settings", {title: "settings - uniSams",
+            res.render("unisams/settings/settingsDatabase", {title: "settings - uniSams",
                 user: req.user._doc,
                 qualificationList: qualList
             })
@@ -57,34 +57,16 @@ function database (req, res, next) {
 }
 
 function user (req, res, next) {
-    var qualList = {};
-    qualificationService.getAll()
-        .then(quals => {
-            qualList = quals;
-            res.render("unisams/settings/settings", {title: "settings - uniSams",
-                user: req.user._doc,
-                qualificationList: qualList
-            })
-        })
-        .catch(err => {
-            next(err);
-        })
+    res.render("unisams/settings/user", {title: "settings - uniSams",
+        user: req.user._doc,
+    })
 }
 
 
 function events (req, res, next) {
-    var qualList = {};
-    qualificationService.getAll()
-        .then(quals => {
-            qualList = quals;
-            res.render("unisams/settings/settings", {title: "settings - uniSams",
-                user: req.user._doc,
-                qualificationList: qualList
-            })
-        })
-        .catch(err => {
-            next(err);
-        })
+    res.render("unisams/settings/events", {title: "settings - uniSams",
+        user: req.user._doc,
+    })
 }
 
 

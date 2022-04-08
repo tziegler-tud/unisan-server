@@ -8,10 +8,25 @@ module.exports = {
         login: "./src/webpack/login.js",
         login_style: "./src/webpack/login.scss",
 
+        index: "./src/webpack/index.js",
+        index_style: "./src/webpack/index.scss",
+
         addUser: "./src/webpack/user/addUser.js",
         addUser_style: "./src/webpack/user/addUser.scss",
         editUser: "./src/webpack/user/editUser.js",
         editUser_style: "./src/webpack/user/editUser.scss",
+
+        viewUser: "./src/webpack/user/viewUser.js",
+        viewUser_style: "./src/webpack/user/viewUser.scss",
+
+        userEvents: "./src/webpack/user/userEvents.js",
+        userEvents_style: "./src/webpack/user/userEvents.scss",
+
+        userLogs: "./src/webpack/user/userLogs.js",
+        userLogs_style: "./src/webpack/user/userLogs.scss",
+
+        userlist: "./src/webpack/user/userlist.js",
+        userlist_style: "./src/webpack/user/userlist.scss",
 
         drawer: "./src/webpack/drawer.js",
         drawer_style: "./src/webpack/drawer.scss",

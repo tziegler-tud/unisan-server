@@ -8,6 +8,7 @@ const Log = require('../utils/log');
 
 
 const User = db.User;
+const Event = db.Event;
 const UserGroup = db.UserGroup;
 const UserACL = db.UserACL;
 const DbLog = db.Log;
@@ -36,6 +37,8 @@ module.exports = {
     addUserGroup,
     removeUserGroup,
     setUserRole,
+    addIndividualEventAccess,
+    removeIndividualEventAccess,
 
     clearDocuments,
 };
@@ -1123,7 +1126,7 @@ async function removeUserGroup(req, id, userGroup){
                     userACL.userGroups.splice(index, 1);
                     //userACL.docker = aclService.buildDockerObject(userACL)
                     userACL.save()
-                        .then( user => {
+                        .then( userACL => {
                             resolve(user);
                             //create log
                             let log = new Log({
@@ -1164,14 +1167,34 @@ async function removeUserGroup(req, id, userGroup){
 /**
  * adds individual event access to user
  * @param req {Object} express request
- * @param id {ObjectId} target user id
+ * @param userid {ObjectId} target user id
  * @param target {ObjectId} target object id
+ * @param operationArray {String[] | String} array containing operations to be granted
  *
  * @returns {Promise<*>}
  */
 
-async function addIndividualEventAccess(req, id, target){
-    let user = await User.findById(id).select('-hash');
+async function addIndividualEventAccess(req, userid, target, operationArray){
+    let errmsg = "Failed to add Event access to user " + userid;
+    if (Array.isArray(operationArray)){
+        operationArray.forEach(operation => {
+            if (!AuthService.checkIfValidOperation(operation)) {
+                throw new Error(errmsg + "Reason: Trying to add invalid operation.");
+            }
+        })
+    }
+    else {
+        //check if single op was given
+        if(AuthService.checkIfValidOperation(operationArray)){
+            operationArray = [operationArray];
+        }
+        else {
+            throw new Error(errmsg + "Reason: Trying to add invalid operation.");
+        }
+    }
+
+    let user = await User.findById(userid).select('-hash');
+    let event = await Event.findById(target);
     // validate
     if (!user) throw new Error('User not found');
 
@@ -1182,20 +1205,29 @@ async function addIndividualEventAccess(req, id, target){
         AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.access.GRANTEVENTCONTROL)
             .then(result => {
                 //get user acl
-                aclService.getUserACL(id, false)
+                aclService.getUserACL(userid, false)
                     .then(userACL=> {
                         if (userACL.individual === undefined) {
                             userACL.individual = {};
                         }
-                        let event = userACL.individual.events.find(object => object.toString() === target.toString())
-                        if (event === undefined){
+                        let index = userACL.individual.events.findIndex(object => {
+                            if (object.target.title) {
+                                return object.target.id.toString() === target.toString()
+                            }
+                            else return object.target.toString() === target.toString()
+                        })
+                        if (index === -1){
                             //create new entry
-                            userACL.individual.events.push(target);
+                            let individualAclEntry = {
+                                target: target,
+                                allowedOperations: operationArray,
+                            }
+                            userACL.individual.events.push(individualAclEntry);
                             console.log("User " + user.username + " has been granted access rights for event " + target.toString());
 
                             userACL.save()
                                 .then( userACL => {
-                                    console.log("user " + user.username + " has been assigned to group.");
+                                    console.log("user " + user.username + " has been granted event rights.");
                                     resolve(user);
                                     //create log
                                     let log = new Log({
@@ -1203,9 +1235,9 @@ async function addIndividualEventAccess(req, id, target){
                                         action: {
                                             objectType: "user",
                                             actionType: "accessModify",
-                                            actionDetail: "userGroupAdd",
-                                            key: "",
-                                            value: target.toString()
+                                            actionDetail: "userAccessRightsModify",
+                                            key: target.toString(),
+                                            value: operationArray.toString(),
                                         },
                                         authorizedUser: req.user,
                                         target: {
@@ -1225,8 +1257,44 @@ async function addIndividualEventAccess(req, id, target){
                         }
                         else {
                             //target entry exists
-                            console.log("User " + user.username + " already has access rights for event " + target.toString());
-                            resolve(user);
+                            //update if additional
+                            let entry = userACL.individual.events[index];
+                            operationArray.forEach(operation => {
+                                //add if not present
+                                if (!entry.allowedOperations.includes(operation)){
+                                    entry.allowedOperations.push(operation)
+                                }
+                            })
+                            userACL.individual.events.splice(index, 1, entry);
+                            userACL.save()
+                                .then( userACL => {
+                                    console.log("user " + user.username + " has been assigned to group.");
+                                    resolve(user);
+                                    //create log
+                                    let log = new Log({
+                                        type: "modification",
+                                        action: {
+                                            objectType: "user",
+                                            actionType: "accessModify",
+                                            actionDetail: "userAccessRightsModify",
+                                            key: target.toString(),
+                                            value: operationArray.toString(),
+                                        },
+                                        authorizedUser: req.user,
+                                        target: {
+                                            targetType: "user",
+                                            targetObject: user._id,
+                                            targetObjectId: user._id,
+                                            targetModel: "User",
+                                        },
+                                        httpRequest: {
+                                            method: req.method,
+                                            url: req.originalUrl,
+                                        }
+                                    })
+                                    LogService.create(log).then().catch();
+                                })
+                                .catch(err => reject(err))
                         }
                     })
                     .catch(err => reject(err))
@@ -1240,14 +1308,14 @@ async function addIndividualEventAccess(req, id, target){
 /**
  * removes individual event access from user
  * @param req {Object} express request
- * @param id {ObjectId} target user id
+ * @param userid {ObjectId} target user id
  * @param target {ObjectId} target object id
  *
  * @returns {Promise<*>}
  */
 
-async function removeIndividualEventAccess(req, id, target){
-    let user = await User.findById(id).select('-hash');
+async function removeIndividualEventAccess(req, userid, target){
+    let user = await User.findById(userid).select('-hash');
     // validate
     if (!user) throw new Error('User not found');
 
@@ -1258,20 +1326,26 @@ async function removeIndividualEventAccess(req, id, target){
         AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.access.REVOKEEVENTCONTROL)
             .then(result => {
                 //get user acl
-                aclService.getUserACL(id, false)
+                aclService.getUserACL(userid, false)
                     .then(userACL=> {
                         if (userACL.individual === undefined) {
                             reject("Failed to read individual access rights.")
                         }
-                        let index = userACL.individual.events.indexOf(object => object.toString() === target.toString())
+                        let index = userACL.individual.events.findIndex(object => {
+                            if (object.target.title) { //check if populated
+                               return object.target.id.toString() === target.toString()
+                            }
+                            else return object.target.toString() === target.toString()
+                        })
                         if (index > -1){
                             //entry found. remove
-                            let el = removeByIndex(userACL.individual.events, index);
-                            console.log("access rights for event " + target.toString() + " removed for user " + user.username);
+                            let result = removeByIndex(userACL.individual.events, index);
+                            let el = result.object;
+                            let removedOperations = (el.allowedOperations !== undefined)? el.allowedOperations.toString() : "";
 
                             userACL.save()
                                 .then( userACL => {
-                                    console.log("user " + user.username + " has been assigned to group.");
+                                    console.log("Event access revoked for " + user.username);
                                     resolve(user);
                                     //create log
                                     let log = new Log({
@@ -1279,9 +1353,9 @@ async function removeIndividualEventAccess(req, id, target){
                                         action: {
                                             objectType: "user",
                                             actionType: "accessModify",
-                                            actionDetail: "userGroupRemove",
-                                            key: "",
-                                            value: target.toString(),
+                                            actionDetail: "userAccessRightsModify",
+                                            key: target.toString(),
+                                            value: removedOperations,
                                         },
                                         authorizedUser: req.user,
                                         target: {
@@ -1461,13 +1535,14 @@ function removeById(array, id){
     }
 }
 
+
 /**
  * removes an element from an array by its index
  *
  * @param {Object} array - array to remove element from
  * @param {number} index - index of element to remove. Note that arrays are 0-indexed.
  *
- * @returns {{array: {Object}, object: {Object}}}
+ * @returns {Object} {array: {Object}, object: {Object}}
  */
 function removeByIndex(array, index){
     // array not indexed, remove by index

@@ -16,7 +16,9 @@ app.use(bodyParser.json());
 router.get('/get', getAll);
 router.post('/get/target', getTargetLogs);
 router.get('/get/:id', getById);
+router.delete("/all", _deleteAll);
 router.delete("/:id", _delete);
+
 
 router.get("/addModelUser", addModelUser);
 
@@ -48,6 +50,12 @@ function getTargetLogs(req, res, next){
 
 function _delete(req, res, next) {
     logService.delete(req, req.params.id)
+        .then(() => res.json({}))
+        .catch(err => next(err));
+}
+
+function _deleteAll(req, res, next) {
+    logService.deleteAll()
         .then(() => res.json({}))
         .catch(err => next(err));
 }

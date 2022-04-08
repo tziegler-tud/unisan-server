@@ -272,7 +272,7 @@ async function remove(req, id) {
 async function update(req, id, data) {
 
     const user = await User.findById(id);
-    const userACL = await UserACL.find({user:id});
+    const userACL = await UserACL.findOne({user:id});
 
     // validate
     if (!user) throw new Error('ACL modification error: assigned user not found.');

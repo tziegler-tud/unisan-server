@@ -6,11 +6,12 @@ block page_includes
         window.exploreUserId = "#{exploreUser.id}";
         window.dockerArgs.activeContainer = "userprofileContainer";
         window.dockerArgs.activeElementId = "userprofileLogs";
+        window.allowedit = #{allowedit};
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
     script(src="/static/unisams/js/userprofile/profile.js")
-    script(src="/static/unisams/js/userprofile/logs.js")
+    script(src="/dist/userLogs.js")
     script(src="/static/unisams/js/actions.js")
 
 block content

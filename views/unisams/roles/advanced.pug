@@ -46,12 +46,10 @@ block content
                                                             - var secKey = "allowedOperations"
                                                             - var secVal = group.allowedOperations
                                                             each val, key in secVal
-                                                                li.user-entry.userkey-entry.changePathEntry(id="allowedOperation" + val.id, data-method=val.method, data-url=val.url)
+                                                                li.user-entry.userkey-entry.changePathEntry(id="allowedOperation" + val.id, data-operation=val)
                                                                     a.inner()
                                                                         .item-property.userkey-entry-title
                                                                             span= val
-                                                                        .item-property.userkey-entry-title
-                                                                            span= group.default
                                                                         .clear
 
 
