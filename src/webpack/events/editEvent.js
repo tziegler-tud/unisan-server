@@ -5,6 +5,11 @@ import {MDCList} from "@material/list";
 import {MDCRipple} from "@material/ripple";
 import {MDCMenu} from '@material/menu';
 
+import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import {eventPlugin} from "../sidebar/plugins/plugin-event";
+
+import {eventActions} from "../actions/eventActions";
+
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
 
@@ -88,7 +93,7 @@ $(document).ready (function () {
         const list = new MDCList(document.querySelector('.mdc-list'));
         const listItemRipples = list.listElements.map((listItemEl) => new MDCRipple(listItemEl));
         // const dropdownOptions = list.listElements.forEach(listItemEl => new MDCMenu($(listItemEl).find('.mdc-menu')));
-        const dropdownOptions = list.listElements.forEach(function(listItemEl){
+       list.listElements.forEach(function(listItemEl){
             var it = $(listItemEl).parent(".mdc-list-item-wrapper").find('.mdc-menu');
             var menu;
             $(it).each(function(index){
@@ -121,9 +126,9 @@ $(document).ready (function () {
             onConfirm: function(editableTextField){
                 let delta = editableTextField.getQuill().getText();
                 let key = "description.longDesc.value";
-                actions.events.updateKey(event.id, key, delta, {})
+                eventActions.updateKey(event.id, key, delta, {})
                 delta = editableTextField.getQuill().getContents();
-                actions.events.saveDelta(event.id, delta, {
+               eventActions.saveDelta(event.id, delta, {
                     onSuccess: function(result){
                         editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
                     }
@@ -138,10 +143,10 @@ $(document).ready (function () {
             onConfirm: function(editableInputField){
                 let delta = editableInputField.getQuill().getText();
                 let key = "title.value";
-                actions.events.updateKey(event.id, key, delta, {})
+                eventActions.updateKey(event.id, key, delta, {})
                 delta = editableInputField.getQuill().getContents();
                 key = "title.delta";
-                actions.events.updateKey(event.id, key, delta, {
+                eventActions.updateKey(event.id, key, delta, {
                     onSuccess: function(result){
                         editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
                         //update docker nav
@@ -160,7 +165,9 @@ $(document).ready (function () {
         let titleInputContainer = document.getElementById("eventtitle-input");
         let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
 
-        var sidebar = new common.Sidebar('wrapper', {title: "Test"});
+        let sidebar = new Sidebar('wrapper', "test");
+        sidebar.addPlugin(eventPlugin);
+
         // init event sidebar
         //find if current user is already registered
         let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
@@ -170,10 +177,10 @@ $(document).ready (function () {
             isParticipant: userIsParticipant,
             callback: {
                 onConfirm: function(){
-                    window.actions.events.addParticipant(event.id, user.id)
+                    eventActions.addParticipant(event.id, user.id)
                 },
                 onDelete: function(){
-                    window.actions.events.removeParticipant(event.id, user.id)
+                    eventActions.removeParticipant(event.id, user.id)
                 }
             },
         });
@@ -189,7 +196,7 @@ $(document).ready (function () {
                 event: event,
                 callback: {
                     onConfirm: function(eventid, data){
-                        window.actions.events.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime }, {
+                        eventActions.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime }, {
                             onSuccess: function(){
                                 window.location.reload();
                             },
@@ -207,7 +214,7 @@ $(document).ready (function () {
                 event: event,
                 callback: {
                     onConfirm: function(eventid, data){
-                        window.actions.events.updateKey(event.id, "location", {value: data.location}, {
+                        eventActions.updateKey(event.id, "location", {value: data.location}, {
                             onSuccess: function(){
                                 window.location.reload();
                             },

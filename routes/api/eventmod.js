@@ -193,8 +193,10 @@ function update(req, res, next) {
 }
 
 function updateKey(req, res, next) {
-    eventService.updateKey(req, req.params.id, req.body.key, req.body.value)
-        .then((result) => res.json(result))
+    eventService.updateKey(req, req.params.id, req.body.key, req.body.value, {})
+        .then(result => {
+            res.json(result)
+        })
         .catch(err => next(err));
 }
 

@@ -225,87 +225,92 @@ async function updateKey(req, id, key, value, eventParams) {
     let newVal = (value.value === undefined) ? value : value.value;
     let logKey = (value.title === undefined) ? key : value.title;
 
-    //check if array operation
-    if(eventParams.isArray) {
+    return new Promise(function(resolve, reject){
+        //check if array operation
+        if(eventParams.isArray) {
 
-        //get current array content. Usually, key refers to an indexed array element.
-        var array;
-        if (eventParams.noIndex) {
-        }
-        else {
-            const keyPos = key.lastIndexOf(".");
-            const i = key.substring(keyPos+1);
-            key = key.substring(0,keyPos);
-        }
-        array = event.get(key);
-        // in-memory update.
-        // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
-
-        try {
-            if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
-            //check if array
-            var index = array.map(e => e._id.toString()).indexOf(value.id);
-        }
-        catch (e) {
-            if (e instanceof TypeError) {
-                console.error("Exception:" + e);
-                console.error("Aborting operation to ensure data integrity.");
-                throw e;
-            } else {
-                console.error("Unhandled exception: " + e);
-                throw e;
+            //get current array content. Usually, key refers to an indexed array element.
+            var array;
+            if (eventParams.noIndex) {
             }
-        }
-        if (index > -1) {
-            // updating existing object @louis can you use array[index] = eventParams.value ?
-            ojVal = array[index];
-            array.splice(index, 1, value);
-        }
-        else {
-            // key not found, creating new entry
-            array.push(value);
-        }
-        event.set(key, array, {strict: false} );
-    }
-    else {
-        let k = event.get(key);
-        if (k === undefined) {
-            ojVal = "N/A"
-        }
-        else {
-            ojVal = (k.value === undefined) ? k : k.value;
-        }
-        event.set(key, value, {strict: false} );
-    }
+            else {
+                const keyPos = key.lastIndexOf(".");
+                const i = key.substring(keyPos+1);
+                key = key.substring(0,keyPos);
+            }
+            array = event.get(key);
+            // in-memory update.
+            // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
 
-    return event.save()
-        .then(event => {
-            // create log
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "event",
-                    actionType: "modify",
-                    actionDetail: "eventModify",
-                    key: logKey,
-                    fullKey: key,
-                    originalValue: ojVal,
-                    value:  newVal,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "event",
-                    targetObject: event._id,
-                    targetObjectId: event._id,
-                    targetModel: "Event",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
+            try {
+                if (!Array.isArray(array)) throw new TypeError(`Key marked as array, but "${typeof (array)}" was found.`);
+                //check if array
+                var index = array.map(e => e._id.toString()).indexOf(value.id);
+            }
+            catch (e) {
+                if (e instanceof TypeError) {
+                    console.error("Exception:" + e);
+                    console.error("Aborting operation to ensure data integrity.");
+                    throw e;
+                } else {
+                    console.error("Unhandled exception: " + e);
+                    throw e;
                 }
+            }
+            if (index > -1) {
+                // updating existing object @louis can you use array[index] = eventParams.value ?
+                ojVal = array[index];
+                array.splice(index, 1, value);
+            }
+            else {
+                // key not found, creating new entry
+                array.push(value);
+            }
+            event.set(key, array, {strict: false} );
+        }
+        else {
+            let k = event.get(key);
+            if (k === undefined) {
+                ojVal = "N/A"
+            }
+            else {
+                ojVal = (k.value === undefined) ? k : k.value;
+            }
+            event.set(key, value, {strict: false} );
+        }
+
+        event.save()
+            .then(event => {
+                // create log
+                resolve(event);
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "event",
+                        actionType: "modify",
+                        actionDetail: "eventModify",
+                        key: logKey,
+                        fullKey: key,
+                        originalValue: ojVal,
+                        value:  newVal,
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "event",
+                        targetObject: event._id,
+                        targetObjectId: event._id,
+                        targetModel: "Event",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => reject(err));
+    })
+
 }
 
 /**
