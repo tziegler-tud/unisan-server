@@ -88,6 +88,9 @@ server.use(session({
     console.log(req.sessionID);
     return uuid() // use UUIDs for session IDs
   },
+  cookie: {
+    secure: false,            //setting this false for http connections
+  },
   store: new FileStore(),
   secret: 'keyboard cat',
   resave: false,
@@ -110,9 +113,10 @@ apiAuth = function(req, res, next){
 
 webAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
-    // req.session.redirectTo = req.originalUrl; //strange bug setting favicon as url, disable until fixed
-    req.session.redirectTo = "/unisams";
-    res.status(401).redirect('/unisams/login');
+    req.session.redirectTo = req.originalUrl; //strange bug setting favicon as url, disable until fixed
+    req.session.save(function(){
+      res.status(401).redirect('/unisams/login');
+    })
   } else {
     next();
   }
@@ -133,8 +137,11 @@ server.use('/info/datenschutz', datenschutzRouter);
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
+//no auth required
 server.use('/unisams', loginRouter);
 server.use('/unisams/apps/protocol', protocolRouter);
+
+//auth required
 server.use("/unisams", webAuth);
 server.use('/unisams', mainRouter);
 server.use('/unisams/user', userManagementRouter);

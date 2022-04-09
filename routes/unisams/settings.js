@@ -41,7 +41,7 @@ function getDockerArguments (req, res, next) {
 //hooked at /unisams/settings
 
 /* GET home page. */
-router.get("/*", auth);
+// router.get("/*", auth);
 router.get("/*", getDockerArguments);
 router.get('/', database);
 router.get('/database', database);

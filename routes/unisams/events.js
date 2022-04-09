@@ -147,7 +147,7 @@ function getDockerArguments (req, res, next) {
 
 // routes
 //check url access by user group
-router.use('/*', auth);
+// router.use('/*', auth);
 router.use('/*', getDockerArguments);
 // routes
 router.get('/', checkEventReadRights, getAll);
