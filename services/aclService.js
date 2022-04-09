@@ -39,6 +39,7 @@ module.exports = {
     getManyByUserId,
     createUserACL,
     getUserACL,
+    getCurrentDocker,
     getUserRole,
     setUserRole,
     addUserGroup,
@@ -129,6 +130,11 @@ async function getUserACL (userid, populateGroups) {
         // throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
     // }
     return userACL;
+}
+
+async function getCurrentDocker(userid) {
+    let userACL = await UserACL.findOne({user: userid});
+    return userACL.docker;
 }
 
 async function createUserACL (req, userid, data, overwrite) {

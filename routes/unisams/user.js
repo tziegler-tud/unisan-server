@@ -7,8 +7,6 @@ const userService = require('../../services/userService');
 const AuthService = require('../../services/authService');
 const aclService = require('../../services/aclService');
 
-
-
 var app = express();
 
 app.use(bodyParser.urlencoded({
@@ -16,14 +14,24 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+function getDockerArguments (req, res, next) {
+    aclService.getCurrentDocker(req.user._id)
+        .then(docker => {
+            req.docker = docker;
+            next()
+        })
+    // req.docker = {};
+    // next();
+}
+
 
 //hooked at /unisams/user
 const baseUrl = "/unisams/user";
 
 // routes
+router.get("/*", getDockerArguments)
 router.get('/', getAll);
 router.get('/addUser', addUser);
-
 
 /*
 legacy api call redirect
@@ -40,15 +48,7 @@ router.get('/:username/settings', userSettings);
 router.get('/:username/roles', userRoles);
 router.get('/:username/events', userEvents);
 //
-// /**
-//  * legacy routes
-//  */
-// router.get('/edit/:username', editUserLegacy);
-//
-// router.get('/view/:username', viewUserLegacy);
-// router.get('/view/:username/logs', userLogsLegacy);
-// router.get('/edit/:username/settings', userSettingsLegacy);
-// router.get('/view/:username/events', userEventsLegacy);
+
 
 module.exports = router;
 
@@ -84,6 +84,7 @@ function getAll(req, res, next) {
                     userList = users;
                     res.render("unisams/user/user", {title: "user managment - uniSams",
                         user: req.user._doc,
+                        docker: req.docker,
                         userList: userList
                     })
                 })
@@ -99,6 +100,7 @@ function addUser(req, res, next) {
         .then(result => {
             res.render("unisams/user/addUser", {
                 title: "create user - uniSams",
+                docker: req.docker,
                 user: req.user._doc
             })
         })
@@ -177,6 +179,7 @@ function userLogs(req, res, next) {
                     .then(result => {
                         res.render("unisams/user/logs", {
                             user: req.user._doc,
+                            docker: req.docker,
                             generalData: req.user._doc.generalData,
                             customData: req.user._doc.customData,
                             title: user.username,
@@ -219,6 +222,7 @@ function userEvents(req, res, next) {
                             .then(result => {
                                 res.render("unisams/user/events", {
                                     user: req.user._doc,
+                                    docker: req.docker,
                                     generalData: req.user._doc.generalData,
                                     customData: req.user._doc.customData,
                                     title: user.username,
@@ -231,6 +235,7 @@ function userEvents(req, res, next) {
                             .catch(err=> {
                                 res.render("unisams/user/events", {
                                     user: req.user._doc,
+                                    docker: req.docker,
                                     generalData: req.user._doc.generalData,
                                     customData: req.user._doc.customData,
                                     title: user.username,
@@ -272,6 +277,7 @@ function userSettings(req, res, next) {
                     .then(result => {
                         res.render("unisams/user/settings", {
                             user: req.user._doc,
+                            docker: req.docker,
                             title: user.username + " | Einstellungen",
                             exploreUser: user,
                             exploreUserDocument: user._doc,
@@ -313,6 +319,7 @@ function userRoles(req, res, next) {
                             if (user) {
                                 res.render("unisams/user/roles", {
                                     user: req.user._doc,
+                                    docker: req.docker,
                                     title: user.username + " | Rechte & Rollen",
                                     exploreUser: user,
                                     exploreUserDocument: user.toJSON(),
@@ -344,171 +351,3 @@ function userRoles(req, res, next) {
         })
         .catch(err => next(err))
 }
-
-/*
-legacy route handlers
- */
-
-function viewUserLegacy(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                //check if editing this user is allowed
-                let edit = AuthService.checkIfEdit(req.user, user, "user");
-                res.render("unisams/user/profile", {
-                    user: req.user._doc,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username,
-                    allowedit: edit,
-                })
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
-        })
-        .catch(err=> next(err));
-
-}
-
-
-function editUserLegacy(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                res.render("unisams/user/editUser", {
-                    user: req.user._doc,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username,
-                })
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
-        })
-        .catch(err => next(err));
-}
-
-function userLogsLegacy(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                res.render("unisams/user/logs", {
-                    user: req.user._doc,
-                    generalData: req.user._doc.generalData,
-                    customData: req.user._doc.customData,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username
-                })
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
-        })
-        .catch(err => next(err));
-
-}
-
-
-function userEventsLegacy(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                res.render("unisams/user/events", {
-                    user: req.user._doc,
-                    generalData: req.user._doc.generalData,
-                    customData: req.user._doc.customData,
-                    title: user.username,
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username
-                })
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
-        })
-        .catch(err => next(err));
-
-}
-
-function userSettingsLegacy(req, res, next) {
-    userService.getByUsername(req.params.username)
-        .then(user => {
-            if (user) {
-                res.render("unisams/user/settings", {
-                    user: req.user._doc,
-                    title: user.username + " | Einstellungen",
-                    exploreUser: user,
-                    exploreUserDocument: user._doc,
-                    refurl: req.params.username,
-                })
-            }
-            else {
-                // try if id was given
-                userService.getById(req.params.username)
-                    .then(user => {
-                        if (user) {
-                            var newPath = req.originalUrl.replace(user.id, user.username);
-                            res.redirect(newPath);
-                        } else {
-                            //give up
-                            res.send("user not found");
-                        }
-                    })
-                    .catch(err=> next(err));
-            }
-        })
-        .catch(err => next(err));
-}
-
-

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
 const aclService = require("./aclService");
+const AclService = require("./aclService.js")
 
 const UserGroup = db.UserGroup;
 const UserACL = db.UserACL;

@@ -7,6 +7,7 @@ const userService = require('../../services/userService');
 const qualificationService = require('../../services/qualificationService');
 const logService = require('../../services/logService');
 const userGroupService = require('../../services/userGroupService');
+const AclService = require("../../services/aclService");
 
 var app = express();
 
@@ -27,10 +28,21 @@ auth = function(req, res, next){
     }
 };
 
+function getDockerArguments (req, res, next) {
+    AclService.getCurrentDocker(req.user._id)
+        .then(docker => {
+            req.docker = docker;
+            next()
+        })
+    // req.docker = {};
+    // next();
+}
+
 //hooked at /unisams/settings
 
 /* GET home page. */
 router.get("/*", auth);
+router.get("/*", getDockerArguments);
 router.get('/', database);
 router.get('/database', database);
 router.get('/user', user);
@@ -48,6 +60,7 @@ function database (req, res, next) {
             qualList = quals;
             res.render("unisams/settings/settingsDatabase", {title: "settings - uniSams",
                 user: req.user._doc,
+                docker: req.docker,
                 qualificationList: qualList
             })
         })
@@ -59,6 +72,7 @@ function database (req, res, next) {
 function user (req, res, next) {
     res.render("unisams/settings/user", {title: "settings - uniSams",
         user: req.user._doc,
+        docker: req.docker,
     })
 }
 
@@ -66,6 +80,7 @@ function user (req, res, next) {
 function events (req, res, next) {
     res.render("unisams/settings/events", {title: "settings - uniSams",
         user: req.user._doc,
+        docker: req.docker,
     })
 }
 
@@ -75,6 +90,7 @@ function roles (req, res, next) {
         .then(groups => {
             res.render("unisams/settings/roles", {title: "Rechte und Rollen - uniSams",
                 user: req.user._doc,
+                docker: req.docker,
                 groups: groups
             })
         })
@@ -87,6 +103,7 @@ function roles (req, res, next) {
 function logs (req, res, next) {
     res.render("unisams/settings/logs", {title: "logs - uniSams",
         user: req.user._doc,
+        docker: req.docker,
     })
 }
 
@@ -101,6 +118,7 @@ function editRole(req, res, next) {
                         {
                             title: "Rolle: " + group.title,
                             user: req.user._doc,
+                            docker: req.docker,
                             group: group._doc,
                             groupId: group._id,
                             assignedUser: user,
@@ -126,6 +144,7 @@ function editRoleAdvanced(req, res, next) {
                         {
                             title: "Rolle: " + group.title,
                             user: req.user._doc,
+                            docker: req.docker,
                             group: group._doc,
                             groupId: group._id,
                             assignedUser: user,

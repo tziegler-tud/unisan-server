@@ -42,6 +42,10 @@ script(src='/dist/drawer.js')
 if (user !== undefined)
     script.
         window.userId = "#{user._id}";
+
+if (docker !== undefined)
+    script.
+        window.dockerAcl =!{JSON.stringify(docker)};
 //
   ***********************************
   ** css libs

@@ -5,6 +5,7 @@ const passport = require('passport');
 const bodyParser = require("body-parser");
 const eventService = require('../../services/eventService');
 const AuthService = require ("../../services/authService");
+const AclService = require ("../../services/aclService");
 
 var app = express();
 
@@ -135,10 +136,19 @@ function allowCreateEvent(req, res, next) {
         })
 }
 
+function getDockerArguments (req, res, next) {
+    AclService.getCurrentDocker(req.user._id)
+        .then(docker => {
+            req.docker = docker;
+            next()
+        })
+}
+
 
 // routes
 //check url access by user group
 router.use('/*', auth);
+router.use('/*', getDockerArguments);
 // routes
 router.get('/', checkEventReadRights, getAll);
 
@@ -164,6 +174,7 @@ function getAll(req, res, next) {
             eventList = events;
             res.render("unisams/events/eventlist", {title: "user managment - uniSams",
                 user: req.user._doc,
+                docker: req.docker,
                 eventList: eventList
             })
         })
@@ -175,6 +186,7 @@ function getAll(req, res, next) {
 function addEvent(req, res, next) {
     res.render("unisams/events/addEvent", {
         title: "create Event - uniSams",
+        docker: req.docker,
         user: req.user._doc
     })
 }
@@ -188,6 +200,7 @@ function viewEvent(req, res, next) {
                     .then(result => {
                         res.render("unisams/events/viewEvent", {
                             user: req.user._doc,
+                            docker: req.docker,
                             title: ev.title.value,
                             exploreEvent: ev,
                             refurl: req.params.id,
@@ -214,6 +227,7 @@ function editEvent(req, res, next) {
             if (event) {
                 res.render("unisams/events/editEvent", {
                     user: req.user._doc,
+                    docker: req.docker,
                     title: event.title.value,
                     exploreEvent: event,
                     refurl: req.params.id,
@@ -235,6 +249,7 @@ function eventParticipants(req, res, next) {
                         url = "unisams/events/editParticipants";
                         res.render(url, {
                             user: req.user.toJSON(),
+                            docker: req.docker,
                             title: ev.title.value,
                             exploreEvent: ev,
                             exploreEventDocument: ev._doc,
@@ -245,6 +260,7 @@ function eventParticipants(req, res, next) {
                         let url = "unisams/events/participants";
                         res.render(url, {
                             user: req.user.toJSON(),
+                            docker: req.docker,
                             title: ev.title.value,
                             exploreEvent: ev,
                             exploreEventDocument: ev._doc,
@@ -263,6 +279,7 @@ function eventLogs(req, res, next) {
             if (ev) {
                 res.render("unisams/events/logs", {
                     user: req.user._doc,
+                    docker: req.docker,
                     title: ev.title.value,
                     exploreEvent: ev,
                     exploreEventDocument: ev._doc,

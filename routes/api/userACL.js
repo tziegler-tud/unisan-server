@@ -24,6 +24,7 @@ router.post("/rebuildNew", rebuildUserAcls)
 
 router.get('/', checkRead, getAll);
 router.get('/current', getCurrentAcl);
+router.get('/docker', getCurrentDockerArgs);
 router.get('/:id', checkRead, getUserACL);
 router.post('/:id', checkWrite, createUserACL);
 router.put('/:id', checkWrite, updateUserACL);
@@ -99,6 +100,18 @@ function getCurrentAcl(req, res, next){
         .then(result => {
             aclService.getUserACL(req.user.id, false)
                 .then(userACL => userACL ? res.json(userACL) : res.sendStatus(404))
+                .catch(err => next(err));
+        })
+        .catch(err =>{
+            next(err);
+        })
+}
+
+function getCurrentDockerArgs(req, res, next){
+    authService.auth(req.user, authService.operations.user.READSELF)
+        .then(result => {
+            aclService.getUserACL(req.user.id, false)
+                .then(userACL => userACL ? res.json(userACL.docker) : res.sendStatus(404))
                 .catch(err => next(err));
         })
         .catch(err =>{
