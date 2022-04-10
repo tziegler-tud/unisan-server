@@ -1,0 +1,35 @@
+<div class="itemlist-header-container borderBottom">
+    <ul class="common-list eventlist-top eventlist  itemlist scrollableItemList list-view border scrollableList-top">
+        <li class="noSelect rowHeading">
+            <div class="inner">
+                <div class="item-property scrollableList-header-column userlist-ch name" data-property="title.html">Bezeichnung</div>
+                <div class="item-property scrollableList-header-column userlist-ch memberid" data-property="type.value">Type</div>
+                <div class="item-property scrollableList-header-column userlist-ch username" data-property="date.startDate">Datum</div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list eventlist itemlist scrollableItemList list-view border">
+        {{#each listdata}}
+            <li class="event-entry" id='eventId{{this.id}}' data-eventid= {{this.id}}>
+                <a class="inner">
+
+                    <div class="item-property item-container name">
+                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                        <span class=" item-container-element">{{{this.title.html}}}</span>
+                    </div>
+                    <div class="item-property item-container type">
+                        <span class="item-container-element">{{this.type.value}}</span>
+                    </div>
+                    <div class="item-property item-container date">
+                        <span class="item-container-element">{{this.dateRangeString}}</span>
+                    </div>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+
+</div>
+
+

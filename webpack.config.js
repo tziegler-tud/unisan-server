@@ -11,6 +11,9 @@ module.exports = {
         index: "./src/webpack/index.js",
         index_style: "./src/webpack/index.scss",
 
+        dashboard: "./src/webpack/dashboard/dashboard.js",
+        dashboard_style: "./src/webpack/dashboard/dashboard.scss",
+
         addUser: "./src/webpack/user/addUser.js",
         addUser_style: "./src/webpack/user/addUser.scss",
         editUser: "./src/webpack/user/editUser.js",

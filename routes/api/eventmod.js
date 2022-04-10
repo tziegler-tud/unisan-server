@@ -160,6 +160,8 @@ router.get('/', getAll);
 router.get('/:id/populateParticipants', populateParticipants);
 router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
+router.get('/userEvents', currentUserEvents);
+router.get('/userEvents/:id', userEvents);
 router.post('/upcoming', getUpcoming);
 router.post('/past', getPast);
 router.get('/:id', getById);
@@ -189,6 +191,34 @@ function getById(req, res, next) {
         .catch(err => next(err));
 }
 
+
+function currentUserEvents(req, res, next) {
+    let userFilter = {
+        filter: "participants.user",
+        value: req.user._id,
+    }
+    let args = {
+        filter: userFilter
+    }
+    eventService.getAllFiltered(args)
+        .then(event => {
+            event ? res.json(event) : res.sendStatus(404)
+        })
+        .catch(err => {
+            next(err)
+        });
+}
+
+function userEvents(req, res, next) {
+    let userFilter = {
+        filter: "participants",
+        value: req.params.userid,
+    }
+    eventService.getAllFiltered(userFilter)
+        .then(event => event ? res.json(event) : res.sendStatus(404))
+        .catch(err => next(err));
+}
+
 function update(req, res, next) {
     eventService.update(req, req.params.id, req.body)
         .then(() => res.json({}))
@@ -209,7 +239,9 @@ function matchAny(req, res, next){
         .then(function(eventlist) {
             res.json(eventlist);
         })
-        .catch(err => next(err));
+        .catch(err => {
+            next(err)
+        });
 }
 
 

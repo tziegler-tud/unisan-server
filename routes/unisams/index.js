@@ -24,13 +24,16 @@ function getDockerArguments (req, res, next) {
 
 
 /* GET pages. */
-router.get('/', getDockerArguments, function(req, res, next) {
-    res.render("unisams/index",
-        {
-            title: "uniSams",
-            user: req.user._doc,
-            docker: req.docker,
-        })
+// router.get('/', getDockerArguments, function(req, res, next) {
+//     res.render("unisams/index",
+//         {
+//             title: "uniSams",
+//             user: req.user._doc,
+//             docker: req.docker,
+//         })
+// });
+router.get('/', function(req, res, next) {
+    res.redirect("/unisams/dashboard");
 });
 
 

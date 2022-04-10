@@ -53,6 +53,9 @@
             case "user":
                 url = '/static/unisams/js/scrollableList/templates/userList.hbs'
                 break;
+            case "event":
+                url = '/static/unisams/js/scrollableList/templates/eventList.hbs'
+                break;
             case "logDetails":
                 url = '/static/unisams/js/scrollableList/templates/logdetailsList.hbs'
                 break;

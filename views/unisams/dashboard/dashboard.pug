@@ -1,0 +1,25 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_index.css')
+    script(src="/dist/dashboard.js")
+
+    script.
+        //used to tell the bundled js which modules to load.
+        window.jsmodule = {
+            module: "dashboard",
+            loaders: ["dash"],
+        };
+
+        window.dockerArgs.activeContainer =  "dashboardContainer";
+        window.dockerArgs.activeElementId = "dashboard";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner
+                section#sec1
+                    span logged in as: #{user.username}
+                    <br>
+                    a.content-link(href="/unisams/logout") logout

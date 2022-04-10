@@ -125,7 +125,7 @@ async function matchAny(matchString, args){
     }
     else {
         let filterObj = {};
-        filterObj[filter.filter] = filter.value;
+        filterObj[args.filter.filter] = args.filter.value;
         universalFilter = filterObj;
     }
 

@@ -27,6 +27,7 @@ var datenschutzRouter = require('./routes/public/datenschutz');
 
 const loginRouter = require('./routes/unisams/login');
 const mainRouter = require('./routes/unisams/index');
+const dashboardRouter = require('./routes/unisams/dashboard');
 var userManagementRouter = require('./routes/unisams/user');
 var eventManagementRouter = require('./routes/unisams/events');
 var settingsRouter = require('./routes/unisams/settings');
@@ -144,6 +145,7 @@ server.use('/unisams/apps/protocol', protocolRouter);
 //auth required
 server.use("/unisams", webAuth);
 server.use('/unisams', mainRouter);
+server.use('/unisams/dashboard', dashboardRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/settings', settingsRouter);
