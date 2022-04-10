@@ -33,6 +33,10 @@ module.exports = {
 
         addEvent: "./src/webpack/events/addEvent.js",
         addEvent_style: "./src/webpack/events/addEvent.scss",
+
+        eventlist: "./src/webpack/events/eventlist.js",
+        eventlist_style: "./src/webpack/events/eventlist.scss",
+
         editEvent: "./src/webpack/events/editEvent.js",
         editEvent_style: "./src/webpack/events/editEvent.scss",
         viewEvent: "./src/webpack/events/viewEvent.js",

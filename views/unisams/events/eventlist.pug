@@ -2,13 +2,16 @@ extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/events.css')
-    script(src="/static/unisams/js/events/eventlist.js")
+    //script(src="/static/unisams/js/events/eventlist.js")
+    script(src="/dist/eventlist.js")
     script(src="/static/unisams/js/actions.js")
 
 
     script.
         window.dockerArgs.activeContainer =  "eventContainer";
         window.dockerArgs.activeElementId =  "eventlist";
+        // window.dateFilter = !{JSON.stringify(dateFilter)};
+        window.dateFilter = "#{dateFilter}";
 
 
 block content

@@ -17,6 +17,8 @@ var fs = require('fs-extra');
 
 module.exports = {
     getAll,
+    getAllFiltered,
+    getUpcoming,
     getById,
     create,
     update,
@@ -35,20 +37,158 @@ module.exports = {
 /** @typedef {import("../schemes/eventScheme.js").EventScheme} EventScheme */
 
 /**
- * Gets all users
+ * Gets all events
  */
 async function getAll() {
     return Event.find();
 }
 
 /**
+ * Gets all events that are in the future
+ */
+async function getUpcoming() {
+    //date.startDate must be in the future
+    //event doc holds native js date object
+    return new Promise(function(resolve, reject){
+        let currentDate = new Date().toISOString(); //Date object
+        Event.find({"date.endDate": { $gte: currentDate}})
+            .then(eventList => {
+                resolve(eventList)
+            })
+            .catch(err => {
+                reject(err)
+            })
+    })
+}
+
+
+/**
+ *
+ * @param args
+ * @returns {Promise<[Event]>}
+ */
+async function getAllFiltered(args){
+    let defaults = {
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
+
+    let filter = args.filter;
+    let sort= args.sort;
+    let query;
+    if (filter===undefined || filter.filter === undefined || filter.value === undefined) {
+        query = Event.find();
+    }
+    else {
+        let filterObj = {};
+        filterObj[filter.filter] = filter.value;
+        query = Event.find(filterObj);
+    }
+
+    if(sort === undefined) {
+        return query;
+    }
+    else {
+        return query.sort(sort);
+    }
+}
+
+
+/**
  * Gets an event by its id
  * @param {number} id id of the event
  */
 async function getById(id) {
-    let event = await Event.findById(id).select('-password');
-    return event;
+    return Event.findById(id);
 }
+
+
+/**
+ *
+ * @param matchString {String} String to match title
+ * @param args
+ * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
+ * @param args.filter {Object} universal mongodb filter object to be applied to query
+ * @param args.dateFilter {Object} Object to set date filtering
+ * @param args.dateFilter.date {Date} Date to filter for. Default to current Date
+ * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte"]
+ * @returns {Promise<Query|*|number>}
+ */
+async function matchAny(matchString, args){
+    //matches a given string username, firstname and lastname, and optionally filters by date
+    let eventlist;
+    let dateFilter = {};
+    let universalFilter = {};
+
+    if (args.filter===undefined || args.filter.filter === undefined || args.filter.value === undefined) {
+
+    }
+    else {
+        let filterObj = {};
+        filterObj[filter.filter] = filter.value;
+        universalFilter = filterObj;
+    }
+
+    if (args.dateFilter === undefined) args.dateFilter = {}
+    if(args.dateFilter.selector === undefined || typeof(args.dateFilter.selector) !== "string") {
+        //invalid paramters for date filtering. ignore
+    }
+    else {
+        //wrap date
+        if (args.dateFilter.date === undefined) args.dateFilter.date = Date.now();
+        let d = new Date(args.dateFilter.date);
+        if (isNaN(d.getTime())) {
+            //failed to parse date.
+        }
+        else {
+            let inner;
+            let innerFilter = {};
+            switch (args.dateFilter.selector){
+                case "match":
+                    inner = {
+                        date: d.toISOString(),
+                        selector: ""
+                    }
+                    innerFilter = inner.date;
+                    break;
+                case "gte":
+                    inner = {
+                        date: d.toISOString(),
+                        selector: "$gte"
+                    }
+                    innerFilter[inner.selector] = inner.date;
+                    break;
+                case "lte":
+                    inner = {
+                        date: d.toISOString(),
+                        selector: "$lte"
+                    }
+                    innerFilter[inner.selector] = inner.date;
+                    break;
+            }
+            dateFilter = {"date.endDate": innerFilter}
+        }
+    }
+
+    //if filter is empty, return all results
+    if (matchString.length === 0) {
+        eventlist = Event.find().and([dateFilter, universalFilter]);
+    }
+    else {
+        //filter user by given string, using title and type
+        // eventlist = Event.find().and([dateFilter, universalFilter]).or([{'title.value': { $regex: matchString, $options: "-i" }}, {'type.value': { $regex: matchString, $options: "-i" }}])
+        eventlist = Event.find().and([dateFilter, universalFilter, {'title.value': { $regex: matchString, $options: "-i" }}]); //dont filter for type
+    }
+
+    if (args.sort) {
+        eventlist = eventlist.sort(args.sort);
+    }
+
+
+
+    return eventlist;
+}
+
 
 /**
  *
@@ -313,32 +453,6 @@ async function updateKey(req, id, key, value, eventParams) {
 
 }
 
-/**
- *
- * @param matchString
- * @param args
- * @returns {Promise<Query|*|number>}
- */
-async function matchAny(matchString, args){
-
-    let eventlist;
-    //matches a given string username, firstname and lastname
-    //if filter is empty, return all results
-    if (matchString.length === 0) {
-        eventlist = Event.find();
-    }
-    else {
-        eventlist = Event.find().or([{'title.value': { $regex: matchString, $options: "-i" }}, {'type.value': { $regex: matchString, $options: "-i" }}])
-
-    }
-    //filter user by given string, using title and type
-
-    if (args.sort) {
-        eventlist = eventlist.sort(args.sort);
-    }
-
-    return eventlist;
-}
 
 async function populateParticipants(id) {
     let event = Event.findById(id).populate({

@@ -151,6 +151,8 @@ function getDockerArguments (req, res, next) {
 router.use('/*', getDockerArguments);
 // routes
 router.get('/', checkEventReadRights, getAll);
+router.get('/upcoming', checkEventReadRights, getUpcoming);
+router.get('/past', checkEventReadRights, getPast);
 
 router.get('/addEvent', allowCreateEvent, addEvent);
 
@@ -172,7 +174,7 @@ function getAll(req, res, next) {
     eventService.getAll()
         .then(events => {
             eventList = events;
-            res.render("unisams/events/eventlist", {title: "user managment - uniSams",
+            res.render("unisams/events/eventlist", {title: "Events - uniSams",
                 user: req.user._doc,
                 docker: req.docker,
                 eventList: eventList
@@ -181,6 +183,22 @@ function getAll(req, res, next) {
         .catch(err => {
             next(err);
         })
+}
+
+function getUpcoming(req, res, next) {
+    res.render("unisams/events/eventlist", {title: "Events - uniSams",
+        user: req.user._doc,
+        dateFilter: "upcoming",
+        docker: req.docker,
+    })
+}
+
+function getPast(req, res, next) {
+    res.render("unisams/events/eventlist", {title: "Events - uniSams",
+        user: req.user._doc,
+        dateFilter: "past",
+        docker: req.docker,
+    })
 }
 
 function addEvent(req, res, next) {

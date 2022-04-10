@@ -160,6 +160,8 @@ router.get('/', getAll);
 router.get('/:id/populateParticipants', populateParticipants);
 router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
+router.post('/upcoming', getUpcoming);
+router.post('/past', getPast);
 router.get('/:id', getById);
 
 
@@ -179,6 +181,7 @@ function getAll(req, res, next) {
         .then(events => res.json(events))
         .catch(err => next(err));
 }
+
 
 function getById(req, res, next) {
     eventService.getById(req.params.id)
@@ -202,6 +205,24 @@ function updateKey(req, res, next) {
 
 function matchAny(req, res, next){
     if (req.body.filter === undefined) req.body.filter = "";
+    eventService.matchAny(req.body.filter, req.body.args)
+        .then(function(eventlist) {
+            res.json(eventlist);
+        })
+        .catch(err => next(err));
+}
+
+
+function getUpcoming(req, res, next) {
+    if (req.body.filter === undefined) req.body.filter = "";
+    eventService.matchAny(req.body.filter, req.body.args)
+        .then(function(eventlist) {
+            res.json(eventlist);
+        })
+        .catch(err => next(err));
+}
+
+function getPast(req, res, next) {
     eventService.matchAny(req.body.filter, req.body.args)
         .then(function(eventlist) {
             res.json(eventlist);

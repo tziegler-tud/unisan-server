@@ -133,8 +133,15 @@ async function getUserACL (userid, populateGroups) {
 }
 
 async function getCurrentDocker(userid) {
-    let userACL = await UserACL.findOne({user: userid});
-    return userACL.docker;
+    return new Promise(function(resolve, reject){
+        UserACL.findOne({user: userid})
+            .then(userACL => {
+                resolve(userACL.docker);
+            })
+            .catch(err => {
+                reject(err);
+            })
+    })
 }
 
 async function createUserACL (req, userid, data, overwrite) {

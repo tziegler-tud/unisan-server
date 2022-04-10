@@ -1,0 +1,32 @@
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/webpack/events/eventlist.js":
+/*!*****************************************!*\
+  !*** ./src/webpack/events/eventlist.js ***!
+  \*****************************************/
+/***/ (() => {
+
+eval("var phone = window.matchMedia(\"only screen and (max-width: 50em)\");\nvar tablet = window.matchMedia(\"only screen and (min-width: 50em) and (max-width: 75em)\");\n\n$(document).ready (function () {\n    buildPage();\n    $(window).on('resize',function(){\n        adjustList();\n    });\n\n    function buildPage(result) {\n\n        //read from window.jsmodule which modules are to be loaded\n        let dateFilter = window.dateFilter;\n        if (dateFilter === undefined) dateFilter = \"all\";\n\n\n        var lidlRTO = window.lidlRTO;\n        var sidebar = new common.Sidebar('wrapper', {title: \"Test\"});\n        var handleData = {};\n\n\n        //display all users initially\n        displayEventList(dateFilter, \"\")\n\n\n        //setup searchbar\n        let searchbarContainer = document.getElementById(\"usersearch\");\n        var searchbar = new common.Searchbar(searchbarContainer, {\n            onInput: {\n                enabled: true,\n                callback: function(inputValue){\n                    displayEventList(dateFilter, inputValue)\n                },\n            },\n        });\n\n        function displayEventList(dateFilter, filter) {\n\n            let url;\n            let dateFilterObj = {}\n            switch(dateFilter) {\n\n                case \"upcoming\":\n                    url = \"/api/v1/eventmod/filter\";\n                    dateFilterObj = {\n                        selector: \"gte\"\n                    }\n                    break;\n                case \"past\":\n                    url = \"/api/v1/eventmod/filter\";\n                    dateFilterObj = {\n                        selector: \"lte\"\n                    }\n                    break;\n                default:\n                case \"all\":\n                    url = \"/api/v1/eventmod/filter\";\n                    dateFilterObj = {\n                    }\n                    break;\n            }\n\n            let data = {\n                filter: filter,\n                args: {\n                    sort: \"date.startDate\",\n                    dateFilter: dateFilterObj,\n                }\n            };\n            //get user list from server\n            $.ajax({\n                url: url,\n                type: 'POST',\n                contentType: \"application/json; charset=UTF-8\",\n                dataType: 'json',\n                data: JSON.stringify(data),\n                success: function(result) {\n                    handleData.eventlist = result;\n                    // render userlist template\n                    $.get('/static/unisams/js/events/templates/eventlist.hbs', function (data) {\n                        var template = Handlebars.compile(data);\n                        appendContent(template(handleData))\n                    });\n                },\n                error: function(XMLHttpRequest, textStatus, errorThrown) {\n                    alert(XMLHttpRequest.status + \": \" + textStatus);\n                }\n            });\n\n            function appendContent(html) {\n                //append to subpage container #userlist-container\n                let container = document.getElementById('eventlist-container');\n                container.innerHTML = html;\n\n                adjustList(container);\n                // hook user entries to sidebar.\n\n                $('.event-entry').each(function(){\n                    $(this).on(\"click\", function(e){\n                        e.preventDefault();\n                        window.location = \"/unisams/events/view/\" + this.dataset.eventid;\n                    })\n                });\n\n\n            }\n        }\n\n        $('.radio-item').checkboxradio({\n            icon: false\n        });\n        $('#eventlist02').checkboxradio({\n            disabled: true\n        });\n\n    }\n\n    function adjustList(c) {\n        let container = c === undefined ? document.getElementById('eventlist-container') : c;\n        // set width of first row\n        let row = document.getElementById(\"eventlist-top\");\n\n        //get viewport height\n        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);\n        //get height of top navigation and topbar element\n        let navHeight = document.getElementById(\"nav-top\").clientHeight +1;\n        let topbarHeight = document.getElementById(\"content1-heading\").clientHeight;\n        //calc remaining height\n        let h = vh - (navHeight + topbarHeight + row.clientHeight +1);\n        //set element height\n        $(container).css({\n            \"height\": h + \"px\",\n            \"overflow\": \"scroll\",\n        });\n\n        //get scollbar width\n        let scrollbarWidth = container.offsetWidth - container.clientWidth;\n        $(\"#eventlist-top\").css({\n            \"width\": \"auto\",\n            \"padding-right\": scrollbarWidth + \"px\",\n        })\n    }\n\n\n});\n\n//# sourceURL=webpack://unisan-server/./src/webpack/events/eventlist.js?");
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module can't be inlined because the eval devtool is used.
+/******/ 	var __webpack_exports__ = {};
+/******/ 	__webpack_modules__["./src/webpack/events/eventlist.js"]();
+/******/ 	
+/******/ })()
+;
