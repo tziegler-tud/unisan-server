@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
@@ -62,6 +63,13 @@ module.exports = {
         path: path.join(__dirname, "./src/dist"),
         filename: "[name].js"
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            "window.jQuery": "jquery"
+        })
+    ],
     module: {
         rules: [
             {
@@ -87,10 +95,14 @@ module.exports = {
                     },
                 ],
             },
-
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: [
+                    {loader: 'style-loader'},
+                    {
+                        loader: 'css-loader',
+                    }
+                ]
             },
             {
                 test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -103,8 +115,8 @@ module.exports = {
                         }
                     }
                 ]
-            }
-        ]
+            },
+        ],
     },
     resolve: {
         alias: {

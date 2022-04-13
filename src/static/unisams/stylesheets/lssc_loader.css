@@ -336,7 +336,7 @@
 .no-js #nav-static {
   display: none;
 }
-body {
+body.unisams-body {
   padding: 0;
   margin: 0;
   width: 100vw;

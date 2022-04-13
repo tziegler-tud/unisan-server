@@ -42,7 +42,7 @@ var EventSchema = new Schema({
             default: "Typ",
         },
         value: {
-            type: String,
+            type: String, //["Ausbildungsabend", "Seminar", "Sanitätswachdienst"]
         },
         raw: {
             type: String,
@@ -205,6 +205,27 @@ EventSchema.virtual('title.html').get(function() {
     let delta = this.title.delta;
     if (delta === undefined) return "";
     return convertDeltaToHtml(delta);
+});
+
+EventSchema.virtual('type.index').get(function() {
+    let type = this.type.value;
+    let index = 3;
+    switch(type) {
+        case "Seminar":
+            index = 0;
+            break;
+        case "Ausbildungsabend":
+            index = 1;
+            break;
+        case "Sanitätswachdienst":
+            index = 2;
+            break;
+        default:
+        case "Anderes":
+            index = 3;
+            break;
+    }
+    return index;
 });
 
 FileReference.virtual('thumbnail').get(function(){

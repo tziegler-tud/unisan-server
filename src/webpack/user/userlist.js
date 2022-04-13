@@ -2,6 +2,10 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 
+import {ScrollableList} from "../scrollableList/scrollableList";
+
+var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
+
 $(document).ready (function () {
     buildPage();
 
@@ -65,7 +69,7 @@ $(document).ready (function () {
                             }
                         }
                     }
-                    let scrollableList = new common.ScrollableList(container, "user", result, args, callback)
+                    let scrollableList = new ScrollableList(container, "user", result, args, callback)
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);

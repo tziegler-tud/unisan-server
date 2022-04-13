@@ -12,7 +12,7 @@ $(document).ready (function () {
     //setup module specific loaders
     let loaders = [];
     let dashLoader = {
-        title: "dashboard",
+        title: "dash",
         loader: dash,
     };
     let eventsLoader = {

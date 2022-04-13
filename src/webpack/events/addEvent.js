@@ -51,17 +51,17 @@ function buildPageSlider(container) {
     })
 
     //get first page
-    $.get('/static/unisams/js/events/templates/webpack/addEvent-general.hbs', function (data) {
+    $.get('/webpack/events/templates/addEvent-general.hbs', function (data) {
         var template = Handlebars.compile(data);
         let page1 = pageslider.addPage(template());
 
         //get second page
-        $.get('/static/unisams/js/events/templates/webpack/addEvent-dateLocation.hbs', function (data) {
+        $.get('/webpack/events/templates/addEvent-dateLocation.hbs', function (data) {
             var template = Handlebars.compile(data);
             let page2 = pageslider.addPage(template());
 
             //get third page
-            $.get('/static/unisams/js/events/templates/webpack/addEvent-description.hbs', function (data) {
+            $.get('/webpack/events/templates/addEvent-description.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 let page3 = pageslider.addPage(template());
 

@@ -1,7 +1,6 @@
 extends ../layout
 
 block page_includes
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_index.css')
     script(src="/dist/dashboard.js")
 
     script.
@@ -19,9 +18,15 @@ block content
         #page-container.page-container
             #page-container-inner.page-container-inner.full-width
                 section#sec1
+                    #eventcalendar-container.eventcalendar-container
+                section#sec2
                     #sec-content.subpage-container
-                        #content1-heading.subpage-topbar
-
+                        #content1-heading.sec-heading.subpage-heading
+                            h3 Bevorstehende Events
+                        .subpage-topbar
+                            .subpage-options.topbar-element
+                            #eventsearch-upcoming.subpage-searchbar.topbar-element
                         #content1-text.sec-content
                             .subpage-content
-                                #eventlist-container
+                                #eventlist-container--upcoming.eventlist-container
+

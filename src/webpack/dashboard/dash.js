@@ -1,5 +1,6 @@
 import {Sidebar} from "../sidebar/sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
+import {phone, tablet} from "../helpers/variables";
 
 var common = window.common;
 var actions = window.actions;
