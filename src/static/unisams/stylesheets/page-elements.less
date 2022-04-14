@@ -32,10 +32,21 @@
   }
 
   .subpage-topbar {
-    padding: 2em 0;
+    padding: 1em 0;
     width: 100%;
     display: flex;
     flex-flow: row wrap;
+
+    .topbar-heading {
+      flex: 0 0 100%;
+      margin: 0 0 0 2em;
+      span, h1, h2, h3 {
+        font-size: 150%;
+        margin: .8em 0;
+        padding: 0;
+        font-weight: normal;
+      }
+    }
 
     .topbar-element {
       flex: 0 1 auto;

@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 function getDockerArguments (req, res, next) {
     aclService.getCurrentDocker(req.user._id)
         .then(docker => {
-            req.docker = docker;
+            req.acl = docker;
             next()
         })
     // req.docker = {};
@@ -100,7 +100,7 @@ function addUser(req, res, next) {
         .then(result => {
             res.render("unisams/user/addUser", {
                 title: "create user - uniSams",
-                docker: req.docker,
+                acl: req.acl,
                 user: req.user._doc
             })
         })
@@ -179,7 +179,7 @@ function userLogs(req, res, next) {
                     .then(result => {
                         res.render("unisams/user/logs", {
                             user: req.user._doc,
-                            docker: req.docker,
+                            acl: req.acl,
                             generalData: req.user._doc.generalData,
                             customData: req.user._doc.customData,
                             title: user.username,
@@ -222,7 +222,7 @@ function userEvents(req, res, next) {
                             .then(result => {
                                 res.render("unisams/user/events", {
                                     user: req.user._doc,
-                                    docker: req.docker,
+                                    acl: req.acl,
                                     generalData: req.user._doc.generalData,
                                     customData: req.user._doc.customData,
                                     title: user.username,
@@ -235,7 +235,7 @@ function userEvents(req, res, next) {
                             .catch(err=> {
                                 res.render("unisams/user/events", {
                                     user: req.user._doc,
-                                    docker: req.docker,
+                                    acl: req.acl,
                                     generalData: req.user._doc.generalData,
                                     customData: req.user._doc.customData,
                                     title: user.username,
@@ -277,7 +277,7 @@ function userSettings(req, res, next) {
                     .then(result => {
                         res.render("unisams/user/settings", {
                             user: req.user._doc,
-                            docker: req.docker,
+                            acl: req.acl,
                             title: user.username + " | Einstellungen",
                             exploreUser: user,
                             exploreUserDocument: user._doc,
@@ -319,7 +319,7 @@ function userRoles(req, res, next) {
                             if (user) {
                                 res.render("unisams/user/roles", {
                                     user: req.user._doc,
-                                    docker: req.docker,
+                                    acl: req.acl,
                                     title: user.username + " | Rechte & Rollen",
                                     exploreUser: user,
                                     exploreUserDocument: user.toJSON(),

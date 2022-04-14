@@ -1,0 +1,33 @@
+<div class="gallery-container">
+    <ul class="common-list documentlist gallery-view protocol-gallery" id="documentlist-top">
+        {{#each listdata}}
+            <li class="gallery-item cards-item" data-viewkey={{this.id}}>
+                <div class="inner">
+<!--                    <div class="image"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                    <div class="image-overlay"></div>
+                    <div class="item-property title gallery-heading eventcard-heading">
+                        {{{this.title.html}}}
+                        <div class="gallery-heading-inner date">{{{this.type.value}}}</div>
+                        <div class="gallery-heading-inner date">{{{this.dateRangeString}}}</div>
+                    </div>
+                    <div class="gallery-item-actions">
+                        <div class="dropdown-menu menu-below"><button class="mdc-icon-button dropdown-button material-icons" title="More options" data-mdc-ripple-is-unbounded="true">more_vert</button>
+                            <div class="userprofile-dropdown">
+                                <div class="dropdown-container">
+                                    <div class="dropdown-entry {{#or ../acl.events.write ../acl.events.delete}}last{{/or}}"><a href="/unisams/events/view/{{this.id}}" class="" id="">Event anzeigen</a></div>
+                                    {{#if ../acl.events.write}}
+                                        <div class="dropdown-entry {{#unless acl.events.delete}}last{{/unless}}"><a href="/unisams/events/edit/{{this.id}}" class="" id="">Event bearbeiten</a></div>
+                                    {{/if}}
+                                    {{#if ../acl.events.delete}}
+                                    <div class="dropdown-entry last"><a class="before-icon icon-delete documentDeleteBtn" id="">Löschen</a></div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+

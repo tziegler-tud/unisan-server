@@ -31,7 +31,7 @@ auth = function(req, res, next){
 function getDockerArguments (req, res, next) {
     AclService.getCurrentDocker(req.user._id)
         .then(docker => {
-            req.docker = docker;
+            req.acl = docker;
             next()
         })
     // req.docker = {};
@@ -49,14 +49,14 @@ router.get('/notifications', dashboardNotifications);
 function dashboard (req, res, next) {
     res.render("unisams/dashboard/dashboard", {title: "Dashboard - uniSams",
         user: req.user._doc,
-        docker: req.docker,
+        acl: req.acl,
     })
 }
 
 function dashboardEvents (req, res, next) {
     res.render("unisams/dashboard/events", {title: "Meine Events - uniSams",
         user: req.user._doc,
-        docker: req.docker,
+        acl: req.acl,
     })
 }
 
@@ -64,7 +64,7 @@ function dashboardEvents (req, res, next) {
 function dashboardNotifications (req, res, next) {
     res.render("unisams/dashboard/notifications", {title: "Benachrichtigungen - uniSams",
         user: req.user._doc,
-        docker: req.docker,
+        acl: req.acl,
     })
 }
 

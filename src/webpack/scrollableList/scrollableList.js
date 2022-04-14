@@ -1,4 +1,6 @@
 import "./scrollableList.scss";
+const Handlebars = require("handlebars");
+import "../helpers/handlebarsHelpers";
 
 let ScrollableListCounter = {
     counter: 0,
@@ -22,7 +24,7 @@ let ScrollableListCounter = {
  * @returns {Window.common.ScrollableList}
  * @constructor
  */
- var ScrollableList = function(container,type, data,  args, callback){
+var ScrollableList = function(container,type, data,  args, callback){
     if (container === undefined) throw new Error("cannot instantiate list without container");
     if (type === undefined) type = "qualification";
     this.id = ScrollableListCounter.next();
@@ -35,34 +37,49 @@ let ScrollableListCounter = {
     this.initialData = jQuery.extend(true, {}, data);
     this.callback = callback;
     this.container = container;
-    this.templateUrl = applyType(type);
+    this.type = type;
+    this.viewUrl = "";
+    this.templateUrl = applyType(type, this);
     this.sorting = args.sorting;
+    this.view = args.view;
     buildHTML(this, data);
-
-
-
     var self = this;
 
     return this;
 };
 
-var applyType = function(type) {
-    let url;
+ScrollableList.prototype.setView = function(view){
+    if (view === undefined || typeof (view) !== "string") view = "list"
+    else {
+        if (view === "cards") {
+            this.view = "cards";
+        }
+        else {
+            this.view = "list";
+        }
+    }
+    buildHTML(this, this.data);
+}
+
+var applyType = function(type, self) {
+    let url = {list: "", cards: ""}
     switch(type) {
         case "qualification":
-            url = '/static/unisams/js/scrollableList/templates/qualificationList.hbs'
+            url.list = '/static/unisams/js/scrollableList/templates/qualificationList.hbs'
             break;
         case "log":
-            url = '/static/unisams/js/scrollableList/templates/logList.hbs'
+            url.list = '/static/unisams/js/scrollableList/templates/logList.hbs'
             break;
         case "user":
-            url = '/static/unisams/js/scrollableList/templates/userList.hbs'
+            url.list = '/static/unisams/js/scrollableList/templates/userList.hbs'
             break;
         case "event":
-            url = '/webpack/scrollableList/templates/eventList.hbs'
+            url.list = '/webpack/scrollableList/templates/eventList.hbs'
+            url.cards = '/webpack/scrollableList/templates/eventCards.hbs'
+            self.viewUrl = "/unisams/events/view/:id"
             break;
         case "logDetails":
-            url = '/static/unisams/js/scrollableList/templates/logdetailsList.hbs'
+            url.list = '/static/unisams/js/scrollableList/templates/logdetailsList.hbs'
             break;
     }
     return url;
@@ -71,12 +88,14 @@ var applyType = function(type) {
 var applyArgs = function(args){
     let defaultArgs = {
         enableSorting: true,
+        view: "list",
         height: "fixed",
         fixedHeight: "40em",
         sorting: {
             property: null,
             direction: 0,
-        }
+        },
+        acl: {}
     }
     if (args===undefined) {
         return defaultArgs;
@@ -90,16 +109,27 @@ var applyArgs = function(args){
 
 var buildHTML = function(self, data){
     var handleData = {
-        listdata: data
+        listdata: data,
+        acl: self.args.acl,
     };
 
-    // render list template
-    $.get(self.templateUrl, function (data) {
-        var template = Handlebars.compile(data);
-        appendContent(self, template(handleData))
-    });
+    if (self.view === "cards"){
+        //render cards template
+        $.get(self.templateUrl.cards, function (data) {
+            var template = Handlebars.compile(data);
+            buildCards(self, template(handleData))
+        });
+    }
+    else {
+        // render list template
+        $.get(self.templateUrl.list, function (data) {
+            var template = Handlebars.compile(data);
+            buildList(self, template(handleData))
+        });
+    }
 
-    function appendContent(self, html) {
+
+    function buildList(self, html) {
         //append to container
         self.container.innerHTML = html;
         self.adjustList();
@@ -114,6 +144,12 @@ var buildHTML = function(self, data){
         }
 
     }
+    function buildCards(self, html) {
+        //append to container
+        self.container.innerHTML = html;
+        cardEventHandlers(self)
+    }
+
     return true;
 }
 
@@ -251,6 +287,23 @@ var setupEventHandlers = function(self){
             self.callback.listItem.onClick(e)
         });
     }
+};
+
+var cardEventHandlers = function(self){
+
+    //register item links
+    $(".gallery-item").on("click", function(){
+        const viewkey = this.dataset.viewkey;
+        let url = self.viewUrl.replace(":id", viewkey);
+        window.location = url;
+    })
+
+    const dropdowns = [].map.call(document.querySelectorAll(".dropdown-button"), function (el) {
+        const container = $(el).closest(".dropdown-menu");
+        const drop = new common.DropdownMenu(container, "click", el);
+    });
+
+
 };
 
 export{ScrollableList}

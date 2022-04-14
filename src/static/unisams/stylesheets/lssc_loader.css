@@ -1223,10 +1223,23 @@ common btn styling
   color: #333;
 }
 .subpage-container .subpage-topbar {
-  padding: 2em 0;
+  padding: 1em 0;
   width: 100%;
   display: flex;
   flex-flow: row wrap;
+}
+.subpage-container .subpage-topbar .topbar-heading {
+  flex: 0 0 100%;
+  margin: 0 0 0 2em;
+}
+.subpage-container .subpage-topbar .topbar-heading span,
+.subpage-container .subpage-topbar .topbar-heading h1,
+.subpage-container .subpage-topbar .topbar-heading h2,
+.subpage-container .subpage-topbar .topbar-heading h3 {
+  font-size: 150%;
+  margin: 0.8em 0;
+  padding: 0;
+  font-weight: normal;
 }
 .subpage-container .subpage-topbar .topbar-element {
   flex: 0 1 auto;

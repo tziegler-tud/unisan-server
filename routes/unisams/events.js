@@ -138,8 +138,8 @@ function allowCreateEvent(req, res, next) {
 
 function getDockerArguments (req, res, next) {
     AclService.getCurrentDocker(req.user._id)
-        .then(docker => {
-            req.docker = docker;
+        .then(dockerAcl => {
+            req.acl = dockerAcl;
             next()
         })
 }
@@ -176,8 +176,11 @@ function getAll(req, res, next) {
             eventList = events;
             res.render("unisams/events/eventlist", {title: "Events - uniSams",
                 user: req.user._doc,
-                docker: req.docker,
-                eventList: eventList
+                docker: req.acl,
+                pageHeader: "Alle Events",
+                eventList: eventList,
+                dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsAll"}
+
             })
         })
         .catch(err => {
@@ -186,10 +189,14 @@ function getAll(req, res, next) {
 }
 
 function getUpcoming(req, res, next) {
+
     res.render("unisams/events/eventlist", {title: "Events - uniSams",
         user: req.user._doc,
         dateFilter: "upcoming",
-        docker: req.docker,
+        pageHeader: "Bevorstehende Events",
+        dockerSection: "eventsUpcoming",
+        acl: req.acl,
+        dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsUpcoming"}
     })
 }
 
@@ -197,14 +204,18 @@ function getPast(req, res, next) {
     res.render("unisams/events/eventlist", {title: "Events - uniSams",
         user: req.user._doc,
         dateFilter: "past",
-        docker: req.docker,
+        pageHeader: "Vergangene Events",
+        dockerSection: "eventsPast",
+        acl: req.acl,
+        dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsPast"}
+
     })
 }
 
 function addEvent(req, res, next) {
     res.render("unisams/events/addEvent", {
         title: "create Event - uniSams",
-        docker: req.docker,
+        acl: req.acl,
         user: req.user._doc
     })
 }
@@ -218,7 +229,7 @@ function viewEvent(req, res, next) {
                     .then(result => {
                         res.render("unisams/events/viewEvent", {
                             user: req.user._doc,
-                            docker: req.docker,
+                            acl: req.acl,
                             title: ev.title.value,
                             exploreEvent: ev,
                             refurl: req.params.id,
@@ -245,7 +256,7 @@ function editEvent(req, res, next) {
             if (event) {
                 res.render("unisams/events/editEvent", {
                     user: req.user._doc,
-                    docker: req.docker,
+                    acl: req.acl,
                     title: event.title.value,
                     exploreEvent: event,
                     refurl: req.params.id,
@@ -267,7 +278,7 @@ function eventParticipants(req, res, next) {
                         url = "unisams/events/editParticipants";
                         res.render(url, {
                             user: req.user.toJSON(),
-                            docker: req.docker,
+                            acl: req.acl,
                             title: ev.title.value,
                             exploreEvent: ev,
                             exploreEventDocument: ev._doc,
@@ -278,7 +289,7 @@ function eventParticipants(req, res, next) {
                         let url = "unisams/events/participants";
                         res.render(url, {
                             user: req.user.toJSON(),
-                            docker: req.docker,
+                            acl: req.acl,
                             title: ev.title.value,
                             exploreEvent: ev,
                             exploreEventDocument: ev._doc,
@@ -297,7 +308,7 @@ function eventLogs(req, res, next) {
             if (ev) {
                 res.render("unisams/events/logs", {
                     user: req.user._doc,
-                    docker: req.docker,
+                    acl: req.acl,
                     title: ev.title.value,
                     exploreEvent: ev,
                     exploreEventDocument: ev._doc,

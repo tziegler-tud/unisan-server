@@ -31,7 +31,7 @@ auth = function(req, res, next){
 function getDockerArguments (req, res, next) {
     AclService.getCurrentDocker(req.user._id)
         .then(docker => {
-            req.docker = docker;
+            req.acl = docker;
             next()
         })
     // req.docker = {};
@@ -60,7 +60,7 @@ function database (req, res, next) {
             qualList = quals;
             res.render("unisams/settings/settingsDatabase", {title: "settings - uniSams",
                 user: req.user._doc,
-                docker: req.docker,
+                acl: req.acl,
                 qualificationList: qualList
             })
         })
@@ -72,7 +72,7 @@ function database (req, res, next) {
 function user (req, res, next) {
     res.render("unisams/settings/user", {title: "settings - uniSams",
         user: req.user._doc,
-        docker: req.docker,
+        acl: req.acl,
     })
 }
 
@@ -80,7 +80,7 @@ function user (req, res, next) {
 function events (req, res, next) {
     res.render("unisams/settings/events", {title: "settings - uniSams",
         user: req.user._doc,
-        docker: req.docker,
+        acl: req.acl,
     })
 }
 
@@ -90,7 +90,7 @@ function roles (req, res, next) {
         .then(groups => {
             res.render("unisams/settings/roles", {title: "Rechte und Rollen - uniSams",
                 user: req.user._doc,
-                docker: req.docker,
+                acl: req.acl,
                 groups: groups
             })
         })
@@ -103,7 +103,7 @@ function roles (req, res, next) {
 function logs (req, res, next) {
     res.render("unisams/settings/logs", {title: "logs - uniSams",
         user: req.user._doc,
-        docker: req.docker,
+        acl: req.acl,
     })
 }
 
@@ -118,7 +118,7 @@ function editRole(req, res, next) {
                         {
                             title: "Rolle: " + group.title,
                             user: req.user._doc,
-                            docker: req.docker,
+                            acl: req.acl,
                             group: group._doc,
                             groupId: group._id,
                             assignedUser: user,
@@ -144,7 +144,7 @@ function editRoleAdvanced(req, res, next) {
                         {
                             title: "Rolle: " + group.title,
                             user: req.user._doc,
-                            docker: req.docker,
+                            acl: req.acl,
                             group: group._doc,
                             groupId: group._id,
                             assignedUser: user,

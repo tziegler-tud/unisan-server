@@ -67,6 +67,22 @@ Handlebars.registerHelper('userHasRole', function (user, role) {
     return (userRoleId === roleId);
 });
 
+Handlebars.registerHelper('and', function (v1, v2, options) {
+    'use strict';
+    if (v1 && v2) {
+        return options.fn(this);
+    }
+    return options.inverse(this);
+});
+
+Handlebars.registerHelper('or', function (v1, v2, options) {
+    'use strict';
+    if (v1 || v2) {
+        return options.fn(this);
+    }
+    return options.inverse(this);
+});
+
 
 
 // Legacy dateTime transformer for comparison, in case anything goes wrong

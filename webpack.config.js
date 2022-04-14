@@ -9,6 +9,9 @@ module.exports = {
         login: "./src/webpack/login.js",
         login_style: "./src/webpack/login.scss",
 
+        init: "./src/webpack/init.js",
+        init_style: "./src/webpack/init.scss",
+
         index: "./src/webpack/index.js",
         index_style: "./src/webpack/index.scss",
 
@@ -31,9 +34,6 @@ module.exports = {
 
         userlist: "./src/webpack/user/userlist.js",
         userlist_style: "./src/webpack/user/userlist.scss",
-
-        drawer: "./src/webpack/drawer.js",
-        drawer_style: "./src/webpack/drawer.scss",
 
         addEvent: "./src/webpack/events/addEvent.js",
         addEvent_style: "./src/webpack/events/addEvent.scss",
