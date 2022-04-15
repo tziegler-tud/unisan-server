@@ -1,11 +1,8 @@
 import {Drawer} from "./drawer"
-/**
- * @namespace: docker
- */
-
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
-
 
 /**
  * typedef Constructor arguments
@@ -56,24 +53,20 @@ var Docker = function(dockerArgs){
         self.wrapper.innerHTML = template(context);
         self.innerContainer = document.getElementById("docker-inner");
 
-        $.get("/api/v1/usermod/current")
-            .then(user=> {
+        // create new observer
+        var observer = new lidlObserver(function(user){
+            window.currentExploredUser = user;
+        });
+
+        // get user data from user service
+        //subscribe as observer to get notification if user changes on server
+        window.currentUserProfile.getUserAndSubscribe(observer)
+            .then(function(user){
                 buildDocker(user)
             })
-        // // create new observer
-        // var observer = new lidl.Observer(function(user){
-        //     window.currentExploredUser = user;
-        // });
-        //
-        // // get user data from user service
-        // //subscribe as observer to get notification if user changes on server
-        // window.currentUserProfile.getUserAndSubscribe(observer)
-        //     .then(function(user){
-        //         buildDocker(user)
-        //     })
-        //     .catch(function(reason){
-        //         console.error("Failed to retrieve user data:" + reason)
-        //     });
+            .catch(function(reason){
+                console.error("Failed to retrieve user data:" + reason)
+            });
 
         var buildDocker = function(user){
             //get user acl
@@ -83,7 +76,7 @@ var Docker = function(dockerArgs){
             //render docker content depending on device
             //desktop/tablet: render static docker
             if(!phone.matches) {
-                domElementsPromise = $.get('/static/unisams/js/docker/templates/docker-desktop.hbs')
+                domElementsPromise = $.get('/webpack/docker/templates/docker-desktop.hbs')
             }
             else {
                 domElementsPromise = new Drawer({user: user});
@@ -123,7 +116,7 @@ var Docker = function(dockerArgs){
 
                     //add settings subpage to all users for now
                     //TODO: settings subpage should only be visible for users with appropriate access rights
-                    self.addDockerSubPage("settings", {id: "DockerSettingsContainer"}, {position: {place: "first"}})
+                    self.addDockerSubPage("settings", {id: "DockerSettingsContainer"}, {position: {place: "first"}}, undefined, userACL.docker)
 
             })
                 .catch(function(){
@@ -222,7 +215,7 @@ var Docker = function(dockerArgs){
          * @param data - see signature of addDockerSubpage method
          */
         update: function(id, type, data){
-            self.addDockerSubPage(type, data, {overwrite: true}, id)
+            self.addDockerSubPage(type, data, {overwrite: true}, id, self.dockerAcl)
         },
         generateId: function(){
             return "docker-subpage_" + this.counter.increase();
@@ -296,7 +289,7 @@ const initEventHandlers = function(dockerInstance){
  *
  * sets up event handlers for the new subpage without compromising existing ones.
  *
- * @param dockerInstance {docker} the docker instance
+ * @param dockerInstance {Docker} the docker instance
  * @param subpage {HTMLElement} the subpage dom element
  * @param activate {Boolean} renders the subpage the active container
  */
@@ -553,10 +546,9 @@ Docker.prototype.addDockerSubPage = function(type, data, options, id, dockerAcl)
                 subpageContainer.append(subpageWrapper);
                 self.subpageHandler.add(subpage);
 
-
-                const subpageDom = document.getElementById(id);
+                const subpageDom = document.getElementById(context.id);
                 addSubpageEventHandlers(self, subpageDom, true);
-                self.subpageHandler.show(id);
+                self.subpageHandler.show(context.id);
                 //initially setup dom elements
                 const container = document.getElementById(dockerArgs.activeContainer);
                 const el = document.getElementById(dockerArgs.activeElementId);

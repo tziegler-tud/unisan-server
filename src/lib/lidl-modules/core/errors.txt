@@ -1,0 +1,12 @@
+error codes and explaination:
+
+errors thrown by lidl framework start with lidlE...
+warnings trhown by lidl framework start with lidlW...
+
+
+Glossary:
+
+E0x01   lidl main object failed to instanciate
+E0x02   lidl manager failed to create
+E0x03   lidl manager missing
+E0x04   lidl manager isUnique==true and already set

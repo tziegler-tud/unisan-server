@@ -5,6 +5,10 @@ import {MDCList} from "@material/list";
 import {MDCRipple} from "@material/ripple";
 import {MDCMenu} from '@material/menu';
 
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
@@ -16,12 +20,11 @@ var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width
 
 $(document).ready (function () {
     var lidlRTO = window.lidlRTO;
-
     var user;
     var profile = new window.profile.Profile(window.userId);
 
     // create new observer
-    var ob1 = new lidl.Observer(function(u){
+    var ob1 = new lidlObserver(function(u){
         user = u;
     });
 
@@ -41,7 +44,7 @@ $(document).ready (function () {
     });
 
     // create new observer
-    var ob2 = new lidl.Observer(function(event){
+    var ob2 = new lidlObserver(function(event){
         currentExploredEvent = event;
     });
 
@@ -87,7 +90,7 @@ $(document).ready (function () {
         };
 
         var token = lidlRTO.objectManager.createNewObjectToken();
-        const dialogDeleteEvent = new lidl.Dialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
+        const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
         lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
 
         const list = new MDCList(document.querySelector('.mdc-list'));

@@ -176,9 +176,9 @@ function getAll(req, res, next) {
             eventList = events;
             res.render("unisams/events/eventlist", {title: "Events - uniSams",
                 user: req.user._doc,
-                docker: req.acl,
                 pageHeader: "Alle Events",
                 eventList: eventList,
+                acl: req.acl,
                 dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsAll"}
 
             })

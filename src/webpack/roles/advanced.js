@@ -4,6 +4,10 @@ import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 import {userActions} from "../actions/userActions";
 import {Userlist} from "../helpers/userlist";
 
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+
 
 let advanced = {
     init: function() {
@@ -44,7 +48,7 @@ let advanced = {
             };
 
             var token = lidlRTO.objectManager.createNewObjectToken();
-            const dialogDeleteUser = new lidl.Dialog(token, ".deleteGroupButton", 'confirmDelete', deleteContent, deleteArgs);
+            const dialogDeleteUser = new lidlDialog(token, ".deleteGroupButton", 'confirmDelete', deleteContent, deleteArgs);
             lidlRTO.objectManager.addObject(dialogDeleteUser, token);
 
             $(".addPathButton").on("click", function (e) {
@@ -98,7 +102,7 @@ let advanced = {
             };
 
             var token2 = lidlRTO.objectManager.createNewObjectToken();
-            const dialogAddToAll = new lidl.Dialog(token2, ".addToAllButton", 'confirmDelete', addToAllContent, addToAllArgs);
+            const dialogAddToAll = new lidlDialog(token2, ".addToAllButton", 'confirmDelete', addToAllContent, addToAllArgs);
             lidlRTO.objectManager.addObject(dialogAddToAll, token2);
 
             const removeFromAllContent = {
@@ -118,7 +122,7 @@ let advanced = {
             };
 
             var token3 = lidlRTO.objectManager.createNewObjectToken();
-            const dialogRemoveFromAll = new lidl.Dialog(token3, ".removeFromAllButton", 'confirmDelete', removeFromAllContent, removeFromAllArgs);
+            const dialogRemoveFromAll = new lidlDialog(token3, ".removeFromAllButton", 'confirmDelete', removeFromAllContent, removeFromAllArgs);
             lidlRTO.objectManager.addObject(dialogAddToAll, token3);
         });
     }

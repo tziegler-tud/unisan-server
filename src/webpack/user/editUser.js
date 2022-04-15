@@ -14,6 +14,9 @@ import {userPlugin} from "../sidebar/plugins/plugin-user";
 
 import {userActions} from "../actions/userActions";
 
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 
 $(document).ready (function () {
 
@@ -25,7 +28,7 @@ $(document).ready (function () {
     var profile = new window.profile.Profile(window.exploreUserId);
 
     // create new observer
-    var observer = new lidl.Observer(function(user){
+    var observer = new lidlObserver(function(user){
         currentExploredUser = user;
     });
 
@@ -66,7 +69,7 @@ $(document).ready (function () {
         };
 
         var token = lidlRTO.objectManager.createNewObjectToken();
-        const dialogDeleteUser = new lidl.Dialog(token, ".userDelete", 'confirmDelete', deleteContent, deleteArgs);
+        const dialogDeleteUser = new lidlDialog(token, ".userDelete", 'confirmDelete', deleteContent, deleteArgs);
         lidlRTO.objectManager.addObject(dialogDeleteUser, token);
 
         const content3 = {
@@ -90,7 +93,7 @@ $(document).ready (function () {
         };
 
         var token3 = lidlRTO.objectManager.createNewObjectToken();
-        const dialog03 = new lidl.Dialog(token3, ".useredit-removeItemBtn", 'removeDBKey', content3, args03);
+        const dialog03 = new lidlDialog(token3, ".useredit-removeItemBtn", 'removeDBKey', content3, args03);
         lidlRTO.objectManager.addObject(dialog03, token3);
 
         const uploader = new Uppload({
@@ -170,7 +173,7 @@ $(document).ready (function () {
                                                 }
                                             }
                                         };
-                                        const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                                        const dialog = new lidlDialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
                                         lidlRTO.objectManager.addObject(dialog, dialog_token);
                                         dialog.openDialog();
                                     }
@@ -307,7 +310,7 @@ $(document).ready (function () {
                                     }
                                 }
                             };
-                            const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                            const dialog = new lidlDialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
                             lidlRTO.objectManager.addObject(dialog, dialog_token);
                             dialog.openDialog();
                         }
@@ -368,7 +371,7 @@ $(document).ready (function () {
                                     }
                                 }
                             };
-                            const dialog = new lidl.Dialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
+                            const dialog = new lidlDialog(dialog_token, null, 'removeDBKey', dialog_content, dialog_args);
                             lidlRTO.objectManager.addObject(dialog, dialog_token);
                             dialog.openDialog();
                         }
@@ -486,7 +489,7 @@ $(document).ready (function () {
                                 }
                             };
                             token = lidlRTO.objectManager.createNewObjectToken();
-                            const dialogChangeUsername = new lidl.Dialog(token, null, 'confirmChange', changeContent, changeArgs);
+                            const dialogChangeUsername = new lidlDialog(token, null, 'confirmChange', changeContent, changeArgs);
                             lidlRTO.objectManager.addObject(dialogChangeUsername, token);
                             dialogChangeUsername.openDialog();
                         },

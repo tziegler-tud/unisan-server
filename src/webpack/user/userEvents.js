@@ -2,6 +2,10 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
@@ -12,7 +16,7 @@ $(document).ready (function () {
     var profile = new window.profile.Profile(window.exploreUserId);
 
     // create new observer
-    var observer = new lidl.Observer(function(user){
+    var observer = new lidlObserver(function(user){
         currentExploredUser = user;
     });
 

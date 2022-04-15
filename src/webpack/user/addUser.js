@@ -2,6 +2,11 @@ import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
 
+import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import {userPlugin} from "../sidebar/plugins/plugin-user";
+
+import {userActions} from "../actions/userActions";
+
 
 $(document).ready (function () {
     //setupTimePickerWidget()
@@ -39,7 +44,7 @@ function buildPageSlider(container) {
                     tmpkey: data[4].userimg_tmpkey,
                 }
             };
-            actions.addUser(apiData, args);
+            userActions.addUser(apiData, args);
         },
         onError: function(){
 

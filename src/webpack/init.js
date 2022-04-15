@@ -1,5 +1,7 @@
 import {Docker} from "./docker/docker"
-
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer"
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
 var lidlRTO = window.lidlRTO;
 
 if (window.dockerArgs === undefined) {
@@ -12,11 +14,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     console.log("js active, removing noscript fallback");
     $("body").removeClass("no-js");
 
-    lidlRTO = new lidl.Main();
+    lidlRTO = new lidl.Lidl();
+    window.lidlRTO = lidlRTO;
 
     lidlRTO.addManager(new lidl.ObjectManager(),true);
 
-    lidl.addDebugCategory(lidl.debugCategory.FULL);
+    lidlRTO.addDebugCategory(lidl.debugCategory.FULL);
 
     Handlebars.registerHelper('transformDateString', function(dateString, format) {
         format = (format === undefined || typeof(format) !== "string") ? "text" : format;
@@ -64,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var profile = new window.profile.Profile(window.userId);
     window.currentUserProfile = profile;
     // create new observer
-    var observer = new lidl.Observer(function(u){
+    var observer = new lidlObserver(function(u){
         user = u;
     });
 

@@ -2,9 +2,12 @@ import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
 
+import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import {eventPlugin} from "../sidebar/plugins/plugin-event";
+
+import {eventActions} from "../actions/eventActions";
 
 var common = window.common;
-var actions = window.actions;
 
 
 $(document).ready (function () {
@@ -43,7 +46,7 @@ function buildPageSlider(container) {
                 longDescVal:   data[3].longDescVal,
                 longDescDelta:   data[3].longDescDelta,
             };
-            actions.events.addEvent(apiData);
+            eventActions.addEvent(apiData);
         },
         onError: function(){
 

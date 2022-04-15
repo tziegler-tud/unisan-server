@@ -84,7 +84,7 @@ function getAll(req, res, next) {
                     userList = users;
                     res.render("unisams/user/user", {title: "user managment - uniSams",
                         user: req.user._doc,
-                        docker: req.docker,
+                        acl: req.acl,
                         userList: userList
                     })
                 })
@@ -128,7 +128,7 @@ function profile(req, res, next) {
                                             exploreUser: user,
                                             exploreUserDocument: user._doc,
                                             refurl: req.params.username,
-                                            docker: docker,
+                                            acl: req.acl,
                                             allowedit: true,
                                         })
                                     })
@@ -141,7 +141,7 @@ function profile(req, res, next) {
                                             exploreUser: user,
                                             exploreUserDocument: user._doc,
                                             refurl: req.params.username,
-                                            docker: docker,
+                                            acl: req.acl,
                                             allowedit: false,
                                         })
                                     })

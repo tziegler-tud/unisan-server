@@ -1,5 +1,12 @@
 import {MDCList} from '@material/list';
 import {MDCRipple} from '@material/ripple';
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+
+import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import {eventPlugin} from "../sidebar/plugins/plugin-event";
+
+import {eventActions} from "../actions/eventActions";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
@@ -11,7 +18,7 @@ $(document).ready (function () {
     var profile = new window.profile.Profile(window.userId);
 
     // create new observer
-    var ob1 = new lidl.Observer(function(u){
+    var ob1 = new lidlObserver(function(u){
         user = u;
     });
 
@@ -31,7 +38,7 @@ $(document).ready (function () {
     });
 
     // create new observer
-    var ob2 = new lidl.Observer(function(event){
+    var ob2 = new lidlObserver(function(event){
         currentExploredEvent = event;
     });
 
@@ -77,7 +84,7 @@ $(document).ready (function () {
         let callback = {
             onConfirm: function(editableTextField){
                 let delta = editableTextField.getQuill().getContents();
-                actions.events.saveDelta(event.id, delta, {
+                eventActions.saveDelta(event.id, delta, {
                     onSuccess: function(result){
                         editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {readOnly: true})
                     }
@@ -91,7 +98,7 @@ $(document).ready (function () {
             onConfirm: function(editableInputField){
                 let delta = editableInputField.getQuill().getContents();
                 let key = "title.delta";
-                actions.events.updateKey(event.id, key, delta, {
+                eventActions.updateKey(event.id, key, delta, {
                     onSuccess: function(result){
                         editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {readOnly: true})
                     }
@@ -119,7 +126,8 @@ $(document).ready (function () {
 
         var ddMenu = common.DropdownMenu(".dropdown-menu", "click", ".dropdown-btn");
 
-        var sidebar = new common.Sidebar('wrapper', {title: "Test"});
+        var sidebar = new Sidebar('wrapper', "test");
+        sidebar.addPlugin(eventPlugin);
         // init event sidebar
         //find if current user is already registered
         let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
@@ -129,10 +137,10 @@ $(document).ready (function () {
             isParticipant: userIsParticipant,
             callback: {
                 onConfirm: function(){
-                    window.actions.events.addParticipant(event.id, user.id)
+                    eventActions.addParticipant(event.id, user.id)
                 },
                 onDelete: function(){
-                    window.actions.events.removeParticipant(event.id, user.id)
+                    eventActions.removeParticipant(event.id, user.id)
                 }
             },
         });
