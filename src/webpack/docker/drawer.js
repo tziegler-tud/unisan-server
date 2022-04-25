@@ -5,7 +5,7 @@ import "./drawer.scss";
 var Drawer = function(context){
     var drawer;
     //load drawer template and attach to body
-    return $.get('/static/unisams/js/drawer/drawer.hbs', function (data) {
+    return $.get('/webpack/docker/templates/drawer.hbs', function (data) {
         var template = Handlebars.compile(data);
         $("body").prepend(template(context));
         drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
