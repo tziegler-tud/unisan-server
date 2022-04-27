@@ -1,0 +1,33 @@
+{{#arrayNotEmpty listdata}}
+    <div class="itemlist-content-container scrollableList-content mdc-list-group">
+        <ul class="mdc-list mdc-list--two-line">
+        {{#each listdata}}
+            <li class="mdc-list-item event-entry" tabindex="0" id='eventId{{this.id}}' data-id= {{this.id}}>
+                <span class="mdc-list-item__ripple"></span>
+                <span class="mdc-list-item__text">
+                    <span class="mdc-list-item__primary-text">{{{this.title.value}}} <span class="mobileList-secondary">| {{this.type.value}}</span></span>
+                     <span class="mdc-list-item__secondary-text">{{this.dateRangeString}}</span>
+                </span>
+            </li>
+    {{/each}}
+        </ul>
+    </div>
+{{else}}
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+        <li class="event-entry noSelect" id='eventId{{this.id}}' data-id= {{this.id}}>
+            <a class="inner">
+                <div class="item-property item-container noEntries-container">
+                    <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                    <span class=" item-container-element">Keine Einträge vorhanden</span>
+                </div>
+            </a>
+        </li>
+    </ul>
+</div>
+{{/arrayNotEmpty}}
+
+
+
+
+

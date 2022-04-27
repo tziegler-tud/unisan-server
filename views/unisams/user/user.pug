@@ -20,15 +20,17 @@ block content
                 section#sec1
                     #sec-content.subpage-container
                         #content1-heading.subpage-topbar
+                            .topbar-heading
+                                h3 Mitglieder
                             .subpage-options.topbar-element
-                                .radiogroup
-                                    label(for="userlist01")
+                                .radiogroup.toggleButtonGroup
+                                    label.toggleButton.toggleButton-first(for="userlist01")
                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list") <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg>
-                                        span Liste
+                                        //span Liste
                                     input#userlist01.radio-item(type="radio", name="userlist-radio")
-                                    label(for="userlist02")
+                                    label.toggleButton(for="userlist02")
                                         svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid") <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                                        span Gallerie
+                                        //span Gallerie
                                     input#userlist02.radio-item(type="radio", name="userlist-radio")
                             #usersearch.subpage-searchbar.topbar-element
                         #content1-text.sec-content

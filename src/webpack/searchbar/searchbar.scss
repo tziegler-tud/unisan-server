@@ -1,0 +1,65 @@
+@use "@material/icon-button";
+@use "@material/floating-label/mdc-floating-label";
+@use "@material/line-ripple/mdc-line-ripple";
+@use "@material/notched-outline/mdc-notched-outline";
+@use "@material/textfield";
+@use "@material/textfield/icon";
+
+
+
+@import "../color-rules";
+@import "../variables";
+@import "../fonts.css";
+
+@import "~material-icons-font/material-icons-font.css";
+
+@include icon-button.core-styles;
+@include textfield.core-styles;
+@include icon.icon-core-styles;
+
+.searchbar-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+  .searchbar-icon {
+    font-size: 150%;
+    font-family: "Material Icons";
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .searchbar {
+
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 100%;
+    overflow: hidden;
+    @include transition(max-width, 500ms);
+    display: flex;
+    flex-flow: row nowrap;
+
+    //label {
+    //  flex: 0 0 auto;
+    //  margin-right: 1em;
+    //  display: none;
+    //  @media #{$tablet-landscape, $desktop} {
+    //    display: block;
+    //  }
+    //
+    //}
+    //input {
+    //  max-width: 100%;
+    //  flex: 0 0 auto;
+    //  &.nomargin {
+    //    margin: 0;
+    //  }
+    //}
+  }
+
+  &.hidden {
+    .searchbar {
+      max-width: 0;
+    }
+  }
+}

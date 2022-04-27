@@ -2,10 +2,12 @@
 @use "@material/button";
 @use "@material/icon-button";
 
+
 @import "~material-icons-font/material-icons-font.css";
 
 @import "../color-rules";
 @import "../variables";
+@import "../fonts.css";
 
 @include icon-button.core-styles;
 @include card.core-styles;
@@ -26,6 +28,36 @@ ul.scrollableItemList {
       }
     }
   }
+  &:not(.noSelect) {
+    li {
+      &:hover {
+        background-color: rgba(124,0,26,0.2);
+        cursor: pointer;
+
+        .inner {
+          &:hover > &.after {
+            border-bottom-color: $text-hover-color;
+          }
+        }
+      }
+    }
+  }
+  &.no-entries {
+    li {
+      .inner {
+        display: grid;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto;
+
+        font-style: italic;
+        font-weight: lighter;
+        padding: .5em 0;
+        text-align: center;
+
+      }
+    }
+  }
+
   list-style: none;
   padding-left: 0;
   margin-left: 0;
@@ -71,17 +103,11 @@ ul.scrollableItemList {
   }
 
   li {
-
     flex: 1 1 auto;
     background-color: $bgCol1;
 
     &:nth-child(odd) {
       background-color: $bgCol2;
-    }
-
-    &:not(.noSelect):hover {
-      background-color: rgba(124,0,26,0.2);
-      cursor: pointer;
     }
 
     &.borderBottom {
@@ -115,9 +141,6 @@ ul.scrollableItemList {
           left: 0;
         }
 
-        &:hover > &.after {
-          border-bottom-color: $text-hover-color;
-        }
       }
     }
   }
@@ -234,11 +257,6 @@ ul.userlist{
           }
         }
 
-        &:not(.noSelect):hover {
-          background-color: rgba(124, 0, 26, 0.2);
-          cursor: pointer;
-        }
-
         &.borderBottom {
           border-bottom: 1px solid #AAA;
         }
@@ -256,11 +274,6 @@ ul.userlist{
   &.gallery-view {
     li {
       display: block;
-
-      &:not(.noSelect):hover {
-        background-color: rgba(124,0,26,0.2);
-        cursor: pointer;
-      }
 
       &.borderBottom {
         border-bottom: 1px solid #AAA;
@@ -296,6 +309,7 @@ ul.eventlist{
 
   &.list-view {
     font-size: 110%;
+
     li {
 
       .type, .dateTime {
@@ -358,11 +372,6 @@ ul.eventlist{
           }
         }
 
-        &:not(.noSelect):hover {
-          background-color: rgba(124, 0, 26, 0.2);
-          cursor: pointer;
-        }
-
         &.borderBottom {
           border-bottom: 1px solid #AAA;
         }
@@ -381,10 +390,6 @@ ul.eventlist{
     li {
       display: block;
 
-      &:not(.noSelect):hover {
-        background-color: rgba(124,0,26,0.2);
-        cursor: pointer;
-      }
 
       &.borderBottom {
         border-bottom: 1px solid #AAA;
@@ -404,7 +409,10 @@ ul.eventlist{
 
 .gallery-container {
   $item-bg: $page-bg-color;
-  $page-bg: $page-bg-color-v2;
+  //$item-bg: #fffefa;
+  //$item-bg: #eaeaea;
+  //$page-bg: $page-bg-color-v2;
+  $page-bg: #AAA;
   padding: 0;
   list-style: none;
   width: 90%;

@@ -1,0 +1,77 @@
+
+
+@font-face {
+    font-family: 'Goudy';
+    src: url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.eot'); /* IE9 Compat Modes */
+    src: url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.woff') format('woff'), /* Pretty Modern Browsers */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+@font-face {
+    font-family: 'Goudy';
+    src: url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.eot'); /* IE9 Compat Modes */
+    src: url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.eot') format('woff'), /* Pretty Modern Browsers */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('/src/static/fonts/opensans/OpenSans-Regular.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: normal;
+    src: url('/src/static/fonts/opensans/OpenSans-Italic.ttf')  format('truetype');
+}
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: bold;
+    src: url('/src/static/fonts/opensans/OpenSans-Bold.ttf')  format('truetype');
+}
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 200;
+    src: url('/src/static/fonts/opensans/OpenSans-Light.ttf')  format('truetype');
+}
+@font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 200;
+    src: url('/src/static/fonts/opensans/OpenSans-LightItalic.ttf')  format('truetype');
+}
+
+
+
+@font-face {
+    font-family: 'Railway';
+    src: url('/src/static/fonts/raleway/raleway_thin-webfont.eot'); /* IE9 Compat Modes */
+    src: url('/src/static/fonts/raleway/raleway_thin-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('/src/static/fonts/raleway/raleway_thin-webfont.woff') format('woff'), /* Pretty Modern Browsers */
+    url('/src/static/fonts/raleway/raleway_thin-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
+    url('/src/static/fonts/raleway/raleway_thin-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+    font-family: 'Comfortaa Light';
+    src: url('/src/static/fonts/comfortaa/Comfortaa-Light.ttf')  format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+    font-family: 'Comfortaa Regular';
+    src: url('/src/static/fonts/comfortaa/Comfortaa-Regular.ttf')  format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+    font-family: 'Comfortaa Bold';
+    src: url('/src/static/fonts/comfortaa/Comfortaa-Bold.ttf')  format('truetype'); /* Safari, Android, iOS */
+}
+

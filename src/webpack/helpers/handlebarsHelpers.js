@@ -40,6 +40,15 @@ Handlebars.registerHelper('checklength', function (v1, v2, options) {
     return options.inverse(this);
 });
 
+Handlebars.registerHelper('arrayNotEmpty', function (v1, options) {
+    'use strict';
+    if (!Array.isArray(v1)) return options.inverse(this)
+    if (v1.length>0) {
+        return options.fn(this);
+    }
+    return options.inverse(this);
+});
+
 Handlebars.registerHelper('greaterThan', function (v1, v2, options) {
     'use strict';
     if (v1>v2) {

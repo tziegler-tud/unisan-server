@@ -3,6 +3,7 @@ import "./eventlist.scss";
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 const {ScrollableList} = require("../scrollableList/scrollableList");
 const {Sidebar} = require("../sidebar/sidebar");
+import {Searchbar} from "../searchbar/searchbar";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
@@ -25,7 +26,11 @@ $(document).ready (function () {
         let scrollableList;
 
         $('.radio-item').checkboxradio({
-            icon: false
+            icon: false,
+            classes: {
+                "ui-checkboxradio-label": "toggleButton",
+                "ui-checkboxradio-checked": "toggleButton-checked"
+            }
         });
         let checked= $('input[name=eventlist-radio]:checked');
         let listRadio = $("#eventlist01");
@@ -60,7 +65,7 @@ $(document).ready (function () {
 
         //setup searchbar
         let searchbarContainer = document.getElementById("usersearch");
-        var searchbar = new common.Searchbar(searchbarContainer, {
+        var searchbar = new Searchbar(searchbarContainer, {
             onInput: {
                 enabled: true,
                 callback: function(inputValue){

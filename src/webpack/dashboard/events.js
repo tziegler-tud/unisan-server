@@ -1,6 +1,8 @@
 import "./events.scss";
 
 import {ScrollableList} from "../scrollableList/scrollableList";
+import {Searchbar} from "../searchbar/searchbar";
+import {dateFromNow} from "../helpers/helpers";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import "/src/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
@@ -18,39 +20,19 @@ let events = {
                 //debug line, remove before flight
                 console.log("loading js module: dashboard.events");
 
-                $('.radio-item').checkboxradio({
-                    icon: false
-                });
-                // let checked= $('input[name=eventlist-radio]:checked');
-                // let listRadio = $("#eventlist01");
-                // let calendarRadio = $("#eventlist02");
-                // listRadio.on("change", function(){
-                //     if (self.view === "calendar") {
-                //         self.view = "list";
-                //         self.show()
-                //     }
-                // });
-                // calendarRadio.on("change", function(){
-                //     if (self.view === "list") {
-                //         self.view = "calendar";
-                //         self.show()
-                //     }
-                // })
                 self.view = "both";
-                //try to recreate checked state across page reloads
-                // if (checked.val()){
-                //     self.view = checked.val();
-                // }
-                self.sort = "date.startDate";
+                self.sort = "-date.startDate";
                 self.calendar = null;
-                self.list = null;
-                self.data = {all: [], upcoming: []};
+                self.upcomingList = null;
+                self.pastList = null;
+                self.data = {all: [], upcoming: [], past: []};
                 self.upcomingListContainer = document.getElementById('eventlist-container--upcoming');
+                self.pastListContainer = document.getElementById('eventlist-container--past');
                 self.calendarContainer = document.getElementById('eventcalendar-container');
 
                 //setup searchbar
                 let searchbarUpcoming = document.getElementById("eventsearch-upcoming");
-                self.searchbarUpcoming = new common.Searchbar(searchbarUpcoming, {
+                self.searchbarUpcoming = new Searchbar(searchbarUpcoming, {
                     onInput: {
                         enabled: true,
                         callback: function(inputValue){
@@ -66,16 +48,37 @@ let events = {
                         },
                     },
                 });
+                let searchbarPast = document.getElementById("eventsearch-past");
+                let filterDate = dateFromNow({weeks: -4});
+                self.searchbarUpcoming = new Searchbar(searchbarPast, {
+                    onInput: {
+                        enabled: true,
+                        callback: function(inputValue){
+                            self.getData(window.userId, inputValue, {selector: "range", minDate: filterDate}, self.sort)
+                                .then(data => {
+                                    self.data.past = data;
+                                    self.showPast();
+                                    resolve(self)
+                                })
+                                .catch(err => {
+                                    reject(err)
+                                })
+                        },
+                    },
+                });
 
                 let all = self.getData(window.userId, "", self.sort);
                 let upcoming = self.getData(window.userId, "", {selector: "gte"}, self.sort);
+                let past = self.getData(window.userId, "", {selector: "range", minDate: filterDate}, self.sort);
 
-                Promise.all([all, upcoming])
+                Promise.all([all, upcoming, past])
                     .then(dataArray => {
                         self.data.all = dataArray[0];
                         self.data.upcoming = dataArray[1];
+                        self.data.past = dataArray[2];
                         self.showCalendar();
                         self.showUpcoming();
+                        self.showPast();
                         resolve(self)
                     })
 
@@ -91,8 +94,20 @@ let events = {
         this.initPromise.then(init => {
             let events = self.data.all;
             let upcoming = self.data.upcoming;
-            self.list = displayEventList(upcoming, self.list, self.upcomingListContainer, self.sort);
-            self.searchbarUpcoming.show();
+            self.upcomingList = displayEventList(upcoming, self.upcomingList, self.upcomingListContainer, self.sort);
+            // self.searchbarUpcoming.show();
+        })
+            .catch(err => {
+                console.error("Failed to show events: Module not initialized: " + err)
+            })
+    },
+    showPast: function(){
+        let self = this;
+        this.initPromise.then(init => {
+            let events = self.data.all;
+            let past = self.data.past;
+            self.pastList = displayEventList(past, self.pastList, self.pastListContainer, self.sort);
+            // self.searchbarUpcoming.show();
         })
             .catch(err => {
                 console.error("Failed to show events: Module not initialized: " + err)
@@ -149,7 +164,7 @@ let events = {
 function displayEventList(events, list, container, sort){
     let args = {
         height: "fixed",
-        fixedHeight: "300px",
+        fixedHeight: "500px",
         sorting: {
             property: sort,
             direction: 1,

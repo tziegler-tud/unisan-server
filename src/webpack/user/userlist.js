@@ -3,6 +3,7 @@ import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 
 import {ScrollableList} from "../scrollableList/scrollableList";
+import {Searchbar} from "../searchbar/searchbar";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
@@ -24,7 +25,7 @@ $(document).ready (function () {
 
         //setup searchbar
         let searchbarContainer = document.getElementById("usersearch");
-        var searchbar = new common.Searchbar(searchbarContainer, {
+        var searchbar = new Searchbar(searchbarContainer, {
             onInput: {
                 enabled: true,
                 callback: function(inputValue){
@@ -51,6 +52,7 @@ $(document).ready (function () {
                     handleData.userlist = result;
                     let container = document.getElementById('userlist-container');
                     let args = {
+                        enableMobile: false,
                         height: "full",
                         sorting: {
                             property: sort,
@@ -78,7 +80,11 @@ $(document).ready (function () {
         }
 
         $('.radio-item').checkboxradio({
-            icon: false
+            icon: false,
+            classes: {
+                "ui-checkboxradio-label": "toggleButton",
+                "ui-checkboxradio-checked": "toggleButton-checked"
+            }
         });
         $('#userlist02').checkboxradio({
             disabled: true

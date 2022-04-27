@@ -1,6 +1,9 @@
 import "./scrollableList.scss";
+import "./scrollableListMobile.scss";
 const Handlebars = require("handlebars");
 import "../helpers/handlebarsHelpers";
+import {phone, tablet} from "../helpers/variables";
+
 
 let ScrollableListCounter = {
     counter: 0,
@@ -14,7 +17,7 @@ let ScrollableListCounter = {
 }
 
 /**
- * constructor for EditableInputField objects
+ * constructor for ScrollableList objects
  *
  * @param {HTMLElement} container - container dom element
  * @param {String} type - type of data. ["user", "event", "qualification"]
@@ -41,25 +44,42 @@ var ScrollableList = function(container,type, data,  args, callback){
     this.viewUrl = "";
     this.templateUrl = applyType(type, this);
     this.sorting = args.sorting;
-    this.view = args.view;
+    this.view = applyView(args.view, args.enableMobile);
     buildHTML(this, data);
     var self = this;
 
     return this;
 };
 
+
 ScrollableList.prototype.setView = function(view){
     if (view === undefined || typeof (view) !== "string") view = "list"
+    if (view === "cards") {
+        this.view = "cards";
+    }
     else {
-        if (view === "cards") {
-            this.view = "cards";
-        }
-        else {
-            this.view = "list";
+        this.view = "list"
+        if(this.args.enableMobile){
+            if(phone.matches){
+                this.view = "mobileList"
+            }
         }
     }
     buildHTML(this, this.data);
 }
+
+var applyView = function(view, enableMobile) {
+    if (view === undefined || typeof (view) !== "string") view = "list"
+    if (view === "list") {
+        if (enableMobile) {
+            if (phone.matches) {
+                view = "mobileList"
+            }
+        }
+    }
+    return view;
+}
+
 
 var applyType = function(type, self) {
     let url = {list: "", cards: ""}
@@ -74,6 +94,7 @@ var applyType = function(type, self) {
             url.list = '/static/unisams/js/scrollableList/templates/userList.hbs'
             break;
         case "event":
+            url.mobile = '/webpack/scrollableList/templates/eventListMobile.hbs'
             url.list = '/webpack/scrollableList/templates/eventList.hbs'
             url.cards = '/webpack/scrollableList/templates/eventCards.hbs'
             self.viewUrl = "/unisams/events/view/:id"
@@ -88,6 +109,7 @@ var applyType = function(type, self) {
 var applyArgs = function(args){
     let defaultArgs = {
         enableSorting: true,
+        enableMobile: false,
         view: "list",
         height: "fixed",
         fixedHeight: "40em",
@@ -113,21 +135,27 @@ var buildHTML = function(self, data){
         acl: self.args.acl,
     };
 
-    if (self.view === "cards"){
-        //render cards template
-        $.get(self.templateUrl.cards, function (data) {
-            var template = Handlebars.compile(data);
-            buildCards(self, template(handleData))
-        });
+    switch(self.view) {
+        case "cards":
+            $.get(self.templateUrl.cards, function (data) {
+                var template = Handlebars.compile(data);
+                buildCards(self, template(handleData))
+            });
+            break;
+        default:
+        case "list":
+            // render list template
+            $.get(self.templateUrl.list, function (data) {
+                var template = Handlebars.compile(data);
+                buildList(self, template(handleData))
+            });
+            break;
+        case "mobileList":
+            $.get(self.templateUrl.mobile, function (data) {
+                var template = Handlebars.compile(data);
+                buildMobile(self, template(handleData))
+            });
     }
-    else {
-        // render list template
-        $.get(self.templateUrl.list, function (data) {
-            var template = Handlebars.compile(data);
-            buildList(self, template(handleData))
-        });
-    }
-
 
     function buildList(self, html) {
         //append to container
@@ -150,17 +178,43 @@ var buildHTML = function(self, data){
         cardEventHandlers(self)
     }
 
+    function buildMobile(self, html) {
+        //append to container
+        self.container.innerHTML = html;
+        setupEventHandlers(self)
+        //if sorting is applied, mark the column accordingly by setting dom class
+    }
+
     return true;
 }
 
 ScrollableList.prototype.adjustList = function() {
+    if(this.args.enableMobile) {
+        if(this.view === "mobileList") {
+            if (!phone.matches) {
+                this.setView("list")
+            }
+            else return
+        }
+        if(phone.matches && this.view === "list") {
+            this.setView(this.view);
+            return;
+        }
+    }
     let self = this;
     // set width of first row
     let row = self.container.getElementsByClassName("scrollableList-top")[0];
     let listContent = self.container.getElementsByClassName("scrollableList-content")[0];
 
     let height = "40em"; //fallback
-    if(self.args.height === "full"){
+
+    let heightSetting = self.args.height;
+    if(phone.matches) {
+        heightSetting = "mobile";
+        height = "unset";
+    }
+
+    if(heightSetting === "full"){
         //use all available viewport height.
         //get viewport height
         const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
@@ -173,7 +227,7 @@ ScrollableList.prototype.adjustList = function() {
         //calc remaining height in px  5px offset to compensate borders
         height = vh - (topBarHeight + contentHeight + row.clientHeight +5) + "px";
     }
-    if (self.args.height === "fixed") {
+    if (heightSetting === "fixed") {
         //use fixedHeight param
         height = self.args.fixedHeight;
     }

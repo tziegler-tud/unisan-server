@@ -1,0 +1,14 @@
+@use "@material/list";
+
+@import "~material-icons-font/material-icons-font.css";
+
+@import "../color-rules";
+@import "../variables";
+@import "../fonts.css";
+
+@include list.core-styles;
+
+.mobileList-secondary {
+  color: #AAA;
+
+}

@@ -92,6 +92,14 @@ a {
         background-color: @page-bg-color;
         overflow-Y: auto;
         overflow-X: hidden;
+        &.page-container-light {
+            //supports use of dark subpage elements
+            background-color: #fff;
+        }
+        &.page-container-dimmed {
+            //supports use of white subpage elements
+            background-color: #f9f9f9;
+        }
 
         .page-container-inner {
             padding: 0 5%;
@@ -116,6 +124,16 @@ a {
     .subpage-container {
 
         width: 100%;
+        margin-bottom: 2em;
+
+        &.subpage-container-light {
+            //supports use of dark subpage elements
+            background-color: #fff;
+        }
+        &.subpage-container-dimmed {
+            //supports use of white subpage elements
+            background-color: #f9f9f9;
+        }
 
         .subpage-heading {
             font-size: 100%;
@@ -123,6 +141,10 @@ a {
 
             display: flex;
             flex-flow: row wrap;
+
+            &.padding {
+                padding-left: 1em;
+            }
 
             .sec-heading-label.propertypage-heading {
 
@@ -363,23 +385,51 @@ a.inline-link {
  */
 
 .radiogroup {
-    label {
+    &.toggleButtonGroup {
 
-        &.ui-checkboxradio-label {
-            background-color: transparent;
-            color: #888;
-            border: 1px solid #888;
+        .toggleButton {
+            background-color: #fff !important;
 
-            &.ui-checkboxradio-checked {
-                color: #333;
-                background-color: #f5f5f5;
-                border: 1px solid @col1;
+            box-shadow: none !important;
+            padding: 8px 8px !important;
+            color: #AAA !important;
+            border-top: 1px solid #AAA !important;
+            border-right: 1px solid #AAA !important;
+            border-bottom: 1px solid #AAA !important;
+            border-left: 0 solid #AAA !important;
+            margin: 0;
+
+            &.toggleButton-first {
+                border-left: 1px solid #AAA !important;
+            }
+
+            &.toggleButton-checked {
+                background-color: #eaeaea !important;
+                color: #333 !important;
+                //border-top: 1px solid @col1 !important;
+                //border-right: 1px solid @col1 !important;
+                //border-bottom: 1px solid @col1 !important;
             }
         }
+    }
+    label {
+
+        //&.ui-checkboxradio-label {
+        //    background-color: transparent;
+        //    color: #888;
+        //    border: 1px solid #888;
+        //
+        //    &.ui-checkboxradio-checked {
+        //        color: #333;
+        //        background-color: #f5f5f5;
+        //        border: 1px solid @col1;
+        //    }
+        //}
         svg {
             display: block;
-            width: 1em;
-            margin-right: .5em;
+            //width: 1em;
+            height: 1.3em;
+            margin-right: 0;
             float: left;
         }
         span {
@@ -1084,6 +1134,8 @@ common btn styling
         top: 1.8em !important;
     }
 }
+
+
 
 .relative {
     position: relative;

@@ -1,3 +1,6 @@
+var moment = require('moment');
+moment().format();
+
 var transformDateTimeString = function(dateString, format) {
     format = (format === undefined || typeof(format) !== "string") ? "text" : format;
     let weekDays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",  "Freitag", "Samstag"];
@@ -132,6 +135,32 @@ let Counter = function(args) {
     return this;
 }
 
+/**
+ *
+ * returns a js date object that matches the given year, month, and days, relative to current date. Use to get a date e.g. 2 weeks from now.
+ *
+ * @param args {Object}
+ * @param args.years years to add/sbustract
+ * @param args.months months to add/substract.
+ * @param args.weeks weeks to add/substract.
+ * @param args.days days to add/substract.
+ * @constructor
+ */
+var dateFromNow = function(args) {
+    let defaults = {
+        years: 0,
+        months: 0,
+        weeks: 0,
+        days: 0
+    }
+    let vals = Object.assign(defaults, args)
+    let current = Date.now();
+    let duration = moment.duration({years: vals.years, months: vals.months, weeks: vals.weeks, days: vals.days})
+    let m = moment(new Date());
+    m.add(duration);
+    return m.toDate();
+}
+
 var getDataFromServer  = function(url, callback){
 
     // get qualification data from server
@@ -146,4 +175,4 @@ var getDataFromServer  = function(url, callback){
 };
 
 
-export {transformDateTimeString, Counter, getDataFromServer}
+export {transformDateTimeString, Counter, dateFromNow, getDataFromServer}

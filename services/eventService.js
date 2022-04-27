@@ -110,8 +110,10 @@ async function getById(id) {
  * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
  * @param args.filter {Object} universal mongodb filter object to be applied to query
  * @param args.dateFilter {Object} Object to set date filtering
- * @param args.dateFilter.date {Date} Date to filter for. Default to current Date
- * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte"]
+ * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
+ * @param args.dateFilter.minDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range"].
  * @returns {Promise<Query|*|number>}
  */
 async function matchAny(matchString, args){
@@ -136,7 +138,11 @@ async function matchAny(matchString, args){
     else {
         //wrap date
         if (args.dateFilter.date === undefined) args.dateFilter.date = Date.now();
+        if (args.dateFilter.minDate === undefined) args.dateFilter.minDate = Date.now();
+        if (args.dateFilter.maxDate === undefined) args.dateFilter.maxDate = Date.now();
         let d = new Date(args.dateFilter.date);
+        let min = new Date(args.dateFilter.minDate);
+        let max = new Date(args.dateFilter.maxDate);
         if (isNaN(d.getTime())) {
             //failed to parse date.
         }
@@ -165,6 +171,16 @@ async function matchAny(matchString, args){
                     }
                     innerFilter[inner.selector] = inner.date;
                     break;
+                case "range":
+                    if (isNaN(min.getTime()) || isNaN(min.getTime())) {
+                        //failed to parse date.
+                    }
+                    inner = {
+                        min: min.toISOString(),
+                        max: max.toISOString(),
+                    }
+                    innerFilter["$gte"] = inner.min;
+                    innerFilter["$lte"] = inner.max;
             }
             dateFilter = {"date.endDate": innerFilter}
         }
