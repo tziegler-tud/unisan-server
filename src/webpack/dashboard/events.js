@@ -240,7 +240,9 @@ function displayCalendar(events, calendar, container){
             // format: "dd.mm.yyyy",
             eventHeaderFormat: "dd. MM yyyy",
             language: "de",
-            // theme: 'Orange Coral',
+            firstDayOfWeek: 1,
+            todayHighlight: true,
+            theme: 'unisan',
             calendarEvents: calendarEvents,
                 // {
                 //     id: 'bHay68s', // Event's ID (required)
