@@ -279,14 +279,14 @@ var userActions = {
             userId: data.userId,
             args: args,
         }
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/usermod/setUserRole/"+data.userId,
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.reload();
+                window.location.reload();
             }
         });
     }

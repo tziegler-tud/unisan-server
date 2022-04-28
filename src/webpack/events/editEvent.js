@@ -8,6 +8,7 @@ import {MDCMenu} from '@material/menu';
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {Snackbar} from "../helpers/snackbar";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
@@ -27,6 +28,7 @@ $(document).ready (function () {
     var ob1 = new lidlObserver(function(u){
         user = u;
     });
+    window.snackbar = new Snackbar();
 
     // get user data from user service
     //subscribe as observer to get notification if user changes on server
@@ -75,7 +77,7 @@ $(document).ready (function () {
 
         const deleteContent = {
             title: "Event löschen",
-            message: "U sure bro?",
+            message: "Dieser Vorgang kann nicht rückgängi gemacht werden. Fortfahren?",
             titleArg: "",
             messageArg: ""
         };

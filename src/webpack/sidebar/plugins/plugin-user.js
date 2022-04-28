@@ -788,8 +788,8 @@ let changeRole = new ContentHandler("UserChangeRole",
 
         var res = {};
 
-        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
-            res.exploreUser = context;
+        getDataFromServer("/api/v1/acl/"+ userId,function(context){
+            res.acl = context;
             action(res)
         });
 
@@ -799,7 +799,7 @@ let changeRole = new ContentHandler("UserChangeRole",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                $("#changeUserRole-select").val(context.exploreUser.userRole);
+                $("#changeUserRole-select").val(context.acl.userRole);
 
                 sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
                 sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){

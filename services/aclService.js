@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
-const AuthService = require("./authService");
+const AuthEnums = require("./authEnums");
 const Log = require("../utils/log");
 const LogService = require("./logService");
 const userService = require("./userService");
@@ -12,26 +12,6 @@ const User = db.User;
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
 
-let rolesMap = {
-    "protected": -1,
-    "member": 1,
-    "admin": 2,
-    "superadmin": 3,
-}
-
-let rolesEnum = {
-    PROTECTED: "protected",
-    MEMBER: "member",
-    ADMIN: "admin",
-    SUPERADMIN: "superadmin",
-}
-
-let roles = [
-    "protected",
-    "member",
-    "admin",
-    "superadmin",
-]
 
 module.exports = {
     getAll,
@@ -208,63 +188,55 @@ async function getUserRole (userid) {
 
 async function setUserRole (req, userid, role) {
     let user = await User.findById(userid).select('-hash');
-    let userACL = await UserACL.find({user: userid});
+    let userACL = await UserACL.findOne({user: userid});
 
     // validate
     if (!user) throw new Error('User not found');
     if (!userACL) throw new Error('AccessControlList not found');
     //check write access
-    AuthService.auth(req.user, AuthService.operations.access.WRITEUSERROLE)
-        .then(result=>{
-            let validRoles = AuthService.roles;
-            // validate
-            if(typeof(role) === 'string'){
-                if(!validRoles.includes(role)){
-                    throw new Error("invalid role name");
+
+    let validRoles = AuthEnums.roles;
+    // validate
+    if(typeof(role) === 'string'){
+        if(!validRoles.includes(role)){
+            throw new Error("invalid role name");
+        }
+    }
+    else {
+        throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof(role));
+    }
+    //cant set role higher than acting user role
+    if (AuthEnums.rolesMap[role] > AuthEnums.rolesMap[req.user.userRole]){
+        throw {status: 403, message: "insufficient access rights"};
+    }
+    //set new role
+    userACL.userRole = role;
+    return userACL.save()
+        .then(user => {
+            //create log
+            let log = new Log({
+                type: "modification",
+                action: {
+                    objectType: "user",
+                    actionType: "modify",
+                    actionDetail: "userRoleModify",
+                    key: "",
+                    value: role,
+                },
+                authorizedUser: req.user,
+                target: {
+                    targetType: "user",
+                    targetObject: user._id,
+                    targetObjectId: user._id,
+                    targetModel: "User",
+                },
+                httpRequest: {
+                    method: req.method,
+                    url: req.originalUrl,
                 }
-            }
-            else {
-                throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof(role));
-            }
-            //cant set role higher than acting user role
-            if (AuthService.rolesMap[role] > AuthService.rolesMap[req.user.userRole]){
-                throw {status: 403, message: "insufficient access rights"};
-            }
-            //set new role
-            userACL.userRole = role;
-            return userACL.save()
-                .then(user => {
-                    //create log
-                    let log = new Log({
-                        type: "modification",
-                        action: {
-                            objectType: "user",
-                            actionType: "modify",
-                            actionDetail: "userRoleModify",
-                            key: "",
-                            value: role,
-                        },
-                        authorizedUser: req.user,
-                        target: {
-                            targetType: "user",
-                            targetObject: user._id,
-                            targetObjectId: user._id,
-                            targetModel: "User",
-                        },
-                        httpRequest: {
-                            method: req.method,
-                            url: req.originalUrl,
-                        }
-                    })
-                    LogService.create(log).then().catch();
-                })
-
+            })
+            LogService.create(log).then().catch();
         })
-        .catch(err => {
-            throw {status: 403, message: "Fehler: Sie haben keine Berechtigung, die Rechte dieses Nutzers einzusehen."};
-        })
-
-
 }
 
 

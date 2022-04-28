@@ -2,6 +2,7 @@ import {Docker} from "./docker/docker"
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer"
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
+import {Snackbar} from "./helpers/snackbar";
 var lidlRTO = window.lidlRTO;
 
 if (window.dockerArgs === undefined) {
@@ -20,6 +21,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     lidlRTO.addManager(new lidl.ObjectManager(),true);
 
     lidlRTO.addDebugCategory(lidl.debugCategory.FULL);
+
+    window.snackbar = new Snackbar();
 
     Handlebars.registerHelper('transformDateString', function(dateString, format) {
         format = (format === undefined || typeof(format) !== "string") ? "text" : format;
