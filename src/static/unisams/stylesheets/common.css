@@ -167,6 +167,9 @@ a {
   width: 100%;
   margin-bottom: 2em;
 }
+#wrapper .subpage-container.no-margin {
+  margin: 0;
+}
 #wrapper .subpage-container.subpage-container-light {
   background-color: #fff;
 }
