@@ -20,10 +20,10 @@ var Navigation = function(context, version){
     let url;
     switch (version) {
         case "public":
-            url = '/static/unisams/js/apps/templates/navigation_public.hbs'
+            url = '/webpack/apps/templates/navigation_public.hbs'
             break
         default:
-            url = '/static/unisams/js/apps/templates/navigation.hbs'
+            url = '/webpack/apps/templates/navigation.hbs'
     }
     //load drawer template and attach to body
     self.initialize = $.get(url, function (data) {

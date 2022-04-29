@@ -11,7 +11,8 @@ $(document).ready (function () {
   //register item links
   $(".protocol-item").on("click", function(){
     const viewkey = this.dataset.viewkey;
-    window.location.replace("/unisams/apps/protocol/protocol-editor?viewkey="+viewkey);
+    let url ="/unisams/apps/protocol/protocol-editor?viewkey="+viewkey;
+    window.open(url, '_blank').focus();
   })
 
   //register add btn

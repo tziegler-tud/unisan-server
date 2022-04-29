@@ -1,8 +1,8 @@
-@import "../../../color-rules.less";
-@import "../../../variables.less";
+@import "../../../color-rules.scss";
+@import "../../../variables.scss";
 
-@page-bg: @page-bg-color-v2;
-@item-bg: @page-bg-color;
+$page-bg: $page-bg-color-v2;
+$item-bg: $page-bg-color;
 
 .protocol-renderer {
   padding: 1em;

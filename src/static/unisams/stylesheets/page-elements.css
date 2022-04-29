@@ -55,24 +55,51 @@
   color: #333;
 }
 .subpage-container .subpage-topbar {
-  padding: 2em 0;
+  padding: 1em 0;
+  margin: 0 1em;
   width: 100%;
+  font-size: 80%;
   display: flex;
   flex-flow: row wrap;
+  align-items: center;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .subpage-container .subpage-topbar {
+    flex-flow: row nowrap;
+    font-size: 100%;
+  }
+}
+.subpage-container .subpage-topbar .topbar-heading {
+  flex: 0 0 100%;
+  margin: 0 2em 0 0;
+}
+@media only screen and (min-width: 75em), only screen and (min-width: 50em) and (max-width: 75em) and (orientation: landscape) {
+  .subpage-container .subpage-topbar .topbar-heading {
+    flex: 0 0 auto;
+  }
+}
+.subpage-container .subpage-topbar .topbar-heading span,
+.subpage-container .subpage-topbar .topbar-heading h1,
+.subpage-container .subpage-topbar .topbar-heading h2,
+.subpage-container .subpage-topbar .topbar-heading h3 {
+  font-size: 150%;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
 }
 .subpage-container .subpage-topbar .topbar-element {
   flex: 0 1 auto;
   float: left;
-  margin-left: 2em;
+  margin-right: 1em;
 }
 .subpage-container .subpage-menu .subpage-menu-btn {
   display: block;
 }
-.searchbar label {
+.subpage-searchbar .searchbar label {
   float: left;
   margin-right: 1em;
 }
-.searchbar input.nomargin {
+.subpage-searchbar .searchbar input.nomargin {
   margin: 0;
 }
 .itemlist-header-container {
