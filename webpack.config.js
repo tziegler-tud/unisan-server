@@ -52,12 +52,9 @@ module.exports = {
 
         protocol: "./src/webpack/apps/protocol/protocol.js",
         protocol_style: "./src/webpack/apps/protocol/protocol.scss",
-        app_navigation: "./src/webpack/apps/app_navigation.js",
-        app_navigation_style: "./src/webpack/apps/app_navigation.scss",
-        app_drawer: "./src/webpack/apps/app_drawer.js",
-        app_drawer_style: "./src/webpack/apps/app_drawer.scss",
-        app_topbar: "./src/webpack/apps/app_topbar.js",
-        app_topbar_style: "./src/webpack/apps/app_topbar.scss"
+
+        protocolEditor: "./src/webpack/apps/protocol/protocol-editor.js",
+        protocolEditor_style: "./src/webpack/apps/protocol/protocol-editor.scss",
     },
     output: {
         path: path.join(__dirname, "./src/dist"),

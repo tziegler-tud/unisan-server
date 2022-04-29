@@ -1,0 +1,28 @@
+@import "../../../color-rules.scss";
+@import "../../../variables.scss";
+
+$page-bg: $page-bg-color-v2;
+$item-bg: $page-bg-color;
+
+.protocol-renderer {
+  padding: 1em;
+  min-width: 1300px;
+
+  .protocol-grid-row {
+    display: grid;
+
+    &.protocol-grid-row3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .protocol-grid-item {
+    display: flex;
+    flex-flow: row nowrap;
+
+  }
+}
+
+.small-caps {
+  font-variant: small-caps;
+}

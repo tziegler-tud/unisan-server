@@ -507,7 +507,21 @@ $(document).ready (function () {
                     key: "userRole",
                     callback: {
                         onConfirm: function (data, args) {
-                            userActions.setRole(data, args);
+                            userActions.setRole(data, args)
+                                .then()
+                                .fail(function(jqxhr, textstatus, error){
+                                    let msg = (jqxhr.responseJSON.message ? jqxhr.responseJSON.message : jqxhr.responseText);
+                                    let message = "Error " + jqxhr.status +": " + msg;
+                                    let options = {
+                                        timeout: -1,
+                                        closeOnEscape: true,
+                                        actionButton: {
+                                            display: true,
+                                            text: "Nagut",
+                                        }
+                                    }
+                                    window.snackbar.show(message, options);
+                                });
                         },
                     },
                 },

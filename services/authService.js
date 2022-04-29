@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
 
 const aclService = require("./aclService");
-const AclService = require("./aclService.js")
 
 const UserGroup = db.UserGroup;
 const UserACL = db.UserACL;
@@ -337,7 +336,7 @@ class AuthService {
                     let targetRole = results[1];
                     //superadmin is allowed to perform any operation
                     if(userRole === rolesEnum.SUPERADMIN) resolve(userRole);
-                    //operations on protected user are not allowed
+                    //operations on protected user are only allowed by superadmin
                     if (targetRole === rolesEnum.PROTECTED) reject("Access denied. Reason: target role: " + rolesEnum.PROTECTED);
                     //get user access level
                     let al = rolesMap[userRole];
@@ -566,12 +565,22 @@ class AuthService {
         }
     }
 
+    /**
+     *
+     * @param user {User} requesting user
+     * @param target {ObjectId | User} target user
+     * @param role {UserGroup} new target role
+     * @returns {Promise<unknown>}
+     */
     checkUserRoleWriteAccess(user, target, role) {
         let self = this;
         //validate
         if (user === undefined || target === undefined || role === undefined) throw new Error("AuthService fail: invalid parameters given");
+        let targetId = target;
+        if (target.id !== undefined) targetId = target.id;
+
         return new Promise(function(resolve, reject){
-            if(target === "self" || user.id.toString() === target.id.toString()) {
+            if(target === "self" || user.id.toString() === targetId.toString()) {
                 //trying to write self
                 aclService.getUserACL(user.id, true)
                     .then(userACL => {
@@ -595,7 +604,8 @@ class AuthService {
                                 resolve(result)
                             })
                             .catch(err => {
-                                reject(err)
+                                let fe = self.createForbiddenError("Insufficient access rights")
+                                reject(fe)
                             })
                     })
                     .catch(err => reject(err))
@@ -603,7 +613,7 @@ class AuthService {
             }
             else {
                 let userACL = aclService.getUserACL(user.id, true);
-                let targetACL = aclService.getUserACL(target.id, true);
+                let targetACL = aclService.getUserACL(targetId, true);
                 Promise.all([userACL, targetACL])
                     .then(results => {
                         userACL = results[0];
@@ -613,7 +623,8 @@ class AuthService {
                                 .then(result => {
                                     //can't increase above own level
                                     if (rolesMap[userACL.userRole] < rolesMap[role]){
-                                        reject(new Error("Cant increase target role to a higher access level than yourself."))
+                                        let err = self.createForbiddenError("Cant increase target role to a higher access level than yourself.")
+                                        reject(err)
                                     }
                                     else resolve(result);
                                 })

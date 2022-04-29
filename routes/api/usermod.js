@@ -73,18 +73,6 @@ function postUpload (req, res, next) {
     }
 }
 
-
-function checkAdminRights(req, res, next){
-    let access = authService.checkRequiredRole(req.user, authService.rolesEnum.ADMIN);
-    if (access){
-        console.log("admin authorization successful!");
-        next();
-    }
-    else {
-        console.log("admin authorization failed!");
-        res.status(403).send();
-    }
-}
 // routes
 //hooked at /api/v1/usermod
 
@@ -121,8 +109,7 @@ router.post('/removeUserGroup/:id', removeUserGroup);
 router.post('/addGroupToAllUser', addGroupToAllUser);
 router.post('/removeGroupFromAllUser', removeGroupFromAllUser);
 
-//role modification requires highest access rights
-router.all("/*", checkAdminRights);
+//role modification requires appropriate access rights
 router.post('/setUserRole/:id', setUserRole);
 
 module.exports = router;
@@ -400,7 +387,7 @@ function setUserRole(req, res, next){
     }
     AuthService.checkUserRoleWriteAccess(req.user, req.params.id, req.body.role)
         .then(result => {
-            userService.setUserRole(req, req.params.id, req.body.role)
+            aclService.setUserRole(req, req.params.id, req.body.role)
                 .then(function(result){
                     res.status(200).json({success: true});
                 })

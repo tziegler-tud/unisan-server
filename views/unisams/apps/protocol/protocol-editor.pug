@@ -4,10 +4,7 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_index.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/protocol.css')
 
-    script(src='/static/unisams/js/apps/protocol/protocol-editor.js')
-    link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/apps/protocol/protocolapp.css')
-    link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/apps/protocol/layout/general.css')
-    link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/apps/protocol/layout/divi.css')
+    script(src='/dist/protocolEditor.js')
 
     script.
         window.currentExploredProtocol = !{JSON.stringify(document)}

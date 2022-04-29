@@ -36,7 +36,6 @@ module.exports = {
     filterByGroup,
     addUserGroup,
     removeUserGroup,
-    setUserRole,
     addIndividualEventAccess,
     removeIndividualEventAccess,
 
@@ -1385,69 +1384,6 @@ async function removeIndividualEventAccess(req, userid, target){
                 reject({status: 403, message: "Fehler: Sie haben keine Berechtigung, diesem Nutzer Schreibrechte für das gewählte Event zu entziehen."});
             })
     })
-}
-
-/**
- *
- * @param req {Object} express request
- * @param id {number} user id
- * @param role {String} role
- * @returns {Promise<*>}
- */
-
-async function setUserRole(req, id, role){
-    let user = await User.findById(id).select('-hash');
-    let validRoles = AuthService.roles;
-    // validate
-    if (!user) throw new Error('User not found');
-    if (typeof (role) === 'string') {
-        if (!validRoles.includes(role)) {
-            throw new Error("invalid role name");
-        }
-    } else {
-        throw new TypeError("invalid data type: parameter 'role' expected to be string, but was" + typeof (role));
-    }
-
-
-    return new Promise(function(resolve, reject) {
-        //check write access
-        AuthService.checkUserRoleWriteAccess(req.user, user, role)
-            .then(result => {
-                //set new role
-                user.userRole = role;
-                user.save()
-                    .then(user => {
-                        resolve(user);
-                        //create log
-                        let log = new Log({
-                            type: "modification",
-                            action: {
-                                objectType: "user",
-                                actionType: "modify",
-                                actionDetail: "userRoleModify",
-                                key: "",
-                                value: role,
-                            },
-                            authorizedUser: req.user,
-                            target: {
-                                targetType: "user",
-                                targetObject: user._id,
-                                targetObjectId: user._id,
-                                targetModel: "User",
-                            },
-                            httpRequest: {
-                                method: req.method,
-                                url: req.originalUrl,
-                            }
-                        })
-                        LogService.create(log).then().catch();
-                    })
-                    .catch(err => reject(err))
-            })
-            .catch(err => reject(err))
-    })
-
-
 }
 
 
