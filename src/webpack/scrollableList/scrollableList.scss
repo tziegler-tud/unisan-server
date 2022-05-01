@@ -101,6 +101,13 @@ ul.scrollableItemList {
       }
     }
   }
+  &.scrollableList-body {
+    .scrollableList-body-column {
+      &.item-selectable, .item-selectable {
+        cursor: pointer;
+      }
+    }
+  }
 
   li {
     flex: 1 1 auto;

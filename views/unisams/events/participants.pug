@@ -43,23 +43,21 @@ block content
                                         .eventprofile-heading-date
                                             span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
                                     .eventprofile-dropdown.dropdown-menu
-                                        if allowedit
-                                            .dropdown-btn
-                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                                                .dropdown-container
-                                                    .dropdown-entry.has-tooltip
-                                                        a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
-                                                        span.tooltip Löscht dieses Event
+                                        .dropdown-btn
+                                            button.material-icons.mdc-icon-button(aria-label="Options") more_vert
+                                            .dropdown-container
+                                                .dropdown-entry
+                                                    a.before-icon.icon-back(id="view" + exploreEvent.id, data-userid=exploreEvent.id href="/unisams/events/view/" + exploreEvent.id) Bearbeitung beenden
+                                                .dropdown-entry
+                                                    a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
                                     .clear
                             .clear
-                section#sec3
-                    #sec-content3.subpage-container
-                        .subpage-topbar
-                            .topbar-heading
-                                h3 Teilnehmende
-                            .subpage-options.topbar-element
-                            #usersearch-participants.searchbar-container.topbar-element
-                        #content3-text.sec-content
+                        #content3-text.sec-content.border-top
+                            .subpage-topbar
+                                .topbar-heading
+                                    h3 Teilnehmende
+                                .subpage-options.topbar-element
+                                #usersearch-participants.searchbar-container.topbar-element
                             .subpage-content
                                 #userlist-container--participants.userlist-container
                                 if allowedit

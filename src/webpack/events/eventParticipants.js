@@ -88,15 +88,20 @@ let eventParticipants = {
                 });
                 self.scrollableList = displayParticipantsList(userlist);
 
+                let titleInputContainer = document.getElementById("eventtitle-input");
+                let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+
                 //setup searchbar
                 let searchbarUpcoming = document.getElementById("usersearch-participants");
                 self.searchbarUpcoming = new Searchbar(searchbarUpcoming, {
                     onInput: {
                         enabled: true,
                         callback: function(inputValue){
-                            let filteredList = userlist.filter(function(user){
-                                return user.user.username.includes(inputValue);
+                            let filteredList = userlist.filter(function(participant){
+                                return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
                             })
+                            displayParticipantsList(filteredList);
+
                         },
                     },
                 });

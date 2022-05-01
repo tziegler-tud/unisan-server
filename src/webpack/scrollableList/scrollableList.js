@@ -279,7 +279,7 @@ ScrollableList.prototype.sort = function(property, direction) {
             if (common.refJSON(a,property) > common.refJSON(b,property)) return 1;
             return 0;
         })
-        buildHTML(self, self.data);
+        buildHTML(self, self.data, self.args);
     }
     else {
         if (direction === -1) {
@@ -290,13 +290,13 @@ ScrollableList.prototype.sort = function(property, direction) {
                 if (common.refJSON(a,property) > common.refJSON(b,property)) return -1;
                 return 0;
             })
-            buildHTML(self, self.data);
+            buildHTML(self, self.data, self.args);
         }
         else {
             if (direction === 0) {
                 //remove any sorting
                 if(self.sorting.direction !== 0){
-                    buildHTML(self, self.initialData)
+                    buildHTML(self, self.initialData, self.args)
                 }
             }
         }

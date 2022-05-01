@@ -106,6 +106,10 @@ var EventSchema = new Schema({
             lastChanged: {
                 type: Date,
                 default: Date.now,
+            },
+            date: {
+                type: Date,
+                default: Date.now,
             }
         }
     ],
