@@ -233,7 +233,7 @@ Searchbar.prototype.resetInput = function(){
                 self.searchbarArgs.onInput.callback(inputElement.val());
             }
         })
-        .catch(err => {
+        .catch(msg => {
             console.warn(msg);
         })
 

@@ -289,7 +289,7 @@ async function create(req, eventParam) {
                 throw err;
             }
             else {
-                fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', { overwrite: true }, (err) => {
+                fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', (err) => {
                     if (err) throw err;
                     console.log('dummy image copied to new event');
                 });

@@ -202,7 +202,7 @@ async function create(req, userParam, args) {
                         .then(function(exists){
                             if(exists) {
                                 try {
-                                    fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                                    fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
                                         if (err) throw err;
                                     });
                                 }
@@ -234,7 +234,7 @@ async function create(req, userParam, args) {
 
                 function copyDummyImage(){
                     // copies the dummy user image to user directory
-                    fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', { overwrite: true }, (err) => {
+                    fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
                         if (err) throw err;
                         console.log('dummy image copied to new user');
                     });

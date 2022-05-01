@@ -23,7 +23,9 @@ let ScrollableListCounter = {
  * @param {String} type - type of data. ["user", "event", "qualification"]
  * @param {Object} data - iterateable JSON object containing data for list entries
  * @param {Object} args
- * @param {Object} callback
+ * @param {Object} [callback] callback object
+ * @param {Object} [callback.listItem] Callback object for generated list items
+ * @param {function[]} [callback.customHandlers] Array of functions to be applied
  * @returns {Window.common.ScrollableList}
  * @constructor
  */
@@ -45,7 +47,7 @@ var ScrollableList = function(container,type, data,  args, callback){
     this.templateUrl = applyType(type, this);
     this.sorting = args.sorting;
     this.view = applyView(args.view, args.enableMobile);
-    buildHTML(this, data);
+    buildHTML(this, data, args);
     var self = this;
 
     return this;
@@ -65,7 +67,7 @@ ScrollableList.prototype.setView = function(view){
             }
         }
     }
-    buildHTML(this, this.data);
+    buildHTML(this, this.data, this.args);
 }
 
 var applyView = function(view, enableMobile) {
@@ -93,6 +95,9 @@ var applyType = function(type, self) {
         case "user":
             url.list = '/static/unisams/js/scrollableList/templates/userList.hbs'
             break;
+        case "participants":
+            url.list = '/webpack/scrollableList/templates/participantsList.hbs';
+            break;
         case "event":
             url.mobile = '/webpack/scrollableList/templates/eventListMobile.hbs'
             url.list = '/webpack/scrollableList/templates/eventList.hbs'
@@ -117,7 +122,7 @@ var applyArgs = function(args){
             property: null,
             direction: 0,
         },
-        acl: {}
+        acl: {},
     }
     if (args===undefined) {
         return defaultArgs;
@@ -129,10 +134,11 @@ var applyArgs = function(args){
     return Object.assign(defaultArgs, args);
 };
 
-var buildHTML = function(self, data){
+var buildHTML = function(self, data, args){
     var handleData = {
         listdata: data,
         acl: self.args.acl,
+        args: args,
     };
 
     switch(self.view) {
@@ -336,11 +342,21 @@ var setupEventHandlers = function(self){
             sortByColumn(self, e.currentTarget);
         })
     }
-    if(self.callback.listItem.onClick !== undefined) {
-        $(".scrollableList-item").on("click", function(e){
-            self.callback.listItem.onClick(e)
-        });
+    if(self.callback){
+        if(self.callback.listItem) {
+            if(self.callback.listItem.onClick !== undefined) {
+                $(".scrollableList-item").on("click", function(e){
+                    self.callback.listItem.onClick(e)
+                });
+            }
+        }
+        if(self.callback.customHandlers !== undefined && Array.isArray(self.callback.customHandlers)) {
+            self.callback.customHandlers.forEach(function(handler){
+                handler(self);
+            });
+        }
     }
+
 };
 
 var cardEventHandlers = function(self){

@@ -50,7 +50,7 @@ var eventActions = {
             type: 'DELETE',
             success: function(result) {
                 alert("Event " + eventid + " deleted.");
-                window.location.replace("/unisams/events");
+                window.location.replace("/unisams/events/view/" + eventid);
             }
         });
 

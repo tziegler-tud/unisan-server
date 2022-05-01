@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const autoprefixer = require('autoprefixer');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     watch: true,
@@ -41,10 +42,8 @@ module.exports = {
         eventlist: "./src/webpack/events/eventlist.js",
         eventlist_style: "./src/webpack/events/eventlist.scss",
 
-        editEvent: "./src/webpack/events/editEvent.js",
-        editEvent_style: "./src/webpack/events/editEvent.scss",
-        viewEvent: "./src/webpack/events/viewEvent.js",
-        viewEvent_style: "./src/webpack/events/viewEvent.scss",
+        event: "./src/webpack/events/event.js",
+        event_style: "./src/webpack/events/event.scss",
 
         settings: "./src/webpack/settings/settings.js",
 
@@ -65,7 +64,13 @@ module.exports = {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery"
-        })
+        }),
+        // new MiniCssExtractPlugin({
+        //     // Options similar to the same options in webpackOptions.output
+        //     // both options are optional
+        //     filename: "[name].css",
+        //     chunkFilename: "[id].css",
+        // }),
     ],
     module: {
         rules: [
@@ -90,6 +95,7 @@ module.exports = {
                             },
                         }
                     },
+
                 ],
             },
             {

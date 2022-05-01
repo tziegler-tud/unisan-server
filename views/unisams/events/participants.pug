@@ -2,12 +2,9 @@ extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
-    script(src="/static/unisams/js/actions.js")
-    script(src="/static/unisams/js/eventActions.js")
 
-    script(src="/static/unisams/js/events/participants.js")
-    script(src="/static/unisams/js/events/event.js")
-
+    script(src="/dist/event.js")
+    script(src="/dist/event_style.js")
     script(src="/static/unisams/js/editableTextField.js")
     script(src="/static/unisams/js/editableInputField.js")
 
@@ -15,6 +12,13 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableInputField.css')
 
     script.
+        window.jsmodule = {
+            module: "event",
+            loaders: ["eventParticipants"],
+            args: {
+                allowEdit: #{allowedit}
+            }
+        };
         window.user = !{JSON.stringify(user)};
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
@@ -43,23 +47,24 @@ block content
                                             .dropdown-btn
                                                 svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical") <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                                 .dropdown-container
-                                                    .dropdown-entry
-                                                        a.before-icon.icon-edit(href="/unisams/events/edit/" + refurl) Event bearbeiten
-                                                    .dropdown-entry.dropdown-entry-disabled.has-tooltip
-                                                        a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
-                                                        span.tooltip Bearbeitung aktivieren, um Event zu entfernen
+                                                    .dropdown-entry.has-tooltip
+                                                        a.before-icon.icon-delete.eventDelete(id="deleteEventId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
+                                                        span.tooltip Löscht dieses Event
                                     .clear
                             .clear
-                        #content1-text.sec-content.border-top
+                section#sec3
+                    #sec-content3.subpage-container
+                        .subpage-topbar
+                            .topbar-heading
+                                h3 Teilnehmende
+                            .subpage-options.topbar-element
+                            #usersearch-participants.searchbar-container.topbar-element
+                        #content3-text.sec-content
                             .subpage-content
-                                .itemlist-header-container
-                                    ul#userlist-top.eventlist.itemlist.common-list.list-view.border
-                                        li.noSelect.rowHeading
-                                            .inner
-                                                .item-property Mitglied
-                                                .item-property Rolle
-
-                                .itemlist-content-container
-                                    #userlist-container
+                                #userlist-container--participants.userlist-container
+                                if allowedit
+                                    .add-smt-button.add-participant-button
+                                        a.add-smt-button-inner
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
 
 

@@ -275,7 +275,7 @@ function eventParticipants(req, res, next) {
                 let url = "unisams/events/participants";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
-                        url = "unisams/events/editParticipants";
+                        url = "unisams/events/participants";
                         res.render(url, {
                             user: req.user.toJSON(),
                             acl: req.acl,

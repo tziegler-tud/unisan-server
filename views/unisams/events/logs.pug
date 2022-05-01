@@ -3,16 +3,21 @@ extends ../layout
 block page_includes
 
     script.
+        window.jsmodule = {
+            module: "event",
+            loaders: ["eventLogs"],
+            args: {
+                allowEdit: #{allowedit}
+            }
+        };
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventLogs";
         window.allowedit =#{allowedit};
 
+    script(src="/dist/event.js")
+    script(src="/dist/event_style.js")
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/events/logs.css')
-    script(src="/static/unisams/js/events/event.js")
-    script(src="/static/unisams/js/events/logs.js")
-    script(src="/static/unisams/js/actions.js")
 
 block content
     #wrapper

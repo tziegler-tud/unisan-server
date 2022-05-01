@@ -5,8 +5,7 @@ block page_includes
     script(src="/static/unisams/js/actions.js")
     script(src="/static/unisams/js/eventActions.js")
 
-    script(src="/dist/editEvent.js")
-    script(src="/static/unisams/js/events/event.js")
+    script(src="/dist/event.js")
     script(src="/static/unisams/js/editableTextField.js")
     script(src="/static/unisams/js/editableInputField.js")
 
@@ -15,9 +14,7 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableTextField.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableInputField.css')
 
-    link(rel='stylesheet', href='/dist/editEvent.css')
-
-
+    script(src="/dist/event_style.js")
     //// Main Quill library
     //script(src='//cdn.quilljs.com/1.3.6/quill.js')
     // Theme included stylesheets
@@ -28,6 +25,15 @@ block page_includes
     script(type="module" src='/lib/quill/quill.js')
 
     script.
+        window.jsmodule = {
+        module: "event",
+        loaders: ["eventDetails"],
+        args: {
+            allowEdit: #{allowedit},
+            edit: true
+            }
+        };
+
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
         window.dockerArgs.activeElementId = "eventDetail";
