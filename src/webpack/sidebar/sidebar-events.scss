@@ -1,5 +1,8 @@
+@use "@material/list";
 @import "../color-rules";
 @import "../variables";
+
+@include list.core-styles;
 
 .sidebar-event {
   .sidebar-content {

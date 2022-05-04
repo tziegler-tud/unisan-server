@@ -23,113 +23,36 @@
   }
 }
 .participants-list {
-  ul.userlist{
-    margin-top: 0;
-    margin-bottom: 0;
-    position: static;
-
-    &.list-view {
-      font-size: 110%;
-      li {
-
-        .memberid, .username {
-          display: none !important;
-        }
-
-        @media #{$tablet-landscape} {
-          .memberid {
-            display: block !important;
-          }
-        }
-
-        @media #{$desktop} {
-          .memberid, .username {
-            display: block !important;
-          }
-        }
-
-        .inner {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: auto;
-
-          @media #{$desktop}{
-            grid-template-columns: 1fr 1fr;
-          }
-          @media #{$tablet-landscape} {
-            grid-template-columns: 1fr 1fr;
-          }
-
-          .item-container {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
-            align-items: center;
-
-            .item-container-element {
-              flex: 1 1 auto;
-              display: block;
-            }
-          }
-
-          .userlist-img {
-            margin-right: 1em;
-            max-width: 3em;
-
-            img {
-              width: 100%;
-              border-radius: 50%;
-            }
-          }
-
-          &:not(.noSelect):hover {
-            background-color: rgba(124, 0, 26, 0.2);
-            cursor: pointer;
-          }
-
-          &.borderBottom {
-            border-bottom: 1px solid #AAA;
-          }
-
-
-          .userDelete {
-            svg {
-              width: 1em;
-            }
-          }
-        }
-
-      }
-    }
-    &.gallery-view {
-      li {
-        display: block;
-
-        &:not(.noSelect):hover {
-          background-color: rgba(124,0,26,0.2);
-          cursor: pointer;
-        }
-
-        &.borderBottom {
-          border-bottom: 1px solid #AAA;
-        }
-
-
-
-        .userDelete {
-          svg {
-            width: 1em;
-          }
-        }
-
-      }
-    }
-
-  }
-
   .user-participate-button {
     &.hidden {
       display: none !important;
+    }
+  }
+}
+
+
+.mdc-list-item-wrapper {
+  position: relative;
+  overflow: initial;
+
+  .mdc-dropdown-menu {
+    position: absolute;
+    top: 1em !important;
+    left: unset !important;
+    right: 3em !important;
+
+    .mdc-list-item {
+      height: 36px;
+
+      .mdc-list-item__text {
+        align-self: initial;
+      }
+
+
+      .mdc-list-item__graphic {
+        height: 18px;
+        width: 18px;
+      }
     }
   }
 }

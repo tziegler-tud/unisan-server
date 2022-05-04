@@ -13,7 +13,7 @@ let showRole = new ContentHandler("user",
             $.get('/webpack/sidebar/templates/sidebar-user.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
-                sidebar.registerBackButton(sidebar,".sidebar-back-btn");
+                sidebar.registerBackButton(".sidebar-back-btn");
             });
         })
     });
@@ -24,8 +24,8 @@ let addGroup = new ContentHandler("addGroup",
         $.get('/webpack/sidebar/templates/roles/sidebar-addGroup.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
-            sidebar.registerBackButton(sidebar,".sidebar-back-btn");
-            sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                 let data = {
                     title: $("#addRoleForm-title").val(),
                     description: $("#addRoleForm-description").val(),
@@ -57,8 +57,8 @@ let changeGroup = new ContentHandler("changeGroup",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     let data = {
                         title: $("#changeGroupForm-title").val(),
                         description: $("#changeGroupForm-description").val(),
@@ -90,8 +90,8 @@ var addUser  = new ContentHandler("addUserToGroup",
             $.get('/webpack/sidebar/templates/roles/sidebar-addUserToGroup.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function () {
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
                     data = {
                         userGroupId: res.group.id,
                         userId: selectedUser.id,
@@ -222,8 +222,8 @@ let addGroupPath = new ContentHandler("addGroupPath",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     let data = {
                         operation: $("#changeGroupForm-operation").val(),
                     };
@@ -267,7 +267,7 @@ let updateGroupPath = new ContentHandler("updateGroupPath",
 
                 $("#changeGroupForm-operation").val(context.operation);
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
+                sidebar.registerBackButton( ".sidebar-back-btn");
 
                 sidebar.registerButton (sidebar, ".sidebar-delete", function(){
 

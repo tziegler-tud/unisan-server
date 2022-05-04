@@ -1,3 +1,12 @@
+@use "@material/theme" with (
+  $primary: #00293c,
+  $on-primary: #c31d34
+);
+@use "@material/button";
+@use "@material/icon-button";
+
+@include icon-button.core-styles;
+
 @import "../color-rules";
 @import "../variables";
 
@@ -165,6 +174,24 @@ body{
         .sidebar-bottom {
           position: relative;
           margin-bottom: 1em;
+          &.sidebar-bottom--padding {
+            padding: 0 1em;
+          }
+
+          height: auto;
+          border-top: 1px solid #AAA;
+          display: flex;
+          flex-flow: row nowrap;
+
+          .sidebar-bottom-element {
+            flex: 1 1 auto;
+            display: flex;
+            justify-content: center;
+          }
+          .sidebar-bottom-element:first-child {
+            border-right: 1px solid #CCC;
+          }
+
         }
 
         .sidebar-content {
@@ -197,6 +224,7 @@ body{
             }
           }
         }
+
 
       }
     }
@@ -239,6 +267,40 @@ body{
       width: 1em;
       margin: 0.5em;
       content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>');
+    }
+  }
+}
+
+.sidebarButton {
+  &.sidebarButton-disabled {
+    cursor: not-allowed;
+
+  }
+  &.sidebarButton--cancel {
+    button {
+      @include icon-button.ink-color(#00293c)
+    }
+  }
+  &.sidebarButton--back {
+    button {
+      @include icon-button.ink-color(#00293c)
+    }
+  }
+  &.sidebarButton--delete {
+    button {
+      @include button.ink-color(#84565E);
+    }
+  }
+  &.sidebarButton--confirm {
+    button {
+      @include icon-button.ink-color(#c31d34);
+      @include icon-button.disabled-ink-color(#AAA);
+      //border: 1px solid #c31d34;
+    }
+  }
+  &.sidebarButton--custom {
+    button {
+      @include button.ink-color(#84565E);
     }
   }
 }

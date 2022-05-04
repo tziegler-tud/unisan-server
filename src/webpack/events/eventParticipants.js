@@ -9,6 +9,7 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
+import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
@@ -69,10 +70,32 @@ let eventParticipants = {
                     isParticipant: userIsParticipant,
                     callback: {
                         onConfirm: function(){
-                            eventActions.addParticipant(event.id, window.user.id)
+                            eventActions.addParticipant(event.id, window.user.id, function(){
+                                eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant});
+                                        self.userlist = event.participants;
+                                        displayParticipantsList(self.userlist);
+                                        self.searchbar.hide();
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
                         },
                         onDelete: function(){
-                            eventActions.removeParticipant(event.id, window.user.id)
+                            eventActions.removeParticipant(event.id, window.user.id, function(){
+                                eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant});
+                                        self.userlist = event.participants;
+                                        displayParticipantsList(self.userlist);
+                                        self.searchbar.hide();
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
                         }
                     },
                 });
@@ -83,21 +106,19 @@ let eventParticipants = {
                     "admin": 2,
                 }
                 //display all users initially
-                let userlist = event.participants.sort(function(a,b){
-                    return (rolesMap[b.role] - rolesMap[a.role]);
-                });
-                self.scrollableList = displayParticipantsList(userlist);
+                self.userlist = event.participants;
+                self.scrollableList = displayParticipantsList(self.userlist);
 
                 let titleInputContainer = document.getElementById("eventtitle-input");
                 let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
 
                 //setup searchbar
-                let searchbarUpcoming = document.getElementById("usersearch-participants");
-                self.searchbarUpcoming = new Searchbar(searchbarUpcoming, {
+                let searchbar = document.getElementById("usersearch-participants");
+                self.searchbar = new Searchbar(searchbar, {
                     onInput: {
                         enabled: true,
                         callback: function(inputValue){
-                            let filteredList = userlist.filter(function(participant){
+                            let filteredList = self.userlist.filter(function(participant){
                                 return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
                             })
                             displayParticipantsList(filteredList);
@@ -105,8 +126,6 @@ let eventParticipants = {
                         },
                     },
                 });
-
-
                 $('.add-participant-button').each(function(){
                     $(this).on("click", function(e){
                         e.preventDefault();
@@ -116,18 +135,31 @@ let eventParticipants = {
                             isParticipant: userIsParticipant,
                             callback: {
                                 onConfirm: function(data){
-                                    eventActions.addParticipant(event.id, data.userid)
+                                    eventActions.addParticipant(event.id, data.userid, function(event){
+                                        eventProfile.refreshEvent()
+                                            .then(event => {
+                                                userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                                sidebar.update({event: event, isParticipant: userIsParticipant});
+                                                self.userlist = event.participants;
+                                                displayParticipantsList(self.userlist);
+                                                self.searchbar.hide();
+                                            })
+                                            .catch(err => {
+                                            })
+                                    })
                                 },
-                                onDelete: function(){
-                                    eventActions.removeParticipant(event.id, window.user.id)
-                                }
                             },
                         });
                         sidebar.show();
                     })
                 });
 
+
                 function displayParticipantsList(userlist) {
+
+                    let sortedList = userlist.sort(function(a,b){
+                        return (rolesMap[b.role] - rolesMap[a.role]);
+                    })
 
                     let roleSelect = function(){
                         $('.participant-role-select').each(function(){
@@ -143,13 +175,31 @@ let eventParticipants = {
 
                         });
                     }
+
+                    let dropdownMenus = function(){
+                        $('.participant-menu-container').each(function(){
+                            let trigger = $(this).find(".participant-menu-button").first();
+                            let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
+                        });
+                    }
                     let deleteParticipant = function(){
                         $('.participant-delete').each(function(){
                             $(this).on("click", function(e){
                                 //push changes to server
                                 e.preventDefault();
                                 let userId = e.target.dataset.userid;
-                                eventActions.removeParticipant(event.id, userId);
+                                eventActions.removeParticipant(event.id, userId, function(){
+                                    eventProfile.refreshEvent()
+                                        .then(event => {
+                                            userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                            sidebar.update({event: event, isParticipant: userIsParticipant});
+                                            self.userlist = event.participants;
+                                            displayParticipantsList(self.userlist);
+                                            self.searchbar.hide();
+                                        })
+                                        .catch(err => {
+                                        })
+                                });
                             })
                         });
                     }
@@ -163,11 +213,11 @@ let eventParticipants = {
                         allowEdit: args.allowEdit,
                     }
                     let callback = {
-                        customHandlers: [deleteParticipant, roleSelect]
+                        customHandlers: [deleteParticipant, roleSelect, dropdownMenus]
                     }
 
                     let listContainer = document.getElementById("userlist-container--participants")
-                    let scrollableList = new ScrollableList(listContainer, "participants", userlist, scrollArgs, callback)
+                    let scrollableList = new ScrollableList(listContainer, "participants", sortedList, scrollArgs, callback)
 
                     return scrollableList;
                 }

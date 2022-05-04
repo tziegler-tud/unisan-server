@@ -1,4 +1,7 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
+import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton} from "../sidebar.js";
+import {Searchbar} from "../../searchbar/searchbar.js";
+import {MDCList} from '@material/list';
+
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
@@ -10,10 +13,10 @@ let showEventParticipants = new ContentHandler("eventParticipants",
     function(sidebar, args, type){
         var event = args.event;
         //populate
-        $.get('/static/unisams/js/sidebar/templates/sidebar-eventParticipants.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/sidebar-eventParticipants.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(event));
-            sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
+            sidebar.registerBackButton( ".sidebar-back-btn");
             // find if current user is registered for event
             let notRegistered = $("#sidebar-participate-button-notregistered");
             let registered = $("#sidebar-participate-button-registered");
@@ -27,7 +30,7 @@ let showEventParticipants = new ContentHandler("eventParticipants",
                     }
                 })
             } else {
-                sidebar.registerButton(sidebar, notRegistered, function () {
+                sidebar.registerButton(notRegistered, function () {
                     args.callback.onConfirm();
                 });
             }
@@ -42,30 +45,46 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
         var selectedUser = {role: "participant"};
 
         //populate
-        $.get('/static/unisams/js/sidebar/templates/sidebar-eventParticipantsAdd.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/sidebar-eventParticipantsAdd.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(event));
-            sidebar.registerBackButton(sidebar,".sidebar-back-btn");
-            sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
-                data = {
-                    userid:  selectedUser.id,
-                    role:  selectedUser.role,
-                };
-                onConfirm(data);
-            }.bind(args));
+            let backBtn = sidebar.registerBackButton(".sidebar-back-btn");
+            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+            let confirmButton = new SidebarButton({
+                sidebar: sidebar,
+                selector: ".sidebar-confirm",
+                type: "confirm",
+                enabled: false,
+                handler: function(){
+                    data = {
+                        userid:  selectedUser.id,
+                        role:  selectedUser.role,
+                    };
+                    onConfirm(data);
+                }.bind(args)
+            });
+            // displayUserList()
 
             //setup searchbar
             let searchContainer = document.getElementById("search-container")
             let searchbarContainer = document.getElementById("usersearch");
-            var searchbar = new common.Searchbar(searchbarContainer, {
+            var searchbar = new Searchbar(searchbarContainer, {
+                hidden: false,
+                label: "Suche:",
+                noIcon: true,
+                enableCollapse: false,
                 onInput: {
                     enabled: true,
                     callback: function(inputValue){
                         displayUserList(inputValue)
                     },
                 },
-                noLabel: true,
-                classes: "nomargin"
+                onFocus: {
+                    enabled: true,
+                    callback: function(inputValue){
+                        displayUserList(inputValue)
+                    }
+                },
             });
 
 
@@ -88,7 +107,7 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
                     success: function(result) {
                         handleData.userlist = result;
                         // render userlist template
-                        $.get('/static/unisams/js/sidebar/plugins/userselect-plugin.hbs', function (data) {
+                        $.get('/webpack/sidebar/plugins/userselect-plugin.hbs', function (data) {
                             var template = Handlebars.compile(data);
                             appendContent(template(handleData))
                         });
@@ -102,36 +121,41 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
                     //append to subpage container #userlist-container
                     let container = document.getElementById('sidebar-userselect-container');
                     container.innerHTML = html;
+                    // const list = new MDCList(document.getElementById("addParticipantList"));
 
                     //click on user selects it
-                    $(".participant-item").on("mousedown", function(e) {
+                    let items = $(".participant-item-selectable");
+                    items.on("mousedown", function(e) {
                         e.preventDefault(); //preventDefault to stop blur event before click is fired
-                    }).on("click", function(e){
-                        let userid = this.dataset.userid;
-                        //hide searchbar, display user item instead
-                        let userentry = this.cloneNode(true);
+                    })
+                    items.each(function(){
+                        this.addEventListener("click", function(){
+                            let userid = this.dataset.userid;
+                            //hide searchbar, display user item instead
+                            let userentry = this.cloneNode(true);
+                            userentry.classList.remove("participant-item-selectable");
+                            searchbar.hide();
+                            container.classList.add("hidden");
+                            let resultContainer = document.getElementById("sidebar-userselect-result");
 
-                        searchbar.hide();
-                        container.classList.add("hidden");
-                        let resultContainer = document.getElementById("sidebar-userselect-result");
+                            //create cancel btn
+                            let cancelBtn = document.createElement("div");
+                            cancelBtn.classList.add("before-icon",  "icon-cancel");
+                            cancelBtn.addEventListener("click", function(){
+                                //reset sidebar
+                                sidebar.resetCurrentPage();
+                            })
+                            userentry.append(cancelBtn);
 
-                        //create cancel btn
-                        let cancelBtn = document.createElement("div");
-                        cancelBtn.classList.add("before-icon",  "icon-cancel");
-                        cancelBtn.addEventListener("click", function(){
-                            //reset sidebar
-                            sidebar.resetCurrentPage();
-                        })
-                        userentry.append(cancelBtn);
+                            let c = document.createElement("div");
+                            c.className = "event-participants";
+                            c.append(userentry);
+                            resultContainer.append(c);
+                            selectedUser.id = userid;
+                            confirmButton.enable();
 
-                        let c = document.createElement("div");
-                        c.className = "event-participants";
-                        c.append(userentry);
-                        resultContainer.append(c);
-                        selectedUser.id = userid;
-
-                    });
-
+                        });
+                    })
 
                     // click outside should hide popup
                     $(searchbar.getInputElement()).blur(function(){
@@ -160,7 +184,7 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
         context.event = args.event;
         var corrupted = false;
 
-        $.get('/static/unisams/js/sidebar/templates/sidebar-updateEventDate.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/sidebar-updateEventDate.hbs', function (data) {
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
@@ -187,8 +211,9 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
             $(t1).val(currentStartDate.toTimeInputValue())
             $(t2).val(currentEndDate.toTimeInputValue())
 
-            sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-            sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+            sidebar.registerBackButton(".sidebar-back-btn");
+            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton(".sidebar-confirm", function(){
                 let date = $(d1).val();
                 let startTime = $(t1).val();
                 let endTime = $(t2).val();
@@ -214,7 +239,7 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
         context.event = args.event;
         var corrupted = false;
 
-        $.get('/static/unisams/js/sidebar/templates/sidebar-updateEventLocation.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/sidebar-updateEventLocation.hbs', function (data) {
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
@@ -230,8 +255,9 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
             }
             var l = document.getElementById("eventinp-location");
 
-            sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-            sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+            sidebar.registerBackButton(".sidebar-back-btn");
+            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton(".sidebar-confirm", function(){
                 let location = $(l).val();
 
                 let data = {

@@ -13,7 +13,7 @@ let showUser = new ContentHandler("user",
             $.get('/webpack/sidebar/templates/sidebar-user.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
-                sidebar.registerBackButton(sidebar,".sidebar-back-btn");
+                sidebar.registerBackButton(".sidebar-back-btn");
             });
         })
     });
@@ -24,8 +24,8 @@ let addUser = new ContentHandler("addUser",
         $.get('/webpack/sidebar/templates/sidebar-addUser.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
-            sidebar.registerBackButton(sidebar,".sidebar-back-btn");
-            sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                 let generalData = {
                     firstName: $("#addUserForm-firstName").val(),
                     lastName: $("#addUserForm-lastName").val(),
@@ -60,8 +60,8 @@ let changeUsername = new ContentHandler("UserChangeUsername",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     data = {
                         value: document.getElementById("userkey-value").value
                     };
@@ -104,8 +104,8 @@ let addDbKey = new ContentHandler("UseraddDBKey",
                 var catKey = "";
                 var key = "";
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function () {
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
                     var r = document.getElementById("userkey-key");
                     var key = catKey + "." + r.value;
                     var funcArgs = {
@@ -167,8 +167,8 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
                 var q = document.getElementById("userkey-category");
                 var v = document.getElementById("userkey-value");
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function () {
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
                     var key = catKey;
                     var type = r.value;
                     var title = r.options[r.selectedIndex].dataset.title;
@@ -250,8 +250,8 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
                 var q = document.getElementById("userkey-category");
                 var v = document.getElementById("userkey-value");
                 let doc = res.dataset.user.categories;
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function () {
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
                     var key = catKey + "." + r.value;
                     var funcArgs = {
                         isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
@@ -354,8 +354,8 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                 var v = document.getElementById("userkey-value");
                 let doc = res.dataset.user.categories;
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     var funcArgs = {
                         isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                         noIndex: true
@@ -459,8 +459,8 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
                 var v = document.getElementById("userkey-value");
                 var def = document.getElementById("default-checkbox");
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     var key = catKey;
                     var ctype = r.value;
                     var title = r.options[r.selectedIndex].dataset.title;
@@ -569,7 +569,7 @@ let viewDbKey = new ContentHandler("UserViewDBKey",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
+                sidebar.registerBackButton( ".sidebar-back-btn");
                 var q = document.getElementById("userkey-category");
                 var r = document.getElementById("userkey-key");
                 var v = document.getElementById("userkey-value");
@@ -614,8 +614,8 @@ let addQualification = new ContentHandler("UserAddQualification",
             $.get('/webpack/sidebar/templates/sidebar-addUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
-                sidebar.registerBackButton(sidebar,".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton(".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     const id = document.getElementById("qual-name").selectedOptions[0].id;
                     var key = catKey;
                     data = {
@@ -665,7 +665,7 @@ let viewQualification = new ContentHandler("UserViewQualification",
             $.get('/webpack/sidebar/templates/sidebar-viewUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
-                sidebar.registerBackButton(sidebar,".sidebar-back-btn");
+                sidebar.registerBackButton(".sidebar-back-btn");
 
                 if(!populateCurrentQualificationDefault(sidebar, res.qualifications.byType, res.currentQualification.qualification)){
                     console.warn("trying to read corrupted data");
@@ -715,8 +715,8 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
             $.get('/webpack/sidebar/templates/sidebar-updateUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
-                sidebar.registerBackButton(sidebar,".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton(".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
 
                     //helper to find qualification document in groupByType array
                     const id = document.getElementById("qual-name").selectedOptions[0].id;
@@ -801,8 +801,8 @@ let changeRole = new ContentHandler("UserChangeRole",
 
                 $("#changeUserRole-select").val(context.acl.userRole);
 
-                sidebar.registerBackButton(sidebar, ".sidebar-back-btn");
-                sidebar.registerConfirmButton(sidebar, ".sidebar-confirm", function(){
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
                     data = {
                         userId: userId,
                         role: $("#changeUserRole-select").val(),

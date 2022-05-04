@@ -50,7 +50,7 @@ var eventActions = {
             type: 'DELETE',
             success: function(result) {
                 alert("Event " + eventid + " deleted.");
-                window.location.replace("/unisams/events/view/" + eventid);
+                window.location.replace("/unisams/events");
             }
         });
 
@@ -82,8 +82,8 @@ var eventActions = {
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(result) {
-                callback();
-                window.location.reload();
+                callback(result);
+                // window.location.reload();
             }
         });
     },
@@ -105,7 +105,7 @@ var eventActions = {
             data: JSON.stringify(data),
             success: function(result) {
                 callback();
-                window.location.reload();
+                // window.location.reload();
             }
         });
     },
@@ -125,8 +125,7 @@ var eventActions = {
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(result) {
-                callback();
-                window.location.reload();
+                callback(result);
             }
         });
     },

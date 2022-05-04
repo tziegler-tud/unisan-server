@@ -635,3 +635,70 @@ ul.eventlist{
     }
   }
 }
+
+/*
+participants list
+ */
+
+.participantslist-top {
+  border-top: 1px solid #AAA;
+  width: 100%;
+  li {
+    background-color: #fAfAfA;
+  }
+}
+
+ul.participantslist{
+  margin-top: 0;
+  margin-bottom: 0;
+  position: static;
+
+  &.list-view {
+    font-size: 110%;
+
+    li {
+
+      .date {
+        display: none !important;
+      }
+
+      @media #{$desktop, $tablet-landscape}  {
+        .date {
+          display: block !important;
+        }
+      }
+
+      .inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+
+        @media #{$desktop, $tablet-landscape}  {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+        .item-container {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
+
+          .item-container-element {
+            flex: 1 1 auto;
+            display: block;
+          }
+        }
+
+        .userlist-img {
+          margin-right: 1em;
+          max-width: 3em;
+
+          img {
+            width: 100%;
+            border-radius: 50%;
+          }
+        }
+      }
+    }
+  }
+}
+

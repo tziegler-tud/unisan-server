@@ -1,47 +1,63 @@
 <div class="itemlist-header-container participantslist-top borderBottom">
-    <ul class="common-list loglist-top participantslist  itemlist scrollableItemList list-view border scrollableList-top">
+    <ul class="common-list participantslist scrollableItemList list-view border scrollableList-top">
         <li class="noSelect rowHeading">
             <div class="inner">
                 <div class="item-property scrollableList-header-column userlist-ch name" data-property="user.generalData.lastName.value">Name</div>
                 <div class="item-property scrollableList-header-column userlist-ch role" data-property="role">Rolle</div>
                 <div class="item-property scrollableList-header-column userlist-ch date" data-property="date">Anmeldungsdatum</div>
-                <div class="item-property scrollableList-header-column userlist-ch delete" data-property=""></div>
             </div>
         </li>
     </ul>
 </div>
+{{#arrayNotEmpty listdata}}
 <div class="itemlist-content-container scrollableList-content">
-    <ul class="participantslist itemlist scrollableItemList scrollableList-body noSelect list-view border">
+    <ul class="common-list participantslist scrollableItemList scrollableList-body noSelect list-view border">
     {{#each listdata}}
         <li class="user-entry noSelect" id='userId{{this.user.id}}' data-userid= {{this.user.id}}>
             <a class="inner noSelect">
+                <div class="scrollableList-body-column item-property item-container name ">
+                    <div class=" userlist-img item-container-element"><img src="/data/uploads/user_images/{{this.user.id}}/{{this.user.id}}.jpg"/></div>
+                    <span class=" item-container-element item-selectable">{{this.user.generalData.firstName.value}} {{this.user.generalData.lastName.value}}</span>
+                    <div class="participant-menu-container mdc-menu-surface--anchor">
+                        <button class="participant-menu-button mdc-icon-button material-icons">
+                            <div class="mdc-icon-button__ripple"></div>
+                            more_vert
+                        </button>
+                        <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
+                            <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                <li class="mdc-list-item" role="menuitem">
+                                    <span class="mdc-list-item__graphic">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                    </span>
+                                    <span class="mdc-list-item__text">Akte öffnen</span>
+                                </li>
+                                <li class="mdc-list-item" role="menuitem">
+                                    <span class="mdc-list-item__graphic">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                    </span>
+                                    <span class="mdc-list-item__text">Abmelden</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 {{#if ../args.allowEdit}}
-                    <div class="scrollableList-body-column item-property item-container name ">
-                        <div class=" userlist-img item-container-element"><img src="/data/uploads/user_images/{{this.user.id}}/{{this.user.id}}.jpg"/></div>
-                        <span class=" item-container-element item-selectable">{{this.user.generalData.firstName.value}} {{this.user.generalData.lastName.value}}</span>
-                    </div>
-                    <div class="scrollableList-body-column item-property item-container role">
-                        <select class="common-select participant-role-select" data-userid= {{this.user.id}}>
-                            <option class="option-participant" value="participant" {{#if (hasRole this "participant")}}selected{{/if}}>teilnehmend</option>
-                            <option class="option-lecturer" value="lecturer" {{#if (hasRole this "lecturer")}}selected{{/if}}>Dozent</option>
-                            <option class="option-admin" value="admin" {{#if (hasRole this "admin")}}selected{{/if}}>verantwortlich</option>
-                        </select>
+                <div class="scrollableList-body-column item-property item-container role">
+                    <select class="common-select participant-role-select" data-userid= {{this.user.id}}>
+                        <option class="option-participant" value="participant" {{#if (hasRole this "participant")}}selected{{/if}}>teilnehmend</option>
+                        <option class="option-lecturer" value="lecturer" {{#if (hasRole this "lecturer")}}selected{{/if}}>Dozent</option>
+                        <option class="option-admin" value="admin" {{#if (hasRole this "admin")}}selected{{/if}}>verantwortlich</option>
+                    </select>
 
-                    </div>
+                </div>
                 {{else}}
-                    <div class="scrollableList-body-column item-property item-container name">
-                        <div class=" userlist-img item-container-element"><img src="/data/uploads/user_images/{{this.user.id}}/{{this.user.id}}.jpg"/></div>
-                        <span class=" item-container-element">{{this.user.generalData.firstName.value}} {{this.user.generalData.lastName.value}}</span>
-                    </div>
-                    <div class="scrollableList-body-column item-property role">
-                        <span class="item-container-element">{{#if (hasRole this "participant")}}teilnehmend{{/if}}{{#if (hasRole this "lecturer")}}Dozent{{/if}}{{#if (hasRole this "admin")}}verantwortlich{{/if}}</span>
-                    </div>
+
+                <div class="scrollableList-body-column item-property role">
+                    <span class="item-container-element">{{#if (hasRole this "participant")}}teilnehmend{{/if}}{{#if (hasRole this "lecturer")}}Dozent{{/if}}{{#if (hasRole this "admin")}}verantwortlich{{/if}}</span>
+                </div>
                 {{/if}}
                 <div class="scrollableList-body-column item-property date">
                     <span class="item-container-element">{{transformDateTimeString date}}</span>
-                </div>
-                <div class="scrollableList-body-column item-property delete">
-                    <div class="participant-delete icon-delete before-icon" data-userid={{this.user.id}}></div>
                 </div>
 
             </a>
@@ -49,5 +65,19 @@
     {{/each}}
     </ul>
 </div>
+{{else}}
+    <div class="itemlist-content-container scrollableList-content">
+        <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+            <li class="event-entry noSelect" id=''>
+                <a class="inner">
+                    <div class="item-property item-container noEntries-container">
+                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                        <span class=" item-container-element">Keine Einträge vorhanden</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+{{/arrayNotEmpty}}
 
 

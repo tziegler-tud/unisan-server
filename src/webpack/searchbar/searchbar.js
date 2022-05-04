@@ -74,6 +74,10 @@ var applyArgs = function(args){
         onInput: {
             enabled: false,
             callback: function(){},
+        },
+        onFocus: {
+            enabled: false,
+            callback: function(){}
         }
     }
     if (args===undefined) {
@@ -193,6 +197,12 @@ var setupEventHandlers = function(self, searchbarHTML){
             self.searchbarArgs.onInput.callback(inputElement.val());
         })
     }
+    if (self.searchbarArgs.onFocus.enabled) {
+        inputElement.on("focus",function(){
+            self.searchbarArgs.onFocus.callback(inputElement.val());
+        })
+    }
+
     if(self.searchbarArgs.enableCollapse){
         $(self.domElements.icon).on("click", function(){
             self.toggle();
@@ -200,6 +210,10 @@ var setupEventHandlers = function(self, searchbarHTML){
     }
 };
 
+/**
+ * returns the native input element
+ * @returns {HTMLInputElement || null} the native input element
+ */
 Searchbar.prototype.getInputElement = function(){
     let self = this;
     this.init
@@ -211,6 +225,11 @@ Searchbar.prototype.getInputElement = function(){
         })
 };
 
+/**
+ *
+ * returns true if the searchbar is active, i.e. not hidden
+ * @returns {Boolean}
+ */
 Searchbar.prototype.isActive = function(){
     let self = this;
     this.init

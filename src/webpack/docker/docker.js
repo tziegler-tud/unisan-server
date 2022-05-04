@@ -504,7 +504,7 @@ Docker.prototype.addDockerSubPage = function(type, data, options, id, dockerAcl)
             };
             break;
         case "eventEdit":
-            url = '/webpack/docker/templates/subpage-eventEdit.hbs';
+            url = '/webpack/docker/templates/subpage-event.hbs';
             context = {
                 id: id,
                 exploredEvent: data,

@@ -1,0 +1,14 @@
+<div class="userselect">
+    <ul id="addParticipantList" class="mdc-list event-participants" role="group" aria-label="List with checkbox items">
+        {{#each userlist}}
+            <li class="mdc-list-item select-popup-entry sidebar-select-entry">
+                <span class="mdc-list-item__ripple"></span>
+                <span class="mdc-list-item__graphic">
+                    <img src="/data/uploads/user_images/{{this.id}}/{{this.id}}.jpg"/>
+                </span>
+                <span class="mdc-list-item__text">{{this.generalData.firstName.value}} {{this.generalData.lastName.value}}</span>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+

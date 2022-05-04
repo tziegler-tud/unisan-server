@@ -105,7 +105,7 @@ var subscribeToPendingRequest = function(){
  *
  * @returns {Promise<Object|String>}
  */
-EventRequest.prototype.getEvent = function(){
+EventRequest.prototype.getEvent = function(forceUpdate){
     var self = this;
     return new Promise(function(resolve, reject){
         let returnEvent = function (event) {
@@ -115,7 +115,7 @@ EventRequest.prototype.getEvent = function(){
         let fail = function (reason) {
             reject(reason);
         };
-      if (self.currentViewedEvent.event === undefined) {
+      if (self.currentViewedEvent.event === undefined || forceUpdate) {
           // check if request is already pending
           if (pendingUserRequest.isActive) {
               pendingUserRequest.subscribe()
@@ -181,7 +181,7 @@ EventRequest.prototype.refreshEvent = function(){
 };
 
 EventRequest.prototype.notifyObservers = function(){
-    this.getEvent().then(function(event){
+    this.getEvent(true).then(function(event){
         observers.forEach(function(ob){
             ob.update(event)
         })}

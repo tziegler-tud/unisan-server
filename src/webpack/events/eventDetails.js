@@ -3,6 +3,7 @@ import "./eventDetails.scss";
 var lidlRTO = window.lidlRTO;
 
 import {Snackbar} from "../helpers/snackbar";
+import {DropdownMenu} from "../helpers/dropdownMenu";
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
@@ -65,6 +66,7 @@ let eventDetails = {
             // create new observer
             var ob2 = new lidlObserver(function(event){
                 currentExploredEvent = event;
+                notifyPage({event:event})
             });
 
             // get user data from user service
@@ -77,10 +79,16 @@ let eventDetails = {
                     console.error("Failed to retrieve event data:" + reason)
                 });
 
+            var sidebar = new Sidebar('wrapper', "test");
+            sidebar.addPlugin(eventPlugin);
+
             let pageData = {};
             function notifyPage(obj) {
                 Object.assign(pageData, obj);
                 if(pageData.user && pageData.event) {
+
+
+                    buildPageCommon(pageData.user, pageData.event, args);
                     if (args.edit) {
                         buildPageEdit(pageData.user, pageData.event, args)
                     }
@@ -88,20 +96,64 @@ let eventDetails = {
                 }
             }
 
-            function buildPageView(user, event, args) {
-                let page = new EventPage();
-
+            function buildPageCommon(user, event, args) {
                 // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
                 window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
 
-                const list = new MDCList(document.querySelector('.mdc-list'));
-                const listItemRipples = list.listElements.map((listItemEl) => new MDCRipple(listItemEl));
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventParticipants", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {
+                        onConfirm: function(){
+                            eventActions.addParticipant(event.id, user.id, function(event) {
+                                eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant})
+                                    })
+                                    .catch(err => {
+                                    })
+                                })
+                        },
+                        onDelete: function(){
+                            eventActions.removeParticipant(event.id, user.id, function(){
+                                eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant})
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
+                        }
+                    },
+                });
+                if(phone.matches || tablet.matches) {
+                    sidebar.hide();
+                }
+                else {
+                    sidebar.show();
+                }
+
+
+            }
+
+            function buildPageView(user, event, args) {
+                let page = new EventPage();
+
+
+                const fileList = new MDCList(document.querySelector(".eventinfo-material-list"));
+                const listItemRipples = fileList.listElements.map((listItemEl) => new MDCRipple(listItemEl));
 
                 $(".download-button").on("click", function(e){
                     e.preventDefault();
                 });
 
-                $(list.listElements).on("click", function(e){
+                $(fileList.listElements).on("click", function(e){
                     e.stopPropagation();
                     e.preventDefault();
                     let url  = $(this).find(".download-button").first().attr('href');
@@ -150,27 +202,6 @@ let eventDetails = {
                     default:
                 }
 
-
-                var ddMenu = common.DropdownMenu(".dropdown-menu", "click", ".dropdown-btn");
-
-                var sidebar = new Sidebar('wrapper', "test");
-                sidebar.addPlugin(eventPlugin);
-                // init event sidebar
-                //find if current user is already registered
-                let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                sidebar.addContent("eventParticipants", {
-                    event: event,
-                    user: user,
-                    isParticipant: userIsParticipant,
-                    callback: {
-                        onConfirm: function(){
-                            eventActions.addParticipant(event.id, user.id)
-                        },
-                        onDelete: function(){
-                            eventActions.removeParticipant(event.id, user.id)
-                        }
-                    },
-                });
                 if(phone.matches || tablet.matches) {
                     sidebar.hide();
                 }
@@ -195,11 +226,9 @@ let eventDetails = {
             }
 
             function buildPageEdit(user, event, args) {
+                const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
-                // window.DockerElement = new docker.Docker(window.dockerArgs);
-                let eventDockerPageId = window.DockerElement.addDockerSubPage("eventEdit", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
-
-                var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+                // var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
 
                 const deleteContent = {
                     title: "Event löschen",
@@ -221,10 +250,10 @@ let eventDetails = {
                 const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
                 lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
 
-                const list = new MDCList(document.querySelector('.mdc-list'));
-                const listItemRipples = list.listElements.map((listItemEl) => new MDCRipple(listItemEl));
+                const fileList = new MDCList(document.querySelector(".eventinfo-material-list"));
+                const listItemRipples = fileList.listElements.map((listItemEl) => new MDCRipple(listItemEl));
                 // const dropdownOptions = list.listElements.forEach(listItemEl => new MDCMenu($(listItemEl).find('.mdc-menu')));
-                list.listElements.forEach(function(listItemEl){
+                fileList.listElements.forEach(function(listItemEl){
                     var it = $(listItemEl).parent(".mdc-list-item-wrapper").find('.mdc-menu');
                     var menu;
                     $(it).each(function(index){
@@ -248,9 +277,7 @@ let eventDetails = {
                             let url  = $(this).find(".download-button").first().attr('href');
                             window.open(url, '_self');
                         });
-
                     })
-
                 });
 
                 let callback = {
@@ -295,32 +322,6 @@ let eventDetails = {
                 };
                 let titleInputContainer = document.getElementById("eventtitle-input");
                 let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
-
-                let sidebar = new Sidebar('wrapper', "test");
-                sidebar.addPlugin(eventPlugin);
-
-                // init event sidebar
-                //find if current user is already registered
-                let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                sidebar.addContent("eventParticipants", {
-                    event: event,
-                    user: user,
-                    isParticipant: userIsParticipant,
-                    callback: {
-                        onConfirm: function(){
-                            eventActions.addParticipant(event.id, user.id)
-                        },
-                        onDelete: function(){
-                            eventActions.removeParticipant(event.id, user.id)
-                        }
-                    },
-                });
-                if(phone.matches || tablet.matches) {
-                    sidebar.hide();
-                }
-                else {
-                    sidebar.show();
-                }
 
                 $("#eventDateEditor").on("click", function(){
                     sidebar.addContent("editEventDate", {

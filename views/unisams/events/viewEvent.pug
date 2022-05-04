@@ -57,16 +57,6 @@ block content
                                             #eventtitle-input.title.event-title
                                         .eventprofile-heading-date
                                             span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
-                                    .eventprofile-dropdown.dropdown-menu
-                                        if allowedit
-                                            .dropdown-btn
-                                                button.material-icons.mdc-icon-button(aria-label="Options") more_vert
-                                                .dropdown-container
-                                                    .dropdown-entry
-                                                        a.before-icon.icon-edit(href="/unisams/events/edit/"+ refurl) Event bearbeiten
-                                                    .dropdown-entry.dropdown-entry-disabled.has-tooltip
-                                                        a.before-icon.icon-delete.userDelete(id="deleteUserId" + exploreEvent.id, data-userid=exploreEvent.id) Event löschen
-                                                        span.tooltip Bearbeitung aktivieren, um Event zu entfernen
                                     .clear
                             .clear
                         #content1-text.sec-content.border-top

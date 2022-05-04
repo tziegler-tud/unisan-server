@@ -146,6 +146,9 @@ function getDockerArguments (req, res, next) {
 
 
 // routes
+//hooked at /unisams/events
+const baseUrl = "/unisams/events";
+
 //check url access by user group
 // router.use('/*', auth);
 router.use('/*', getDockerArguments);
@@ -156,17 +159,40 @@ router.get('/past', checkEventReadRights, getPast);
 
 router.get('/addEvent', allowCreateEvent, addEvent);
 
-router.get('/edit/:id', auth, checkEventEditRights, editEvent);
-router.get('/view/:id/logs', checkEventEditRights, eventLogs);
+router.get('/*', checkEventReadRights)
+router.get('/:id', auth, checkEventEditRights, editEvent);
+router.get('/:id/logs', checkEventEditRights, eventLogs);
 
-router.get('/view/*', checkEventReadRights)
-router.get('/view/:id', viewEvent);
-router.get('/view/:id/participants', eventParticipants);
-router.get('/view/:id/files/:filename', eventFileDownloader);
+router.get('/:id', viewEvent);
+router.get('/:id/participants', eventParticipants);
+router.get('/:id/files/:filename', eventFileDownloader);
+
+
+/* legacy */
+
+router.get('/view/:id', legacyRedirect);
+router.get('/view/:id/:url', legacyRedirect);
+router.get('/edit/:id', legacyRedirect);
+router.get('/edit/:id/:url', legacyRedirect);
+
+// router.get('/edit/:id', auth, checkEventEditRights, editEvent);
+//
+// router.get('/view/:id/logs', checkEventEditRights, eventLogs);
+//
+// router.get('/view/*', checkEventReadRights)
+// router.get('/view/:id', viewEvent);
+// router.get('/view/:id/participants', eventParticipants);
+// router.get('/view/:id/files/:filename', eventFileDownloader);
 
 
 
 module.exports = router;
+
+function legacyRedirect(req, res, next){
+    var newPath = baseUrl + "/" + req.params.id;
+    if (req.params.url) newPath = newPath + "/" + req.params.url;
+    res.redirect(newPath);
+}
 
 /* GET home page. */
 function getAll(req, res, next) {
@@ -227,7 +253,7 @@ function viewEvent(req, res, next) {
                 //check if editing this user is allowed
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
-                        res.render("unisams/events/viewEvent", {
+                        res.render("unisams/events/editEvent", {
                             user: req.user._doc,
                             acl: req.acl,
                             title: ev.title.value,

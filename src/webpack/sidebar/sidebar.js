@@ -87,6 +87,102 @@ Sidebar.prototype.addPlugin = function(sidebarPlugin){
 
 }
 
+/**
+ *
+ * @param args {Object} constructor arguments
+ * @param args.sidebar {Object} sidebar object to associate this button with
+ * @param args.selector {string} container selector
+ * @param args.type {string} "cancel", "confirm", "delete", "custom"
+ * @param args.handler {function} handler function, optional for back buttons
+ * @param args.enabled {Boolean} true if the button should initially be enabled
+ * @returns {SidebarButton}
+ * @constructor
+ */
+var SidebarButton = function(args) {
+    let self = this;
+    let defaultArgs = {
+        sidebar: undefined,
+        selector: undefined,
+        type: "custom",
+        handler: function(){},
+        enabled: true,
+    }
+    args = Object.assign(defaultArgs, args);
+    this.sidebar = args.sidebar;
+    this.selector = args.selector;
+    this.type = args.type;
+    this.handler = args.handler;
+    this.enabled = args.enabled;
+
+    if (this.selector === undefined) {
+        console.error("Failed to create SidebarButton: Invalid Selector")
+        return false;
+    }
+    let item = document.querySelector(this.selector);
+    if(item === undefined || item === null) {
+        console.error("Failed to create SidebarButton: Invalid Selector")
+        return false;
+    }
+    this.container = item;
+    this.button = this.container.querySelector('button')
+    if (this.button === null || this.button === undefined) this.button = this.container;
+
+    if(this.type === undefined || typeof(this.type) !== "string") this.type = "custom";
+    this.container.classList.add("sidebarButton");
+    switch(this.type) {
+        case "back":
+            self.container.classList.add("sidebarButton--back");
+            self.handler = function(self){
+                self.sidebar.toggle();
+            }
+            break;
+        case "confirm":
+            self.container.classList.add("sidebarButton--confirm");
+            break;
+        case "cancel":
+            self.container.classList.add("sidebarButton--cancel");
+            self.handler = function(self){
+                self.sidebar.resetCurrentPage();
+                self.sidebar.toggle();
+            }
+            break;
+        case "reset":
+            self.container.classList.add("sidebarButton--reset");
+            self.handler = function(self){
+                self.sidebar.resetCurrentPage();
+            }
+            break;
+        case "delete":
+            self.container.classList.add("sidebarButton--delete");
+            break;
+        default:
+        case "custom":
+            self.container.classList.add("sidebarButton--custom");
+            break;
+    }
+    this.container.addEventListener("click", function(){
+        if(self.enabled) {
+            self.handler(self)
+        }
+    })
+    if(!self.enabled){
+        self.disable();
+    }
+}
+
+SidebarButton.prototype.disable = function(){
+    this.container.classList.add("sidebarButton-disabled");
+    this.button.disabled = true;
+    this.enabled = false;
+}
+
+
+SidebarButton.prototype.enable = function(){
+    this.container.classList.remove("sidebarButton-disabled");
+    this.button.disabled = false;
+    this.enabled = true;
+}
+
 /***
  * adds content of a specific type
  * @param {String} type string denoting the type of content to be rendered
@@ -116,53 +212,6 @@ Sidebar.prototype.addContent = function(type, args){
         //     showUserContent(self, args);
         //     break;
         //
-        // case "user":
-        //     showUserContent(self, args);
-        //     break;
-        //
-        // case "addUser":
-        //     showAddUserContent(self,args);
-        //     break;
-        //
-        // case "UserChangeUsername":
-        //     showUpdateUsernameContent(self, args);
-        //     break;
-        //
-        // case "UserAddDBKey":
-        //     showInsertUserKeyContent(self, args);
-        //     break;
-        //
-        // case "UserAddContactDataKey":
-        //     showInsertContactDataKeyContent(self, args);
-        //     break;
-        //
-        // case "UserAddGeneralDataKey":
-        //     showInsertGeneralDataKeyContent(self, args);
-        //     break;
-        //
-        // case "UserUpdateDBKey":
-        //     showUpdateUserKeyContent(self, args);
-        //     break;
-        //
-        // case "UserUpdateContactKey":
-        //     showUpdateContactDataKeyContent(self, args);
-        //     break;
-        //
-        // case "UserViewDBKey":
-        //     showViewUserKeyContent(self, args);
-        //     break;
-        //
-        // case "UserAddQualification":
-        //     showInsertUserQualificationContent(self,args);
-        //     break;
-        //
-        // case "UserViewQualification":
-        //     showViewUserQualificationContent(self, args);
-        //     break;
-        //
-        // case "UserUpdateQualification":
-        //     showUpdateUserQualificationContent(self,args);
-        //     break;
 
         case "QualificationCreate":
             showCreateQualificationContent(self,args);
@@ -177,6 +226,14 @@ Sidebar.prototype.addContent = function(type, args){
             break;
     }
 };
+
+/**
+ * refreshs the current sidebar content by re-rendering with current settings
+ */
+Sidebar.prototype.update = function(args){
+    let newArgs = Object.assign(this.currentPage.args, args);
+    this.addContent(this.currentPage.type, newArgs);
+}
 
 /**
  * toggles the sidebar activity state.
@@ -435,7 +492,8 @@ Sidebar.prototype.disableOptional = function(selector){
 
 var registerBackButton = function(self, selector){
 
-  $(self.sidebarHTML).find($(selector)).each(function(){
+  // $(self.sidebarHTML).find($(selector)).each(function(){
+  $(selector).each(function(){
       $(this).on("click", function(e){
           self.toggle();
           // $(this).toggleClass("btn-rotate");
@@ -443,8 +501,32 @@ var registerBackButton = function(self, selector){
   })
 };
 
-Sidebar.prototype.registerBackButton = function(self, selector) {
-    registerBackButton(self, selector)
+Sidebar.prototype.registerBackButton = function(selector) {
+    let self = this;
+    return new SidebarButton({
+        sidebar: self,
+        selector: selector,
+        type: "back",
+        handler: function(){
+            self.toggle()
+        },
+        enabled: true,
+    })
+}
+
+
+Sidebar.prototype.registerCancelButton = function(selector) {
+    let self = this;
+    return new SidebarButton({
+        sidebar: self,
+        selector: selector,
+        type: "cancel",
+        handler: function(){
+            self.resetCurrentPage();
+            self.toggle();
+        },
+        enabled: true,
+    })
 }
 
 var registerConfirmButton = function(self, selector, action){
@@ -454,8 +536,15 @@ var registerConfirmButton = function(self, selector, action){
     });
 };
 
-Sidebar.prototype.registerConfirmButton = function(self, selector, action) {
-    registerConfirmButton(self, selector, action)
+Sidebar.prototype.registerConfirmButton = function(selector, handler) {
+    let self = this;
+    return new SidebarButton({
+        sidebar: self,
+        selector: selector,
+        type: "confirm",
+        handler: handler,
+        enabled: true,
+    })
 }
 
 var registerButton = function(self, selector, action){
@@ -465,9 +554,29 @@ var registerButton = function(self, selector, action){
     });
 };
 
-Sidebar.prototype.registerButton = function(self, selector, action) {
-    registerButton(self, selector, action)
+Sidebar.prototype.registerDeleteButton = function(selector, handler) {
+    let self = this;
+    return new SidebarButton({
+        sidebar: self,
+        selector: selector,
+        type: "delete",
+        handler: handler,
+        enabled: true,
+    })
 }
+
+Sidebar.prototype.registerButton = function(selector, handler) {
+    let self = this;
+    return new SidebarButton({
+        sidebar: self,
+        selector: selector,
+        type: "custom",
+        handler: handler,
+        enabled: true,
+    })
+}
+
+
 
 var getDataFromServer  = function(url, callback){
 
@@ -763,4 +872,4 @@ Sidebar.prototype.resetCurrentPage = function(){
     this.addContent(this.currentPage.type, this.currentPage.args);
 }
 
-export {Sidebar, SidebarPlugin, ContentHandler}
+export {Sidebar, SidebarPlugin, ContentHandler, SidebarButton}
