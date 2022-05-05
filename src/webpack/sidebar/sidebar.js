@@ -198,7 +198,7 @@ Sidebar.prototype.addContent = function(type, args){
     //look for handler
     let handler = this.contentHandlers.find(handler => handler.type === type);
     if (handler === undefined) {
-        console.warn("Sidebar error: No handler found for given content type: " + type);
+        console.error("Sidebar error: No handler found for given content type: " + type);
         return false;
     }
     else {
@@ -206,12 +206,6 @@ Sidebar.prototype.addContent = function(type, args){
     }
 
     switch(type){
-
-        // default:
-        //     console.warn("Sidebar: no content type given!");
-        //     showUserContent(self, args);
-        //     break;
-        //
 
         case "QualificationCreate":
             showCreateQualificationContent(self,args);

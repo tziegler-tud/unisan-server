@@ -18,6 +18,7 @@ let showEventParticipants = new ContentHandler("eventParticipants",
             sidebar.sidebarHTML.html(template(event));
             sidebar.registerBackButton( ".sidebar-back-btn");
             // find if current user is registered for event
+            let notRegisteredSelector = "#sidebar-participate-button-notregistered";
             let notRegistered = $("#sidebar-participate-button-notregistered");
             let registered = $("#sidebar-participate-button-registered");
             let target;
@@ -30,7 +31,7 @@ let showEventParticipants = new ContentHandler("eventParticipants",
                     }
                 })
             } else {
-                sidebar.registerButton(notRegistered, function () {
+                sidebar.registerButton(notRegisteredSelector, function () {
                     args.callback.onConfirm();
                 });
             }

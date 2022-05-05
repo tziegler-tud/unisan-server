@@ -277,31 +277,39 @@ async function create(req, eventParam) {
     })
 
     // save event
-    if(await event.save()){
-        LogService.create(log)
-            .then(
-            )
-            .catch(
+    return new Promise(function(resolve, reject){
+        event.save()
+            .then(event => {
+                resolve(event);
+                LogService.create(log)
+                    .then(
+                    )
+                    .catch(
 
-            );
-        fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
-            if (err) {
-                throw err;
-            }
-            else {
-                fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', (err) => {
-                    if (err) throw err;
-                    console.log('dummy image copied to new event');
+                    );
+                fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
+                    if (err) {
+                        throw err;
+                    }
+                    else {
+                        fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', (err) => {
+                            if (err) throw err;
+                            console.log('dummy image copied to new event');
+                        });
+                    }
                 });
-            }
-        });
-        fs.mkdir(appRoot + '/src/data/uploads/event_files/' + event._id.toString(), { recursive: true }, (err) => {
-            if (err) {
-                throw err;
-            } else {
-            }
-        });
-    }
+                fs.mkdir(appRoot + '/src/data/uploads/event_files/' + event._id.toString(), { recursive: true }, (err) => {
+                    if (err) {
+                        throw err;
+                    } else {
+                    }
+                });
+            })
+            .catch(err => {
+                console.error("Error while creating event: " + err);
+                throw new Error(err)
+            });
+    })
 }
 
 /**

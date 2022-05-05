@@ -100,11 +100,11 @@ function checkEventEditRightsPromise(req, res, next){
                                     resolve();
                                 })
                                 .catch(err => {
-                                    reject();
+                                    reject({status:403, message: "forbidden"});
                                 })
                         }
                     })
-                    .catch(err => reject());
+                    .catch(err => reject({status:404, message: "not found"}));
             })
     });
 }
@@ -160,11 +160,11 @@ router.get('/past', checkEventReadRights, getPast);
 router.get('/addEvent', allowCreateEvent, addEvent);
 
 router.get('/*', checkEventReadRights)
-router.get('/:id', auth, checkEventEditRights, editEvent);
 router.get('/:id/logs', checkEventEditRights, eventLogs);
 
-router.get('/:id', viewEvent);
+router.get('/:id', eventDetails);
 router.get('/:id/participants', eventParticipants);
+router.get('/:id/settings', eventSettings);
 router.get('/:id/files/:filename', eventFileDownloader);
 
 
@@ -246,11 +246,11 @@ function addEvent(req, res, next) {
     })
 }
 
-function viewEvent(req, res, next) {
+function eventDetails(req, res, next) {
     eventService.getById(req.params.id)
         .then(ev => {
             if (ev) {
-                //check if editing this user is allowed
+                //check if editing this event is allowed
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
                         res.render("unisams/events/editEvent", {
@@ -321,6 +321,32 @@ function eventParticipants(req, res, next) {
                             exploreEventDocument: ev._doc,
                             allowedit: false,
                         })
+                    })
+            }
+        })
+        .catch(err => next(err));
+}
+
+
+function eventSettings(req, res, next) {
+    eventService.getById(req.params.id)
+        .then(ev => {
+            if (ev) {
+                //check if editing this user is allowed
+                let url = "unisams/events/settings";
+                checkEventEditRightsPromise(req, res, next)
+                    .then(result => {
+                        res.render(url, {
+                            user: req.user.toJSON(),
+                            acl: req.acl,
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            exploreEventDocument: ev._doc,
+                            allowedit: true,
+                        })
+                    })
+                    .catch(err => {
+                        next(err)
                     })
             }
         })

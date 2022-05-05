@@ -172,7 +172,9 @@ module.exports = router;
 
 function create(req, res, next) {
     eventService.create(req, req.body)
-        .then(() => res.json(req.body))
+        .then(event => {
+            res.json(event)
+        })
         .catch(err => {
             next(err);
         })
