@@ -535,6 +535,7 @@ async function addParticipant(req, id, userId, args) {
         if(!args.overwrite){
             //abort
             console.log("user " + userId + " already registered for Event "+ event.title.value);
+            return true;
         }
         else {
             //overwrite

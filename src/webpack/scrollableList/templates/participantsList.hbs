@@ -24,16 +24,16 @@
                             more_vert
                         </button>
                         <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
-                            <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                                <li class="mdc-list-item" role="menuitem">
-                                    <span class="mdc-list-item__graphic">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                <li class="mdc-list-item participant-details" role="menuitem" data-userid="{{this.user.id}}">
+                                    <span class="mdc-list-item__graphic material-icons">
+                                        contact_page
                                     </span>
                                     <span class="mdc-list-item__text">Akte öffnen</span>
                                 </li>
-                                <li class="mdc-list-item" role="menuitem">
-                                    <span class="mdc-list-item__graphic">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                <li class="mdc-list-item participant-delete" role="menuitem" data-userid="{{this.user.id}}">
+                                    <span class="mdc-list-item__graphic material-icons">
+                                        person_remove
                                     </span>
                                     <span class="mdc-list-item__text">Abmelden</span>
                                 </li>
@@ -44,7 +44,7 @@
                 {{#if ../args.allowEdit}}
                 <div class="scrollableList-body-column item-property item-container role">
                     <select class="common-select participant-role-select" data-userid= {{this.user.id}}>
-                        <option class="option-participant" value="participant" {{#if (hasRole this "participant")}}selected{{/if}}>teilnehmend</option>
+                        <option class="option-participant" value="participant" {{#if (hasRole this "participant")}}selected{{/if}}>nimmt Teil</option>
                         <option class="option-lecturer" value="lecturer" {{#if (hasRole this "lecturer")}}selected{{/if}}>Dozent</option>
                         <option class="option-admin" value="admin" {{#if (hasRole this "admin")}}selected{{/if}}>verantwortlich</option>
                     </select>
@@ -53,7 +53,7 @@
                 {{else}}
 
                 <div class="scrollableList-body-column item-property role">
-                    <span class="item-container-element">{{#if (hasRole this "participant")}}teilnehmend{{/if}}{{#if (hasRole this "lecturer")}}Dozent{{/if}}{{#if (hasRole this "admin")}}verantwortlich{{/if}}</span>
+                    <span class="item-container-element">{{#if (hasRole this "participant")}}nimmt Teil{{/if}}{{#if (hasRole this "lecturer")}}Dozent{{/if}}{{#if (hasRole this "admin")}}verantwortlich{{/if}}</span>
                 </div>
                 {{/if}}
                 <div class="scrollableList-body-column item-property date">

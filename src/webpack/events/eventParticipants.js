@@ -203,9 +203,20 @@ let eventParticipants = {
                             })
                         });
                     }
+                    let showParticipant = function(){
+                        $('.participant-details').each(function(){
+                            $(this).on("click", function(e){
+                                //push changes to server
+                                e.preventDefault();
+                                let userId = e.target.dataset.userid;
+                                window.location.href= "/unisams/user/"+userId;
+                            })
+                        });
+                    }
+
                     let scrollArgs = {
-                        height: "fixed",
-                        fixedHeight: "500px",
+                        height: "full",
+                        // fixedHeight: "500px",
                         sorting: {
                             property: "role",
                             direction: 1,
@@ -213,7 +224,7 @@ let eventParticipants = {
                         allowEdit: args.allowEdit,
                     }
                     let callback = {
-                        customHandlers: [deleteParticipant, roleSelect, dropdownMenus]
+                        customHandlers: [deleteParticipant, roleSelect, dropdownMenus, showParticipant]
                     }
 
                     let listContainer = document.getElementById("userlist-container--participants")

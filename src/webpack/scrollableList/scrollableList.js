@@ -213,6 +213,7 @@ ScrollableList.prototype.adjustList = function() {
     let listContent = self.container.getElementsByClassName("scrollableList-content")[0];
 
     let height = "40em"; //fallback
+    let marginBottom = 20;
 
     let heightSetting = self.args.height;
     if(phone.matches) {
@@ -230,13 +231,22 @@ ScrollableList.prototype.adjustList = function() {
         // let navHeight = document.getElementById("nav-top").clientHeight +1;
         let topBarHeight = window.DockerElement.getTopBarHeight();
         let contentHeight = document.getElementById("content1-heading").clientHeight;
+        let spacers = $(".scrollableList--spacer");
+        let spacerHeight = 0;
+        spacers.each(function(element){
+            spacerHeight = spacerHeight + this.clientHeight;
+        })
+
         //calc remaining height in px  5px offset to compensate borders
-        height = vh - (topBarHeight + contentHeight + row.clientHeight +5) + "px";
+        height = vh - (topBarHeight + contentHeight + spacerHeight + row.clientHeight + marginBottom +5) + "px";
     }
     if (heightSetting === "fixed") {
         //use fixedHeight param
         height = self.args.fixedHeight;
     }
+    $(self.container).css({
+        "margin": "0 0 "+ marginBottom +"px 0",
+    })
     //set element height
     $(listContent).css({
         "max-height": height,

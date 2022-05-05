@@ -30,28 +30,17 @@
   }
 }
 
+.participant-menu-container {
+  .mdc-menu {
+    .mdc-list {
+      li {
+        font-size: 80%;
+        .mdc-list-item__graphic {
 
-.mdc-list-item-wrapper {
-  position: relative;
-  overflow: initial;
+        }
+        .mdc-list-item__text {
 
-  .mdc-dropdown-menu {
-    position: absolute;
-    top: 1em !important;
-    left: unset !important;
-    right: 3em !important;
-
-    .mdc-list-item {
-      height: 36px;
-
-      .mdc-list-item__text {
-        align-self: initial;
-      }
-
-
-      .mdc-list-item__graphic {
-        height: 18px;
-        width: 18px;
+        }
       }
     }
   }

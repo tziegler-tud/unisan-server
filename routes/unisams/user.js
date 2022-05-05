@@ -113,9 +113,9 @@ function profile(req, res, next) {
         .then(result => {
             userService.getByUsername(req.params.username)
                 .then(user => {
-                    aclService.getUserACL(user.id, true)
-                        .then(userACL => {
-                            if (user) {
+                    if (user) {
+                        aclService.getUserACL(user.id, true)
+                            .then(userACL => {
                                 //build docker arguments
                                 let docker = userACL.docker;
                                 AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.WRITE)
@@ -132,7 +132,7 @@ function profile(req, res, next) {
                                             allowedit: true,
                                         })
                                     })
-                                    .catch(err=> {
+                                    .catch(err => {
                                         res.render("unisams/user/profile", {
                                             user: req.user._doc,
                                             userrole: userACL.userRole,
@@ -146,28 +146,27 @@ function profile(req, res, next) {
                                         })
                                     })
 
-                            }
-                            else {
-                                // try if id was given
-                                userService.getById(req.params.username)
-                                    .then(user => {
-                                        if (user) {
-                                            var newPath = req.originalUrl.replace(user.id, user.username);
-                                            res.redirect(newPath);
-                                        } else {
-                                            //give up
-                                            res.send("user not found");
-                                        }
-                                    })
-                                    .catch(err=> next(err));
-                            }
-                        })
-                        .catch(err=> next(err));
-                        })
-                        .catch(err => next(err))
-
-        })
-        .catch(err => next(err))
+                            })
+                            .catch()
+                    }
+                    else {
+                        // try if id was given
+                        userService.getById(req.params.username)
+                            .then(user => {
+                                if (user) {
+                                    var newPath = req.originalUrl.replace(user.id, user.username);
+                                    res.redirect(newPath);
+                                } else {
+                                    //give up
+                                    res.send("user not found");
+                                }
+                            })
+                            .catch(err=> next(err));
+                        }
+                    })
+                    .catch(err=> next(err)); //failed to get user
+                    })
+                    .catch(err => next(err)); //not authorized
 }
 
 function userLogs(req, res, next) {

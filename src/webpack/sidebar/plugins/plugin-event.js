@@ -13,7 +13,7 @@ let showEventParticipants = new ContentHandler("eventParticipants",
     function(sidebar, args, type){
         var event = args.event;
         //populate
-        $.get('/webpack/sidebar/templates/sidebar-eventParticipants.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/events/sidebar-eventParticipants.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(event));
             sidebar.registerBackButton( ".sidebar-back-btn");
@@ -45,7 +45,7 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
         var selectedUser = {role: "participant"};
 
         //populate
-        $.get('/webpack/sidebar/templates/sidebar-eventParticipantsAdd.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/events/sidebar-eventParticipantsAdd.hbs', function (data) {
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(event));
             let backBtn = sidebar.registerBackButton(".sidebar-back-btn");
@@ -184,7 +184,7 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
         context.event = args.event;
         var corrupted = false;
 
-        $.get('/webpack/sidebar/templates/sidebar-updateEventDate.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/events/sidebar-updateEventDate.hbs', function (data) {
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
@@ -239,7 +239,7 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
         context.event = args.event;
         var corrupted = false;
 
-        $.get('/webpack/sidebar/templates/sidebar-updateEventLocation.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/events/sidebar-updateEventLocation.hbs', function (data) {
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
