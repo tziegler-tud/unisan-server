@@ -59,66 +59,71 @@ block content
                                             span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
                                     .clear
                             .clear
+
                         #content1-text.sec-content.border-top
                             .subpage-content
                                 .eventinfo-container
-                                    .eventinfo-inner
-                                        .eventinfo-section.eventinfo-card.card-full.eventwidget-description
-                                            .eventinfo-section-inner
-                                                .eventinfo-sectionheader
-                                                    span Beschreibung
-                                                #eventDescribtionEditor.eventinfo-item.editor-container
-                                                    .eventinfo-item.quill-renderer
-
-                                        .eventinfo-section.eventinfo-card.card-half.eventwidget-location
-                                            .eventinfo-section-inner
-                                                .eventinfo-sectionheader
-                                                    span Termin
-                                                #eventDateEditor.eventinfo-item.eventinfo-item-date
-                                                    .eventinfo-item-inner
-                                                        .eventinfo-date-day
-                                                            = exploreEvent.date.startDateString
-                                                        .eventinfo-date-time
-                                                            =exploreEvent.date.timeString
-                                                        .eventinfo-item-spacer
-
-
-                                                .eventinfo-sectionheader
-                                                    span Veranstaltungsort
-                                                #eventLocationEditor.eventinfo-item.eventinfo-item-date
-                                                    .eventinfo-item-inner
-                                                        .eventinfo-date-location.before-icon.icon-location
-                                                            =exploreEvent.location.value
-                                                    .eventinfo-item-spacer
-
-
-                                        .eventinfo-section.eventinfo-card.card-half.eventwidget-location
-                                            .eventinfo-section-inner.limitCharacters
-                                                .eventinfo-sectionheader
-                                                    span Material
-                                                #eventMaterialViewer.eventinfo-item.eventinfo-item-location
-                                                    .eventinfo-item-inner
-                                                        .eventinfo-material
-                                                            .eventinfo-material-content
-                                                            .eventinfo-material-viewContainer
-                                                                ul.eventinfo-material-list.mdc-list.mdc-list--two-line.mdc-list--thumbnail-list
-                                                                    if exploreEvent.files
-                                                                        each val in exploreEvent.files
-                                                                            - var title = val.filename
-                                                                            - var filetype = val.filetype
-                                                                            - var size = val.humanReadableFileSize
-                                                                                li.eventinfo-material-listItem.mdc-list-item
-                                                                                    span.mdc-list-item__ripple
-                                                                                    span.mdc-list-item__graphic
-                                                                                        if val.thumbnail === val.filename
-                                                                                           //img(src="/api/v1/eventmod/" + refurl + "/files/" + title + "?thumbnail=true")
-                                                                                           img(src="/data/uploads/event_files/" + refurl + "/thumbnails/" + title)
-                                                                                        else
-                                                                                            img(src=val.thumbnail)
-
-                                                                                    span.mdc-list-item__text
-                                                                                        span.mdc-list-item__primary-text
-                                                                                            a.download-button(href="/api/v1/eventmod/"+ refurl + "/files/" + title, download)= title
-                                                                                        span.mdc-list-item__secondary-text= filetype + " | " + size
-                                                                                li.mdc-list-divider.mdc-list-divider--inset-padding(role="separator")
+                                    #eventPage-component-container.eventPage-component-container
+                        //#content1-text.sec-content.border-top
+                        //    .subpage-content
+                        //        .eventinfo-container
+                        //            .eventinfo-inner
+                        //                .eventinfo-section.eventinfo-card.card-full.eventwidget-description
+                        //                    .eventinfo-section-inner
+                        //                        .eventinfo-sectionheader
+                        //                            span Beschreibung
+                        //                        #eventDescriptionEditor.eventinfo-item.editor-container
+                        //                            .eventinfo-item.quill-renderer
+                        //
+                        //                .eventinfo-section.eventinfo-card.card-half.eventwidget-location
+                        //                    .eventinfo-section-inner
+                        //                        .eventinfo-sectionheader
+                        //                            span Termin
+                        //                        #eventDateEditor.eventinfo-item.eventinfo-item-date
+                        //                            .eventinfo-item-inner
+                        //                                .eventinfo-date-day
+                        //                                    = exploreEvent.date.startDateString
+                        //                                .eventinfo-date-time
+                        //                                    =exploreEvent.date.timeString
+                        //                                .eventinfo-item-spacer
+                        //
+                        //
+                        //                        .eventinfo-sectionheader
+                        //                            span Veranstaltungsort
+                        //                        #eventLocationEditor.eventinfo-item.eventinfo-item-date
+                        //                            .eventinfo-item-inner
+                        //                                .eventinfo-date-location.before-icon.icon-location
+                        //                                    =exploreEvent.location.value
+                        //                            .eventinfo-item-spacer
+                        //
+                        //
+                        //                .eventinfo-section.eventinfo-card.card-half.eventwidget-location
+                        //                    .eventinfo-section-inner.limitCharacters
+                        //                        .eventinfo-sectionheader
+                        //                            span Material
+                        //                        #eventMaterialViewer.eventinfo-item.eventinfo-item-location
+                        //                            .eventinfo-item-inner
+                        //                                .eventinfo-material
+                        //                                    .eventinfo-material-content
+                        //                                    .eventinfo-material-viewContainer
+                        //                                        ul.eventinfo-material-list.mdc-list.mdc-list--two-line.mdc-list--thumbnail-list
+                        //                                            if exploreEvent.files
+                        //                                                each val in exploreEvent.files
+                        //                                                    - var title = val.filename
+                        //                                                    - var filetype = val.filetype
+                        //                                                    - var size = val.humanReadableFileSize
+                        //                                                        li.eventinfo-material-listItem.mdc-list-item
+                        //                                                            span.mdc-list-item__ripple
+                        //                                                            span.mdc-list-item__graphic
+                        //                                                                if val.thumbnail === val.filename
+                        //                                                                   //img(src="/api/v1/eventmod/" + refurl + "/files/" + title + "?thumbnail=true")
+                        //                                                                   img(src="/data/uploads/event_files/" + refurl + "/thumbnails/" + title)
+                        //                                                                else
+                        //                                                                    img(src=val.thumbnail)
+                        //
+                        //                                                            span.mdc-list-item__text
+                        //                                                                span.mdc-list-item__primary-text
+                        //                                                                    a.download-button(href="/api/v1/eventmod/"+ refurl + "/files/" + title, download)= title
+                        //                                                                span.mdc-list-item__secondary-text= filetype + " | " + size
+                        //                                                        li.mdc-list-divider.mdc-list-divider--inset-padding(role="separator")
 

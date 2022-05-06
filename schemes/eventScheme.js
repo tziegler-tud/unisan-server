@@ -213,24 +213,25 @@ EventSchema.virtual('title.html').get(function() {
 
 EventSchema.virtual('type.index').get(function() {
     let type = this.type.value;
-    let index = 3;
+    let index = 0;
     switch(type) {
-        case "Seminar":
-            index = 0;
-            break;
         case "Ausbildungsabend":
             index = 1;
             break;
-        case "Sanitätswachdienst":
+        case "Seminar":
             index = 2;
+            break;
+        case "Sanitätswachdienst":
+            index = 3;
             break;
         default:
         case "Anderes":
-            index = 3;
+            index = 0;
             break;
     }
     return index;
 });
+
 
 FileReference.virtual('thumbnail').get(function(){
     let filetype = this.filetype;

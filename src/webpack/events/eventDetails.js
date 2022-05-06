@@ -21,6 +21,8 @@ import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
+import {EditableTextField} from "../helpers/editableTextField";
+import {EditableInputField} from "../helpers/editableInputField";
 
 import * as FilePond from "filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
@@ -97,6 +99,10 @@ let eventDetails = {
         var sidebar = new Sidebar('wrapper', {title: "Test"});
         sidebar.addPlugin(eventPlugin);
 
+        let pageContainer = document.getElementById("eventPage-component-container");
+        var eventPage = new EventPage(pageContainer, {user: user, event: event});
+        window.eventPage = eventPage;
+
         buildPageCommon(self.pageData.user, self.pageData.event, args);
         if (args.edit) {
             buildPageEdit(self.pageData.user, self.pageData.event, args)
@@ -150,57 +156,18 @@ let eventDetails = {
         }
 
         function buildPageView(user, event, args) {
-            let page = new EventPage();
-            const fileList = new MDCList(document.querySelector(".eventinfo-material-list"));
-            const listItemRipples = fileList.listElements.map((listItemEl) => new MDCRipple(listItemEl));
 
-            $(".download-button").on("click", function(e){
-                e.preventDefault();
-            });
-
-            $(fileList.listElements).on("click", function(e){
-                e.stopPropagation();
-                e.preventDefault();
-                let url  = $(this).find(".download-button").first().attr('href');
-                window.open(url, '_self');
-            })
-
-            let callback = {
-                onConfirm: function(editableTextField){
-                    let delta = editableTextField.getQuill().getContents();
-                    eventActions.saveDelta(event.id, delta, {
-                        onSuccess: function(result){
-                            editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {readOnly: true})
-                        }
-                    })
-                }
-            };
-            let editableTextFieldContainer = document.getElementById("eventDescribtionEditor");
-            let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {readOnly: true});
-
-            let cb = {
-                onConfirm: function(editableInputField){
-                    let delta = editableInputField.getQuill().getContents();
-                    let key = "title.delta";
-                    eventActions.updateKey(event.id, key, delta, {
-                        onSuccess: function(result){
-                            editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {readOnly: true})
-                        }
-                    })
-                }
-            };
             let titleInputContainer = document.getElementById("eventtitle-input");
-            let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {readOnly: true});
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
 
-            //get event type
-            switch(event.type.raw){
-                case "eventTraining":
+            switch(event.type.index){
+                case 1:
                     buildTrainingPage();
                     break;
-                case "eventSeminar":
+                case 2:
                     buildSeminarPage();
                     break;
-                case "eventSan":
+                case 3:
                     buildSanPage();
                     break;
                 case undefined:
@@ -215,17 +182,21 @@ let eventDetails = {
             }
 
             function buildTrainingPage(){
-                page.addComponent(window.eventPage.componentTypes.DESCRIPTION);
-                page.addComponent(window.eventPage.componentTypes.DATE);
-                page.addComponent(window.eventPage.componentTypes.LOCATION);
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
             }
 
             function buildSeminarPage(){
-
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
             }
 
             function buildSanPage(){
-
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
             }
 
         }
@@ -255,53 +226,6 @@ let eventDetails = {
             const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
             lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
 
-            const fileList = new MDCList(document.querySelector(".eventinfo-material-list"));
-            const listItemRipples = fileList.listElements.map((listItemEl) => new MDCRipple(listItemEl));
-            // const dropdownOptions = list.listElements.forEach(listItemEl => new MDCMenu($(listItemEl).find('.mdc-menu')));
-            fileList.listElements.forEach(function(listItemEl){
-                var it = $(listItemEl).parent(".mdc-list-item-wrapper").find('.mdc-menu');
-                var menu;
-                $(it).each(function(index){
-                    menu = new MDCMenu(this);
-                    menu.open = false;
-                    listItemEl.menu = menu;
-                    $(listItemEl).click(function(e){
-                        this.menu.open = true;
-                    })
-                    $(menu.items).closest(".menu-entry-delete").on("click", function(e) {
-
-                        let uniqueId = this.dataset.id;
-                        eventActions.deleteFileFromStorage(event.id, uniqueId, {
-                            onSuccess: function(){
-                                $(listItemEl).parent(".mdc-list-item-wrapper").next(".mdc-list-divider").remove();
-                                listItemEl.remove();
-                            },
-                        })
-                    });
-                    $(menu.items).closest(".menu-entry-download").on("click", function(e) {
-                        let url  = $(this).find(".download-button").first().attr('href');
-                        window.open(url, '_self');
-                    });
-                })
-            });
-
-            let callback = {
-                onConfirm: function(editableTextField){
-                    let delta = editableTextField.getQuill().getText();
-                    let key = "description.longDesc.value";
-                    eventActions.updateKey(event.id, key, delta, {})
-                    delta = editableTextField.getQuill().getContents();
-                    eventActions.saveDelta(event.id, delta, {
-                        onSuccess: function(result){
-                            editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
-                        }
-                    })
-                }
-            };
-            let editableTextFieldContainer = document.getElementById("eventDescriptionEditor");
-            let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
-
-
             let cb = {
                 onConfirm: function(editableInputField){
                     let delta = editableInputField.getQuill().getText();
@@ -328,65 +252,80 @@ let eventDetails = {
             let titleInputContainer = document.getElementById("eventtitle-input");
             let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
 
-            $("#eventDateEditor").on("click", function(){
-                sidebar.addContent("editEventDate", {
-                    event: event,
-                    callback: {
-                        onConfirm: function(eventid, data){
-                            eventActions.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime }, {
-                                onSuccess: function(){
-                                    window.location.reload();
-                                },
-                                onError: function(error) {
-                                    sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
-                                }
-                            });
+            let eventDate = function(component){
+                $("#eventDateEditor").on("click", function(){
+                    sidebar.addContent("editEventDate", {
+                        event: event,
+                        callback: {
+                            onConfirm: function(eventid, data){
+                                eventActions.updateDate(event.id, {date: data.date, startTime: data.startTime, endTime: data.endTime }, {
+                                    onSuccess: function(){
+                                        window.location.reload();
+                                    },
+                                    onError: function(error) {
+                                        sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
+                                    }
+                                });
+                            },
                         },
-                    },
-                });
-                sidebar.show();
-            })
-            $("#eventLocationEditor").on("click", function(){
-                sidebar.addContent("editEventLocation", {
-                    event: event,
-                    callback: {
-                        onConfirm: function(eventid, data){
-                            eventActions.updateKey(event.id, "location", {value: data.location}, {
-                                onSuccess: function(){
-                                    window.location.reload();
-                                },
-                                onError: function(error) {
-                                    sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
-                                }
-                            });
+                    });
+                    sidebar.show();
+                })
+            }
+
+            let eventLocation = function(component) {
+                $("#eventLocationEditor").on("click", function(){
+                    sidebar.addContent("editEventLocation", {
+                        event: event,
+                        callback: {
+                            onConfirm: function(eventid, data){
+                                eventActions.updateKey(event.id, "location", {value: data.location}, {
+                                    onSuccess: function(){
+                                        window.location.reload();
+                                    },
+                                    onError: function(error) {
+                                        sidebar.addErrorMessage("Failed to save entry to database: " + error.msg, null, true, false)
+                                    }
+                                });
+                            },
                         },
-                    },
-                });
-                sidebar.show();
-            })
+                    });
+                    sidebar.show();
+                })
+            }
 
-            //initialize filepond
-            FilePond.setOptions(
-                {
-                    server: {
-                        url: '/api/v1/eventmod/' + event.id + "/uploadFile",
-                        load: '/load/',
-                        restore: '/load/',
-                        remove: (source, load, error) => {
-                            console.error("REMOVE")
-                        }
+            //get event type
+            switch(event.type.index){
+                case 1:
+                    buildTrainingPage();
+                    break;
+                case 2:
+                    buildSeminarPage();
+                    break;
+                case 3:
+                    buildSanPage();
+                    break;
+                case undefined:
+                default:
+            }
 
-                    },
-                });
-            FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginGetFile);
+            function buildTrainingPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+            }
 
-            const inputElement = document.querySelector('#materialUploadElement');
-            const pond = FilePond.create( inputElement , {
-                allowMultiple: true,
-                files: [],
-                credits: false,
-                imagePreviewMaxHeight: 100,
-            });
+            function buildSeminarPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+            }
+
+            function buildSanPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+            }
         }
     },
     updatePage: function(user, event, args){

@@ -1,3 +1,5 @@
+import "./event.scss";
+
 //load settings modules
 import {eventDetails} from "./eventDetails.js";
 import {eventParticipants} from "./eventParticipants.js";
