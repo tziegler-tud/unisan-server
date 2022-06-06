@@ -37,7 +37,10 @@ var eventActions = {
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(result) {
-                location.replace("/unisams/events")
+                if (result.id) {
+                    location.replace("/unisams/events/" + result.id)
+                }
+                else location.replace("/unisams/events");
             }
         });
     },

@@ -2,6 +2,12 @@ var lidlRTO = window.lidlRTO;
 var common = window.common;
 var actions = window.actions;
 
+import {ScrollableList} from "../scrollableList/scrollableList";
+
+import {Sidebar} from "../sidebar/sidebar";
+import {logPlugin} from "../sidebar/plugins/plugin-logs";
+
+
 let logs = {
     init: function() {
         $(document).ready(function () {
@@ -10,7 +16,8 @@ let logs = {
             console.log("loading js module: settings.logs");
 
             // window.DockerElement = new docker.Docker(window.dockerArgs);
-            var sidebar = new common.Sidebar('wrapper', {title: "Test"});
+            var sidebar = new Sidebar('wrapper', {title: "Test"});
+            sidebar.addPlugin(logPlugin);
 
             //get logs
             $.ajax({
@@ -42,7 +49,7 @@ let logs = {
                             }
                         }
                     }
-                    let scrollableList = new common.ScrollableList(container, "logDetails", result, args, callback)
+                    let scrollableList = new ScrollableList(container, "logDetails", result, args, callback)
                 }
             });
         });

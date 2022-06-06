@@ -21,6 +21,8 @@ import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
+import {EditableTextField} from "../helpers/editableTextField";
+import {EditableInputField} from "../helpers/editableInputField";
 
 import * as FilePond from "filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
@@ -32,31 +34,29 @@ import {MDCMenu} from "@material/menu";
 
 let eventDetails = {
     title: "eventDetails",
+    pageData: {},
     init: function (args) {
         let self = this;
         $(document).ready(function () {
             //debug line, remove before flight
             console.log("loading js module: " + self.title);
 
+            self.pageData = {};
             var lidlRTO = window.lidlRTO;
             var user;
-            var profile = new window.profile.Profile(window.userId);
+            var userProfile = new window.profile.Profile(window.userId);
 
             // create new observer
-            var ob1 = new lidlObserver(function(u){
+            var ob1 = new lidlObserver(function (u) {
                 user = u;
+                self.pageData.user = user;
+                self.updatePage(self.pageData.user, self.pageData.event, args)
             });
             window.snackbar = new Snackbar();
 
             // get user data from user service
             //subscribe as observer to get notification if user changes on server
-            profile.getUserAndSubscribe(ob1)
-                .then(function(user){
-                    notifyPage({user:user})
-                })
-                .catch(function(reason){
-                    console.error("Failed to retrieve user data:" + reason)
-                });
+            let userPromise = userProfile.getUserAndSubscribe(ob1)
 
             var currentExploredEvent;
             var eventProfile = new EventRequest(window.exploreEventId, {
@@ -64,265 +64,195 @@ let eventDetails = {
             });
 
             // create new observer
-            var ob2 = new lidlObserver(function(event){
+            var ob2 = new lidlObserver(function (event) {
                 currentExploredEvent = event;
-                notifyPage({event:event})
+                self.pageData.event = event;
+                self.updatePage(self.pageData.user, self.pageData.event, args)
             });
+
+            window.eventProfile = eventProfile;
+            window.userProfile = userProfile;
 
             // get user data from user service
             //subscribe as observer to get notification if user changes on server
-            eventProfile.getEventAndSubscribe(ob2)
-                .then(function(event){
-                    notifyPage({event: event})
+            let eventPromise = eventProfile.getEventAndSubscribe(ob2);
+
+            Promise.all([eventPromise, userPromise])
+                .then(results => {
+                    let event = results[0];
+                    let user = results[1];
+                    self.pageData = {
+                        event: event,
+                        user: user,
+                    };
+
+                    self.buildPage(self.pageData.user, self.pageData.event, args);
                 })
-                .catch(function(reason){
-                    console.error("Failed to retrieve event data:" + reason)
-                });
+                .catch(function (reason) {
+                    console.error("Failed to retrieve data:" + reason)
+                })
+        })
+    },
+    buildPage: function(user, event, args){
+        let self = this;
+        var lidlRTO = window.lidlRTO;
+        var sidebar = new Sidebar('wrapper', {title: "Test"});
+        sidebar.addPlugin(eventPlugin);
 
-            var sidebar = new Sidebar('wrapper', "test");
-            sidebar.addPlugin(eventPlugin);
+        let pageContainer = document.getElementById("eventPage-component-container");
+        var eventPage = new EventPage(pageContainer, {user: user, event: event});
+        window.eventPage = eventPage;
 
-            let pageData = {};
-            function notifyPage(obj) {
-                Object.assign(pageData, obj);
-                if(pageData.user && pageData.event) {
+        buildPageCommon(self.pageData.user, self.pageData.event, args);
+        if (args.edit) {
+            buildPageEdit(self.pageData.user, self.pageData.event, args)
+        }
+        else buildPageView(self.pageData.user, self.pageData.event, args)
 
+        function buildPageCommon(user, event, args) {
+            // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
+            window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
 
-                    buildPageCommon(pageData.user, pageData.event, args);
-                    if (args.edit) {
-                        buildPageEdit(pageData.user, pageData.event, args)
-                    }
-                    else buildPageView(pageData.user, pageData.event, args)
-                }
-            }
-
-            function buildPageCommon(user, event, args) {
-                // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
-                window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
-
-                // init event sidebar
-                //find if current user is already registered
-                let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                sidebar.addContent("eventParticipants", {
-                    event: event,
-                    user: user,
-                    isParticipant: userIsParticipant,
-                    callback: {
-                        onConfirm: function(){
-                            eventActions.addParticipant(event.id, user.id, function(event) {
-                                eventProfile.refreshEvent()
-                                    .then(event => {
-                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                        sidebar.update({event: event, isParticipant: userIsParticipant})
-                                    })
-                                    .catch(err => {
-                                    })
+            // init event sidebar
+            //find if current user is already registered
+            let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+            sidebar.addContent("eventParticipants", {
+                event: event,
+                user: user,
+                isParticipant: userIsParticipant,
+                callback: {
+                    onConfirm: function(){
+                        eventActions.addParticipant(event.id, user.id, function(event) {
+                            window.eventProfile.refreshEvent()
+                                .then(event => {
+                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    sidebar.update({event: event, isParticipant: userIsParticipant})
                                 })
-                        },
-                        onDelete: function(){
-                            eventActions.removeParticipant(event.id, user.id, function(){
-                                eventProfile.refreshEvent()
-                                    .then(event => {
-                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                        sidebar.update({event: event, isParticipant: userIsParticipant})
-                                    })
-                                    .catch(err => {
-                                    })
-                            })
-                        }
+                                .catch(err => {
+                                })
+                        })
                     },
-                });
-                if(phone.matches || tablet.matches) {
-                    sidebar.hide();
-                }
-                else {
-                    sidebar.show();
-                }
-
-
-            }
-
-            function buildPageView(user, event, args) {
-                let page = new EventPage();
-
-
-                const fileList = new MDCList(document.querySelector(".eventinfo-material-list"));
-                const listItemRipples = fileList.listElements.map((listItemEl) => new MDCRipple(listItemEl));
-
-                $(".download-button").on("click", function(e){
-                    e.preventDefault();
-                });
-
-                $(fileList.listElements).on("click", function(e){
-                    e.stopPropagation();
-                    e.preventDefault();
-                    let url  = $(this).find(".download-button").first().attr('href');
-                    window.open(url, '_self');
-                })
-
-                let callback = {
-                    onConfirm: function(editableTextField){
-                        let delta = editableTextField.getQuill().getContents();
-                        eventActions.saveDelta(event.id, delta, {
-                            onSuccess: function(result){
-                                editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {readOnly: true})
-                            }
+                    onDelete: function(){
+                        eventActions.removeParticipant(event.id, user.id, function(){
+                            window.eventProfile.refreshEvent()
+                                .then(event => {
+                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    sidebar.update({event: event, isParticipant: userIsParticipant})
+                                })
+                                .catch(err => {
+                                })
                         })
                     }
-                };
-                let editableTextFieldContainer = document.getElementById("eventDescribtionEditor");
-                let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {readOnly: true});
-
-                let cb = {
-                    onConfirm: function(editableInputField){
-                        let delta = editableInputField.getQuill().getContents();
-                        let key = "title.delta";
-                        eventActions.updateKey(event.id, key, delta, {
-                            onSuccess: function(result){
-                                editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {readOnly: true})
-                            }
-                        })
-                    }
-                };
-                let titleInputContainer = document.getElementById("eventtitle-input");
-                let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {readOnly: true});
-
-                //get event type
-                switch(event.type.raw){
-                    case "eventTraining":
-                        buildTrainingPage();
-                        break;
-                    case "eventSeminar":
-                        buildSeminarPage();
-                        break;
-                    case "eventSan":
-                        buildSanPage();
-                        break;
-                    case undefined:
-                    default:
-                }
-
-                if(phone.matches || tablet.matches) {
-                    sidebar.hide();
-                }
-                else {
-                    sidebar.show();
-                }
-
-                function buildTrainingPage(){
-                    page.addComponent(window.eventPage.componentTypes.DESCRIPTION);
-                    page.addComponent(window.eventPage.componentTypes.DATE);
-                    page.addComponent(window.eventPage.componentTypes.LOCATION);
-                }
-
-                function buildSeminarPage(){
-
-                }
-
-                function buildSanPage(){
-
-                }
-
+                },
+            });
+            if(phone.matches || tablet.matches) {
+                sidebar.hide();
+            }
+            else {
+                sidebar.show();
             }
 
-            function buildPageEdit(user, event, args) {
-                const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
-                // var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+        }
 
-                const deleteContent = {
-                    title: "Event löschen",
-                    message: "Dieser Vorgang kann nicht rückgängig gemacht werden. Fortfahren?",
-                    titleArg: "",
-                    messageArg: ""
-                };
+        function buildPageView(user, event, args) {
 
-                var deleteArgs = {
-                    eventid: event.id,
-                    callback: {
-                        onConfirm: function () {
-                            eventActions.deleteEvent(event.id)
+            let titleInputContainer = document.getElementById("eventtitle-input");
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+
+            switch(event.type.index){
+                case 1:
+                    buildTrainingPage();
+                    break;
+                case 2:
+                    buildSeminarPage();
+                    break;
+                case 3:
+                    buildSanPage();
+                    break;
+                case undefined:
+                default:
+            }
+
+            if(phone.matches || tablet.matches) {
+                sidebar.hide();
+            }
+            else {
+                sidebar.show();
+            }
+
+            function buildTrainingPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
+            }
+
+            function buildSeminarPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
+            }
+
+            function buildSanPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
+            }
+
+        }
+
+        function buildPageEdit(user, event, args) {
+            const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
+
+            // var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+
+            const deleteContent = {
+                title: "Event löschen",
+                message: "Dieser Vorgang kann nicht rückgängig gemacht werden. Fortfahren?",
+                titleArg: "",
+                messageArg: ""
+            };
+
+            var deleteArgs = {
+                eventid: event.id,
+                callback: {
+                    onConfirm: function () {
+                        eventActions.deleteEvent(event.id)
+                    }
+                }
+            };
+
+            var token = lidlRTO.objectManager.createNewObjectToken();
+            const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
+            lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
+
+            let cb = {
+                onConfirm: function(editableInputField){
+                    let delta = editableInputField.getQuill().getText();
+                    let key = "title.value";
+                    eventActions.updateKey(event.id, key, delta, {})
+                    delta = editableInputField.getQuill().getContents();
+                    key = "title.delta";
+                    eventActions.updateKey(event.id, key, delta, {
+                        onSuccess: function(result){
+                            editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
+                            //update docker nav
+                            window.eventProfile.refreshEvent()
+                                .then(function(ev){
+                                    event = ev;
+                                    window.DockerElement.subpageHandler.update(eventDockerPageId, "event", event)
+                                })
+                                .catch(function(err){
+                                    throw new Error(err)
+                                });
                         }
-                    }
-                };
-
-                var token = lidlRTO.objectManager.createNewObjectToken();
-                const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
-                lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
-
-                const fileList = new MDCList(document.querySelector(".eventinfo-material-list"));
-                const listItemRipples = fileList.listElements.map((listItemEl) => new MDCRipple(listItemEl));
-                // const dropdownOptions = list.listElements.forEach(listItemEl => new MDCMenu($(listItemEl).find('.mdc-menu')));
-                fileList.listElements.forEach(function(listItemEl){
-                    var it = $(listItemEl).parent(".mdc-list-item-wrapper").find('.mdc-menu');
-                    var menu;
-                    $(it).each(function(index){
-                        menu = new MDCMenu(this);
-                        menu.open = false;
-                        listItemEl.menu = menu;
-                        $(listItemEl).click(function(e){
-                            this.menu.open = true;
-                        })
-                        $(menu.items).closest(".menu-entry-delete").on("click", function(e) {
-
-                            let uniqueId = this.dataset.id;
-                            eventActions.deleteFileFromStorage(event.id, uniqueId, {
-                                onSuccess: function(){
-                                    $(listItemEl).parent(".mdc-list-item-wrapper").next(".mdc-list-divider").remove();
-                                    listItemEl.remove();
-                                },
-                            })
-                        });
-                        $(menu.items).closest(".menu-entry-download").on("click", function(e) {
-                            let url  = $(this).find(".download-button").first().attr('href');
-                            window.open(url, '_self');
-                        });
                     })
-                });
+                }
+            };
+            let titleInputContainer = document.getElementById("eventtitle-input");
+            let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
 
-                let callback = {
-                    onConfirm: function(editableTextField){
-                        let delta = editableTextField.getQuill().getText();
-                        let key = "description.longDesc.value";
-                        eventActions.updateKey(event.id, key, delta, {})
-                        delta = editableTextField.getQuill().getContents();
-                        eventActions.saveDelta(event.id, delta, {
-                            onSuccess: function(result){
-                                editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
-                            }
-                        })
-                    }
-                };
-                let editableTextFieldContainer = document.getElementById("eventDescriptionEditor");
-                let editableTextField = new common.EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {});
-
-
-                let cb = {
-                    onConfirm: function(editableInputField){
-                        let delta = editableInputField.getQuill().getText();
-                        let key = "title.value";
-                        eventActions.updateKey(event.id, key, delta, {})
-                        delta = editableInputField.getQuill().getContents();
-                        key = "title.delta";
-                        eventActions.updateKey(event.id, key, delta, {
-                            onSuccess: function(result){
-                                editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
-                                //update docker nav
-                                eventProfile.refreshEvent()
-                                    .then(function(ev){
-                                        event = ev;
-                                        window.DockerElement.subpageHandler.update(eventDockerPageId, "event", event)
-                                    })
-                                    .catch(function(err){
-                                        throw new Error(err)
-                                    });
-                            }
-                        })
-                    }
-                };
-                let titleInputContainer = document.getElementById("eventtitle-input");
-                let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
-
+            let eventDate = function(component){
                 $("#eventDateEditor").on("click", function(){
                     sidebar.addContent("editEventDate", {
                         event: event,
@@ -341,6 +271,9 @@ let eventDetails = {
                     });
                     sidebar.show();
                 })
+            }
+
+            let eventLocation = function(component) {
                 $("#eventLocationEditor").on("click", function(){
                     sidebar.addContent("editEventLocation", {
                         event: event,
@@ -359,31 +292,44 @@ let eventDetails = {
                     });
                     sidebar.show();
                 })
-
-                //initialize filepond
-                FilePond.setOptions(
-                    {
-                        server: {
-                            url: '/api/v1/eventmod/' + event.id + "/uploadFile",
-                            load: '/load/',
-                            restore: '/load/',
-                            remove: (source, load, error) => {
-                                console.error("REMOVE")
-                            }
-
-                        },
-                    });
-                FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginGetFile);
-
-                const inputElement = document.querySelector('#materialUploadElement');
-                const pond = FilePond.create( inputElement , {
-                    allowMultiple: true,
-                    files: [],
-                    credits: false,
-                    imagePreviewMaxHeight: 100,
-                });
             }
-        })
+
+            //get event type
+            switch(event.type.index){
+                case 1:
+                    buildTrainingPage();
+                    break;
+                case 2:
+                    buildSeminarPage();
+                    break;
+                case 3:
+                    buildSanPage();
+                    break;
+                case undefined:
+                default:
+            }
+
+            function buildTrainingPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+            }
+
+            function buildSeminarPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+            }
+
+            function buildSanPage(){
+                eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+                eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+            }
+        }
+    },
+    updatePage: function(user, event, args){
+        this.buildPage(user, event, args)
     }
 };
 
