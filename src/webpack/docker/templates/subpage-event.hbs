@@ -14,6 +14,7 @@
                     <div class="clear"></div>
                 </a>
             </div>
+            {{#ifEquals exploredEvent.type.index 1}}
             <div class="docker-element docker-subElement" id="eventParticipants"><a href="/unisams/events/view/{{exploredEvent.id}}/participants">
                 <svg class="feather feather-calendar" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -26,6 +27,35 @@
                 <span class="docker-element-label">Teilnehmende</span>
                 <div class="clear"></div>
             </a></div>
+            {{/ifEquals}}
+            {{#ifEquals exploredEvent.type.index 2}}
+                <div class="docker-element docker-subElement" id="eventPostings"><a href="/unisams/events/view/{{exploredEvent.id}}/postings">
+                    <svg class="feather feather-calendar" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="docker-element-label">Dozenten</span>
+                    <div class="clear"></div>
+                </a></div>
+            {{/ifEquals}}
+            {{#ifEquals exploredEvent.type.index 3}}
+                <div class="docker-element docker-subElement" id="eventPostings"><a href="/unisams/events/view/{{exploredEvent.id}}/postings">
+                    <svg class="feather feather-calendar" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="docker-element-label">Dienstplan</span>
+                    <div class="clear"></div>
+                </a></div>
+            {{/ifEquals}}
             {{#if docker.currentEvent.edit}}
             <div class="docker-element docker-subElement" id="eventSettings"><a href="/unisams/events/edit/{{exploredEvent.id}}/settings">
                 <svg class="feather feather-settings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"

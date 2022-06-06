@@ -56,7 +56,7 @@ let eventLogs = {
                 // window.DockerElement = new docker.Docker(window.dockerArgs);
                 window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
 
-                const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
+                // const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
                 var sidebar = new Sidebar('wrapper', {title: "Test"});
                 sidebar.addPlugin(eventPlugin);

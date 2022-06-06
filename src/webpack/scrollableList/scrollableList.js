@@ -39,7 +39,8 @@ var ScrollableList = function(container,type, data,  args, callback){
     container.classList.add("scrollableList");
     this.args = args;
     this.data = data;
-    this.initialData = jQuery.extend(true, {}, data);
+    // this.initialData = jQuery.extend(true, {}, data);
+    this.initialData = data;
     this.callback = callback;
     this.container = container;
     this.type = type;
