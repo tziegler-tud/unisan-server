@@ -94,6 +94,58 @@ var EventSchema = new Schema({
 
         },
     },
+    hasPostings: {
+        type: Boolean,
+        default: false,
+    },
+    postings: [
+        {
+            requiredQualifications: [{
+                qualType: {
+                    type: String,
+                    required: true
+                },
+                name: {
+                    type: String,
+                    required: true
+                },
+            }],
+            description: {
+                type: String,
+            },
+            order: {
+                type: String,
+                default: "auto",
+            },
+            enabled: {
+                type: Boolean,
+                default: true,
+            },
+            assigned: {
+                isAssigned: {
+                    type: Boolean,
+                    default: false,
+                },
+                user: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'User',
+                    default: undefined,
+                },
+                qualification: {
+                    qualType: {
+                        type: String,
+                    },
+                    name: {
+                        type: String,
+                    },
+                },
+                date: {
+                    type: Date,
+                    default: Date.now,
+                }
+            },
+        }
+    ],
     participants: [
         {
             user: {

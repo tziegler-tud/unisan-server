@@ -1,4 +1,4 @@
-import "./eventParticipants.scss";
+import "./eventPostings.scss";
 
 
 var lidlRTO = window.lidlRTO;
@@ -23,8 +23,8 @@ import {EventPage} from "./eventPage";
 import {phone, tablet} from "../helpers/variables";
 
 
-let eventParticipants = {
-    title: "eventParticipants",
+let eventPostings = {
+    title: "eventPostings",
     init: function (args) {
         let self = this;
         $(document).ready(function () {
@@ -35,6 +35,8 @@ let eventParticipants = {
             var currentExploredEvent;
             var eventProfile = new EventRequest(window.exploreEventId, {
                 populateParticipants: true,
+                populatePostings: true,
+
             });
 
             // create new observer
@@ -64,50 +66,23 @@ let eventParticipants = {
                 // init event sidebar
                 //find if current user is already registered
                 let userIsParticipant = eventProfile.checkIfUserIsRegistered(window.user);
-                sidebar.addContent("eventParticipants", {
+                sidebar.addContent("eventPostings", {
                     event: event,
                     user: window.user,
                     isParticipant: userIsParticipant,
                     callback: {
                         onConfirm: function(){
-                            eventActions.addParticipant(event.id, window.user.id, function(){
-                                eventProfile.refreshEvent()
-                                    .then(event => {
-                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                        sidebar.update({event: event, isParticipant: userIsParticipant});
-                                        self.userlist = event.participants;
-                                        displayParticipantsList(self.userlist);
-                                        self.searchbar.hide();
-                                    })
-                                    .catch(err => {
-                                    })
-                            })
+
                         },
                         onDelete: function(){
-                            eventActions.removeParticipant(event.id, window.user.id, function(){
-                                eventProfile.refreshEvent()
-                                    .then(event => {
-                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                        sidebar.update({event: event, isParticipant: userIsParticipant});
-                                        self.userlist = event.participants;
-                                        displayParticipantsList(self.userlist);
-                                        self.searchbar.hide();
-                                    })
-                                    .catch(err => {
-                                    })
-                            })
+
                         }
                     },
                 });
                 sidebar.show();
-                let rolesMap = {
-                    "participant": 0,
-                    "lecturer": 1,
-                    "admin": 2,
-                }
                 //display all users initially
-                self.userlist = event.participants;
-                self.scrollableList = displayParticipantsList(self.userlist);
+                self.userlist = event.postings;
+                self.scrollableList = displayPostingsList(self.userlist);
 
                 let titleInputContainer = document.getElementById("eventtitle-input");
                 let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
@@ -129,13 +104,13 @@ let eventParticipants = {
                 $('.add-participant-button').each(function(){
                     $(this).on("click", function(e){
                         e.preventDefault();
-                        sidebar.addContent("addEventParticipant", {
+                        sidebar.addContent("addEventPosting", {
                             event: event,
                             user: window.user,
                             isParticipant: userIsParticipant,
                             callback: {
                                 onConfirm: function(data){
-                                    eventActions.addParticipant(event.id, data.userid, function(event){
+                                    eventActions.addPosting(event.id, data.posting, function(event){
                                         eventProfile.refreshEvent()
                                             .then(event => {
                                                 userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
@@ -155,34 +130,11 @@ let eventParticipants = {
                 });
 
 
-                function displayParticipantsList(userlist) {
+                function displayPostingsList(userlist) {
 
                     let sortedList = userlist.sort(function(a,b){
-                        return (rolesMap[b.role] - rolesMap[a.role]);
+                        return (a-b);
                     })
-
-                    let roleSelect = function(){
-                        $('.participant-role-select').each(function(){
-                            //display current role
-
-                            $(this).on("change", function(e){
-                                //push changes to server
-                                let userId = e.target.dataset.userid;
-                                let role = e.target.value;
-                                console.log("changed role for uid: " + userId + " to " + role);
-                                eventActions.changeParticipant(event.id, userId, role, function(){
-                                    eventProfile.refreshEvent()
-                                        .then(event => {
-                                            userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                            sidebar.update({event: event, isParticipant: userIsParticipant});
-                                        })
-                                        .catch(err => {
-                                        })
-                                })
-                            })
-
-                        });
-                    }
 
                     let dropdownMenus = function(){
                         $('.participant-menu-container').each(function(){
@@ -190,19 +142,17 @@ let eventParticipants = {
                             let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
                         });
                     }
-                    let deleteParticipant = function(){
-                        $('.participant-delete').each(function(){
+                    let deletePosting = function(){
+                        $('.posting-delete').each(function(){
                             $(this).on("click", function(e){
                                 //push changes to server
                                 e.preventDefault();
-                                let userId = e.target.dataset.userid;
-                                eventActions.removeParticipant(event.id, userId, function(){
+                                let postingId = e.target.dataset.postingid;
+                                eventActions.removePosting(event.id, postingId, function(){
                                     eventProfile.refreshEvent()
                                         .then(event => {
-                                            userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                            sidebar.update({event: event, isParticipant: userIsParticipant});
-                                            self.userlist = event.participants;
-                                            displayParticipantsList(self.userlist);
+                                            self.userlist = event.postings;
+                                            displayPostingsList(self.userlist);
                                             self.searchbar.hide();
                                         })
                                         .catch(err => {
@@ -222,6 +172,30 @@ let eventParticipants = {
                         });
                     }
 
+                    let postDetails = function(){
+                        $('.posting-details').each(function(){
+                            $(this).on("click", function(e){
+                                //push changes to server
+                                e.preventDefault();
+                                sidebar.addContent("showPostingDetails", {
+                                    event: event,
+                                    posting: e.target.dataset.postingid,
+                                })
+                            })
+                        });
+                    }
+
+                    let unassignPost = function(){
+                        $('.posting-unassign').each(function(){
+                            $(this).on("click", function(e){
+                                //push changes to server
+                                e.preventDefault();
+                                eventActions.unassignPost(event.id, e.target.dataset.postingid, e.target.dataset.userid, function(){
+                                })
+                            })
+                        });
+                    }
+
                     let scrollArgs = {
                         height: "full",
                         // fixedHeight: "500px",
@@ -232,11 +206,11 @@ let eventParticipants = {
                         allowEdit: args.allowEdit,
                     }
                     let callback = {
-                        customHandlers: [deleteParticipant, roleSelect, dropdownMenus, showParticipant]
+                        customHandlers: [deletePosting, dropdownMenus, showParticipant, postDetails, unassignPost]
                     }
 
                     let listContainer = document.getElementById("userlist-container--participants")
-                    let scrollableList = new ScrollableList(listContainer, "participants", sortedList, scrollArgs, callback)
+                    let scrollableList = new ScrollableList(listContainer, "postings", sortedList, scrollArgs, callback)
 
                     return scrollableList;
                 }
@@ -247,4 +221,4 @@ let eventParticipants = {
     }
 };
 
-export {eventParticipants}
+export {eventPostings}

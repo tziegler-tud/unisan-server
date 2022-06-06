@@ -27,6 +27,11 @@ module.exports = {
     populateParticipants,
     addParticipant,
     removeParticipant,
+    enablePostings,
+    addPosting,
+    removePosting,
+    assignPost,
+    unassignPost,
     delete: _delete,
 
     addFileReference,
@@ -473,6 +478,9 @@ async function updateKey(req, id, key, value, eventParams) {
 async function populateParticipants(id) {
     let event = Event.findById(id).populate({
         path: 'participants.user',
+        select: 'generalData username',
+    }).populate({
+        path: 'postings.assigned.user',
         select: 'generalData username',
     });
     return event;
@@ -933,4 +941,289 @@ async function addEventAdmin(req, event, user, operationsArray) {
 
 async function removeEventAdmin(req, event, user) {
     return UserService.removeIndividualEventAccess(req, user.id, event.id)
+}
+
+/**
+ * @typedef {Object} Qualification
+ * @property {String} qualType
+ * @property {String} name
+ */
+
+/**
+ *
+ * @param req
+ * @param eventId
+ * @param value {Boolean} [true] - true to enable, false to disable
+ * @returns {Promise<void>}
+ */
+async function enablePostings(req, eventId, value){
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error('Event not found');
+    if(value === undefined) value = true;
+
+    event.hasPostings = value;
+    return event.save();
+}
+
+/**
+ *
+ * @param req
+ * @param eventId {String} event id
+ * @param posting {Object} posting Object
+ * @param posting.requiredQualifications {Qualification[]} array of qualification objects
+ * @param posting.assigned {Object} holds information on assigned user
+ * @param posting.assigned.isAssigned {Boolean} true if the posting has an assigned user
+ * @param posting.assigned.user {String} user id of assigned user. requires isAssigned to be set in order to take effect.
+ * @param posting.assigned.qualification {Object} qualification associated with assigned user. requires isAssigned to be set in order to take effect.
+ * @param posting.enabled {Boolean} true if the posting is enabled, i.e. user can register for this post
+ * @returns {Promise<void>}
+ */
+async function addPosting (req, eventId, posting, args) {
+
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error('Event not found');
+    let defaults = {
+        isAssigned: false,
+        enabled: true,
+        userId: undefined,
+        order: (event.postings.length + 1),
+    };
+
+    posting = Object.assign(defaults, posting);
+
+    let post = {
+        requiredQualifications: posting.requiredQualifications,
+        assigned: {
+            isAssigned: false,
+        },
+        enabled: posting.enabled,
+        order: posting.order,
+    };
+
+    if (posting.assigned.isAssigned) {
+        const user = await User.findById(posting.assigned.user);
+        if (user) {
+            post.assigned.isAssigned = true;
+            post.assigned.user = posting.assigned.user;
+            post.assigned.qualification = posting.assigned.qualification;
+
+            //add user to participants as well
+            addParticipant(req, eventId, post.assigned.user, {})
+        }
+        else {
+            console.warn("parameter error: assigned user not found. creating unassigned posting...");
+        }
+    }
+
+    event.postings.push(post);
+    return new Promise(function(resolve, reject){
+        event.save()
+            .then(result => {
+                resolve();
+
+
+            })
+            .catch(err => {
+                reject(err);
+            })
+    });
+
+}
+
+async function removePosting (req, eventId, postingId) {
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error('Event not found');
+
+    //find posting
+    let index = event.postings.findIndex(obj => obj.id = postingId);
+    return new Promise(function(resolve, reject){
+        if(index > -1) {
+            //found it!
+            event.postings.splice(index, 1);
+            event.save()
+                .then(result => {
+                    resolve();
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "event",
+                            actionType: "modify",
+                            actionDetail: "eventRemovePost",
+                            key: postingId,
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "event",
+                            targetObject: event._id,
+                            targetObjectId: event._id,
+                            targetModel: "Event",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    LogService.create(log).then().catch();
+                })
+        }
+        else {
+            //posting not found :(
+            reject()
+        }
+    });
+}
+
+/**
+ *
+ * @param req {Object} req object
+ * @param eventId {String} event id
+ * @param postingId {String} id of posting
+ * @param userId {String} id of user to be assigned to this post
+ * @param qualification {Object} Qualification object to associate with assigned user. Must match required qualifications.
+ * @param args {Object} [false] true to overwrite if posting already has assigned user
+ * @returns {Promise<unknown>}
+ */
+async function assignPost (req, eventId, postingId, userId, qualification, args) {
+    //assigns a user to an empty post
+    let errMsg = "Failed to assign user to post: "
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error(errMsg + 'Event not found');
+
+    const user = await User.findById(userId);
+    if(!user) throw new Error(errMsg + "User not found.");
+
+    if (args === undefined) args = {};
+    let defaultArgs = {
+        overwrite: false,
+    }
+
+    args = Object.assign(defaultArgs, args)
+
+    let post = {
+        requiredQualifications: posting.requiredQualifications,
+        isAssigned: posting.assigned.isAssigned,
+        enabled: posting.enabled,
+    };
+
+    //find posting
+    let index = event.postings.findIndex(obj => obj.id = postingId);
+    return new Promise(function(resolve, reject){
+        if(index > -1) {
+            //found it!
+            let post = event.postings[index];
+            //check if taken
+            if(post.assigned.isAssigned) {
+                //already taken. overwrite?
+                console.log("Post has already an user assigned. Checking for overwrite...");
+                if(args.overwrite) {
+                    console.log("overwriting assignment...")
+                    post.assigned.user = user.id;
+                }
+                else reject();
+
+            }
+            else {
+                post.assigned.user = user.id;
+                post.assigned.isAssigned = true;
+            }
+            console.log("user "+ user.username + "assigned to post.")
+            event.save()
+                .then(result => {
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "event",
+                            actionType: "modify",
+                            actionDetail: "eventAssignPost",
+                            key: user.username,
+                            value: qualification.name,
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "event",
+                            targetObject: event._id,
+                            targetObjectId: event._id,
+                            targetModel: "Event",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    resolve();
+                })
+        }
+        else {
+            //posting not found :(
+            reject()
+        }
+    });
+}
+
+async function unassignPost (req, eventId, userId, postingId) {
+//assigns a user to an empty post
+    let errMsg = "Failed to unassign user from post: "
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error(errMsg + 'Event not found');
+
+    //find posting
+    let index = event.postings.findIndex(obj => obj.id = postingId);
+    return new Promise(function(resolve, reject){
+        if(index > -1) {
+            //found it!
+            let post = event.postings[index];
+            //check if taken
+            if(post.assigned.isAssigned) {
+                //found it!
+                //check if expected user matches
+                if (post.assigned.user !== userId){
+                    console.warn(errMsg + "User does not match!");
+                    reject();
+                }
+                //all good, lets go
+                post.assigned.user = undefined;
+                post.assigned.isAssigned = false;
+            }
+            else {
+                if(post.assigned.user !== undefined) {
+                    post.assigned.user = undefined;
+                }
+                else {
+                    console.warn(errMsg + "No assigned user found.")
+                    reject();
+                }
+            }
+            console.log("user "+ user.username + "unassigned from post.")
+            event.save()
+                .then(result => {
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "event",
+                            actionType: "modify",
+                            actionDetail: "eventUnassignPost",
+                            key: user.username,
+                            value: qualification.name,
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "event",
+                            targetObject: event._id,
+                            targetObjectId: event._id,
+                            targetModel: "Event",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    resolve();
+                })
+        }
+        else {
+            //posting not found :(
+            console.warn(errMsg + "Post not found.")
+            reject()
+        }
+    });
 }

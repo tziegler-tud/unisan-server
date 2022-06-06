@@ -130,7 +130,93 @@ var eventActions = {
         });
     },
 
+    addPosting: function(eventId, postingData, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            id: eventId,
+            posting: postingData,
+            args: {},
+        };
+        return $.ajax({
+            url: "/api/v1/eventmod/addPost",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback(result);
+                // window.location.reload();
+            }
+        });
+    },
 
+    removePosting: function(eventId, postingId, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            id: eventId,
+            postingId: postingId,
+            args: {},
+        };
+        return $.ajax({
+            url: "/api/v1/eventmod/removePost",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback(result);
+                // window.location.reload();
+            }
+        });
+    },
+
+    assignPost: function(eventId, postingId, userId, qualification, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            id: eventId,
+            postingId: postingId,
+            userId: userId,
+            qualification: qualification,
+            args: {},
+        };
+        return $.ajax({
+            url: "/api/v1/eventmod/assignPost",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback(result);
+                // window.location.reload();
+            }
+        });
+    },
+
+    unassignPost: function(eventId, postingId, userId, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            id: eventId,
+            postingId: postingId,
+            userId: userId,
+            args: {},
+        };
+        return $.ajax({
+            url: "/api/v1/eventmod/unassignPost",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback(result);
+                // window.location.reload();
+            }
+        });
+
+    },
 
     saveDelta: function(id, delta, callback){
         if (callback === undefined) callback = {};

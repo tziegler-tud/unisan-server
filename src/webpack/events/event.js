@@ -1,6 +1,7 @@
 //load settings modules
 import {eventDetails} from "./eventDetails.js";
 import {eventParticipants} from "./eventParticipants.js";
+import {eventPostings} from "./eventPostings.js";
 import {eventLogs} from "./eventLogs.js";
 
 import {phone, tablet} from "../helpers/variables";
@@ -18,12 +19,17 @@ $(document).ready(function () {
         loader: eventParticipants,
     };
 
+    let postingsLoader = {
+        title: "eventPostings",
+        loader: eventPostings,
+    };
+
     let logsLoader = {
         title: "eventLogs",
         loader: eventLogs,
     };
 
-    loaders.push(detailsLoader, participantsLoader, logsLoader);
+    loaders.push(detailsLoader, participantsLoader, logsLoader, postingsLoader);
 
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;

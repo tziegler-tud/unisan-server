@@ -98,6 +98,9 @@ var applyType = function(type, self) {
         case "participants":
             url.list = '/webpack/scrollableList/templates/participantsList.hbs';
             break;
+        case "postings":
+            url.list = '/webpack/scrollableList/templates/postingsList.hbs';
+            break;
         case "event":
             url.mobile = '/webpack/scrollableList/templates/eventListMobile.hbs'
             url.list = '/webpack/scrollableList/templates/eventList.hbs'

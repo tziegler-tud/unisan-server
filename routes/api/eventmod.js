@@ -150,8 +150,16 @@ router.post('/:id/uploadImage', checkEventEditRights, upload.single('image'), fu
 //participant modification. this requires write access, unless the user modifies itself.
 router.post('/addParticipant', checkParticipantAccess, addParticipant);
 router.post('/removeParticipant', checkParticipantAccess, removeParticipant);
+router.post('/assignPost', checkParticipantAccess, assignPost);
+router.post('/unassignPost', checkParticipantAccess, unassignPost);
+
 // changing role requires editing rights
 router.post('/changeParticipant', checkEventEditRights, changeParticipant);
+//adding posts requiores editing rights
+router.post('/addPost', checkParticipantAccess, addPost);
+router.post('/removePost', checkParticipantAccess, removePost);
+
+
 
 
 //viewing. needs general url access
@@ -294,6 +302,49 @@ function removeParticipant(req, res, next) {
     };
     eventService.removeParticipant(req, req.body.id, req.body.userId, args)
         .then(() => res.json(req.body))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function addPost(req, res, next){
+    let args = {
+        overwrite: false
+    };
+
+    let posting = req.body.posting;
+    let id = req.body.id;
+    eventService.addPosting(req, id, posting, args)
+        .then(() => res.json())
+        .catch(err => {
+            next(err);
+        })
+}
+
+function removePost(req, res, next){
+    eventService.removePosting(req, req.body.id, req.body.postingId)
+        .then(() => res.json())
+        .catch(err => {
+            next(err);
+        })
+}
+
+function assignPost(req, res, next) {
+
+    let args = {
+        overwrite: false
+    };
+    eventService.assignPost(req, req.body.id, req.body.postingId, req.body.userId, req.body.qualification, args)
+        .then(() => res.json())
+        .catch(err => {
+            next(err);
+        })
+}
+
+function unassignPost(req, res, next) {
+
+    eventService.unassignPost(req, req.body.id, req.body.userId, req.body.postingId)
+        .then(() => res.json())
         .catch(err => {
             next(err);
         })

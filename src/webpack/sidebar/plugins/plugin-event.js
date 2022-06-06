@@ -18,8 +18,10 @@ let showEventParticipants = new ContentHandler("eventParticipants",
             sidebar.sidebarHTML.html(template(event));
             sidebar.registerBackButton( ".sidebar-back-btn");
             // find if current user is registered for event
-            let notRegistered = $("#sidebar-participate-button-notregistered");
-            let registered = $("#sidebar-participate-button-registered");
+            let notRegisteredSelector = "#sidebar-participate-button-notregistered"
+            let notRegistered = $(notRegisteredSelector);
+            let registeredSelector = "#sidebar-participate-button-registered";
+            let registered = $(registeredSelector);
             let target;
             if (args.isParticipant) {
                 notRegistered.addClass("hidden");
@@ -30,7 +32,7 @@ let showEventParticipants = new ContentHandler("eventParticipants",
                     }
                 })
             } else {
-                sidebar.registerButton(notRegistered, function () {
+                sidebar.registerButton(notRegisteredSelector, function () {
                     args.callback.onConfirm();
                 });
             }
@@ -253,6 +255,62 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
                     $("#sidebar-inner").before(data);
                 }, false, true);
             }
+            var l = document.getElementById("eventinp-location");
+
+            sidebar.registerBackButton(".sidebar-back-btn");
+            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton(".sidebar-confirm", function(){
+                let location = $(l).val();
+
+                let data = {
+                    location: location,
+                }
+                onConfirm(args.event, data, {});
+            }.bind(args));
+        })
+    })
+
+let addPosting = new ContentHandler("addEventPosting",
+    function(sidebar, args, type){
+        var onConfirm = args.callback.onConfirm;
+
+        let context = {};
+        context.event = args.event;
+        var corrupted = false;
+
+        $.get('/webpack/sidebar/templates/events/sidebar-addEventPosting.hbs', function (data) {
+
+            var template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+
+            var l = document.getElementById("eventinp-location");
+
+            sidebar.registerBackButton(".sidebar-back-btn");
+            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton(".sidebar-confirm", function(){
+                let location = $(l).val();
+
+                let data = {
+                    location: location,
+                }
+                onConfirm(args.event, data, {});
+            }.bind(args));
+        })
+    })
+
+let showPosting = new ContentHandler("addEventPosting",
+    function(sidebar, args, type){
+        var onConfirm = args.callback.onConfirm;
+
+        let context = {};
+        context.event = args.event;
+        var corrupted = false;
+
+        $.get('/webpack/sidebar/templates/events/sidebar-addEventPosting.hbs', function (data) {
+
+            var template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+
             var l = document.getElementById("eventinp-location");
 
             sidebar.registerBackButton(".sidebar-back-btn");
