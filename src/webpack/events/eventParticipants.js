@@ -10,6 +10,7 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
+import {EditableInputField} from "../helpers/editableInputField";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
@@ -89,6 +90,13 @@ let eventParticipants = {
         // window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
 
+        let pageContainer = document.getElementById("eventPage-component-container");
+        var eventPage = new EventPage(pageContainer, {user: user, event: event});
+        window.eventPage = eventPage;
+
+        let titleInputContainer = document.getElementById("eventtitle-input");
+        let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+
         const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
         const deleteContent = {
             title: "Event löschen",
@@ -112,81 +120,245 @@ let eventParticipants = {
 
         var sidebar = new Sidebar('wrapper', {title: "Test"});
         sidebar.addPlugin(eventPlugin);
-        // init event sidebar
-        //find if current user is already registered
+
         let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-        sidebar.addContent("eventParticipants", {
-            event: event,
-            user: user,
-            isParticipant: userIsParticipant,
-            callback: {
-                onConfirm: function(){
-                    eventActions.addParticipant(event.id, user.id, function(){
-                        window.eventProfile.refreshEvent()
-                            .then(event => {
-                                userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-                                sidebar.update({event: event, isParticipant: userIsParticipant});
-                                self.userlist = event.participants;
-                                displayParticipantsList(self.userlist);
-                                self.searchbar.hide();
-                            })
-                            .catch(err => {
-                            })
-                    })
-                },
-                onDelete: function(){
-                    eventActions.removeParticipant(event.id, user.id, function(){
-                        window.eventProfile.refreshEvent()
-                            .then(event => {
-                                userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-                                sidebar.update({event: event, isParticipant: userIsParticipant});
-                                self.userlist = event.participants;
-                                displayParticipantsList(self.userlist);
-                                self.searchbar.hide();
-                            })
-                            .catch(err => {
-                            })
-                    })
-                }
-            },
-        });
-        sidebar.show();
-        let rolesMap = {
-            "participant": 0,
-            "lecturer": 1,
-            "admin": 2,
+        // init event sidebar
+
+        switch(event.type.index){
+            case 1:
+                buildTrainingPage();
+                break;
+            case 2:
+                buildSeminarPage();
+                break;
+            case 3:
+                buildSanPage();
+                eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false})
+                break;
+            case undefined:
+            default:
         }
-        //display all users initially
-        self.userlist = event.participants;
-        self.scrollableList = displayParticipantsList(self.userlist);
 
-        let titleInputContainer = document.getElementById("eventtitle-input");
-        let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+        function buildTrainingPage(){
+            var rolesMap = {
+                "participant": 0,
+                "lecturer": 1,
+                "admin": 2,
+            }
+            //find if current user is already registered
 
-        //setup searchbar
-        let searchbar = document.getElementById("usersearch-participants");
-        self.searchbar = new Searchbar(searchbar, {
-            onInput: {
-                enabled: true,
-                callback: function(inputValue){
-                    let filteredList = self.userlist.filter(function(participant){
-                        return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
-                    })
-                    displayParticipantsList(filteredList);
-
+            sidebar.addContent("eventParticipants", {
+                event: event,
+                user: user,
+                isParticipant: userIsParticipant,
+                callback: {
+                    onConfirm: function(){
+                        eventActions.addParticipant(event.id, user.id, function(){
+                            window.eventProfile.refreshEvent()
+                                .then(event => {
+                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    sidebar.update({event: event, isParticipant: userIsParticipant});
+                                    self.userlist = event.participants;
+                                    displayParticipantsList(self.userlist);
+                                    self.searchbar.hide();
+                                })
+                                .catch(err => {
+                                })
+                        })
+                    },
+                    onDelete: function(){
+                        eventActions.removeParticipant(event.id, user.id, function(){
+                            window.eventProfile.refreshEvent()
+                                .then(event => {
+                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    sidebar.update({event: event, isParticipant: userIsParticipant});
+                                    self.userlist = event.participants;
+                                    displayParticipantsList(self.userlist);
+                                    self.searchbar.hide();
+                                })
+                                .catch(err => {
+                                })
+                        })
+                    }
                 },
-            },
-        });
-        $('.add-participant-button').each(function(){
-            $(this).on("click", function(e){
-                e.preventDefault();
-                sidebar.addContent("addEventParticipant", {
-                    event: event,
-                    user: user,
-                    isParticipant: userIsParticipant,
-                    callback: {
-                        onConfirm: function(data){
-                            eventActions.addParticipant(event.id, data.userid, function(event){
+            });
+            sidebar.show();
+
+            //display all users initially
+            self.userlist = event.participants;
+            self.scrollableList = displayParticipantsList(self.userlist);
+
+            //setup searchbar
+            let searchbar = document.getElementById("usersearch-participants");
+            self.searchbar = new Searchbar(searchbar, {
+                onInput: {
+                    enabled: true,
+                    callback: function(inputValue){
+                        let filteredList = self.userlist.filter(function(participant){
+                            return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
+                        })
+                        displayParticipantsList(filteredList);
+
+                    },
+                },
+            });
+            $('.add-participant-button').each(function(){
+                $(this).on("click", function(e){
+                    e.preventDefault();
+                    sidebar.addContent("addEventParticipant", {
+                        event: event,
+                        user: user,
+                        isParticipant: userIsParticipant,
+                        callback: {
+                            onConfirm: function(data){
+                                eventActions.addParticipant(event.id, data.userid, function(event){
+                                    window.eventProfile.refreshEvent()
+                                        .then(event => {
+                                            userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                            sidebar.update({event: event, isParticipant: userIsParticipant});
+                                            self.userlist = event.participants;
+                                            displayParticipantsList(self.userlist);
+                                            self.searchbar.hide();
+                                        })
+                                        .catch(err => {
+                                        })
+                                })
+                            },
+                        },
+                    });
+                    sidebar.show();
+                })
+            });
+        }
+
+        function buildSeminarPage() {
+
+        }
+
+        function buildSanPage() {
+            var rolesMap = {
+                "participant": 0,
+                "lecturer": 1,
+                "admin": 2,
+            }
+            //find if current user is already registered
+
+            sidebar.addContent("eventParticipants", {
+                event: event,
+                user: user,
+                isParticipant: userIsParticipant,
+                callback: {
+                    onConfirm: function(){
+                        eventActions.addParticipant(event.id, user.id, function(){
+                            window.eventProfile.refreshEvent()
+                                .then(event => {
+                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    sidebar.update({event: event, isParticipant: userIsParticipant});
+                                    self.userlist = event.participants;
+                                    displaySanList(self.userlist);
+                                    self.searchbar.hide();
+                                })
+                                .catch(err => {
+                                })
+                        })
+                    },
+                    onDelete: function(){
+                        eventActions.removeParticipant(event.id, user.id, function(){
+                            window.eventProfile.refreshEvent()
+                                .then(event => {
+                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    sidebar.update({event: event, isParticipant: userIsParticipant});
+                                    self.userlist = event.participants;
+                                    displayParticipantsList(self.userlist);
+                                    self.searchbar.hide();
+                                })
+                                .catch(err => {
+                                })
+                        })
+                    }
+                },
+            });
+            sidebar.show();
+
+            //display all users initially
+            self.userlist = event.participants;
+            self.userlist.sort(function(a,b){
+                return (rolesMap[b.role] - rolesMap[a.role]);
+            })
+            self.scrollableList = displayParticipantsList(self.userlist);
+
+            //setup searchbar
+            let searchbar = document.getElementById("usersearch-participants");
+            self.searchbar = new Searchbar(searchbar, {
+                onInput: {
+                    enabled: true,
+                    callback: function(inputValue){
+                        let filteredList = self.userlist.filter(function(participant){
+                            return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
+                        })
+                        displaySanList(filteredList);
+
+                    },
+                },
+            });
+            $('.add-participant-button').each(function(){
+                $(this).on("click", function(e){
+                    e.preventDefault();
+                    // sidebar.addContent("addEventParticipant", {
+                    //     event: event,
+                    //     user: user,
+                    //     isParticipant: userIsParticipant,
+                    //     callback: {
+                    //         onConfirm: function(data){
+                    //             eventActions.addParticipant(event.id, data.userid, function(event){
+                    //                 window.eventProfile.refreshEvent()
+                    //                     .then(event => {
+                    //                         userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                    //                         sidebar.update({event: event, isParticipant: userIsParticipant});
+                    //                         self.userlist = event.participants;
+                    //                         displaySanList(self.userlist);
+                    //                         self.searchbar.hide();
+                    //                     })
+                    //                     .catch(err => {
+                    //                     })
+                    //             })
+                    //         },
+                    //     },
+                    // });
+                    // sidebar.show();
+                })
+            });
+
+            function displaySanList(userlist) {
+
+                let roleSelect = function(){
+                    $('.participant-role-select').each(function(){
+                        //display current role
+
+                        $(this).on("change", function(e){
+                            //push changes to server
+                            let userId = e.target.dataset.userid;
+                            let role = e.target.value;
+                            console.log("changed role for uid: " + userId + " to " + role);
+                            eventActions.changeParticipant(event.id, userId, role);
+                        })
+
+                    });
+                }
+
+                let dropdownMenus = function(){
+                    $('.participant-menu-container').each(function(){
+                        let trigger = $(this).find(".participant-menu-button").first();
+                        let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
+                    });
+                }
+                let deleteParticipant = function(){
+                    $('.participant-delete').each(function(){
+                        $(this).on("click", function(e){
+                            //push changes to server
+                            e.preventDefault();
+                            let userId = e.target.dataset.userid;
+                            eventActions.removeParticipant(event.id, userId, function(){
                                 window.eventProfile.refreshEvent()
                                     .then(event => {
                                         userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
@@ -197,20 +369,42 @@ let eventParticipants = {
                                     })
                                     .catch(err => {
                                     })
-                            })
-                        },
-                    },
-                });
-                sidebar.show();
-            })
-        });
+                            });
+                        })
+                    });
+                }
+                let showParticipant = function(){
+                    $('.participant-details').each(function(){
+                        $(this).on("click", function(e){
+                            //push changes to server
+                            e.preventDefault();
+                            let userId = e.target.dataset.userid;
+                            window.location.href= "/unisams/user/"+userId;
+                        })
+                    });
+                }
 
+                let scrollArgs = {
+                    height: "full",
+                    // fixedHeight: "500px",
+                    sorting: {
+                        property: "role",
+                        direction: 1,
+                    },
+                    allowEdit: args.allowEdit,
+                }
+                let callback = {
+                    customHandlers: [deleteParticipant, roleSelect, dropdownMenus, showParticipant]
+                }
+
+                let listContainer = document.getElementById("userlist-container--participants")
+                let scrollableList = new ScrollableList(listContainer, "participants", userlist, scrollArgs, callback)
+
+                return scrollableList;
+            }
+        }
 
         function displayParticipantsList(userlist) {
-
-            let sortedList = userlist.sort(function(a,b){
-                return (rolesMap[b.role] - rolesMap[a.role]);
-            })
 
             let roleSelect = function(){
                 $('.participant-role-select').each(function(){
@@ -279,10 +473,11 @@ let eventParticipants = {
             }
 
             let listContainer = document.getElementById("userlist-container--participants")
-            let scrollableList = new ScrollableList(listContainer, "participants", sortedList, scrollArgs, callback)
+            let scrollableList = new ScrollableList(listContainer, "participants", userlist, scrollArgs, callback)
 
             return scrollableList;
         }
+
     },
     updatePage: function(user, event, args) {
         this.buildPage(user, event, args)
