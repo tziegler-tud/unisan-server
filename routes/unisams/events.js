@@ -164,6 +164,7 @@ router.get('/:id/logs', checkEventEditRights, eventLogs);
 
 router.get('/:id', eventDetails);
 router.get('/:id/participants', eventParticipants);
+router.get('/:id/postings', eventPostings);
 router.get('/:id/settings', eventSettings);
 router.get('/:id/files/:filename', eventFileDownloader);
 
@@ -327,6 +328,39 @@ function eventParticipants(req, res, next) {
         .catch(err => next(err));
 }
 
+function eventPostings(req, res, next) {
+    eventService.getById(req.params.id)
+        .then(ev => {
+            if (ev) {
+                //check if editing this user is allowed
+                let url = "unisams/events/postings";
+                checkEventEditRightsPromise(req, res, next)
+                    .then(result => {
+                        url = "unisams/events/postings";
+                        res.render(url, {
+                            user: req.user.toJSON(),
+                            acl: req.acl,
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            exploreEventDocument: ev._doc,
+                            allowedit: true,
+                        })
+                    })
+                    .catch(err => {
+                        let url = "unisams/events/postings";
+                        res.render(url, {
+                            user: req.user.toJSON(),
+                            acl: req.acl,
+                            title: ev.title.value,
+                            exploreEvent: ev,
+                            exploreEventDocument: ev._doc,
+                            allowedit: false,
+                        })
+                    })
+            }
+        })
+        .catch(err => next(err));
+}
 
 function eventSettings(req, res, next) {
     eventService.getById(req.params.id)

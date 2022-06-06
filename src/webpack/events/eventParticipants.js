@@ -417,7 +417,84 @@ let eventParticipants = {
                         console.log("changed role for uid: " + userId + " to " + role);
                         eventActions.changeParticipant(event.id, userId, role);
                     })
+                    let roleSelect = function(){
+                        $('.participant-role-select').each(function(){
+                            //display current role
 
+                            $(this).on("change", function(e){
+                                //push changes to server
+                                let userId = e.target.dataset.userid;
+                                let role = e.target.value;
+                                console.log("changed role for uid: " + userId + " to " + role);
+                                eventActions.changeParticipant(event.id, userId, role, function(){
+                                    eventProfile.refreshEvent()
+                                        .then(event => {
+                                            userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                            sidebar.update({event: event, isParticipant: userIsParticipant});
+                                        })
+                                        .catch(err => {
+                                        })
+                                })
+                            })
+
+                        });
+                    }
+
+                    let dropdownMenus = function(){
+                        $('.participant-menu-container').each(function(){
+                            let trigger = $(this).find(".participant-menu-button").first();
+                            let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
+                        });
+                    }
+                    let deleteParticipant = function(){
+                        $('.participant-delete').each(function(){
+                            $(this).on("click", function(e){
+                                //push changes to server
+                                e.preventDefault();
+                                let userId = e.target.dataset.userid;
+                                eventActions.removeParticipant(event.id, userId, function(){
+                                    eventProfile.refreshEvent()
+                                        .then(event => {
+                                            userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                            sidebar.update({event: event, isParticipant: userIsParticipant});
+                                            self.userlist = event.participants;
+                                            displayParticipantsList(self.userlist);
+                                            self.searchbar.hide();
+                                        })
+                                        .catch(err => {
+                                        })
+                                });
+                            })
+                        });
+                    }
+                    let showParticipant = function(){
+                        $('.participant-details').each(function(){
+                            $(this).on("click", function(e){
+                                //push changes to server
+                                e.preventDefault();
+                                let userId = e.target.dataset.userid;
+                                window.location.href= "/unisams/user/"+userId;
+                            })
+                        });
+                    }
+
+                    let scrollArgs = {
+                        height: "full",
+                        // fixedHeight: "500px",
+                        sorting: {
+                            property: "role",
+                            direction: 1,
+                        },
+                        allowEdit: args.allowEdit,
+                    }
+                    let callback = {
+                        customHandlers: [deleteParticipant, roleSelect, dropdownMenus, showParticipant]
+                    }
+
+                    let listContainer = document.getElementById("userlist-container--participants")
+                    let scrollableList = new ScrollableList(listContainer, "participants", sortedList, scrollArgs, callback)
+
+                    return scrollableList;
                 });
             }
 

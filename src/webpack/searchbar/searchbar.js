@@ -35,6 +35,7 @@ var Searchbar = function(container, searchbarArgs){
     this.domElements = {};
     this.isactive = true;
     this.container = container;
+    this.input = undefined;
 
 
     //build html
@@ -119,6 +120,7 @@ var buildHTML = function(self){
     // }
     let input = createInput(self);
     input.id = "searchbarInput"+ self.count;
+    self.input = input;
     sb.append(input);
 
     self.domElements.container = sb;
@@ -241,6 +243,17 @@ Searchbar.prototype.isActive = function(){
         })
 
 };
+
+Searchbar.prototype.getValue = function(){
+    let self = this;
+    this.init
+        .then(function(){
+            return self.domElements.input.value;
+        })
+        .catch(err => {
+            return null;
+        })
+}
 
 Searchbar.prototype.resetInput = function(){
     let self = this;

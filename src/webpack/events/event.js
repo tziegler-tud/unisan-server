@@ -3,6 +3,7 @@ import "./event.scss";
 //load settings modules
 import {eventDetails} from "./eventDetails.js";
 import {eventParticipants} from "./eventParticipants.js";
+import {eventPostings} from "./eventPostings.js";
 import {eventLogs} from "./eventLogs.js";
 import {eventSettings} from "./eventSettings.js";
 
@@ -25,13 +26,17 @@ $(document).ready(function () {
         loader: eventSettings,
     };
 
+    let postingsLoader = {
+        title: "eventPostings",
+        loader: eventPostings,
+    };
+
     let logsLoader = {
         title: "eventLogs",
         loader: eventLogs,
     };
 
-    loaders.push(detailsLoader, participantsLoader, logsLoader, settingsLoader);
-
+    loaders.push(detailsLoader, participantsLoader, logsLoader, postingsLoader, settingsLoader);
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;
     if (jsmodule === undefined) jsmodule = {};
