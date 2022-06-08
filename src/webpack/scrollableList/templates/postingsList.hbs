@@ -4,8 +4,8 @@
             <div class="inner">
                 <div class="item-property scrollableList-header-column userlist-ch name" data-property="user.generalData.lastName.value">Name</div>
                 <div class="item-property scrollableList-header-column userlist-ch role" data-property="qualification">Qualifikation</div>
+                <div class="item-property scrollableList-header-column userlist-ch role" data-property="description">Beschreibung</div>
                 <div class="item-property scrollableList-header-column userlist-ch date" data-property="date">Anmeldedatum</div>
-                <div class="item-property scrollableList-header-column userlist-ch options" data-property="options"></div>
             </div>
         </li>
     </ul>
@@ -14,7 +14,7 @@
 <div class="itemlist-content-container scrollableList-content">
     <ul class="common-list postingslist scrollableItemList scrollableList-body noSelect list-view border">
     {{#each listdata}}
-        <li class="user-entry noSelect" id='postingId{{this._id}}' data-userid= {{this._id}}>
+        <li class="user-entry noSelect" id='postingId{{this._id}}' data-postingId= {{this._id}}>
             <a class="inner noSelect">
                 {{#if this.assigned.isAssigned}}
                 <div class="scrollableList-body-column item-property item-container name ">
@@ -65,7 +65,7 @@
                         </button>
                         <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
                             <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                                <li class="mdc-list-item posting-edit" role="menuitem" data-postingId="{{this.id}}">
+                                <li class="mdc-list-item posting-edit" role="menuitem" data-postingId="{{this._id}}">
                                     <span class="mdc-list-item__graphic material-icons">
                                         edit
                                     </span>
@@ -97,10 +97,14 @@
                     <span class="item-container-element">{{#each this.requiredQualifications}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}</span>
                 </div>
                 {{/if}}
-
-                <div class="scrollableList-body-column center item-property date">
-                    <span class="item-container-element"></span>
+                <div class="scrollableList-body-column center item-property description">
+                    <span class="item-container-element">{{this.description}}</span>
                 </div>
+                {{#if this.assigned.isAssigned}}
+                <div class="scrollableList-body-column center item-property date">
+                    <span class="item-container-element">{{transformDateTimeString this.assigned.date}}</span>
+                </div>
+                {{/if}}
 
             </a>
         </li>

@@ -102,6 +102,12 @@ async function groupByType(){
                     $push: "$$ROOT"
                 }
             }
-        }
+        },
+        // {
+        //     $addFields:
+        //         {
+        //             typeIdentifier: {$first: "$typeIdentifier"}
+        //         }
+        // }
     ])
 }

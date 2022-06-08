@@ -317,7 +317,7 @@ function addPost(req, res, next){
     let posting = req.body.posting;
     let id = req.body.id;
     eventService.addPosting(req, id, posting, args)
-        .then(() => res.json())
+        .then(event => res.json({}))
         .catch(err => {
             next(err);
         })
@@ -325,7 +325,7 @@ function addPost(req, res, next){
 
 function removePost(req, res, next){
     eventService.removePosting(req, req.body.id, req.body.postingId)
-        .then(() => res.json())
+        .then(event => res.json({}))
         .catch(err => {
             next(err);
         })

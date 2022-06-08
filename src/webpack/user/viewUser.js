@@ -2,6 +2,10 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 
+import {ScrollableList} from "../scrollableList/scrollableList";
+import {Searchbar} from "../searchbar/searchbar";
+import {DropdownMenu} from "../helpers/dropdownMenu";
+
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
@@ -33,9 +37,10 @@ $(document).ready (function () {
     function buildPage(user) {
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("user", user);
+        window.DockerElement.addDockerSubPage("user", user, {}, undefined, {currentUser: {edit: false}});
 
-        var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+
+        const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
         var addDBKey_sidebar = new Sidebar('wrapper', "test");
         addDBKey_sidebar.addPlugin(userPlugin);
@@ -58,7 +63,7 @@ $(document).ready (function () {
         });
 
         let listContainer = document.getElementById("qualification-list")
-        let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
+        let listElem = new ScrollableList(listContainer, "userQualification", user.qualifications, {}, {
             listItem: {
                 onClick: function(e){
                     e.preventDefault();

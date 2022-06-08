@@ -96,11 +96,12 @@ let eventPostings = {
                             let filteredList = self.userlist.filter(function(participant){
                                 return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
                             })
-                            displayParticipantsList(filteredList);
+                            displayPostingsList(filteredList);
 
                         },
                     },
                 });
+
                 $('.add-participant-button').each(function(){
                     $(this).on("click", function(e){
                         e.preventDefault();
@@ -108,6 +109,7 @@ let eventPostings = {
                             event: event,
                             user: window.user,
                             isParticipant: userIsParticipant,
+                            qualTypes: qualTypes,
                             callback: {
                                 onConfirm: function(data){
                                     eventActions.addPosting(event.id, data.posting, function(event){
@@ -116,7 +118,7 @@ let eventPostings = {
                                                 userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
                                                 sidebar.update({event: event, isParticipant: userIsParticipant});
                                                 self.userlist = event.participants;
-                                                displayParticipantsList(self.userlist);
+                                                displayPostingsList(self.userlist);
                                                 self.searchbar.hide();
                                             })
                                             .catch(err => {

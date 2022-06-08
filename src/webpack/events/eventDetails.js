@@ -100,7 +100,12 @@ let eventDetails = {
         sidebar.addPlugin(eventPlugin);
 
         let pageContainer = document.getElementById("eventPage-component-container");
-        var eventPage = new EventPage(pageContainer, {user: user, event: event});
+        var eventPage = new EventPage({
+            container: pageContainer,
+            sidebar: sidebar,
+            data: {user: user, event: event},
+            args: {},
+        });
         window.eventPage = eventPage;
 
         buildPageCommon(self.pageData.user, self.pageData.event, args);

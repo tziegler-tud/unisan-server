@@ -2,6 +2,7 @@ let common = window.common;
 import {groupActions} from "./groupActions"
 import {userActions} from "./userActions"
 import {eventActions} from "./eventActions"
+import {qualificationActions} from "./qualificationActions"
 
 var actions = {
     getLogs: function(targetId, logType, callback) {
@@ -26,4 +27,4 @@ var actions = {
 
 }
 
-export {actions, groupActions, userActions, eventActions}
+export {actions, groupActions, userActions, eventActions, qualificationActions}

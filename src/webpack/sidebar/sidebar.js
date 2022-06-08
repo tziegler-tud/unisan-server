@@ -1,6 +1,5 @@
 import "./sidebar.scss";
-import "./sidebar-addParticipant.scss";
-import "./sidebar-events.scss";
+
 import "./sidebar-logs.scss";
 
 let SidebarCounter = {
@@ -35,6 +34,11 @@ var Sidebar = function(parentId, content, optionalId){
     this.isActive = false;
     this.currentState = {
         activeElement: null,
+    };
+    this.hasDefault = false;
+    this.defaultPage = {
+      type: undefined,
+      args: {}
     };
     this.sidebarHTML = createHTML(this, content);
     this.parent.append(this.sidebarHTML);
@@ -93,7 +97,8 @@ Sidebar.prototype.addPlugin = function(sidebarPlugin){
  * @param args.sidebar {Object} sidebar object to associate this button with
  * @param args.selector {string} container selector
  * @param args.type {string} "cancel", "confirm", "delete", "custom"
- * @param args.handler {function} handler function, optional for back buttons
+ * @param args.customHandler {Boolean} overwrite default function with custom handler.
+ * @param args.handler {function} custom handler function. requires type "custom" or customHandler parameter set.
  * @param args.enabled {Boolean} true if the button should initially be enabled
  * @returns {SidebarButton}
  * @constructor
@@ -104,6 +109,7 @@ var SidebarButton = function(args) {
         sidebar: undefined,
         selector: undefined,
         type: "custom",
+        customHandler: false,
         handler: function(){},
         enabled: true,
     }
@@ -111,6 +117,7 @@ var SidebarButton = function(args) {
     this.sidebar = args.sidebar;
     this.selector = args.selector;
     this.type = args.type;
+    this.customHandler = args.customHandler;
     this.handler = args.handler;
     this.enabled = args.enabled;
 
@@ -142,8 +149,7 @@ var SidebarButton = function(args) {
         case "cancel":
             self.container.classList.add("sidebarButton--cancel");
             self.handler = function(self){
-                self.sidebar.resetCurrentPage();
-                self.sidebar.toggle();
+                self.sidebar.showDefault(false)
             }
             break;
         case "reset":
@@ -159,6 +165,10 @@ var SidebarButton = function(args) {
         case "custom":
             self.container.classList.add("sidebarButton--custom");
             break;
+    }
+    if(self.customHandler){
+        //overwrite default handler, if any is set
+        self.handler = args.handler;
     }
     this.container.addEventListener("click", function(){
         if(self.enabled) {
@@ -204,22 +214,37 @@ Sidebar.prototype.addContent = function(type, args){
     else {
         handler.fn(self, args, type)
     }
-
-    switch(type){
-
-        case "QualificationCreate":
-            showCreateQualificationContent(self,args);
-            break;
-
-        case "QualificationUpdate":
-            showUpdateQualificationContent(self,args);
-            break;
-
-        case "logDetails":
-            showLogDetails(self,args);
-            break;
-    }
 };
+
+Sidebar.prototype.setDefault = function(type, args){
+    this.defaultPage.type = type;
+    this.defaultPage.args = args;
+    this.hasDefault = true;
+}
+
+Sidebar.prototype.setCurrentDefault = function(){
+    this.defaultPage.type = this.currentPage.type;
+    this.defaultPage.args = this.currentPage.args;
+    this.hasDefault = true;
+}
+
+/**
+ * resets current input and shows the default sidebar element, if any is set. otherwise, the sidebar will go into hiding
+ * @param hide
+ */
+Sidebar.prototype.showDefault = function(hide){
+    if(hide === undefined) hide = false;
+    //if default is unset, close sidebar
+    if(!this.hasDefault) {
+        this.resetCurrentPage();
+        this.hide();
+    }
+    else {
+        this.addContent(this.defaultPage.type, this.defaultPage.args);
+        if(hide) this.hide();
+    }
+
+}
 
 /**
  * refreshs the current sidebar content by re-rendering with current settings
@@ -318,256 +343,150 @@ Sidebar.prototype.disableOptional = function(selector){
     $(selector).removeClass("optional-enabled");
 };
 
-    var showUpdateQualificationContent = function(self, args){
-
-        var qualId = args.qualificationId;
-        var onConfirm = args.callback.onConfirm;
-        var onDelete = args.callback.onDelete;
-
-        var res = {qualifications: {}};
-
-        getDataFromServer("/api/v1/qualification/groupByType", function(context){
-            res.qualifications.byType = context;
-            res.currentQualification = findQualByIdInTypeArray(context, qualId);
-            action(res);
-
-        });
-
-        var action = function(context){
-            var opt = false;
-            $.get('/static/unisams/js/sidebar/templates/sidebar-updateQualification.hbs', function (data) {
-                var template = Handlebars.compile(data);
-                self.sidebarHTML.html(template(context));
-                registerBackButton(self,".sidebar-back-btn");
-                registerConfirmButton(self, ".sidebar-confirm", function(){
-                    data = {
-                        id: qualId,
-                        qualType: $("#qual-type").val(),
-                    };
-                    if(opt) {
-                        data.name = $("#custom-name").val();
-                    }
-                    else {
-                        data.name = $("#qual-name").val();
-                    }
-                    onConfirm(qualId, data);
-                }.bind(args));
-
-                registerButton (self, ".sidebar-delete", function(){
-                    // delete array entry
-                    data = res.currentQualification;
-                    onDelete(qualId, data);
-                });
-
-                // populate selects with current content as default
-                if(!populateCurrentQualificationDefault(self, res.qualifications.byType, res.currentQualification, {addCreateEntry: true})){
-                    console.warn("trying to read corrupted data");
-                    self.addErrorMessage("trying to read corrupted data!",  function(data){
-                        $("#sidebar-inner").before(data);
-                    });
-
-                    $("#qual-type").addClass("select-disabled");
-                    $("#qual-name").addClass("select-disabled");
-                }
-                $("#qual-type").prop('disabled', 'disabled').addClass("select-disabled");
-                // listener to update names if type changes
-                var q = document.getElementById("qual-type");
-                $(q).on("change",function(e){
-                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
-                    var qualNameObject = document.getElementById("qual-name");
-                    // remove existing options
-                    qualNameObject.options.length = 0;
-                    //add available options for selected type
-                    typeData.values.forEach(function (el, index){
-                        const option = document.createElement('option');
-                        option.id = el._id;
-                        option.value = el.name;
-                        option.innerHTML = el.name;
-                        option.selected = "";
-                        qualNameObject.options[index] = option;
-                    });
-                });
-                $("#qual-name").on("change",function(e) {
-                    if (e.target.value === "enableOptional_custom-name"){
-                        self.enableOptional(".ak-customName");
-                        opt = true;
-                    }
-                    else {
-                        self.disableOptional(".ak-customName");
-                        opt = false;
-                    }
-                });
-
-            });
-        };
-    };
-
-    var showCreateQualificationContent = function(self, args){
-
-        var onConfirm = args.callback.onConfirm;
-        var res = {qualifications: {}};
-
-        getDataFromServer("/api/v1/qualification/groupByType", function(context){
-            res.qualifications.byType = context;
-            action(res);
-
-        });
-
-        var action = function(context){
-            var opt = false;
-            $.get('/static/unisams/js/sidebar/templates/sidebar-createQualification.hbs', function (data) {
-                var template = Handlebars.compile(data);
-                self.sidebarHTML.html(template(context));
-                registerBackButton(self,".sidebar-back-btn");
-                registerConfirmButton(self, ".sidebar-confirm", function(){
-                    data = {
-                        name:  $("#qual-name").val(),
-                    };
-                    if(opt) {
-                        data.qualType = $("#custom-type").val();
-                    }
-                    else {
-                        data.qualType = $("#qual-type").val();
-                    }
-                    onConfirm(false, data);
-                }.bind(args));
-                $("#qual-type").on("change",function(e) {
-                    if (e.target.value === "enableOptional_custom-type"){
-                        self.enableOptional(".ak-customType");
-                        opt = true;
-                    }
-                    else {
-                        self.disableOptional(".ak-customType");
-                        opt = false;
-                    }
-                });
-            });
-        };
-    };
-
-    /* events */
-
-
-
-    var showLogDetails = function(self, args){
-
-        let log = args.log;
-        let handleData = {
-            log: log,
-        }
-
-        $.get('/static/unisams/js/sidebar/templates/sidebar-viewLogEntry.hbs', function (data) {
-            var template = Handlebars.compile(data);
-            self.sidebarHTML.html(template(handleData));
-            registerBackButton(self,".sidebar-back-btn");
-            registerButton (self, ".sidebar-delete", function(){
-                // delete log entry
-                $.ajax({
-                    url: "/api/v1/logs/" + log.id,
-                    type: 'DELETE',
-                    contentType: "application/json; charset=UTF-8",
-                    success: function(result) {
-                        window.location.reload();
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        // alert(textStatus + ": " + XMLHttpRequest.status + " " + errorThrown);
-                        if (XMLHttpRequest.status===403) self.addErrorMessage("Operation not permitted.", function(data){
-                            $("#sidebar-inner").before(data);
-                        }, true);
-                    }
-                });
-
-            });
-        });
-
-    };
-
-
-
-var registerBackButton = function(self, selector){
-
-  // $(self.sidebarHTML).find($(selector)).each(function(){
-  $(selector).each(function(){
-      $(this).on("click", function(e){
-          self.toggle();
-          // $(this).toggleClass("btn-rotate");
-      });
-  })
-};
-
-Sidebar.prototype.registerBackButton = function(selector) {
+/**
+ *
+ * @param selector {string} selector for button element. must be a native-js compatible selector string
+ * @param args {Object} args object
+ * @param {string} [args.type] - button type, used for styling and default handler. Default: "back"
+ * @param {boolean} [args.customHandler] - true if a custom handler is provided. Default: false
+ * @param {Function} [args.handler] - custom handler function. requires customHandler set to true.
+ * @param {boolean} [args.enabled] - sets whether the button should be enabled initially. Default: true.
+ * @returns {SidebarButton}
+ */
+Sidebar.prototype.registerBackButton = function(selector, args) {
     let self = this;
-    return new SidebarButton({
+    let defaultArgs = {
         sidebar: self,
         selector: selector,
         type: "back",
+        customHandler: false,
         handler: function(){
             self.toggle()
         },
         enabled: true,
-    })
+    }
+    let constructorArgs = Object.assign(defaultArgs, args);
+    return new SidebarButton(constructorArgs);
 }
 
-
-Sidebar.prototype.registerCancelButton = function(selector) {
+/**
+ *
+ * @param selector {string} selector for button element. must be a native-js compatible selector string
+ * @param args {Object} args object
+ * @param {string} [args.type] - button type, used for styling and default handler. Default: "reset"
+ * @param {boolean} [args.customHandler] - true if a custom handler is provided. Default: false
+ * @param {Function} [args.handler] - custom handler function. requires customHandler set to true.
+ * @param {boolean} [args.enabled] - sets whether the button should be enabled initially. Default: true.
+ * @returns {SidebarButton}
+ */
+Sidebar.prototype.registerResetButton = function(selector, args) {
     let self = this;
-    return new SidebarButton({
+    let defaultArgs = {
+        sidebar: self,
+        selector: selector,
+        type: "reset",
+        customHandler: false,
+        handler: function(){},
+        enabled: true,
+    }
+    let constructorArgs = Object.assign(defaultArgs, args);
+    return new SidebarButton(constructorArgs)
+}
+
+/**
+ *
+ * @param selector {string} selector for button element. must be a native-js compatible selector string
+ * @param args {Object} args object
+ * @param {string} [args.type] - button type, used for styling and default handler. Default: "cancel"
+ * @param {boolean} [args.customHandler] - true if a custom handler is provided. Default: false
+ * @param {Function} [args.handler] - custom handler function. requires customHandler set to true.
+ * @param {boolean} [args.enabled] - sets whether the button should be enabled initially. Default: true.
+ * @returns {SidebarButton}
+ */
+Sidebar.prototype.registerCancelButton = function(selector, args) {
+    let self = this;
+    let defaultArgs = {
         sidebar: self,
         selector: selector,
         type: "cancel",
-        handler: function(){
-            self.resetCurrentPage();
-            self.toggle();
-        },
+        customHandler: false,
+        handler: function(){},
         enabled: true,
-    })
+    }
+    let constructorArgs = Object.assign(defaultArgs, args)
+    return new SidebarButton(constructorArgs)
 }
 
-var registerConfirmButton = function(self, selector, action){
-    var args = this;
-    $(selector).on("click", function(args){
-        action();
-    });
-};
-
-Sidebar.prototype.registerConfirmButton = function(selector, handler) {
+/**
+ *
+ * @param selector {string} selector for button element. must be a native-js compatible selector string
+ * @param args {Object} args object
+ * @param {string} [args.type] - button type, used for styling and default handler. Default: "confirm"
+ * @param {boolean} [args.customHandler] - true if a custom handler is provided. Default: true
+ * @param {Function} args.handler - custom handler function. confirm buttons do not provide default handlers, so this should be set.
+ * @param {boolean} [args.enabled] - sets whether the button should be enabled initially. Default: true.
+ * @returns {SidebarButton}
+ */
+Sidebar.prototype.registerConfirmButton = function(selector, args) {
     let self = this;
-    return new SidebarButton({
+    let defaultArgs = {
         sidebar: self,
         selector: selector,
         type: "confirm",
-        handler: handler,
+        customHandler: true,
+        handler: function(){},
         enabled: true,
-    })
+    }
+    let constructorArgs = Object.assign(defaultArgs, args)
+    return new SidebarButton(constructorArgs)
 }
 
-var registerButton = function(self, selector, action){
-    var args = this;
-    $(selector).on("click", function(args){
-        action();
-    });
-};
-
-Sidebar.prototype.registerDeleteButton = function(selector, handler) {
+/**
+ *
+ * @param selector {string} selector for button element. must be a native-js compatible selector string
+ * @param args {Object} args object
+ * @param {string} [args.type] - button type, used for styling and default handler. Default: "delete"
+ * @param {boolean} [args.customHandler] - true if a custom handler is provided. Default: true
+ * @param {Function} [args.handler] - custom handler function. requires customHandler set to true.
+ * @param {boolean} [args.enabled] - sets whether the button should be enabled initially. Default: true.
+ * @returns {SidebarButton}
+ */
+Sidebar.prototype.registerDeleteButton = function(selector, args) {
     let self = this;
-    return new SidebarButton({
+    let defaultArgs = {
         sidebar: self,
         selector: selector,
         type: "delete",
-        handler: handler,
+        customHandler: true,
+        handler: function(){},
         enabled: true,
-    })
+    }
+    let constructorArgs = Object.assign(defaultArgs, args)
+    return new SidebarButton(constructorArgs)
 }
 
-Sidebar.prototype.registerButton = function(selector, handler) {
+/**
+ *
+ * @param selector {string} selector for button element. must be a native-js compatible selector string
+ * @param args {Object} args object
+ * @param {string} [args.type] - button type, used for styling and default handler. Default: "delete"
+ * @param {boolean} [args.customHandler] - true if a custom handler is provided. Default: true
+ * @param {Function} [args.handler] - custom handler function. requires customHandler set to true.
+ * @param {boolean} [args.enabled] - sets whether the button should be enabled initially. Default: true.
+ * @returns {SidebarButton}
+ */
+Sidebar.prototype.registerButton = function(selector, args) {
     let self = this;
-    return new SidebarButton({
+    let defaultArgs = {
         sidebar: self,
         selector: selector,
         type: "custom",
-        handler: handler,
+        customHandler: true,
+        handler: function(){},
         enabled: true,
-    })
+    }
+    let constructorArgs = Object.assign(defaultArgs, args)
+    return new SidebarButton(constructorArgs)
 }
 
 
@@ -600,6 +519,18 @@ var createHTML = function(self){
     });
 };
 
+
+/*
+Sidebar helpers public
+ */
+
+Sidebar.prototype.findQualByIdInTypeArray = function(byTypeArr, qualId){
+    return findQualByIdInTypeArray(byTypeArr, qualId);
+}
+
+Sidebar.prototype.populateCurrentQualificationDefault = function(self, doc, current, args){
+    return populateCurrentQualificationDefault(self,doc,current,args);
+}
 /*
 helpers for the updating operations
  */

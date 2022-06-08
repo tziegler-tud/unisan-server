@@ -28,6 +28,7 @@ module.exports = {
     update,
     rebuildFromUserData,
     rebuildFresh,
+    updateAllUser,
 };
 
 
@@ -331,6 +332,13 @@ async function rebuildFromUserData(req){
         //build acl
         let userACL = new UserACL(oj);
         userACL.save();
+    })
+}
+
+async function updateAllUser(req){
+    let userAclArray = await UserACL.find();
+    userAclArray.forEach(user => {
+        user.save();
     })
 }
 

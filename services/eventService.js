@@ -984,6 +984,7 @@ async function enablePostings(req, eventId, value){
  * @param posting.assigned.user {String} user id of assigned user. requires isAssigned to be set in order to take effect.
  * @param posting.assigned.qualification {Object} qualification associated with assigned user. requires isAssigned to be set in order to take effect.
  * @param posting.enabled {Boolean} true if the posting is enabled, i.e. user can register for this post
+ * @param args {Object} args
  * @returns {Promise<void>}
  */
 async function addPosting (req, eventId, posting, args) {
@@ -992,6 +993,7 @@ async function addPosting (req, eventId, posting, args) {
     if (!event) throw new Error('Event not found');
     let defaults = {
         isAssigned: false,
+        description: "",
         enabled: true,
         userId: undefined,
         order: (event.postings.length + 1),
@@ -1001,6 +1003,7 @@ async function addPosting (req, eventId, posting, args) {
 
     let post = {
         requiredQualifications: posting.requiredQualifications,
+        description: posting.description,
         assigned: {
             isAssigned: false,
         },
@@ -1027,7 +1030,7 @@ async function addPosting (req, eventId, posting, args) {
     return new Promise(function(resolve, reject){
         event.save()
             .then(result => {
-                resolve();
+                resolve(event);
 
 
             })
@@ -1043,7 +1046,7 @@ async function removePosting (req, eventId, postingId) {
     if (!event) throw new Error('Event not found');
 
     //find posting
-    let index = event.postings.findIndex(obj => obj.id = postingId);
+    let index = event.postings.findIndex(obj => obj._id.toString() === postingId);
     return new Promise(function(resolve, reject){
         if(index > -1) {
             //found it!

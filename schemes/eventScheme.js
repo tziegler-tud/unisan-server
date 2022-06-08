@@ -113,6 +113,20 @@ var EventSchema = new Schema({
             description: {
                 type: String,
             },
+            date: {
+                startDate: {
+                    type: Date,
+                    default: function(){
+                        return this.parent().date.startDate;
+                    }
+                },
+                endDate: {
+                    type: Date,
+                    default: function(){
+                        return this.parent().date.endDate;
+                    }
+                }
+            },
             order: {
                 type: String,
                 default: "auto",
@@ -120,6 +134,10 @@ var EventSchema = new Schema({
             enabled: {
                 type: Boolean,
                 default: true,
+            },
+            optional: {
+                type: Boolean,
+                default: false,
             },
             assigned: {
                 isAssigned: {

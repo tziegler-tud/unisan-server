@@ -13,8 +13,9 @@
             </a>
         </div>
         <div class="docker-subElementContainer">
-            <div class="docker-element docker-subElement" id="settingsDatabase">
-                <a href="/unisams/settings/database">
+            {{#if docker.settings.qualifications}}
+            <div class="docker-element docker-subElement" id="settingsQualifications">
+                <a href="/unisams/settings/qualifications">
                     <svg class="feather feather-database" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                          stroke-linejoin="round">
@@ -22,10 +23,11 @@
                         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                     </svg>
-                    <span class="docker-element-label">Datenbasis verwalten</span>
+                    <span class="docker-element-label">Qualifikationen</span>
                     <div class="clear"></div>
                 </a>
             </div>
+            {{/if}}
             {{#if docker.settings.user}}
             <div class="docker-element docker-subElement" id="settingsUser">
                 <a href="/unisams/settings/user">

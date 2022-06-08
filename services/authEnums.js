@@ -71,6 +71,7 @@ let operations = {
         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
     },
     settings: {
+        QUALIFICATIONS: "manageQualificationSettings",
         LOGS: "manageSystemLogs",
         EVENTS: "manageEventSettings",
         USER: "manageUserSettings",

@@ -11,6 +11,9 @@ import {
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
+import {ScrollableList} from "../scrollableList/scrollableList";
+import {Searchbar} from "../searchbar/searchbar";
+import {DropdownMenu} from "../helpers/dropdownMenu";
 
 import {userActions} from "../actions/userActions";
 
@@ -46,11 +49,11 @@ $(document).ready (function () {
 
     function buildPage(user) {
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("userEdit", user, {});
+        window.DockerElement.addDockerSubPage("userEdit", user, {}, undefined, {currentUser: {edit: true}});
         currentExploredUser = user;
         var userid = window.exploreUserId;
 
-        var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+        const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
         const deleteContent = {
             title: "Nutzer löschen",
@@ -128,7 +131,15 @@ $(document).ready (function () {
 
         let listContainer = document.getElementById("qualification-list")
         if(listContainer) {
-            let listElem = new common.ScrollableList(listContainer, "qualification", user.qualifications, {}, {
+            let listElem = new ScrollableList(listContainer, "userQualification", user.qualifications,
+                {
+                    sorting: {
+                        property: "qualification.qualType",
+                        direction: "asc",
+                    },
+
+                },
+                {
                 listItem: {
                     onClick: function(e){
                         e.preventDefault();
@@ -307,6 +318,7 @@ $(document).ready (function () {
                                             $("#userkey-" + common.escapeSelector(key)).remove();
                                         });
                                         lidlRTO.objectManager.removeObject(dialog_token);
+                                        addDBKey_sidebar.showDefault(true);
                                     }
                                 }
                             };

@@ -14,8 +14,17 @@
 @include button.core-styles;
 
 .scrollableList {
+  .scrollableList-title {
+    font-size: 120%;
+    margin-bottom: .5em;
+    color: #666;
+    padding: 12px 12px 0 12px;
 
+    font-variant: small-caps;
+    letter-spacing: .15em;
+  }
 }
+
 
 ul.scrollableItemList {
   &.border {
@@ -761,11 +770,11 @@ ul.postingslist{
 
       .inner {
         display: grid;
-        grid-template-columns: 1fr 1fr min-content;
+        grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: auto;
 
         @media #{$desktop, $tablet-landscape}  {
-          grid-template-columns: 1fr 1fr 1fr 3em;
+          grid-template-columns: 1fr 1fr 1fr 1fr;
         }
         .item-container {
           display: flex;

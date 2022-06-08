@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 //debug functions, remove for production TODO: remove before production
 router.post("/rebuildFromData", rebuildFromUserData);
 router.post("/rebuildNew", rebuildUserAcls)
+router.post("/updateAllUser", updateAllUser)
 
 router.get('/', checkRead, getAll);
 router.get('/current', getCurrentAcl);
@@ -158,6 +159,12 @@ function rebuildFromUserData(req, res, next){
 
 function rebuildUserAcls(req, res, next){
     aclService.rebuildFresh()
+        .then(result => res.json(result))
+        .catch(err => next(err))
+}
+
+function updateAllUser(req, res, next){
+    aclService.updateAllUser(req)
         .then(result => res.json(result))
         .catch(err => next(err))
 }

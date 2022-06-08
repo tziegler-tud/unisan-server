@@ -174,5 +174,54 @@ var getDataFromServer  = function(url, callback){
     });
 };
 
+var common = {
+    escapeSelector: function(selector){
+        return selector.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
+    },
+    //find key in json by string in dot-notation
+    refJSON: function (obj, str) {
+        return str.split(".").reduce(function(o, x) { return o[x] }, obj);
+    },
 
-export {transformDateTimeString, Counter, dateFromNow, getDataFromServer}
+    stringToBoolean: function (string){
+        var bool = undefined;
+        var msg;
+        try {
+            if (typeof (string) !== "string") {
+                msg = "Argument of type 'string' expected, but " + typeof (string) + "found.";
+                throw new TypeError(msg);
+            }
+            //convert to lowercase
+            string = string.toLowerCase();
+            if (string === "true" || string === "1") {
+                return true;
+            }
+            else if (string === "false" || string === "0") {
+                return false;
+            }
+            msg = ("failed to parse string.");
+            throw new Error(msg);
+        }
+        catch(e) {
+            console.error("Caught exception: "+ msg);
+        }
+        return bool;
+    },
+}
+
+Date.prototype.toDateInputValue = (function() {
+    var local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0,10);
+});
+
+Date.prototype.toTimeInputValue = (function() {
+    var local = new Date(this);
+    var hours = local.getHours().toString().length < 2 ? "0" + local.getHours().toString() : local.getHours().toString();
+    var minutes = local.getMinutes().toString().length < 2 ? "0" + local.getMinutes().toString() : local.getMinutes().toString();
+    return hours + ":" + minutes;
+});
+
+
+
+export {transformDateTimeString, Counter, dateFromNow, getDataFromServer, common}

@@ -1,5 +1,10 @@
 import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton} from "../sidebar.js";
 import {Searchbar} from "../../searchbar/searchbar.js";
+
+import "../sidebar-events.scss";
+import "../sidebar-addParticipant.scss";
+import "../sidebar-addPosting.scss";
+
 import {MDCList} from '@material/list';
 
 
@@ -32,9 +37,13 @@ let showEventParticipants = new ContentHandler("eventParticipants",
                     }
                 })
             } else {
-                sidebar.registerButton(notRegisteredSelector, function () {
-                    args.callback.onConfirm();
-                });
+                sidebar.registerButton(notRegisteredSelector,
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            args.callback.onConfirm();
+                        }
+                    });
             }
         });
     });
@@ -215,20 +224,24 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
 
             sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
-            sidebar.registerConfirmButton(".sidebar-confirm", function(){
-                let date = $(d1).val();
-                let startTime = $(t1).val();
-                let endTime = $(t2).val();
-                let location = $(l).val();
+            sidebar.registerConfirmButton(".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        let date = $(d1).val();
+                        let startTime = $(t1).val();
+                        let endTime = $(t2).val();
+                        let location = $(l).val();
 
-                let data = {
-                    date: date,
-                    startTime: startTime,
-                    endTime: endTime,
-                    location: location,
-                }
-                onConfirm(args.event, data, {});
-            }.bind(args));
+                        let data = {
+                            date: date,
+                            startTime: startTime,
+                            endTime: endTime,
+                            location: location,
+                        }
+                        onConfirm(args.event, data, {});
+                    }.bind(args)
+                });
         })
     })
 
@@ -259,14 +272,36 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
 
             sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
-            sidebar.registerConfirmButton(".sidebar-confirm", function(){
-                let location = $(l).val();
+            sidebar.registerConfirmButton(".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        let location = $(l).val();
 
-                let data = {
-                    location: location,
-                }
-                onConfirm(args.event, data, {});
-            }.bind(args));
+                        let data = {
+                            location: location,
+                        }
+                        onConfirm(args.event, data, {});
+                    }.bind(args)
+                });
+        })
+    })
+
+let showPostings = new ContentHandler("eventPostings",
+    function(sidebar, args, type){
+        var onConfirm = args.callback.onConfirm;
+
+        let context = {};
+        context.event = args.event;
+        var corrupted = false;
+
+        $.get('/webpack/sidebar/templates/events/sidebar-eventPostings.hbs', function (data) {
+
+            var template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+
+            sidebar.registerBackButton(".sidebar-back-btn");
+
         })
     })
 
@@ -278,27 +313,63 @@ let addPosting = new ContentHandler("addEventPosting",
         context.event = args.event;
         var corrupted = false;
 
-        $.get('/webpack/sidebar/templates/events/sidebar-addEventPosting.hbs', function (data) {
+        var res = {qualifications: {}}
 
-            var template = Handlebars.compile(data);
-            sidebar.sidebarHTML.html(template(context));
+        getDataFromServer("/api/v1/qualification/groupByType", function(context){
 
-            var l = document.getElementById("eventinp-location");
-
-            sidebar.registerBackButton(".sidebar-back-btn");
-            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
-            sidebar.registerConfirmButton(".sidebar-confirm", function(){
-                let location = $(l).val();
-
-                let data = {
-                    location: location,
-                }
-                onConfirm(args.event, data, {});
-            }.bind(args));
+            //filter for appropriate types
+            let qualTypeFilters = args.qualTypes;
+            if (!(qualTypeFilters === undefined || qualTypeFilters === null || !Array.isArray(qualTypeFilters) || qualTypeFilters.length === 0)) {
+                context = context.filter(qualGroup => {return qualTypeFilters.includes(qualGroup._id)})
+            }
+            res.qualifications.byType = context;
+            action(res)
         })
+
+        function action(res){
+            $.get('/webpack/sidebar/templates/events/sidebar-addEventPosting.hbs', function (tdata) {
+
+                context.qualifications = res.qualifications;
+                var template = Handlebars.compile(tdata);
+                sidebar.sidebarHTML.html(template(context));
+
+                sidebar.registerBackButton(".sidebar-back-btn");
+                let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            const id = document.getElementById("qual-name").selectedOptions[0].id;
+                            const data = {
+                                qualifications: [sidebar.findQualByIdInTypeArray(res.qualifications.byType, id)], //array of quals
+                                description: $("#posting-description").val(), //string
+                            };
+                            onConfirm(data);
+                        }.bind(args)
+                    });
+
+                var q = $("#qual-type");
+                q.on("change",function(e){
+                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
+                    var qualNameObject = document.getElementById("qual-name");
+                    // remove existing options
+                    qualNameObject.options.length = 0;
+                    //add available options for selected type
+                    typeData.values.forEach(function (el, index){
+                        const option = document.createElement('option');
+                        option.id = el._id;
+                        option.value = el.name;
+                        option.innerHTML = el.name;
+                        qualNameObject.options[index] = option;
+                    });
+
+
+                })
+            })
+        }
     })
 
-let showPosting = new ContentHandler("addEventPosting",
+let showPostingDetails = new ContentHandler("showPostingDetails",
     function(sidebar, args, type){
         var onConfirm = args.callback.onConfirm;
 
@@ -306,7 +377,7 @@ let showPosting = new ContentHandler("addEventPosting",
         context.event = args.event;
         var corrupted = false;
 
-        $.get('/webpack/sidebar/templates/events/sidebar-addEventPosting.hbs', function (data) {
+        $.get('/webpack/sidebar/templates/events/sidebar-showPostingDetails.hbs', function (data) {
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
@@ -315,14 +386,18 @@ let showPosting = new ContentHandler("addEventPosting",
 
             sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
-            sidebar.registerConfirmButton(".sidebar-confirm", function(){
-                let location = $(l).val();
+            sidebar.registerConfirmButton(".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        let location = $(l).val();
 
-                let data = {
-                    location: location,
-                }
-                onConfirm(args.event, data, {});
-            }.bind(args));
+                        let data = {
+                            location: location,
+                        }
+                        onConfirm(args.event, data, {});
+                    }.bind(args)
+                });
         })
     })
 
@@ -330,6 +405,9 @@ eventPlugin.addContentHandler(showEventParticipants);
 eventPlugin.addContentHandler(addEventParticipant);
 eventPlugin.addContentHandler(showUpdateEventDateContent);
 eventPlugin.addContentHandler(showUpdateEventLocationContent);
+eventPlugin.addContentHandler(showPostings);
+eventPlugin.addContentHandler(addPosting);
+eventPlugin.addContentHandler(showPostingDetails);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 

@@ -188,7 +188,7 @@ body{
             display: flex;
             justify-content: center;
           }
-          .sidebar-bottom-element:first-child {
+          .sidebar-bottom-element:not(:last-child) {
             border-right: 1px solid #CCC;
           }
 
@@ -213,7 +213,10 @@ body{
               font-weight: bold;
             }
             .section-title {
-
+              padding-bottom: 1em;
+              text-transform: uppercase;
+              color: #AAA;
+              font-size: 90%;
             }
             .section-content {
               .content-item {

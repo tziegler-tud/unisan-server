@@ -333,10 +333,10 @@ function eventPostings(req, res, next) {
         .then(ev => {
             if (ev) {
                 //check if editing this user is allowed
-                let url = "unisams/events/postings";
+                let url = "unisams/events/participants";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
-                        url = "unisams/events/postings";
+
                         res.render(url, {
                             user: req.user.toJSON(),
                             acl: req.acl,
@@ -347,7 +347,6 @@ function eventPostings(req, res, next) {
                         })
                     })
                     .catch(err => {
-                        let url = "unisams/events/postings";
                         res.render(url, {
                             user: req.user.toJSON(),
                             acl: req.acl,

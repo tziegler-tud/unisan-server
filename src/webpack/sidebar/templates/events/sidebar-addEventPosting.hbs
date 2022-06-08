@@ -5,46 +5,71 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
         <div class="sidebar-title">
-            <span>{{qual.name}}</span>
+            <span class="quill-renderer limitCharacters">{{title.value}}</span>
         </div>
     </div>
     <div id="sidebar-inner" class="sidebar-inner">
         <div class="sidebar-content">
             <div class="sidebar-section top-section">
                 <div class="sidebar-title">
-                    <span>Qualifikation bearbeiten</span>
+                    <span>Dienstposten hinzufügen</span>
                 </div>
                 <div class="section-content">
 
                 </div>
             </div>
             <div class="sidebar-section body-section">
+                <div class="section-title participant-heading">
+                    Benötigte Qualifikation
+                </div>
                 <div class="section-content">
                     <div class="ak-form">
                         <div class="ak-item ak-qual ak-qual-type">
                             <label for="qual-type">Typ</label>
                             <select class="common-select" id="qual-type" name="qual-type">
                                 {{#each qualifications.byType}}
-                                    <option>{{_id}}</option>
+                                    <option>{{this._id}}</option>
                                 {{/each}}
                             </select>
                         </div>
                         <div class="ak-item ak-qual ak-qual-name">
                             <label for="qual-name">Bezeichnung</label>
                             <select class="common-select" id="qual-name" name="qual-name">
+                                {{#each qualifications.byType.[0].values}}
+                                    <option id={{this._id}}>{{name}}</option>
+                                {{/each}}
                             </select>
                         </div>
-                        <div class="ak-item ak-customName ak-optional formElement-optional">
-                            <label for="custom-name">Neue Bezeichnung anlegen</label>
-                            <input class="common-input" id="custom-name" name="custom-name" type="text"/>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title">
+                    Weitere Angaben
+                </div>
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item ak-qual ak-qual-aquiredDate">
+                            <label for="posting-description">Bemerkung (optional)</label>
+                            <input class="common-input" id="posting-description" name="posting-description" type="text"/>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="sidebar-bottom">
-            <a class="sidebar-confirm content-link">Speichern</a>
-            <a class="sidebar-delete content-link style2">Eintrag löschen</a>
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
         </div>
     </div>
 </div>

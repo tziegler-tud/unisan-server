@@ -25,18 +25,21 @@ let addUser = new ContentHandler("addUser",
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton(".sidebar-back-btn");
-            sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                let generalData = {
-                    firstName: $("#addUserForm-firstName").val(),
-                    lastName: $("#addUserForm-lastName").val(),
-                };
-                let memberId = {
-                    setCustom: false,
-                };
-                onConfirm($("#addUserForm-username").val(), $("#addUserForm-password").val(), generalData, memberId);
-            }.bind(args));
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        let generalData = {
+                            firstName: $("#addUserForm-firstName").val(),
+                            lastName: $("#addUserForm-lastName").val(),
+                        };
+                        let memberId = {
+                            setCustom: false,
+                        };
+                        onConfirm($("#addUserForm-username").val(), $("#addUserForm-password").val(), generalData, memberId);
+                    }.bind(args)
+                });
         });
-    
     });
 
 let changeUsername = new ContentHandler("UserChangeUsername",
@@ -61,12 +64,16 @@ let changeUsername = new ContentHandler("UserChangeUsername",
                 sidebar.sidebarHTML.html(template(context));
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    data = {
-                        value: document.getElementById("userkey-value").value
-                    };
-                    onConfirm(args.userid, key, data.value);
-                }.bind(args));
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            data = {
+                                value: document.getElementById("userkey-value").value
+                            };
+                            onConfirm(args.userid, key, data.value);
+                        }.bind(args)
+                    });
 
             });
         };
@@ -105,18 +112,22 @@ let addDbKey = new ContentHandler("UseraddDBKey",
                 var key = "";
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
-                    var r = document.getElementById("userkey-key");
-                    var key = catKey + "." + r.value;
-                    var funcArgs = {
-                        isArray: r.options[r.selectedIndex].dataset.isarray
-                    };
-                    var val = {
-                        value: document.getElementById("userkey-value").value,
-                        title: "TestTitle2",
-                    };
-                    onConfirm(userId, key, val, funcArgs);
-                }.bind(args));
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            var r = document.getElementById("userkey-key");
+                            var key = catKey + "." + r.value;
+                            var funcArgs = {
+                                isArray: r.options[r.selectedIndex].dataset.isarray
+                            };
+                            var val = {
+                                value: document.getElementById("userkey-value").value,
+                                title: "TestTitle2",
+                            };
+                            onConfirm(userId, key, val, funcArgs);
+                        }.bind(args)
+                    });
                 var q = document.getElementById("userkey-category");
                 let doc = res.dataset.user.categories;
                 q.addEventListener("change", function(e){
@@ -168,29 +179,33 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
                 var v = document.getElementById("userkey-value");
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
-                    var key = catKey;
-                    var type = r.value;
-                    var title = r.options[r.selectedIndex].dataset.title;
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            var key = catKey;
+                            var type = r.value;
+                            var title = r.options[r.selectedIndex].dataset.title;
 
-                    var funcArgs = {
-                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
-                        noIndex: true
-                    };
-                    var val = {
-                        value: v.value,
-                        title: r.options[r.selectedIndex].dataset.title,
-                        type: type
-                    };
-                    if (sidebar.currentState.customEntryActive) {
-                        val = {
-                            value: v.value,
-                            title: document.getElementById("custom-type").value,
-                            type: type
-                        };
-                    }
-                    onConfirm(userId, key, val, funcArgs);
-                }.bind(args));
+                            var funcArgs = {
+                                isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                                noIndex: true
+                            };
+                            var val = {
+                                value: v.value,
+                                title: r.options[r.selectedIndex].dataset.title,
+                                type: type
+                            };
+                            if (sidebar.currentState.customEntryActive) {
+                                val = {
+                                    value: v.value,
+                                    title: document.getElementById("custom-type").value,
+                                    type: type
+                                };
+                            }
+                            onConfirm(userId, key, val, funcArgs);
+                        }.bind(args)
+                    });
 
                 let doc = res.dataset.user.categories;
 
@@ -251,28 +266,31 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
                 var v = document.getElementById("userkey-value");
                 let doc = res.dataset.user.categories;
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
-                    var key = catKey + "." + r.value;
-                    var funcArgs = {
-                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
-                        noIndex: true
-                    };
-                    var val = {
-                        value: v.value,
-                        title: r.options[r.selectedIndex].dataset.title
-                    };
-                    if (sidebar.currentState.customEntryActive) {
-                        val = {
-                            value: v.value,
-                            title: document.getElementById("custom-type").value,
-                            type: "customData",
-                        };
-                    }
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            var key = catKey + "." + r.value;
+                            var funcArgs = {
+                                isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                                noIndex: true
+                            };
+                            var val = {
+                                value: v.value,
+                                title: r.options[r.selectedIndex].dataset.title
+                            };
+                            if (sidebar.currentState.customEntryActive) {
+                                val = {
+                                    value: v.value,
+                                    title: document.getElementById("custom-type").value,
+                                    type: "customData",
+                                };
+                            }
 
 
-                    onConfirm(userId, key, val, funcArgs);
-                }.bind(args));
-
+                            onConfirm(userId, key, val, funcArgs);
+                        }.bind(args)
+                    });
                 // set current category
                 setCurrentUserKey(q,catKey);
                 // populate
@@ -355,36 +373,45 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                 let doc = res.dataset.user.categories;
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    var funcArgs = {
-                        isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
-                        noIndex: true
-                    };
-                    var val = {
-                        id: keyId,
-                        value: v.value,
-                        title: r.options[r.selectedIndex].dataset.title,
-                    };
-                    if (sidebar.currentState.customEntryActive) {
-                        val = {
-                            id: keyId,
-                            value: v.value,
-                            title: document.getElementById("custom-type").value,
-                        };
-                    }
-                    onConfirm(args.userid, key, val);
-                }.bind(args));
+                sidebar.registerCancelButton(".sidebar-cancel");
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            var funcArgs = {
+                                isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                                noIndex: true
+                            };
+                            var val = {
+                                id: keyId,
+                                value: v.value,
+                                title: r.options[r.selectedIndex].dataset.title,
+                            };
+                            if (sidebar.currentState.customEntryActive) {
+                                val = {
+                                    id: keyId,
+                                    value: v.value,
+                                    title: document.getElementById("custom-type").value,
+                                };
+                            }
+                            onConfirm(args.userid, key, val);
+                        }.bind(args)
+                    });
 
-                sidebar.registerButton (sidebar, ".sidebar-delete", function(){
+                sidebar.registerButton (".sidebar-delete",
+                    {
+                        customHandler: true,
+                        handler: function () {
 
-                    // delete array entry
-                    data = {
-                        title: key
-                    };
-                    if (corrupted) {
-                    }
-                    onDelete(args.userid, key, data);
-                });
+                            // delete array entry
+                            data = {
+                                title: key
+                            };
+                            if (corrupted) {
+                            }
+                            onDelete(args.userid, key, data);
+                        }
+                    });
 
                 q.addEventListener("change", function(e){
                     populateUserKeys(sidebar, doc, q.options[q.selectedIndex].dataset.datasetid, {
@@ -460,38 +487,46 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
                 var def = document.getElementById("default-checkbox");
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    var key = catKey;
-                    var ctype = r.value;
-                    var title = r.options[r.selectedIndex].dataset.title;
+                sidebar.registerCancelButton(".sidebar-cancel")
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            var key = catKey;
+                            var ctype = r.value;
+                            var title = r.options[r.selectedIndex].dataset.title;
 
-                    var funcArgs = {
-                        isArray: true,
-                        noIndex: true,
-                    };
-                    var val = {
-                        value: v.value,
-                        id: field._id,
-                        title: r.options[r.selectedIndex].dataset.title,
-                        type: ctype,
-                        default: def.checked,
-                    };
-                    if (sidebar.currentState.customEntryActive) {
-                        val.title = document.getElementById("custom-type").value;
-                    }
-                    onConfirm(args.userid, key, val, funcArgs);
-                }.bind(args));
+                            var funcArgs = {
+                                isArray: true,
+                                noIndex: true,
+                            };
+                            var val = {
+                                value: v.value,
+                                id: field._id,
+                                title: r.options[r.selectedIndex].dataset.title,
+                                type: ctype,
+                                default: def.checked,
+                            };
+                            if (sidebar.currentState.customEntryActive) {
+                                val.title = document.getElementById("custom-type").value;
+                            }
+                            onConfirm(args.userid, key, val, funcArgs);
+                        }.bind(args)
+                    });
 
-                sidebar.registerButton (sidebar, ".sidebar-delete", function(){
-
-                    // delete array entry
-                    data = {
-                        title: key
-                    };
-                    if (corrupted) {
-                    }
-                    onDelete(args.userid, key, data);
-                });
+                sidebar.registerButton ( ".sidebar-delete",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            // delete array entry
+                            data = {
+                                title: key
+                            };
+                            if (corrupted) {
+                            }
+                            onDelete(args.userid, key, data);
+                        }
+                    });
 
                 let [status, msg] = checkDataValidity(field, {value: "string", title: "string", type: "string"});
                 if(status !== 0){
@@ -597,35 +632,47 @@ let addQualification = new ContentHandler("UserAddQualification",
 
         var res = {qualifications: {}};
 
-        getDataFromServer("/api/v1/usermod/"+userId,function(context){
-            res.exploreUser = context;
-            if (res.qualifications.byType){
-                action(res)
-            }
+        let userData = new Promise(function(resolve, reject){
+            getDataFromServer("/api/v1/usermod/"+userId,function(context){
+                resolve(context);
+            });
         });
 
-        getDataFromServer("/api/v1/qualification/groupByType", function(context){
-            res.qualifications.byType = context;
-            if (res.exploreUser){
+        let qualificationData = new Promise(function(resolve, reject) {
+            getDataFromServer("/api/v1/qualification/groupByType", function (context) {
+                resolve(context);
+            });
+        })
+
+        Promise.all([userData, qualificationData])
+            .then(function(values){
+                let exploreUser = values[0];
+                let byTypeArray = values[1];
+                res.exploreUser = exploreUser;
+                res.qualifications.byType = byTypeArray
                 action(res);
-            }
-        });
+            })
         var action = function(context){
             $.get('/webpack/sidebar/templates/sidebar-addUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    const id = document.getElementById("qual-name").selectedOptions[0].id;
-                    var key = catKey;
-                    data = {
-                        qualification: findQualByIdInTypeArray(res.qualifications.byType, id),
-                        acquiredDate: $("#qual-acquiredDate").val(),
-                        expireDate: $("#qual-expireDate").val(),
-                        trainingDate: $("#qual-trainingDate").val(),
-                    };
-                    onConfirm(args.userid, key, data);
-                }.bind(args));
+                sidebar.registerCancelButton(".sidebar-cancel")
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            const id = document.getElementById("qual-name").selectedOptions[0].id;
+                            var key = catKey;
+                            data = {
+                                qualification: findQualByIdInTypeArray(res.qualifications.byType, id),
+                                acquiredDate: $("#qual-acquiredDate").val(),
+                                expireDate: $("#qual-expireDate").val(),
+                                trainingDate: $("#qual-trainingDate").val(),
+                            };
+                            onConfirm(args.userid, key, data);
+                        }.bind(args)
+                    });
                 var q = $("#qual-type");
                 q.on("change",function(e){
                     var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
@@ -696,54 +743,70 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
 
         var corrupted = false;
 
-        getDataFromServer("/api/v1/usermod/"+userId,function(context){
-            res.exploreUser = context;
-            res.currentQualification = context.qualifications.find(qual => qual._id === qualId);
-            if (res.qualifications.byType){
-                action(res)
-            }
+        let userData = new Promise(function(resolve, reject){
+            getDataFromServer("/api/v1/usermod/"+userId,function(context){
+                resolve(context);
+            });
         });
 
-        getDataFromServer("/api/v1/qualification/groupByType", function(context){
-            res.qualifications.byType = context;
-            if (res.exploreUser){
+        let qualificationData = new Promise(function(resolve, reject) {
+            getDataFromServer("/api/v1/qualification/groupByType", function (context) {
+                resolve(context);
+            });
+        })
+
+        Promise.all([userData, qualificationData])
+            .then(function(values){
+                let exploreUser = values[0];
+                let byTypeArray = values[1];
+                res.exploreUser = exploreUser;
+                res.qualifications.byType = byTypeArray
+                res.currentQualification = exploreUser.qualifications.find(qual => qual._id === qualId);
                 action(res);
-            }
-        });
+            })
 
         var action = function(context){
             $.get('/webpack/sidebar/templates/sidebar-updateUserQualification.hbs', function (data) {
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
+                sidebar.registerCancelButton(".sidebar-cancel");
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
 
-                    //helper to find qualification document in groupByType array
-                    const id = document.getElementById("qual-name").selectedOptions[0].id;
-                    data = {
-                        id: keyId,
-                        qualification: findQualByIdInTypeArray(res.qualifications.byType, id),
-                        acquiredDate: $("#qual-acquiredDate").val(),
-                        expireDate: $("#qual-expireDate").val(),
-                        trainingDate: $("#qual-trainingDate").val(),
-                    };
-                    onConfirm(args.userid, key, data);
-                }.bind(args));
+                            //helper to find qualification document in groupByType array
+                            const id = document.getElementById("qual-name").selectedOptions[0].id;
+                            data = {
+                                id: keyId,
+                                qualification: sidebar.findQualByIdInTypeArray(res.qualifications.byType, id),
+                                acquiredDate: $("#qual-acquiredDate").val(),
+                                expireDate: $("#qual-expireDate").val(),
+                                trainingDate: $("#qual-trainingDate").val(),
+                            };
+                            onConfirm(args.userid, key, data);
+                        }.bind(args)
+                    });
 
-                sidebar.registerButton (sidebar, ".sidebar-delete", function(){
+                sidebar.registerButton (".sidebar-delete",
+                    {
+                        customHandler: true,
+                        handler: function () {
 
-                    // delete array entry
-                    data = {
-                        id: keyId,
-                        qualification: res.currentQualification.qualification,
-                    };
-                    if (corrupted) {
-                        data.qualification = {qualType: "error", name: "error"}
-                    }
-                    onDelete(args.userid, key, data);
-                });
+                            // delete array entry
+                            data = {
+                                id: keyId,
+                                qualification: res.currentQualification.qualification,
+                            };
+                            if (corrupted) {
+                                data.qualification = {qualType: "error", name: "error"}
+                            }
+                            onDelete(args.userid, key, data);
+                        }
+                    });
 
-                if(!populateCurrentQualificationDefault(sidebar, res.qualifications.byType, res.currentQualification.qualification)){
+                if(!sidebar.populateCurrentQualificationDefault(sidebar, res.qualifications.byType, res.currentQualification.qualification)){
                     console.warn("trying to read corrupted data");
                     sidebar.addErrorMessage("trying to read corrupted data!",  function(data){
                         $("#sidebar-inner").before(data);
@@ -802,14 +865,17 @@ let changeRole = new ContentHandler("UserChangeRole",
                 $("#changeUserRole-select").val(context.acl.userRole);
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    data = {
-                        userId: userId,
-                        role: $("#changeUserRole-select").val(),
-                    };
-                    onConfirm(data);
-                }.bind(args));
-
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            data = {
+                                userId: userId,
+                                role: $("#changeUserRole-select").val(),
+                            };
+                            onConfirm(data);
+                        }.bind(args)
+                    });
             });
         };
     });

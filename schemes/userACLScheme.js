@@ -75,6 +75,7 @@ UserACLSchema.methods.updateDockerObject = function(){
                     protocol: true,
                 },
                 settings: {
+                    qualifications: opArray.includes(authEnums.operations.settings.QUALIFICATIONS),
                     logs: opArray.includes(authEnums.operations.settings.LOGS),
                     events: opArray.includes(authEnums.operations.settings.EVENTS),
                     user: opArray.includes(authEnums.operations.settings.USER),

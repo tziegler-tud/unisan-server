@@ -19,6 +19,9 @@
                 </div>
             </div>
             <div class="sidebar-section body-section">
+                <div class="section-title participant-heading">
+                    Art und Name
+                </div>
                 <div class="section-content">
                     <div class="ak-form">
                         <div class="ak-item ak-qual ak-qual-type">
@@ -39,12 +42,41 @@
                             <label for="qual-name">Bezeichnung</label>
                             <input class="common-input" id="qual-name" name="custom-name" type="text"/>
                         </div>
+                        <div class="ak-item ak-qual ak-qual-name">
+                            <label for="qual-short">Abkürzung / Kurzbezeichnung</label>
+                            <input class="common-input" id="qual-short" name="qual-short" placeholder="SanH" value="{{currentQualification.short}}" type="text"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title participant-heading">
+                    Hierarchie
+                </div>
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item ak-qual ak-qual-type">
+                            <label for="qual-type">Hierarchie-Ebene</label>
+                            <input class="common-select" id="qual-level" name="qual-level" value="{{currentQualification.level}}" type="number"/>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-        <div class="sidebar-bottom">
-            <a class="sidebar-confirm content-link">Speichern</a>
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
         </div>
     </div>
 </div>

@@ -10,18 +10,25 @@ import {MDCList} from "@material/list";
 import {MDCRipple} from "@material/ripple";
 import {MDCMenu} from "@material/menu";
 
-var EventPage = function(container, data, args){
+var EventPage = function(args){
     let defaults = {
+        container: null,
+        data: null,
+        sidebar: null,
+        args: {
+
+        }
     }
     args = (args === undefined) ? {}: args;
     args = Object.assign(defaults, args);
 
-    this.data = data;
-    if(data.event === undefined) data.event = {}
-    this.event = data.event;
-    this.container = container;
+    this.data = args.data;
+    this.container = args.container;
+    this.sidebar = args.sidebar;
+    if(args.data.event === undefined) this.data.event = {}
+    this.event = this.data.event;
     this.components = [];
-    this.componentContainer = container;
+    this.componentContainer = this.container;
     //constructor
     return this;
 };

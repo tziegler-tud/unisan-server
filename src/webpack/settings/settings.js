@@ -3,6 +3,7 @@ import {logs} from "./logs.js";
 import {groups} from "./groups.js";
 import {user} from "./user.js";
 import {events} from "./events.js";
+import {qualifications} from "./qualifications.js";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
@@ -25,11 +26,16 @@ $(document).ready(function () {
         loader: user,
     };
 
+    let qualificationsLoader = {
+        title: "qualifications",
+        loader: qualifications,
+    }
+
     let eventsLoader = {
         title: "events",
         loader: events,
     };
-    loaders.push(logsLoader, groupsLoader, userLoader, eventsLoader);
+    loaders.push(logsLoader, groupsLoader, userLoader, eventsLoader, qualificationsLoader);
 
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;

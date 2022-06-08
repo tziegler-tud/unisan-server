@@ -44,7 +44,7 @@ function getDockerArguments (req, res, next) {
 // router.get("/*", auth);
 router.get("/*", getDockerArguments);
 router.get('/', database);
-router.get('/database', database);
+router.get('/qualifications', qualifications);
 router.get('/user', user);
 router.get('/events', events);
 router.get('/roles', roles);
@@ -59,6 +59,22 @@ function database (req, res, next) {
         .then(quals => {
             qualList = quals;
             res.render("unisams/settings/settingsDatabase", {title: "settings - uniSams",
+                user: req.user._doc,
+                acl: req.acl,
+                qualificationList: qualList
+            })
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function qualifications (req, res, next) {
+    var qualList = {};
+    qualificationService.getAll()
+        .then(quals => {
+            qualList = quals;
+            res.render("unisams/settings/qualifications", {title: "qualifications - uniSams",
                 user: req.user._doc,
                 acl: req.acl,
                 qualificationList: qualList

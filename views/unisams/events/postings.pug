@@ -14,7 +14,7 @@ block page_includes
     script.
         window.jsmodule = {
             module: "event",
-            loaders: ["eventPostings"],
+            loaders: ["eventParticipants"],
             args: {
                 allowEdit: #{allowedit}
             }
@@ -22,7 +22,7 @@ block page_includes
         window.user = !{JSON.stringify(user)};
         window.exploreEventId = "#{exploreEvent.id}";
         window.dockerArgs.activeContainer = "eventDetailContainer";
-        window.dockerArgs.activeElementId = "eventPostings";
+        window.dockerArgs.activeElementId = "eventParticipants";
         window.allowedit =#{allowedit};
 
 

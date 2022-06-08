@@ -10,10 +10,22 @@ var QualificationsSchema = new Schema({
         type: String,
         required: true
     },
+    typeIdentifier: {
+        type: Number,
+        default: 0,
+    },
+    level: {
+        type: Number,
+        default: 0,
+    },
     name: {
         type: String,
         required: true
     },
+    short: {
+        type: String,
+        default: this.name,
+    }
 });
 
 

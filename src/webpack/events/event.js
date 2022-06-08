@@ -25,18 +25,12 @@ $(document).ready(function () {
         title: "eventSettings",
         loader: eventSettings,
     };
-
-    let postingsLoader = {
-        title: "eventPostings",
-        loader: eventPostings,
-    };
-
     let logsLoader = {
         title: "eventLogs",
         loader: eventLogs,
     };
 
-    loaders.push(detailsLoader, participantsLoader, logsLoader, postingsLoader, settingsLoader);
+    loaders.push(detailsLoader, participantsLoader, logsLoader, settingsLoader);
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;
     if (jsmodule === undefined) jsmodule = {};

@@ -25,16 +25,17 @@ let addGroup = new ContentHandler("addGroup",
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton(".sidebar-back-btn");
-            sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                let data = {
-                    title: $("#addRoleForm-title").val(),
-                    description: $("#addRoleForm-description").val(),
-                };
-                onConfirm(data);
-            }.bind(args));
-
+            sidebar.registerConfirmButton( ".sidebar-confirm", {
+                customHandler: true,
+                handler: function () {
+                    let data = {
+                        title: $("#addRoleForm-title").val(),
+                        description: $("#addRoleForm-description").val(),
+                    };
+                    onConfirm(data);
+                }.bind(args),
+            });
         });
-    
     });
 
 let changeGroup = new ContentHandler("changeGroup",
@@ -58,14 +59,17 @@ let changeGroup = new ContentHandler("changeGroup",
                 sidebar.sidebarHTML.html(template(context));
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    let data = {
-                        title: $("#changeGroupForm-title").val(),
-                        description: $("#changeGroupForm-description").val(),
-                    };
-                    onConfirm(groupId, data);
-                }.bind(args));
-
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                                let data = {
+                                    title: $("#changeGroupForm-title").val(),
+                                    description: $("#changeGroupForm-description").val(),
+                                };
+                                onConfirm(groupId, data);
+                        }.bind(args)
+                    });
             });
         };
     });
@@ -91,13 +95,17 @@ var addUser  = new ContentHandler("addUserToGroup",
                 var template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function () {
-                    data = {
-                        userGroupId: res.group.id,
-                        userId: selectedUser.id,
-                    };
-                    onConfirm(data);
-                }.bind(args));
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            data = {
+                                userGroupId: res.group.id,
+                                userId: selectedUser.id,
+                            };
+                            onConfirm(data);
+                        }.bind(args)
+                    });
 
                 //setup searchbar
                 let searchContainer = document.getElementById("search-container")
@@ -223,13 +231,16 @@ let addGroupPath = new ContentHandler("addGroupPath",
                 sidebar.sidebarHTML.html(template(context));
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                sidebar.registerConfirmButton( ".sidebar-confirm", function(){
-                    let data = {
-                        operation: $("#changeGroupForm-operation").val(),
-                    };
-                    onConfirm(groupId, data);
-                }.bind(args));
-
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            let data = {
+                                operation: $("#changeGroupForm-operation").val(),
+                            };
+                            onConfirm(groupId, data);
+                        }.bind(args)
+                    });
             });
         };
     });
@@ -269,12 +280,16 @@ let updateGroupPath = new ContentHandler("updateGroupPath",
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
 
-                sidebar.registerButton (sidebar, ".sidebar-delete", function(){
+                sidebar.registerButton (".sidebar-delete",
+                    {
+                        customHandler: true,
+                        handler: function () {
 
-                    if (corrupted) {
-                    }
-                    onDelete(groupId, currentOperation);
-                }.bind(args));
+                            if (corrupted) {
+                            }
+                            onDelete(groupId, currentOperation);
+                        }.bind(args)
+                    });
             });
         };
     });

@@ -2,6 +2,8 @@ import "./scrollableList.scss";
 import "./scrollableListMobile.scss";
 const Handlebars = require("handlebars");
 import "../helpers/handlebarsHelpers";
+import {common} from "../helpers/helpers";
+import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 import {phone, tablet} from "../helpers/variables";
 
 
@@ -21,8 +23,18 @@ let ScrollableListCounter = {
  *
  * @param {HTMLElement} container - container dom element
  * @param {String} type - type of data. ["user", "event", "qualification"]
- * @param {Object} data - iterateable JSON object containing data for list entries
- * @param {Object} args
+ * @param {Object} data - iterateable object containing data for list entries
+ * @param {Object} args constructor args
+ * @param [args.enableMobile = false] {Boolean} true to render mobile version.
+ * @param [args.view = "list"] {String} choose between "list" and "cards" view
+ * @param [args.height = "fixed"] {String} limits container dimensions. Options: "full": expand to fill parent container, "fixed": fixed height, use fixedHeight parameter to set a value
+ * @param [args.fixedHeight = "40em"] {String} css-parseable value. Requires "height" parameter to be set to "fixed".
+ * @param args.sorting {Object} sorting object
+ * @param args.sorting.property {String} property to be sorted
+ * @param args.sorting.direction {String} direction. Either "asc" or "desc"
+ * @param [args.acl] {Object} Contains additional information for rendering purposes, usually concerning user access rights. This object is passed to the template as Object named "acl".
+ * @param args.hasTitle {Boolean} true if title is provided
+ * @param args.title {String} title of scrollable List. Requires hasTitle to be set to true.
  * @param {Object} [callback] callback object
  * @param {Object} [callback.listItem] Callback object for generated list items
  * @param {function[]} [callback.customHandlers] Array of functions to be applied
@@ -40,7 +52,7 @@ var ScrollableList = function(container,type, data,  args, callback){
     this.args = args;
     this.data = data;
     // this.initialData = jQuery.extend(true, {}, data);
-    this.initialData = data;
+    this.initialData = data.slice();
     this.callback = callback;
     this.container = container;
     this.type = type;
@@ -48,7 +60,8 @@ var ScrollableList = function(container,type, data,  args, callback){
     this.templateUrl = applyType(type, this);
     this.sorting = args.sorting;
     this.view = applyView(args.view, args.enableMobile);
-    buildHTML(this, data, args);
+    // buildHTML(this, data, args);
+    this.sort(this.sorting.property, this.sorting.direction, true)
     var self = this;
 
     return this;
@@ -87,14 +100,17 @@ var applyView = function(view, enableMobile) {
 var applyType = function(type, self) {
     let url = {list: "", cards: ""}
     switch(type) {
+        case "userQualification":
+            url.list = '/webpack/scrollableList/templates/userQualificationList.hbs'
+            break;
         case "qualification":
-            url.list = '/static/unisams/js/scrollableList/templates/qualificationList.hbs'
+            url.list = '/webpack/scrollableList/templates/qualificationList.hbs'
             break;
         case "log":
-            url.list = '/static/unisams/js/scrollableList/templates/logList.hbs'
+            url.list = '/webpack/scrollableList/templates/logList.hbs'
             break;
         case "user":
-            url.list = '/static/unisams/js/scrollableList/templates/userList.hbs'
+            url.list = '/webpack/scrollableList/templates/userList.hbs'
             break;
         case "participants":
             url.list = '/webpack/scrollableList/templates/participantsList.hbs';
@@ -127,6 +143,8 @@ var applyArgs = function(args){
             direction: 0,
         },
         acl: {},
+        hasTitle: false,
+        title: "test",
     }
     if (args===undefined) {
         return defaultArgs;
@@ -270,9 +288,10 @@ ScrollableList.prototype.adjustList = function() {
     });
 }
 
-ScrollableList.prototype.sort = function(property, direction) {
+ScrollableList.prototype.sort = function(property, direction, forceRebuild) {
     let self = this;
     if(property === undefined || property === null) direction = 0;
+    if(forceRebuild === undefined) forceRebuild = false;
     if (typeof(direction)==="string") {
         switch(direction){
             case "asc":
@@ -285,40 +304,72 @@ ScrollableList.prototype.sort = function(property, direction) {
                 direction = 0;
         }
     }
-    if(direction === 1)
-    {
-        //sort ascending
-        self.data.sort(function(a,b){
-            if (common.refJSON(a,property) < common.refJSON(b,property)) return -1;
-            if (common.refJSON(a,property) > common.refJSON(b,property)) return 1;
-            return 0;
-        })
-        buildHTML(self, self.data, self.args);
+    let sortObj = {
+        property: property,
+        direction: direction,
     }
-    else {
-        if (direction === -1) {
-            //sort descending
-            //sort ascending
-            self.data.sort(function(a,b){
-                if (common.refJSON(a,property) < common.refJSON(b,property)) return 1;
-                if (common.refJSON(a,property) > common.refJSON(b,property)) return -1;
-                return 0;
-            })
-            buildHTML(self, self.data, self.args);
+    if(direction === 0)
+    {
+        //remove any sorting
+        if(forceRebuild){
+            buildHTML(self, self.initialData, self.args)
         }
         else {
-            if (direction === 0) {
-                //remove any sorting
-                if(self.sorting.direction !== 0){
-                    buildHTML(self, self.initialData, self.args)
-                }
+
+            if (self.sorting.direction !== 0) {
+                buildHTML(self, self.initialData, self.args)
             }
         }
+    }
+    else {
+        let sortedData = sortData(self.data, sortObj);
+        self.data = sortedData;
+        buildHTML(self, sortedData, self.args);
     }
     this.sorting = {
         property: property,
         direction: direction,
     }
+}
+
+/**
+ *
+ * @param data {Object} iterable object containing data to be sorted
+ * @param sortingObject {Object} sorting Object
+ * @param sortingObject.property {String} property to be sorted for
+ * @param sortingObject.direction {String} direction (1: asc, -1: desc)
+ *
+ * @returns {Object} the sorted data
+ */
+var sortData = function(data, sortingObject){
+    let property = sortingObject.property;
+    let direction = sortingObject.direction;
+    if(property === undefined || property === null) direction = 0;
+    if(direction !== -1 && direction !== 1) {
+        console.warn("sidebar sorting subroutine error: Invalid argument received: direction: "+ direction)
+        return data;
+    }
+    if(direction === 1)
+    {
+        //sort ascending
+        data.sort(function(a,b){
+            if (common.refJSON(a,property) < common.refJSON(b,property)) return -1;
+            if (common.refJSON(a,property) > common.refJSON(b,property)) return 1;
+            return 0;
+        })
+    }
+    else {
+        if (direction === -1) {
+            //sort descending
+            //sort ascending
+            data.sort(function(a,b){
+                if (common.refJSON(a,property) < common.refJSON(b,property)) return 1;
+                if (common.refJSON(a,property) > common.refJSON(b,property)) return -1;
+                return 0;
+            })
+        }
+    }
+    return data;
 }
 
 var sortByColumn = function(self, headerElement) {
@@ -384,7 +435,7 @@ var cardEventHandlers = function(self){
 
     const dropdowns = [].map.call(document.querySelectorAll(".dropdown-button"), function (el) {
         const container = $(el).closest(".dropdown-menu");
-        const drop = new common.DropdownMenu(container, "click", el);
+        const drop = new DropdownMenu(container, "click", el);
     });
 
 

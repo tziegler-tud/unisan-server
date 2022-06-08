@@ -89,6 +89,7 @@ let operations = {
         DELETE: "deleteGroups",
     },
     settings: {
+        QUALIFICATIONS: "manageQualificationSettings",
         LOGS: "manageSystemLogs",
         EVENTS: "manageEventSettings",
         USER: "manageUserSettings",
@@ -126,6 +127,7 @@ let defaultUserAdmin = {
         operations.access.READACL,
 
         operations.settings.USER,
+        operations.settings.QUALIFICATIONS,
     ]
 }
 
@@ -229,6 +231,7 @@ let defaultSysAdmin = {
         operations.settings.LOGS,
         operations.settings.GOUPS,
         operations.settings.SYSTEM,
+        operations.settings.QUALIFICATIONS,
 
     ]
 }

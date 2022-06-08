@@ -16,23 +16,27 @@ let showLogDetails = new ContentHandler("logDetails",
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(handleData));
             sidebar.registerBackButton(".sidebar-back-btn");
-            sidebar.registerButton(".sidebar-delete", function(){
-                // delete log entry
-                $.ajax({
-                    url: "/api/v1/logs/" + log.id,
-                    type: 'DELETE',
-                    contentType: "application/json; charset=UTF-8",
-                    success: function(result) {
-                        window.location.reload();
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        // alert(textStatus + ": " + XMLHttpRequest.status + " " + errorThrown);
-                        if (XMLHttpRequest.status===403) self.addErrorMessage("Operation not permitted.", function(data){
-                            $("#sidebar-inner").before(data);
-                        }, true);
+            sidebar.registerButton(".sidebar-delete",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        // delete log entry
+                        $.ajax({
+                            url: "/api/v1/logs/" + log.id,
+                            type: 'DELETE',
+                            contentType: "application/json; charset=UTF-8",
+                            success: function (result) {
+                                window.location.reload();
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                // alert(textStatus + ": " + XMLHttpRequest.status + " " + errorThrown);
+                                if (XMLHttpRequest.status === 403) self.addErrorMessage("Operation not permitted.", function (data) {
+                                    $("#sidebar-inner").before(data);
+                                }, true);
+                            }
+                        });
                     }
                 });
-            });
         });
     });
 
