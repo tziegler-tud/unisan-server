@@ -5,9 +5,10 @@
 
 @import "~material-icons-font/material-icons-font.css";
 
+@import "../common";
 @import "../color-rules";
 @import "../variables";
-@import "../fonts.css";
+@import "../fonts";
 
 @include icon-button.core-styles;
 @include card.core-styles;
@@ -655,6 +656,9 @@ ul.eventlist{
       }
     }
   }
+  .card-menu-container .mdc-menu .mdc-list li {
+    font-size: 80%;
+  }
 }
 
 /*
@@ -761,16 +765,22 @@ ul.postingslist{
       .date {
         display: none !important;
       }
+      .description {
+        display: none !important;
+      }
 
       @media #{$desktop, $tablet-landscape}  {
         .date {
+          display: block !important;
+        }
+        .description {
           display: block !important;
         }
       }
 
       .inner {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         grid-template-rows: auto;
 
         @media #{$desktop, $tablet-landscape}  {
@@ -802,3 +812,188 @@ ul.postingslist{
   }
 }
 
+/*
+posting cards
+ */
+
+
+.postingslist-cards-container {
+  $item-bg: $page-bg-color;
+  //$item-bg: #fffefa;
+  //$item-bg: #eaeaea;
+  //$page-bg: $page-bg-color-v2;
+  $page-bg: #AAA;
+  padding: 0;
+  list-style: none;
+  width: 96%;
+  margin: 0 auto;
+  font-size: 90%;
+  position: relative;
+  @media  #{$desktop}  {
+    //width: 90%;
+  }
+
+
+  ul.postingslist-cards {
+    padding: 0;
+    list-style: none;
+    margin: 0 0 2em 0;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-auto-rows: 1fr;
+    grid-column-gap: 1em;
+    grid-row-gap: 2em;
+    width:        100%;
+
+    li.postingscards-item {
+      width: 100%;
+      margin: .5em 0;
+      display: block;
+
+      box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+
+      .postingscards-inner {
+
+        background-color: $item-bg;
+
+        text-align: left;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-flow: row nowrap;
+        padding: 1em 1em 1em 1em;
+
+        @media  #{$desktop, $tablet-landscape}  {
+          //margin:           0 1em;
+        }
+
+        .postingscards-label {
+          flex: 0 0 3em;
+          overflow: hidden;
+          width: auto;
+          font-weight: lighter;
+          font-size: 100%;
+
+          color: $col1;
+
+          display: flex;
+          flex-flow: row wrap;
+          justify-content: flex-start;
+
+          border-right: 1px solid #AAA;
+
+          .postingscards--qualificationLabel {
+            flex: 1 1 auto;
+            //font-variant: small-caps;
+            font-size: 180%;
+            writing-mode: tb-rl;
+            transform: rotate(-180deg);
+          }
+        }
+
+        .postingscards-body {
+          flex: 1 1 auto;
+          display: flex;
+          flex-flow: row wrap-reverse;
+          align-items: end;
+
+
+          .postingscards-body-item {
+            flex: 1 1 40%;
+            width: auto;
+            padding: 0 1em;
+
+          }
+
+          .postingscards-user {
+
+            font-weight: lighter;
+            font-size: 130%;
+
+            color: $col1;
+
+            display: flex;
+            flex-flow: column wrap;
+            justify-content: flex-start;
+
+            .postingscards--assignedUser {
+              display: flex;
+              flex: 1 1 auto;
+            }
+
+            .postingscards--assignedDate {
+              flex: 1 1 auto;
+              font-size: 70%;
+              color: $text-color-secondary;
+              flex-flow: row wrap;
+              justify-content: flex-start;
+              display: none;
+
+              @media #{$desktop, $tablet-landscape} {
+                display: flex;
+              }
+
+              span {
+                flex: 0 0 auto;
+                padding: 0 5px 0 0;
+              }
+            }
+
+            .postingscards--assignSelf {
+              .allowed {
+                @include button.ink-color(#3b8d23)
+              }
+
+              .not-allowed {
+                @include button.ink-color(#858585)
+              }
+            }
+          }
+
+          .postingscards-content {
+
+
+            font-weight: lighter;
+            font-size: 130%;
+
+            color: $col1;
+            display: flex;
+            flex-flow: column wrap;
+            justify-content: flex-start;
+          }
+
+          .postingscards-content-item {
+            flex: 1 1 auto;
+            padding: .5em 0 0 0;
+
+            .postingscards-text {
+              display: block;
+              color: $text-color-heading;
+
+            }
+            .postingscards-value {
+              display: block;
+              color: $text-color-secondary;
+            }
+
+            &.postingscards--description {
+            }
+          }
+        }
+        .gallery-item-actions {
+          flex: 0 0 auto;
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: flex-end;
+        }
+      }
+    }
+    li.gallery-add-item {
+      svg {
+        height: 4em;
+        width: 4em;
+        color: #c31d34;
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 const Handlebars = require("handlebars");
-import {transformDateTimeString} from "./helpers";
+import {transformDateTimeString, dateRangeString} from "./helpers";
 
 Handlebars.registerHelper('hasRole', function(participant, roleString) {
     return participant.role === roleString;
@@ -32,9 +32,27 @@ Handlebars.registerHelper('transformDateStringExtended', function(dateString, fo
     return new Handlebars.SafeString(transformDateTimeString(dateString, format).dateExtended);
 });
 
+Handlebars.registerHelper('dateRangeString', function(startDateString, endDateString) {
+    return new Handlebars.SafeString(dateRangeString(startDateString, endDateString).dateTimeRange);
+});
+
+Handlebars.registerHelper('timeRangeString', function(startDateString, endDateString) {
+    return new Handlebars.SafeString(dateRangeString(startDateString, endDateString).timeRange);
+});
+
 Handlebars.registerHelper('checklength', function (v1, v2, options) {
     'use strict';
     if (v1.length>v2) {
+        return options.fn(this);
+    }
+    return options.inverse(this);
+});
+
+
+Handlebars.registerHelper('stringNotEmpty', function (v1, options) {
+    'use strict';
+    if(typeof(v1) !== "string") return options.inverse(this);
+    if (v1.length>0) {
         return options.fn(this);
     }
     return options.inverse(this);
@@ -74,6 +92,10 @@ Handlebars.registerHelper('userHasRole', function (user, role) {
     let userRoleId = (user.role.id === undefined) ? user.role : user.role.id;
     let roleId = (role.id === undefined) ? role : role.id;
     return (userRoleId === roleId);
+});
+
+Handlebars.registerHelper('not', function (v1) {
+    return !v1;
 });
 
 Handlebars.registerHelper('and', function (v1, v2, options) {

@@ -10,6 +10,7 @@ const Log = require('../utils/log');
 const User = db.User;
 const Event = db.Event;
 const UserGroup = db.UserGroup;
+const Qualifications = db.Qualifications;
 const UserACL = db.UserACL;
 const DbLog = db.Log;
 
@@ -48,7 +49,7 @@ module.exports = {
  * Gets all users
  */
 async function getAll() {
-    return User.find().select('-hash');
+    return User.find().select('-hash').populate("qualifications.qualification");
 }
 
 /**
@@ -59,7 +60,7 @@ async function getManyById(idArray) {
         '_id': {
             $in: idArray
         }
-    }).select('-hash')
+    }).select('-hash').populate("qualifications.qualification")
 }
 
 /**
@@ -86,10 +87,10 @@ async function getAllFiltered(args){
     }
 
     if(sort === undefined) {
-        return query;
+        return query.populate("qualifications.qualification");
     }
     else {
-        return query.sort(sort);
+        return query.sort(sort).populate("qualifications.qualification");
     }
 }
 
@@ -100,7 +101,7 @@ async function getAllFiltered(args){
  */
 async function getById(id) {
     //populate userGroups
-    return User.findById(id).select('-hash');
+    return User.findById(id).select('-hash').populate("qualifications.qualification");
 
 }
 
@@ -1522,3 +1523,4 @@ function clearDocuments(){
             .catch(err => reject(err))
     })
 }
+

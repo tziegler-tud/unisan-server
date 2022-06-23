@@ -3,8 +3,8 @@
         <li class="noSelect rowHeading">
             <div class="inner">
                 <div class="item-property scrollableList-header-column userlist-ch name" data-property="user.generalData.lastName.value">Name</div>
-                <div class="item-property scrollableList-header-column userlist-ch role" data-property="qualification">Qualifikation</div>
-                <div class="item-property scrollableList-header-column userlist-ch role" data-property="description">Beschreibung</div>
+                <div class="item-property scrollableList-header-column userlist-ch qualification" data-property="qualification">Qualifikation</div>
+                <div class="item-property scrollableList-header-column userlist-ch description" data-property="description">Beschreibung</div>
                 <div class="item-property scrollableList-header-column userlist-ch date" data-property="date">Anmeldedatum</div>
             </div>
         </li>
@@ -14,12 +14,13 @@
 <div class="itemlist-content-container scrollableList-content">
     <ul class="common-list postingslist scrollableItemList scrollableList-body noSelect list-view border">
     {{#each listdata}}
-        <li class="user-entry noSelect" id='postingId{{this._id}}' data-postingId= {{this._id}}>
+        <li class="user-entry noSelect scrollableList-item" id='postingId{{this._id}}' data-postingId="{{this._id}}" data-userisallowed="{{this.userIsAllowed}}">
             <a class="inner noSelect">
                 {{#if this.assigned.isAssigned}}
                 <div class="scrollableList-body-column item-property item-container name ">
                     <div class=" userlist-img item-container-element"><img src="/data/uploads/user_images/{{this.assigned.user.id}}/{{this.assigned.user.id}}.jpg"/></div>
                     <span class=" item-container-element item-selectable">{{this.assigned.user.generalData.firstName.value}} {{this.assigned.user.generalData.lastName.value}}</span>
+                    {{#if ../args.allowEdit}}
                     <div class="participant-menu-container mdc-menu-surface--anchor">
                         <button class="participant-menu-button mdc-icon-button material-icons">
                             <div class="mdc-icon-button__ripple"></div>
@@ -28,29 +29,27 @@
                         <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
                             <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
                                 <li class="mdc-list-item posting-details" role="menuitem" data-postingId="{{this._id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
-                                        info
-                                    </span>
+                            <span class="mdc-list-item__graphic material-icons">
+                                info
+                            </span>
                                     <span class="mdc-list-item__text">Details</span>
                                 </li>
                                 <li class="mdc-list-item participant-details" role="menuitem" data-userid="{{this.assigned.user.id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
-                                        contact_page
-                                    </span>
+                            <span class="mdc-list-item__graphic material-icons">
+                                contact_page
+                            </span>
                                     <span class="mdc-list-item__text">Akte öffnen</span>
                                 </li>
                                 <li class="mdc-list-item posting-unassign" role="menuitem" data-postingId="{{this._id}}" data-userId="{{this.assigned.user.id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
-                                        person_remove
-                                    </span>
+                            <span class="mdc-list-item__graphic material-icons">
+                                person_remove
+                            </span>
                                     <span class="mdc-list-item__text">Abmelden</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                </div>
-                <div class="scrollableList-body-column center item-property role">
-                    <span class="item-container-element">{{this.assigned.qualification.name}}</span>
+                    {{/if}}
                 </div>
                 {{else}}
                 <div class="scrollableList-body-column item-property item-container postingslist-unassigned-container name ">
@@ -65,6 +64,15 @@
                         </button>
                         <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
                             <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                {{#if this.userIsAllowed}}
+                                    <li class="mdc-list-item posting-assignCurrentUser" role="menuitem" data-postingId="{{this._id}}">
+                                        <span class="mdc-list-item__graphic material-icons">
+                                            person_add
+                                        </span>
+                                        <span class="mdc-list-item__text">Mich anmelden</span>
+                                    </li>
+                                {{/if}}
+                                {{#if ../args.allowEdit}}
                                 <li class="mdc-list-item posting-edit" role="menuitem" data-postingId="{{this._id}}">
                                     <span class="mdc-list-item__graphic material-icons">
                                         edit
@@ -89,14 +97,15 @@
                                     </span>
                                     <span class="mdc-list-item__text">Posten entfernen</span>
                                 </li>
+                                {{/if}}
                             </ul>
                         </div>
                     </div>
                 </div>
+                {{/if}}
                 <div class="scrollableList-body-column center item-property role">
                     <span class="item-container-element">{{#each this.requiredQualifications}}{{this.name}}{{#unless @last}}, {{/unless}}{{/each}}</span>
                 </div>
-                {{/if}}
                 <div class="scrollableList-body-column center item-property description">
                     <span class="item-container-element">{{this.description}}</span>
                 </div>

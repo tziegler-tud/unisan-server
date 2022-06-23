@@ -1,7 +1,7 @@
 <div class="gallery-container">
     <ul class="common-list documentlist gallery-view protocol-gallery" id="documentlist-top">
         {{#each listdata}}
-            <li class="gallery-item cards-item" data-viewkey={{this.id}}>
+            <li class="gallery-item viewKey-item cards-item" data-viewkey={{this.id}}>
                 <div class="inner">
 <!--                    <div class="image"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
                     <div class="image-overlay"></div>
@@ -11,17 +11,37 @@
                         <div class="gallery-heading-inner date">{{{this.dateRangeString}}}</div>
                     </div>
                     <div class="gallery-item-actions">
-                        <div class="dropdown-menu menu-below"><button class="mdc-icon-button dropdown-button material-icons" title="More options" data-mdc-ripple-is-unbounded="true">more_vert</button>
-                            <div class="userprofile-dropdown">
-                                <div class="dropdown-container">
-                                    <div class="dropdown-entry {{#or ../acl.events.write ../acl.events.delete}}last{{/or}}"><a href="/unisams/events/view/{{this.id}}" class="" id="">Event anzeigen</a></div>
+                        <div class="eventcard-menu-container card-menu-container mdc-menu-surface--anchor">
+                            <button class="eventcard-menu-button card-menu-button mdc-icon-button material-icons">
+                                <div class="mdc-icon-button__ripple"></div>
+                                more_vert
+                            </button>
+                            <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
+                                <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
                                     {{#if ../acl.events.write}}
-                                        <div class="dropdown-entry {{#unless acl.events.delete}}last{{/unless}}"><a href="/unisams/events/edit/{{this.id}}" class="" id="">Event bearbeiten</a></div>
+                                    <li class="mdc-list-item event-show" role="menuitem" data-eventid="{{this._id}}">
+                                            <span class="mdc-list-item__graphic material-icons">
+                                                edit
+                                            </span>
+                                        <span class="mdc-list-item__text">Event bearbeiten</span>
+                                    </li>
+                                    {{else}}
+                                        <li class="mdc-list-item event-show" role="menuitem" data-eventid="{{this._id}}">
+                                            <span class="mdc-list-item__graphic material-icons">
+                                                info
+                                            </span>
+                                            <span class="mdc-list-item__text">Event anzeigen</span>
+                                        </li>
                                     {{/if}}
                                     {{#if ../acl.events.delete}}
-                                    <div class="dropdown-entry last"><a class="before-icon icon-delete documentDeleteBtn" id="">Löschen</a></div>
+                                    <li class="mdc-list-item event-delete" role="menuitem" data-eventid="{{this._id}}">
+                                            <span class="mdc-list-item__graphic material-icons">
+                                                delete
+                                            </span>
+                                        <span class="mdc-list-item__text">Event löschen</span>
+                                    </li>
                                     {{/if}}
-                                </div>
+                                </ul>
                             </div>
                         </div>
                     </div>

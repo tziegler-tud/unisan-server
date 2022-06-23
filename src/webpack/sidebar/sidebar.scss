@@ -43,8 +43,7 @@ body{
 
   }
 
-    @media #{$tablet-landscape} {
-
+  @media #{$tablet-landscape} {
     //overflow: auto;
     .page-container {
       width: 0;
@@ -56,8 +55,13 @@ body{
         float: left;
       }
     }
-
   }
+  @media #{$phone} {
+    .page-container {
+      overflow-y: hidden;
+    }
+  }
+
 
     .sidebar-container {
       transform: translateX(0);
@@ -75,8 +79,9 @@ body{
 
   .sidebar-container {
     width:    100vw;
-    min-height: 100vh;
-    height: auto;
+    //min-height: 100vh;
+    //height: auto;
+    height: 100vh;
     transform: translateX(100%);
     position: fixed;
     border-left: 1px solid $menu-border-color;
@@ -112,7 +117,7 @@ body{
         display: flex;
         flex-flow: row nowrap;
         padding: 0;
-        height: 3em;
+        flex: 0 0 3em;
         width: 100%;
         border-bottom: 1px solid $menu-border-color;
         background-color: $page-bg-color-v2;
@@ -163,7 +168,7 @@ body{
         flex-flow: column nowrap;
         justify-content: flex-start;
 
-        overflow-y: scroll;
+        overflow-y: hidden;
 
         .label-caps {
           label {
@@ -172,6 +177,7 @@ body{
         }
 
         .sidebar-bottom {
+          flex: 0 0 auto;
           position: relative;
           margin-bottom: 1em;
           &.sidebar-bottom--padding {
@@ -196,6 +202,7 @@ body{
 
         .sidebar-content {
           flex: 1 1 auto;
+          overflow-y: auto;
 
           .sidebar-section {
             padding: 1em;

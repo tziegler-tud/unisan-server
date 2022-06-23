@@ -209,6 +209,7 @@
         width: 100%;
         .eventPage-component-inner {
           margin: 10px;
+          padding-bottom: 10px;
           background-color: $page-bg-color;
           box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
           width: calc(100% - 20px);
@@ -252,6 +253,13 @@
             .eventinfo-item-inner {
               margin: .5em;
 
+            }
+            &.eventinfo-item-material {
+              .eventinfo-material {
+                .eventinfo-material-uploadContainer {
+                  padding-bottom: 1px; //needed to expand with children, dont ask me why.
+                }
+              }
             }
             &.eventinfo-item-date {
               padding-left: 2em;
@@ -417,3 +425,7 @@
     }
   }
 }
+
+/**
+special classes
+ */

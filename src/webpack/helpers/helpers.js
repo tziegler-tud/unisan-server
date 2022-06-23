@@ -1,6 +1,29 @@
 var moment = require('moment');
 moment().format();
+/**
+ * typedef Posting
+ * @typedef {Object} Posting
+ * @property {Qualification[]} requiredQualifications - array of required qualifications
+ * @property {Object} date - complex object wrapping date information
+ * @property {Date} date.startDate - start date
+ * @property {Date} date.endDate - end date
+ * @property {Number} order - order of posting, for displaying purposes
+ * @property {boolean} enabled - true if the posting is enabled. Currently not used.
+ * @property {boolean} optional - true if the posting is optional. Currently not used.
+ * @property {Object} assigned - complex object containing information on assigned user
+ * @property {boolean} isAssigned - true if the posting has an user assigned.
+ * @property {User} isAssigned - the assigned user.
+ * @property {Qualification} qualification - information on the qualification used for assignement.
+ * @property {Date} date - date this user was assigned
+ *
+ */
 
+/**
+ *
+ * @param dateString
+ * @param format
+ * @returns {{dateTime: string, date: string, dateExtended: string, dateTimeExtended: string, time: ((function(*): (string|string))|*)}}
+ */
 var transformDateTimeString = function(dateString, format) {
     format = (format === undefined || typeof(format) !== "string") ? "text" : format;
     let weekDays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",  "Freitag", "Samstag"];
@@ -33,6 +56,45 @@ var transformDateTimeString = function(dateString, format) {
             }
         },
     };
+}
+
+var dateRangeString = function(startDateString, endDateString){
+    var dateString;
+    var dateTimeString;
+    var timeString;
+    var startDate = new Date(startDateString);
+    var endDate = new Date(endDateString);
+
+    // check if startDate and EndDate is the same day
+    if (startDate.getFullYear() === endDate.getFullYear()){
+        if (startDate.getMonth() === endDate.getMonth()){
+            if (startDate.getDate() === endDate.getDate()){
+
+                dateString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()+1) + "." + startDate.getFullYear();
+                //event ends the same day it started. Make output dd.mm.yyyy hh:mm - hh:mm
+                dateTimeString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()+1) + "." + startDate.getFullYear() + " " + wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes());
+                timeString = wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes());
+            }
+        }
+    }
+    else {
+        dateString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()+1) + "." + startDate.getFullYear() + " - " + wrapTime(endDate.getDate()) + "." + wrapTime(endDate.getMonth()+1) + "." + startDate.getFullYear();
+        //event ends a different day as it started. Make output dd.mm.yyyy hh:mm - dd.mm.yyyy hh:mm
+        dateTimeString = wrapTime(startDate.getDate()) + "." + wrapTime(startDate.getMonth()+1) + "." + startDate.getFullYear() + " " + wrapTime(startDate.getHours()) + ":" + wrapTime(startDate.getMinutes()) + " - " + wrapTime(endDate.getDate()) + "." + wrapTime(endDate.getMonth()+1) + "." + startDate.getFullYear() + " "+ wrapTime(endDate.getHours()) + ":" + wrapTime(endDate.getMinutes());
+        timeString = dateString;
+    }
+    return {
+        dateRange: dateString,
+        dateTimeRange: dateTimeString,
+        timeRange: timeString,
+    }
+}
+
+function wrapTime(timeString){
+    if(parseInt(timeString) < 10){
+        return "0" + timeString;
+    }
+    else return timeString
 }
 
 /**
@@ -174,6 +236,29 @@ var getDataFromServer  = function(url, callback){
     });
 };
 
+/**
+ * returns an array of qualifications with which the user can fill a posting
+ * @param user {User} user object
+ * @param posting {Posting} posting object
+ * @returns {Qualification[]}
+ */
+var getMatchingQualifications = function(user, posting) {
+    //determine if user is allowed to assign himself to this post
+    let userIsAllowed = false;
+    let matchingQualifications = [];
+    //find user qualification that match type and minimum level
+    posting.requiredQualifications.forEach(requiredQualification => {
+        let minimumLevel = requiredQualification.level;
+        user.qualifications.forEach(userQualification => {
+            if (userQualification.qualification.qualType === requiredQualification.qualType && userQualification.qualification.level >= requiredQualification.level) {
+                matchingQualifications.push(userQualification);
+            }
+        })
+    });
+    //matchingQualifications contain all user qualifications that can be used. let the user choose which one to use?
+   return matchingQualifications;
+}
+
 var common = {
     escapeSelector: function(selector){
         return selector.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
@@ -224,4 +309,4 @@ Date.prototype.toTimeInputValue = (function() {
 
 
 
-export {transformDateTimeString, Counter, dateFromNow, getDataFromServer, common}
+export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, common}

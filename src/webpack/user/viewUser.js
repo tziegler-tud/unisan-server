@@ -63,25 +63,35 @@ $(document).ready (function () {
         });
 
         let listContainer = document.getElementById("qualification-list")
-        let listElem = new ScrollableList(listContainer, "userQualification", user.qualifications, {}, {
-            listItem: {
-                onClick: function(e){
-                    e.preventDefault();
-                    var self = e.currentTarget;
+        if(listContainer) {
+            let listElem = new ScrollableList(listContainer, "userQualification", user.qualifications,
+                {
+                    sorting: {
+                        property: "qualification.qualType",
+                        direction: "asc",
+                    },
 
-                    addDBKey_sidebar.addContent('UserViewQualification', {
-                            userid: user.id,
-                            qualificationId: self.dataset.keyid,
-                            callback: {
-                                onConfirm: function(){
+                },
+                {
+                    listItem: {
+                        onClick: function (e) {
+                            e.preventDefault();
+                            var self = e.currentTarget;
+
+                            addDBKey_sidebar.addContent('UserViewQualification', {
+                                    userid: user.id,
+                                    qualificationId: self.dataset.keyid,
+                                    callback: {
+                                        onConfirm: function () {
+                                        },
+                                    },
                                 },
-                            },
-                        },
-                    );
-                    addDBKey_sidebar.show();
-                }
-            }
-        });
+                            );
+                            addDBKey_sidebar.show();
+                        }
+                    }
+                });
+        }
 
         const token2 = lidlRTO.objectManager.createNewObjectToken();
         const dialog02 = new lidlDialog(token2, ".viewProfilePicture", 'imageUpload',

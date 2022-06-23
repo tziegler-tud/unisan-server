@@ -6,7 +6,7 @@
     src: url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
     url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.woff') format('woff'), /* Pretty Modern Browsers */
     url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
-    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-webfont.svg') format('svg'); /* Legacy iOS */
 }
 @font-face {
     font-family: 'Goudy';
@@ -14,7 +14,7 @@
     src: url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
     url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.eot') format('woff'), /* Pretty Modern Browsers */
     url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
-    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+    url('/src/static/fonts/sorts-mill-goudy/GoudyStM-Italic-webfont.svg') format('svg'); /* Legacy iOS */
 
     font-style: italic;
 }
@@ -57,7 +57,7 @@
     src: url('/src/static/fonts/raleway/raleway_thin-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
     url('/src/static/fonts/raleway/raleway_thin-webfont.woff') format('woff'), /* Pretty Modern Browsers */
     url('/src/static/fonts/raleway/raleway_thin-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
-    url('/src/static/fonts/raleway/raleway_thin-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+    url('/src/static/fonts/raleway/raleway_thin-webfont.svg') format('svg'); /* Legacy iOS */
 }
 
 @font-face {

@@ -21,32 +21,44 @@
                     <span class="content-item"></span>
                 </div>
             </div>
-            <div class="sidebar-section body-section event-participants-container">
-                <div class="section-title participant-heading">
+            <div class="sidebar-section body-section event-postings-container">
+                <div class="section-title postings-heading">
                     Dienstposten
                 </div>
-                <div class="event-participants">
+                <div class="event-postings">
                     {{#each event.postings}}
                         {{#if this.assigned.isAssigned}}
-                            <div class="content-item participant-item">
-                                <div class="participant-img">
-                                    <img src="/data/uploads/user_images/{{this.assigned.user.id}}/{{this.assigned.user.id}}.jpg"/>
-                                </div>
-                                <div class="participant-details">
-                                    <a href="/unisams/user/view/{{this.assigned.user.username}}">
-                                        {{this.assigned.user.generalData.firstName.value}} {{this.assigned.user.generalData.lastName.value}}
-                                    </a>
+                            <div class="content-item postings-item">
+                                <div class="assignee-label userDisplay">
+                                    <div class="userDisplay-avatar">
+                                        <img src="/data/uploads/user_images/{{this.assigned.user.id}}/{{this.assigned.user.id}}.jpg"/>
+                                    </div>
+                                    <div class="userDisplay-label">
+                                        <div class="userDisplay-label--name">
+                                            <a href="/unisams/user/view/{{this.assigned.user.username}}" >{{this.assigned.user.generalData.firstName.value}} {{this.assigned.user.generalData.lastName.value}}</a>
+
+                                        </div>
+                                        <div class="userDisplay-label--text">
+                                            {{#each this.requiredQualifications}}{{this.short}}{{#unless @last}}, {{/unless}}{{/each}}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         {{else}}
-                            <div class="content-item participant-item">
-                                <div class="participant-img">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                                </div>
-                                <div class="participant-details">
-                                    <a>
-                                        {{#each this.requiredQualifications}}{{this.short}}{{#unless @last}}, {{/unless}}{{/each}}
-                                    </a>
+                            <div class="content-item postings-item">
+                                <div class="assignee-label userDisplay">
+                                    <div class="userDisplay-avatar">
+                                        <span class="userDisplay-avatar--placeholder material-icons">add_circle</span>
+                                    </div>
+                                    <div class="userDisplay-label">
+                                        <div class="userDisplay-label--name">
+                                            <span>{{#each this.requiredQualifications}}{{this.short}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+
+                                        </div>
+                                        <div class="userDisplay-label--text">
+                                           unbesetzt
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         {{/if}}

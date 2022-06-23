@@ -60,6 +60,10 @@ DropdownMenu.prototype.init = function() {
 
     //find mdc container
     let menuElement = $(container).find(".mdc-menu")[0];
+    if(!menuElement) {
+        console.warn("Failed to build DropdownMenu: no root element found. Aborting...");
+        return false;
+    }
     self.menu = new MDCMenu(menuElement);
     self.menu.setAnchorCorner(self.args.anchorCorner);
 
@@ -75,6 +79,7 @@ DropdownMenu.prototype.init = function() {
 
 var registerEvent = function (self, eventType, target) {
     $(target).on(eventType, function(e){
+        e.preventDefault();
         e.stopPropagation();
         if(self.args.classes){
             $(self.container).toggleClass(self.args.classes);

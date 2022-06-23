@@ -7,6 +7,8 @@ import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 
+var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
+
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
@@ -16,23 +18,27 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {actions, eventActions} from "../actions/actions";
+import {actions, eventActions, qualificationActions} from "../actions/actions";
 
 import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
 import {Snackbar} from "../helpers/snackbar";
+import {common, getMatchingQualifications} from "../helpers/helpers";
 
 
 let eventParticipants = {
     title: "eventParticipants",
     pageData: {},
+    pageArgs: {},
     init: function (args) {
         let self = this;
         $(document).ready(function () {
             //debug line, remove before flight
             console.log("loading js module: " + self.title);
+
+            self.pageArgs = args;
 
             self.pageData = {};
             var lidlRTO = window.lidlRTO;
@@ -87,8 +93,37 @@ let eventParticipants = {
     },
     buildPage: function(user, event, args){
         let self = this;
+        self.view = "cards";
+        self.scrollableList;
+        $('.radio-item').checkboxradio({
+            icon: false,
+            classes: {
+                "ui-checkboxradio-label": "toggleButton",
+                "ui-checkboxradio-checked": "toggleButton-checked"
+            }
+        });
+        let checked= $('input[name=eventlist-radio]:checked');
+        let listRadio = $("#eventlist01");
+        let cardsRadio = $("#eventlist02");
+        listRadio.on("change", function(){
+            if (self.view === "cards") {
+                self.view = "list";
+                self.scrollableList.setView("list")
+            }
+        });
+        cardsRadio.on("change", function(){
+            if (self.view === "list") {
+                self.view = "cards";
+                self.scrollableList.setView("cards")
+            }
+        })
+        //try to recreate checked state across page reloads
+        if (checked.val()){
+            self.view = checked.val();
+        }
+
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: event.type.index}});
+        window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
 
         let pageContainer = document.getElementById("eventPage-component-container");
         var eventPage = new EventPage({
@@ -100,7 +135,7 @@ let eventParticipants = {
         window.eventPage = eventPage;
 
         let titleInputContainer = document.getElementById("eventtitle-input");
-        let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+        let editableInputField = new EditableInputField(titleInputContainer,self.pageData.event.title.delta,self.pageData.event.title.html, "text", {}, {readOnly: true});
 
         const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
         const deleteContent = {
@@ -111,7 +146,7 @@ let eventParticipants = {
         };
 
         var deleteArgs = {
-            eventid: event.id,
+            eventid:self.pageData.event.id,
             callback: {
                 onConfirm: function () {
                     eventActions.deleteEvent(event.id)
@@ -128,6 +163,15 @@ let eventParticipants = {
 
         let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
         // init event sidebar
+        sidebar.addContent("eventDetails", {
+            event: self.pageData.event,
+            user: self.pageData.user,
+            isParticipant: userIsParticipant,
+            callback: {
+            },
+        });
+        if(!(phone.matches || tablet.matches)) sidebar.show();
+        sidebar.setCurrentDefault();
 
         switch(event.type.index){
             case 1:
@@ -149,49 +193,15 @@ let eventParticipants = {
                 "lecturer": 1,
                 "admin": 2,
             }
+
+            self.view = "list";
+            listRadio.checkboxradio("disable");
+            cardsRadio.checkboxradio("disable");
             //find if current user is already registered
 
-            sidebar.addContent("eventParticipants", {
-                event: event,
-                user: user,
-                isParticipant: userIsParticipant,
-                callback: {
-                    onConfirm: function(){
-                        eventActions.addParticipant(event.id, user.id, function(){
-                            window.eventProfile.refreshEvent()
-                                .then(event => {
-                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-                                    sidebar.update({event: event, isParticipant: userIsParticipant});
-                                    self.userlist = event.participants;
-                                    displayParticipantsList(self.userlist);
-                                    self.searchbar.hide();
-                                })
-                                .catch(err => {
-                                })
-                        })
-                    },
-                    onDelete: function(){
-                        eventActions.removeParticipant(event.id, user.id, function(){
-                            window.eventProfile.refreshEvent()
-                                .then(event => {
-                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-                                    sidebar.update({event: event, isParticipant: userIsParticipant});
-                                    self.userlist = event.participants;
-                                    displayParticipantsList(self.userlist);
-                                    self.searchbar.hide();
-                                })
-                                .catch(err => {
-                                })
-                        })
-                    }
-                },
-            });
-            sidebar.show();
-            sidebar.setCurrentDefault();
-
             //display all users initially
-            self.userlist = event.participants;
-            self.scrollableList = displayParticipantsList(self.userlist);
+            self.dataList = event.participants;
+            self.scrollableList = displayParticipantsList(self.dataList);
 
             //setup searchbar
             let searchbar = document.getElementById("usersearch-participants");
@@ -199,7 +209,7 @@ let eventParticipants = {
                 onInput: {
                     enabled: true,
                     callback: function(inputValue){
-                        let filteredList = self.userlist.filter(function(participant){
+                        let filteredList = self.dataList.filter(function(participant){
                             return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
                         })
                         displayParticipantsList(filteredList);
@@ -211,7 +221,7 @@ let eventParticipants = {
                 $(this).on("click", function(e){
                     e.preventDefault();
                     sidebar.addContent("addEventParticipant", {
-                        event: event,
+                        event: self.pageData.event,
                         user: user,
                         isParticipant: userIsParticipant,
                         callback: {
@@ -219,18 +229,19 @@ let eventParticipants = {
                                 eventActions.addParticipant(event.id, data.userid, function(event){
                                     window.eventProfile.refreshEvent()
                                         .then(event => {
+                                            self.pageData.event = event;
                                             userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
                                             sidebar.update({event: event, isParticipant: userIsParticipant});
-                                            self.userlist = event.participants;
-                                            displayParticipantsList(self.userlist);
+                                            self.dataList =self.pageData.event.participants;
+                                            displayParticipantsList(self.dataList);
                                             self.searchbar.hide();
                                         })
                                         .catch(err => {
                                         })
-                                })
+                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                             },
                         },
-                    });
+                    })
                     sidebar.show();
                 })
             });
@@ -240,28 +251,9 @@ let eventParticipants = {
             //qualTypes to be enabled for new postings: (empty array to include all)
             let qualTypes = [qualTypesMap.AUSBILDUNG, qualTypesMap.NACHWEIS];
 
-            sidebar.addContent("eventPostings", {
-                event: event,
-                user: window.user,
-                isParticipant: userIsParticipant,
-                callback: {
-                    onConfirm: function(){
-
-                    },
-                    onDelete: function(){
-
-                    }
-                },
-            });
-            sidebar.show();
-            sidebar.setCurrentDefault();
-
             //display all users initially
-            self.userlist = event.postings;
-            self.userlist.sort(function(a,b){
-                return (a.order - b.order);
-            })
-            self.scrollableList = displayPostingsList(self.userlist);
+            self.dataList =self.pageData.event.postings;
+            self.scrollableList = displayPostingsList(self.dataList);
 
             //setup searchbar
             let searchbar = document.getElementById("usersearch-participants");
@@ -269,7 +261,7 @@ let eventParticipants = {
                 onInput: {
                     enabled: true,
                     callback: function(inputValue){
-                        let filteredList = self.userlist.filter(function(participant){
+                        let filteredList = self.dataList.filter(function(participant){
                             return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
                         })
                         displayPostingsList(filteredList);
@@ -281,7 +273,7 @@ let eventParticipants = {
                 $(this).on("click", function(e){
                     e.preventDefault();
                     sidebar.addContent("addEventPosting", {
-                        event: event,
+                        event: self.pageData.event,
                         user: window.user,
                         isParticipant: userIsParticipant,
                         qualTypes: qualTypes,
@@ -297,15 +289,16 @@ let eventParticipants = {
                                 eventActions.addPosting(event.id, posting, function(event){
                                     eventProfile.refreshEvent()
                                         .then(event => {
+                                            self.pageData.event = event;
                                             userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
                                             sidebar.update({event: event, isParticipant: userIsParticipant});
-                                            self.userlist = event.postings;
-                                            displayPostingsList(self.userlist);
+                                            self.dataList =self.pageData.event.postings;
+                                            displayPostingsList(self.dataList);
                                             self.searchbar.hide();
                                         })
                                         .catch(err => {
                                         })
-                                })
+                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                             },
                         },
                     });
@@ -319,28 +312,9 @@ let eventParticipants = {
             //qualTypes to be enabled for new postings: (empty array to include all)
             let qualTypes = [qualTypesMap.SAN, qualTypesMap.FUEHRUNG];
 
-            sidebar.addContent("eventPostings", {
-                event: event,
-                user: window.user,
-                isParticipant: userIsParticipant,
-                callback: {
-                    onConfirm: function(){
-
-                    },
-                    onDelete: function(){
-
-                    }
-                },
-            });
-            sidebar.show();
-            sidebar.setCurrentDefault();
-
             //display all users initially
-            self.userlist = event.postings;
-            self.userlist.sort(function(a,b){
-                return (a.order - b.order);
-            })
-            self.scrollableList = displayPostingsList(self.userlist);
+            self.dataList =self.pageData.event.postings;
+            self.scrollableList = displayPostingsList(self.dataList);
 
             //setup searchbar
             let searchbar = document.getElementById("usersearch-participants");
@@ -348,7 +322,7 @@ let eventParticipants = {
                 onInput: {
                     enabled: true,
                     callback: function(inputValue){
-                        let filteredList = self.userlist.filter(function(participant){
+                        let filteredList = self.dataList.filter(function(participant){
                             return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
                         })
                         displayPostingsList(filteredList);
@@ -356,11 +330,12 @@ let eventParticipants = {
                     },
                 },
             });
+
             $('.add-participant-button').each(function(){
                 $(this).on("click", function(e){
                     e.preventDefault();
                     sidebar.addContent("addEventPosting", {
-                        event: event,
+                        event: self.pageData.event,
                         user: window.user,
                         isParticipant: userIsParticipant,
                         qualTypes: qualTypes,
@@ -376,15 +351,16 @@ let eventParticipants = {
                                 eventActions.addPosting(event.id, posting, function(event){
                                     eventProfile.refreshEvent()
                                         .then(event => {
+                                            self.pageData.event = event;
                                             userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
                                             sidebar.update({event: event, isParticipant: userIsParticipant});
-                                            self.userlist = event.postings;
-                                            displayPostingsList(self.userlist);
+                                            self.dataList =self.pageData.event.postings;
+                                            displayPostingsList(self.dataList);
                                             self.searchbar.hide();
                                         })
                                         .catch(err => {
                                         })
-                                })
+                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                             },
                         },
                     });
@@ -393,25 +369,26 @@ let eventParticipants = {
             });
         }
 
-        function displayParticipantsList(userlist) {
+        function displayParticipantsList(dataList) {
             let roleSelect = function(){
                 $('.participant-role-select').each(function(){
                     //display current role
 
                     $(this).on("change", function(e){
                         //push changes to server
-                        let userId = e.target.dataset.userid;
-                        let role = e.target.value;
+                        let userId = e.currentTarget.dataset.userid;
+                        let role = e.currentTarget.value;
                         console.log("changed role for uid: " + userId + " to " + role);
                         eventActions.changeParticipant(event.id, userId, role, function(){
                             eventProfile.refreshEvent()
                                 .then(event => {
+                                    self.pageData.event = event;
                                     userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
                                     sidebar.update({event: event, isParticipant: userIsParticipant});
                                 })
                                 .catch(err => {
                                 })
-                        })
+                        }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                     })
 
                 });
@@ -428,19 +405,20 @@ let eventParticipants = {
                     $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
-                        let userId = e.target.dataset.userid;
+                        let userId = e.currentTarget.dataset.userid;
                         eventActions.removeParticipant(event.id, userId, function(){
                             window.eventProfile.refreshEvent()
                                 .then(event => {
+                                    self.pageData.event = event;
                                     userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
                                     sidebar.update({event: event, isParticipant: userIsParticipant});
-                                    self.userlist = event.participants;
-                                    displayParticipantsList(self.userlist);
+                                    self.dataList =self.pageData.event.participants;
+                                    displayParticipantsList(self.dataList);
                                     self.searchbar.hide();
                                 })
                                 .catch(err => {
                                 })
-                        });
+                        }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                     })
                 });
             }
@@ -450,7 +428,7 @@ let eventParticipants = {
                     $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
-                        let userId = e.target.dataset.userid;
+                        let userId = e.currentTarget.dataset.userid;
                         window.location.href= "/unisams/user/"+userId;
                     })
                 });
@@ -470,16 +448,67 @@ let eventParticipants = {
             }
 
             let listContainer = document.getElementById("userlist-container--participants")
-            let scrollableList = new ScrollableList(listContainer, "participants", userlist, scrollArgs, callback)
+            let scrollableList = new ScrollableList(listContainer, "participants", dataList, scrollArgs, callback)
 
             return scrollableList;
         }
 
-        function displayPostingsList(userlist) {
+        function displayPostingsList(dataList) {
 
-            let sortedList = userlist.sort(function(a,b){
-                return (a-b);
+            //check if user is already registered
+            let isRegistered = eventProfile.checkIfUserIsRegistered(user, {
+                role: "assigned"
             })
+
+            let userPostings = [];
+            if (isRegistered) {
+                //find all postings for the current user
+                userPostings = dataList.filter(posting => {
+                    if (posting.assigned.isAssigned){
+                        let postingUserId = (posting.assigned.user._id === undefined) ? posting.assigned.user : posting.assigned.user._id;
+                        return (postingUserId.toString() === self.pageData.user._id);
+                    }
+                    else return false;
+                })
+            }
+
+            function augmentPostingsList(list){
+                let sortedList = list;
+                sortedList.forEach(posting =>{
+                    let matchingQualifications = getMatchingQualifications(self.pageData.user, posting);
+                    //check if user has posting at the same time
+                    let overlap = userPostings.find(userPosting => {
+                        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
+                            //found overlap
+                            return true
+                        }
+                        if (userPosting.date.endDate < posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
+                            //found overlap
+                            return true
+                        }
+                        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.endDate > posting.date.endDate) {
+                            //found overlap
+                            return true
+                        }
+                        if (userPosting.date.startDate < posting.date.startDate && userPosting.date.endDate > posting.date.startDate) {
+                            //found overlap
+                            return true
+                        }
+                        else return false;
+                    })
+                    if(overlap !== undefined) {
+                        //overlap found
+                        posting.userIsBlocked = true;
+                    }
+                    else posting.userIsBlocked = false;
+                    posting.userIsAllowed = (matchingQualifications.length > 0);
+                    posting.matchingQualifications = matchingQualifications;
+                })
+                return sortedList;
+            }
+
+            let sortedList = augmentPostingsList(dataList)
+            self.dataList = sortedList;
 
             let dropdownMenus = function(){
                 $('.participant-menu-container').each(function(){
@@ -492,17 +521,19 @@ let eventParticipants = {
                     $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
-                        let postingId = e.target.dataset.postingid;
+                        e.stopPropagation();
+                        let postingId = e.currentTarget.dataset.postingid;
                         eventActions.removePosting(event.id, postingId, function(){
                             eventProfile.refreshEvent()
                                 .then(event => {
-                                    self.userlist = event.postings;
-                                    displayPostingsList(self.userlist);
+                                    self.pageData.event = event;
+                                    self.dataList = event.postings;
+                                    displayPostingsList(self.dataList);
                                     self.searchbar.hide();
                                 })
                                 .catch(err => {
                                 })
-                        });
+                        }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                     })
                 });
             }
@@ -511,7 +542,8 @@ let eventParticipants = {
                     $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
-                        let userId = e.target.dataset.userid;
+                        e.stopPropagation();
+                        let userId = e.currentTarget.dataset.userid;
                         window.location.href= "/unisams/user/"+userId;
                     })
                 });
@@ -520,12 +552,94 @@ let eventParticipants = {
             let postDetails = function(){
                 $('.posting-details').each(function(){
                     $(this).on("click", function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let element = e.currentTarget;
+                        sidebar.addContent("showPostingDetails", {
+                            postingId: element.dataset.postingid,
+                            event: self.pageData.event,
+                            allowEdit: args.allowEdit,
+                            user: self.pageData.user,
+                            userIsAllowed: element.dataset.userisallowed,
+                            userIsRegistered: isRegistered,
+                            callback: {
+                                onConfirm: function(data){
+                                    let posting = data;
+                                    eventActions.updatePosting(event.id, posting, function(event){
+                                        eventProfile.refreshEvent()
+                                            .then(event => {
+                                                self.pageData.event = event;
+                                                userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                                sidebar.update({event: event, isParticipant: userIsParticipant});
+                                                self.dataList =self.pageData.event.postings;
+                                                displayPostingsList(self.dataList);
+                                                self.searchbar.hide();
+                                            })
+                                            .catch(err => {
+                                            })
+                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                },
+                                onDelete: function(data){
+                                    let postingId = data.id;
+                                    //push changes to server
+                                    eventActions.removePosting(self.pageData.event.id, postingId, function(){
+                                        eventProfile.refreshEvent()
+                                            .then(event => {
+                                                self.pageData.event = event;
+                                                self.dataList = self.pageData.event.postings;
+                                                displayPostingsList(self.dataList);
+                                                self.searchbar.hide();
+                                            })
+                                            .catch(err => {
+                                            })
+                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                }
+                            }
+                        });
+                        sidebar.show();
+                    })
+                });
+            }
+
+            let assignCurrentUser = function(){
+                $('.posting-assignCurrentUser').each(function(){
+                    $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
-                        sidebar.addContent("showPostingDetails", {
-                            event: event,
-                            posting: e.target.dataset.postingid,
+                        e.stopPropagation();
+                        let postingId = e.currentTarget.dataset.postingid;
+                        //find posting in local augmented list
+                        let posting = sortedList.find(posting => {
+                            return (posting._id === postingId)
                         })
+                        if (posting === undefined) {
+                            //posting not found. Something went wrong
+                            console.warn("posting not found in local list. This is most likely due to coding errors. Please fix.");
+                            return false;
+                        }
+                        else {
+                            //posting found
+                            //check if user meets qualification requirement
+                            if (!posting.userIsAllowed) {
+                                console.log("Trying to assign user to event, but required Qualifications are not met. Aborting.")
+                                return false;
+                            }
+                            else {
+                                let qualification = posting.requiredQualifications[0];
+                                eventActions.assignPost(event.id, postingId, self.pageData.user.id, function(){
+                                    eventProfile.refreshEvent()
+                                        .then(event => {
+                                            self.pageData.event = event;
+                                            self.dataList = self.pageData.event.postings;
+                                            displayPostingsList(self.dataList);
+                                            self.searchbar.hide();
+                                        })
+                                        .catch(err => {
+                                        })
+                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                            }
+
+                        }
                     })
                 });
             }
@@ -535,23 +649,88 @@ let eventParticipants = {
                     $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
-                        eventActions.unassignPost(event.id, e.target.dataset.postingid, e.target.dataset.userid, function(){
-                        })
+                        e.stopPropagation();
+                        eventActions.unassignPost(event.id, e.currentTarget.dataset.postingid, e.currentTarget.dataset.userid, function(){
+                            eventProfile.refreshEvent()
+                                .then(event => {
+                                    self.pageData.event = event;
+                                    self.dataList = self.pageData.event.postings;
+                                    displayPostingsList(self.dataList);
+                                    self.searchbar.hide();
+                                })
+                                .catch(err => {
+                                })
+                        }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                     })
                 });
             }
 
             let scrollArgs = {
                 height: "full",
+                enableMobile: true,
+                view: self.view,
                 // fixedHeight: "500px",
                 sorting: {
                     property: "role",
                     direction: 1,
                 },
                 allowEdit: args.allowEdit,
+                userIsRegistered: isRegistered,
             }
             let callback = {
-                customHandlers: [deletePosting, dropdownMenus, showParticipant, postDetails, unassignPost]
+                listItem: {
+                    onClick: function (e) {
+                        let element = e.currentTarget;
+                        e.preventDefault();
+                        sidebar.addContent("showPostingDetails", {
+                            postingId: element.dataset.postingid,
+                            event: self.pageData.event,
+                            allowEdit: args.allowEdit,
+                            user: self.pageData.user,
+                            userIsAllowed: element.dataset.userisallowed,
+                            userIsRegistered: isRegistered,
+                            callback: {
+                                onConfirm: function(data, localArgs){
+                                    let posting = data;
+                                    eventActions.updatePosting(event.id, posting, function(event){
+                                        eventProfile.refreshEvent()
+                                            .then(event => {
+                                                self.pageData.event = event;
+                                                userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                                sidebar.update({event: event, isParticipant: userIsParticipant});
+                                                self.dataList =self.pageData.event.postings;
+                                                displayPostingsList(self.dataList);
+                                                self.searchbar.hide();
+                                            })
+                                            .catch(err => {
+                                            })
+                                    }, {
+                                        date: localArgs.date,
+                                        startTime: localArgs.startTime,
+                                        endTime: localArgs.endTime,
+                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                },
+                                onDelete: function(data){
+                                    let postingId = data.id;
+                                    //push changes to server
+                                    eventActions.removePosting(self.pageData.event.id, postingId, function(){
+                                        eventProfile.refreshEvent()
+                                            .then(event => {
+                                                self.pageData.event = event;
+                                                self.dataList = self.pageData.event.postings;
+                                                displayPostingsList(self.dataList);
+                                                self.searchbar.hide();
+                                            })
+                                            .catch(err => {
+                                            })
+                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                }
+                            }
+                        });
+                        sidebar.show();
+                    }
+                },
+                customHandlers: [deletePosting, dropdownMenus, showParticipant, postDetails, assignCurrentUser, unassignPost]
             }
 
             let listContainer = document.getElementById("userlist-container--participants")

@@ -11,12 +11,17 @@
 
 
 .mdc-snackbar {
+  @include button.ink-color(#f5f5f5);
   .mdc-snackbar__action {
-    color: #f5f5f5;
-    //outline: 1px solid #f5f5f5;
+    color: #f5f5f5 !important;
     display: none;
   }
   &.show-action {
+    .snackbar-action-seperator {
+      height: 1em;
+      width: 1px;
+      border-left: 1px solid #fafafa;
+    }
     .mdc-snackbar__action {
       display: block;
     }

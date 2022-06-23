@@ -22,6 +22,7 @@ var Snackbar = function(options){
         '                Hier könnte Ihre Meldung stehen.\n' +
         '            </div>\n' +
         '            <div class="mdc-snackbar__actions" aria-atomic="true">\n' +
+        '                <div class="snackbar-action-seperator"></div>\n' +
         '                <button type="button" class="mdc-button mdc-snackbar__action">\n' +
         '                    <div class="mdc-button__ripple"></div>\n' +
         '                    <span class="mdc-button__label"></span>\n' +
@@ -75,6 +76,22 @@ Snackbar.prototype.show = function(message, options) {
         snackbar.root.classList.remove("show-action");
     }
     snackbar.open()
+}
+
+Snackbar.prototype.showError = function(jqxhr, textstatus, error){
+    let self = this;
+    let snackbar = self.snackbar;
+    let message = jqxhr.responseJSON.message;
+    let text = (error ? error: "Error " + jqxhr.status) +": " + (message ? message : jqxhr.responseText);
+    let options = {
+        timeout: -1,
+        closeOnEscape: true,
+        actionButton: {
+            display: true,
+            text: "Nagut",
+        }
+    }
+    this.show(text, options);
 }
 
 export {Snackbar}

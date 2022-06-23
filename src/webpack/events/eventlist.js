@@ -4,6 +4,9 @@ var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 const {ScrollableList} = require("../scrollableList/scrollableList");
 const {Sidebar} = require("../sidebar/sidebar");
 import {Searchbar} from "../searchbar/searchbar";
+import {Corner, DropdownMenu} from "../helpers/dropdownMenu";
+import {eventActions} from "../actions/eventActions";
+import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
@@ -80,7 +83,56 @@ $(document).ready (function () {
             },
         });
 
+
+
         function displayEventList(dateFilter, filter, initialView) {
+
+
+            let deleteEvent = function(){
+                $('.event-delete').each(function(){
+                    $(this).on("click", function(e){
+                        //push changes to server
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let eventId = e.target.dataset.eventid;
+                        const deleteContent = {
+                            title: "Event löschen",
+                            message: "Dieser Vorgang kann nicht rückgängig gemacht werden. Fortfahren?",
+                            titleArg: "",
+                            messageArg: ""
+                        };
+
+                        var deleteArgs = {
+                            eventid: eventId,
+                            callback: {
+                                onConfirm: function () {
+                                    eventActions.deleteEvent(eventId, function(){
+                                        window.location.reload();
+                                    })
+                                    .fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                }
+                            }
+                        };
+
+                        var token = lidlRTO.objectManager.createNewObjectToken();
+                        const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
+                        lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
+                        dialogDeleteEvent.openDialog();
+                    })
+                })
+            }
+            let showEvent = function(){
+                $('.event-show').each(function(){
+                    $(this).on("click", function(e){
+                        //push changes to server
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let eventId = e.target.dataset.eventid;
+                        window.location.href= "/unisams/events/"+eventId;
+                    })
+                });
+            }
+
 
             let url;
             let dateFilterObj = {}
@@ -126,6 +178,7 @@ $(document).ready (function () {
                         let events = result;
                         let args = {
                             height: "full",
+                            enableDropdowns: true,
                             sorting: {
                                 property: sort,
                                 direction: 1,
@@ -141,7 +194,8 @@ $(document).ready (function () {
                                     window.location = "/unisams/events/view/"+self.dataset.id;
 
                                 }
-                            }
+                            },
+                            customHandlers: [deleteEvent, showEvent],
                         }
                         let container = document.getElementById('eventlist-container');
                         let scrollableList = new ScrollableList(container, "event", events, args, callback);

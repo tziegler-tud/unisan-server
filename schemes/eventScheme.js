@@ -101,14 +101,8 @@ var EventSchema = new Schema({
     postings: [
         {
             requiredQualifications: [{
-                qualType: {
-                    type: String,
-                    required: true
-                },
-                name: {
-                    type: String,
-                    required: true
-                },
+                type: Schema.Types.ObjectId,
+                ref: 'Qualifications',
             }],
             description: {
                 type: String,
@@ -127,10 +121,6 @@ var EventSchema = new Schema({
                     }
                 }
             },
-            order: {
-                type: String,
-                default: "auto",
-            },
             enabled: {
                 type: Boolean,
                 default: true,
@@ -148,14 +138,6 @@ var EventSchema = new Schema({
                     type: Schema.Types.ObjectId,
                     ref: 'User',
                     default: undefined,
-                },
-                qualification: {
-                    qualType: {
-                        type: String,
-                    },
-                    name: {
-                        type: String,
-                    },
                 },
                 date: {
                     type: Date,
@@ -301,7 +283,6 @@ EventSchema.virtual('type.index').get(function() {
     }
     return index;
 });
-
 
 FileReference.virtual('thumbnail').get(function(){
     let filetype = this.filetype;

@@ -371,6 +371,92 @@ LogSchema.virtual('description').get(function() {
                 minDescription = target + ": " + targetUser + "-" + role;
                 logType = "Rolle geändert";
                 break;
+            case "eventAddPost":
+                {
+                    let qualificationName = this.action.key;
+
+                    fullDescription.en = authorizedUser +" has created an event posting: " + qualificationName;
+                    fullDescription.de = authorizedUser + " hat einen Dienstposten hinzugefügt: " + qualificationName;
+                    shortDescription.en = "posting added: " + qualificationName;
+                    shortDescription.de = "Dienstposten hinzugefügt: " + qualificationName;
+
+                    actionDescription.en = "posting added: " + qualificationName;
+                    actionDescription.de = "Dienstposten hinzugefügt: " + qualificationName;
+
+                    minDescription = qualificationName;
+                    logType = "Dienstposten hinzugefügt";
+                    break;
+                }
+            case "eventRemovePost":
+                {
+                    let qualificationName = this.action.key;
+
+                    fullDescription.en = authorizedUser +" has removed an event posting: " + qualificationName;
+                    fullDescription.de = authorizedUser + " hat einen Dienstposten entfernt: " + qualificationName;
+                    shortDescription.en = "posting removed: " + qualificationName;
+                    shortDescription.de = "Dienstposten entfernt: " + qualificationName;
+
+                    actionDescription.en = "posting removed: " + qualificationName;
+                    actionDescription.de = "Dienstposten added: " + qualificationName;
+
+                    minDescription = qualificationName;
+                    logType = "Dienstposten entfernt";
+                    break;
+                }
+            case "eventAssignPost":
+            {
+                let qualificationName = this.action.value;
+                let targetUser = this.action.key;
+                if (authorizedUser === targetUser) {
+                    fullDescription.en = authorizedUser +" has assigned " + targetUser + " to an event posting: " + qualificationName;
+                    fullDescription.de = authorizedUser + " hat " + targetUser + " für einen Posten angemeldet: " + qualificationName;
+                    shortDescription.en = authorizedUser + " assigned " + targetUser + " as " + qualificationName;
+                    shortDescription.de = authorizedUser + " hat " + targetUser + "als " + qualificationName + " angemeldet";
+                }
+                else {
+                    fullDescription.en = targetUser + " has signed up for an event posting: " + qualificationName;
+                    fullDescription.de = targetUser + " hat sich für einen Posten angemeldet: " + qualificationName;
+                    shortDescription.en = targetUser + " signed up for " + qualificationName;
+                    shortDescription.de = targetUser + "hat sich als " + qualificationName + " angemeldet";
+                }
+
+
+
+                actionDescription.en = targetUser + " assigned: " + qualificationName;
+                actionDescription.de = targetUser + " angemeldet: " + qualificationName;
+
+                minDescription = qualificationName;
+                logType = "Dienstanmeldung";
+                break;
+            }
+            case "eventUnassignPost":
+            {
+                let qualificationName = this.action.value;
+                let targetUser = this.action.key;
+
+                if (authorizedUser === targetUser) {
+                    fullDescription.en = authorizedUser +" has unassigned " + targetUser + " from event posting: " + qualificationName;
+                    fullDescription.de = authorizedUser + " hat " + targetUser + " von einem Posten abgemeldet: " + qualificationName;
+                    shortDescription.en = authorizedUser + " unassigned " + targetUser + " from " + qualificationName;
+                    shortDescription.de = authorizedUser + " hat " + targetUser + "abgemeldet: " + qualificationName;
+                }
+                else {
+                    fullDescription.en = targetUser + " has signed up for an event posting: " + qualificationName;
+                    fullDescription.de = targetUser + " hat sich für von Posten abgemeldet: " + qualificationName;
+                    shortDescription.en = targetUser + " signed up for " + qualificationName;
+                    shortDescription.de = targetUser + "hat sich abgemeldet: " + qualificationName;
+                }
+
+
+
+                actionDescription.en = targetUser + " unassigned: " + qualificationName;
+                actionDescription.de = targetUser + " abgemeldet: " + qualificationName;
+
+                minDescription = qualificationName;
+                logType = "Dienstabmeldung";
+                break;
+            }
+
             case "eventAddFile":
                 if (!this.action.value) this.action.value = "_filename_not_found";
                 fullDescription.en = "user " + authorizedUser + " added file " + this.action.value + " to event '" + target + "'";

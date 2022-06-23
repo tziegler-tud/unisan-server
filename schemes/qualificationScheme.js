@@ -28,6 +28,20 @@ var QualificationsSchema = new Schema({
     }
 });
 
+QualificationsSchema.virtual('index').get(function() {
+    switch(this.qualType) {
+        case "Einsatzführung":
+            return 0;
+        case "Sanitätsdienst":
+            return 1;
+        case "Ausbildung":
+            return 2;
+        case "Nachweis":
+            return 3;
+        default:
+            return 4;
+    }
+});
 
 QualificationsSchema.set('toJSON', { virtuals: true });
 

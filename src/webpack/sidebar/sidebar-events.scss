@@ -54,6 +54,96 @@
         }
       }
     }
+    .event-postings-container {
+      .postings-heading {
+        padding-bottom: 1em;
+        text-transform: uppercase;
+        color: #AAA;
+        font-size: 90%;
+      }
+      .event-postings {
+
+        .postings-item {
+          width: 100%;
+          display: flex;
+          flex-flow: row wrap;
+          justify-content: center;
+          align-items: center;
+          border-bottom: 1px solid #CCC;
+          padding: 5px 0;
+
+          .qualification-label {
+            flex: 0 1 25%;
+            border-right: 1px solid #AAA;
+          }
+          .assignee-label {
+            flex: 1 1 auto;
+            .userDisplay-label {
+              .userDisplay-label--text {
+                font-size: 90%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.sidebar-eventDetails {
+  .sidebar-eventDetails-inner {
+    //background-color: $docker-bg-color;
+    .eventDetails-top {
+      width: 100%;
+      border-bottom: 1px solid $menu-border-color;
+      background-color: #fff;
+
+
+        .eventDetails-top-inner {
+          width: 80%;
+          margin: 0 10%;
+          padding: 2em 0 1em 0;
+
+          .eventDetails-eventTitle {
+            .eventDetails-eventTitle--text {
+              font-size: 150%;
+              padding-bottom: 5px;
+              //color: $text-color-heading--light;
+              color: $text-color-heading;
+              word-break: break-word;
+            }
+          }
+          .eventDetails-eventType {
+            .eventDetails-eventType--text {
+              font-size: 130%;
+              font-weight: lighter;
+              color: $text-color-secondary;
+              word-break: break-word;
+            }
+          }
+      }
+    }
+    .eventDetails-body {
+      font-size: 100%;
+      .eventDetails-section-content {
+        font-size: 140%;
+        font-weight: lighter;
+      }
+      .eventDetails-description {
+        font-size: 110%;
+      }
+      .eventDetails-location {
+
+      }
+      .eventDetails-date {
+        .eventDetails-date--day {
+
+        }
+        .eventDetails-date--time {
+
+        }
+      }
+    }
   }
 }
 

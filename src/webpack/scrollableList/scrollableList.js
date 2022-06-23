@@ -69,15 +69,16 @@ var ScrollableList = function(container,type, data,  args, callback){
 
 
 ScrollableList.prototype.setView = function(view){
+    let self = this;
     if (view === undefined || typeof (view) !== "string") view = "list"
     if (view === "cards") {
         this.view = "cards";
     }
     else {
-        this.view = "list"
-        if(this.args.enableMobile){
+        self.view = "list"
+        if(self.args.enableMobile){
             if(phone.matches){
-                this.view = "mobileList"
+                self.view = "mobileList"
             }
         }
     }
@@ -117,6 +118,8 @@ var applyType = function(type, self) {
             break;
         case "postings":
             url.list = '/webpack/scrollableList/templates/postingsList.hbs';
+            url.cards = '/webpack/scrollableList/templates/postingsListCards.hbs';
+            url.mobile = '/webpack/scrollableList/templates/postingsListMobile.hbs';
             break;
         case "event":
             url.mobile = '/webpack/scrollableList/templates/eventListMobile.hbs'
@@ -135,6 +138,7 @@ var applyArgs = function(args){
     let defaultArgs = {
         enableSorting: true,
         enableMobile: false,
+        enableDropdowns: false,
         view: "list",
         height: "fixed",
         fixedHeight: "40em",
@@ -426,17 +430,34 @@ var setupEventHandlers = function(self){
 
 var cardEventHandlers = function(self){
 
-    //register item links
-    $(".gallery-item").on("click", function(){
-        const viewkey = this.dataset.viewkey;
-        let url = self.viewUrl.replace(":id", viewkey);
-        window.location = url;
-    })
+    if(self.viewUrl) {
+        $(".viewKey-item").on("click", function(){
+            const viewkey = this.dataset.viewkey;
+            let url = self.viewUrl.replace(":id", viewkey);
+            window.location = url;
+        })
+    }
+    if(self.callback){
+        if(self.callback.listItem) {
+            if(self.callback.listItem.onClick !== undefined) {
+                $(".scrollableList-item").on("click", function(e){
+                    self.callback.listItem.onClick(e)
+                });
+            }
+        }
+        if(self.callback.customHandlers !== undefined && Array.isArray(self.callback.customHandlers)) {
+            self.callback.customHandlers.forEach(function(handler){
+                handler(self);
+            });
+        }
+    }
+    if(self.args.enableDropdowns) {
+        $('.card-menu-container').each(function(){
+            let trigger = $(this).find(".card-menu-button").first();
+            let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
+        });
 
-    const dropdowns = [].map.call(document.querySelectorAll(".dropdown-button"), function (el) {
-        const container = $(el).closest(".dropdown-menu");
-        const drop = new DropdownMenu(container, "click", el);
-    });
+    }
 
 
 };

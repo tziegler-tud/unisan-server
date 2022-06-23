@@ -121,6 +121,20 @@ function allowCreateEvent(req, res, next) {
 //creation. need creation rights
 router.post('/create', allowCreateEvent, create);
 
+//participant modification. this requires write access, unless the user modifies itself.
+router.post('/addParticipant', checkParticipantAccess, addParticipant);
+router.post('/removeParticipant', checkParticipantAccess, removeParticipant);
+router.post('/assignPost', checkParticipantAccess, assignPost);
+router.post('/unassignPost', checkParticipantAccess, unassignPost);
+
+// changing role requires editing rights
+router.post('/changeParticipant', checkEventEditRights, changeParticipant);
+//adding posts requiores editing rights
+router.put('/addPost', checkEventEditRights, addPost);
+router.post('/updatePost', checkEventEditRights, updatePost);
+router.delete('/removePost', checkParticipantAccess, removePost);
+
+
 //modification. need general or individual editing rights
 router.put('/:id', checkEventEditRights, update);
 router.put('/updateKey/:id', checkEventEditRights, updateKey);
@@ -146,18 +160,6 @@ router.post('/:id/uploadImage', checkEventEditRights, upload.single('image'), fu
         })
         .catch(err => next(err));
 });
-
-//participant modification. this requires write access, unless the user modifies itself.
-router.post('/addParticipant', checkParticipantAccess, addParticipant);
-router.post('/removeParticipant', checkParticipantAccess, removeParticipant);
-router.post('/assignPost', checkParticipantAccess, assignPost);
-router.post('/unassignPost', checkParticipantAccess, unassignPost);
-
-// changing role requires editing rights
-router.post('/changeParticipant', checkEventEditRights, changeParticipant);
-//adding posts requiores editing rights
-router.post('/addPost', checkParticipantAccess, addPost);
-router.post('/removePost', checkParticipantAccess, removePost);
 
 
 
@@ -232,7 +234,9 @@ function userEvents(req, res, next) {
 function update(req, res, next) {
     eventService.update(req, req.params.id, req.body)
         .then(() => res.json({}))
-        .catch(err => next(err));
+        .catch(err => {
+            next(err)
+        });
 }
 
 function updateKey(req, res, next) {
@@ -323,6 +327,20 @@ function addPost(req, res, next){
         })
 }
 
+
+function updatePost(req, res, next){
+    let args = {
+        overwrite: false
+    };
+    let posting = req.body.posting;
+    let eventId = req.body.id;
+    eventService.updatePosting(req, eventId, posting, args)
+        .then(event => res.json({}))
+        .catch(err => {
+            next(err);
+        })
+}
+
 function removePost(req, res, next){
     eventService.removePosting(req, req.body.id, req.body.postingId)
         .then(event => res.json({}))
@@ -334,10 +352,11 @@ function removePost(req, res, next){
 function assignPost(req, res, next) {
 
     let args = {
-        overwrite: false
+        overwrite: false,
+        ignoreRequiredQualification: false,
     };
-    eventService.assignPost(req, req.body.id, req.body.postingId, req.body.userId, req.body.qualification, args)
-        .then(() => res.json())
+    eventService.assignPost(req, req.body.id, req.body.postingId, req.body.userId, args)
+        .then(() => res.json({}))
         .catch(err => {
             next(err);
         })
@@ -346,7 +365,7 @@ function assignPost(req, res, next) {
 function unassignPost(req, res, next) {
 
     eventService.unassignPost(req, req.body.id, req.body.userId, req.body.postingId)
-        .then(() => res.json())
+        .then(() => res.json({}))
         .catch(err => {
             next(err);
         })

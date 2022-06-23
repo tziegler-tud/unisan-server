@@ -214,14 +214,29 @@ EventRequest.prototype.update = function(keyIdentifier, value, args, callback){
     });
 };
 
-EventRequest.prototype.checkIfUserIsRegistered = function(user){
+EventRequest.prototype.checkIfUserIsRegistered = function(user, args){
     let self = this;
+    let defaults = {
+        role: "any",
+    }
+    if (args === undefined) args = {};
+    args  = Object.assign(defaults, args);
+    var index = -1;
     let event = self.currentViewedEvent.event;
     // create array of participants by id
     try {
         //check if array contains elements
         if (event.participants.length > 0) {
-            var index = event.participants.map(e => e.user._id).indexOf(user.id);
+            if (args.role === "any"){
+                index = event.participants.findIndex(e => {
+                    return (e.user._id.toString() === user.id)
+                });
+            }
+            else {
+                index = event.participants.findIndex(e => {
+                    return (e.user._id.toString() === user.id && e.role.toString() === args.role)
+                });
+            }
         }
         //false if no user are registered
         else return false;
@@ -236,7 +251,7 @@ EventRequest.prototype.checkIfUserIsRegistered = function(user){
             throw e;
         }
     }
-    return index > -1;
+   return index > -1;
 }
 
 export {EventRequest}

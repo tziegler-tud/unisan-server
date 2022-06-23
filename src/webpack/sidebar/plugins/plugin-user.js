@@ -665,7 +665,7 @@ let addQualification = new ContentHandler("UserAddQualification",
                             const id = document.getElementById("qual-name").selectedOptions[0].id;
                             var key = catKey;
                             data = {
-                                qualification: findQualByIdInTypeArray(res.qualifications.byType, id),
+                                qualification: findQualByIdInTypeArray(res.qualifications.byType, id)._id,
                                 acquiredDate: $("#qual-acquiredDate").val(),
                                 expireDate: $("#qual-expireDate").val(),
                                 trainingDate: $("#qual-trainingDate").val(),
@@ -780,7 +780,7 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
                             const id = document.getElementById("qual-name").selectedOptions[0].id;
                             data = {
                                 id: keyId,
-                                qualification: sidebar.findQualByIdInTypeArray(res.qualifications.byType, id),
+                                qualification: sidebar.findQualByIdInTypeArray(res.qualifications.byType, id)._id,
                                 acquiredDate: $("#qual-acquiredDate").val(),
                                 expireDate: $("#qual-expireDate").val(),
                                 trainingDate: $("#qual-trainingDate").val(),

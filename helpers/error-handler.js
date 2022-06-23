@@ -70,7 +70,7 @@ function apiErrorHandler(err, req, res, next) {
     }
 
     // default to 500 server error
-    res.status(err.status || 500).json(err);
+    res.status(err.status || 500).json({message: err.message});
 }
 
 module.exports = {

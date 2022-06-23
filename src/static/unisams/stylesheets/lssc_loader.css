@@ -937,6 +937,11 @@ input.common-input {
   color: #555;
   margin-bottom: 1em;
 }
+input.common-input.disabled {
+  background-color: #CCC;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 select.common-select {
   display: block;
   border: 1px solid #BBB;

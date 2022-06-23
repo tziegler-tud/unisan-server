@@ -117,47 +117,6 @@ let eventDetails = {
         function buildPageCommon(user, event, args) {
             // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
             window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
-
-            // init event sidebar
-            //find if current user is already registered
-            let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-            sidebar.addContent("eventParticipants", {
-                event: event,
-                user: user,
-                isParticipant: userIsParticipant,
-                callback: {
-                    onConfirm: function(){
-                        eventActions.addParticipant(event.id, user.id, function(event) {
-                            window.eventProfile.refreshEvent()
-                                .then(event => {
-                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-                                    sidebar.update({event: event, isParticipant: userIsParticipant})
-                                })
-                                .catch(err => {
-                                })
-                        })
-                    },
-                    onDelete: function(){
-                        eventActions.removeParticipant(event.id, user.id, function(){
-                            window.eventProfile.refreshEvent()
-                                .then(event => {
-                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-                                    sidebar.update({event: event, isParticipant: userIsParticipant})
-                                })
-                                .catch(err => {
-                                })
-                        })
-                    }
-                },
-            });
-            if(phone.matches || tablet.matches) {
-                sidebar.hide();
-            }
-            else {
-                sidebar.show();
-            }
-
-
         }
 
         function buildPageView(user, event, args) {
@@ -190,18 +149,77 @@ let eventDetails = {
                 eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
                 eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
                 eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
+
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventParticipants", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {
+                        onConfirm: function(){
+                            eventActions.addParticipant(event.id, user.id, function(event) {
+                                window.eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant})
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
+                        },
+                        onDelete: function(){
+                            eventActions.removeParticipant(event.id, user.id, function(){
+                                window.eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant})
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
+                        }
+                    },
+                });
+
             }
 
             function buildSeminarPage(){
                 eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
                 eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
                 eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
+
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventPostings", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {
+
+                    },
+                });
+
             }
 
             function buildSanPage(){
                 eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: false, size: "full"});
                 eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: false, size: "half"});
                 eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: false, size: "half"});
+
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventPostings", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {
+
+                    },
+                });
             }
 
         }
@@ -314,22 +332,82 @@ let eventDetails = {
                 default:
             }
 
+            if(phone.matches || tablet.matches) {
+                sidebar.hide();
+            }
+            else {
+                sidebar.show();
+            }
+
             function buildTrainingPage(){
                 eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
                 eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
                 eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventParticipants", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {
+                        onConfirm: function(){
+                            eventActions.addParticipant(event.id, user.id, function(event) {
+                                window.eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant})
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
+                        },
+                        onDelete: function(){
+                            eventActions.removeParticipant(event.id, user.id, function(){
+                                window.eventProfile.refreshEvent()
+                                    .then(event => {
+                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        sidebar.update({event: event, isParticipant: userIsParticipant})
+                                    })
+                                    .catch(err => {
+                                    })
+                            })
+                        }
+                    },
+                });
             }
 
             function buildSeminarPage(){
                 eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
                 eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
                 eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventPostings", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {},
+                });
             }
 
             function buildSanPage(){
                 eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
                 eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
                 eventPage.addComponent(EventPage.componentTypes.FILES, {allowEdit: true, size: "half"});
+
+                // init event sidebar
+                //find if current user is already registered
+                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                sidebar.addContent("eventPostings", {
+                    event: event,
+                    user: user,
+                    isParticipant: userIsParticipant,
+                    callback: {},
+                });
             }
         }
     },

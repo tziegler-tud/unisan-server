@@ -2,6 +2,8 @@ import "./sidebar.scss";
 
 import "./sidebar-logs.scss";
 
+import {phone, tablet} from "../helpers/variables";
+
 let SidebarCounter = {
     counter: 0,
     next: function(){
@@ -149,7 +151,7 @@ var SidebarButton = function(args) {
         case "cancel":
             self.container.classList.add("sidebarButton--cancel");
             self.handler = function(self){
-                self.sidebar.showDefault(false)
+                self.sidebar.showDefault((phone.matches || tablet.matches))
             }
             break;
         case "reset":
@@ -180,17 +182,23 @@ var SidebarButton = function(args) {
     }
 }
 
-SidebarButton.prototype.disable = function(){
-    this.container.classList.add("sidebarButton-disabled");
-    this.button.disabled = true;
-    this.enabled = false;
+SidebarButton.prototype.disable = function(disable){
+    if(disable === undefined) disable = true;
+    if(disable) {
+        this.container.classList.add("sidebarButton-disabled");
+        this.button.disabled = true;
+        this.enabled = false;
+    }
 }
 
 
-SidebarButton.prototype.enable = function(){
-    this.container.classList.remove("sidebarButton-disabled");
-    this.button.disabled = false;
-    this.enabled = true;
+SidebarButton.prototype.enable = function(enable){
+    if(enable === undefined) enable = true;
+    if(enable) {
+        this.container.classList.remove("sidebarButton-disabled");
+        this.button.disabled = false;
+        this.enabled = true;
+    }
 }
 
 /***
@@ -318,10 +326,9 @@ Sidebar.prototype.addErrorMessage = function(msg, insertFunc, overwrite, warning
     if(warning) {
        c = "sidebar-errorMsg warnMsg"
     }
-    var errorHtml = $("<div/>", {
-        "class": c,
-        text: msg,
-    });
+    var errorHtml = document.createElement("div");
+    errorHtml.classList = c;
+    errorHtml.innerHTML = msg;
     if (insertFunc == null) {
         this.sidebarHTML.prepend(errorHtml);
     }

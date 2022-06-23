@@ -1,26 +1,71 @@
+/**
+ * typedef Posting
+ * @typedef {Object} Posting
+ * @property {Qualification[]} requiredQualifications - array of required qualifications
+ * @property {Object} date - complex object wrapping date information
+ * @property {Date} date.startDate - start date
+ * @property {Date} date.endDate - end date
+ * @property {Number} order - order of posting, for displaying purposes
+ * @property {boolean} enabled - true if the posting is enabled. Currently not used.
+ * @property {boolean} optional - true if the posting is optional. Currently not used.
+ * @property {Object} assigned - complex object containing information on assigned user
+ * @property {boolean} isAssigned - true if the posting has an user assigned.
+ * @property {User} isAssigned - the assigned user.
+ * @property {Qualification} qualification - information on the qualification used for assignement.
+ * @property {Date} date - date this user was assigned
+ *
+ */
+
 import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton} from "../sidebar.js";
 import {Searchbar} from "../../searchbar/searchbar.js";
 
 import "../sidebar-events.scss";
 import "../sidebar-addParticipant.scss";
-import "../sidebar-addPosting.scss";
 
 import {MDCList} from '@material/list';
 
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
-import {getDataFromServer} from "../../helpers/helpers";
+import {getDataFromServer, getMatchingQualifications} from "../../helpers/helpers";
+import {EditableInputField} from "../../helpers/editableInputField";
+import {EditableTextField} from "../../helpers/editableTextField";
 
 let eventPlugin = new SidebarPlugin("event");
+
+
+let eventDetails = new ContentHandler("eventDetails",
+    function(sidebar, args, type){
+        var event = args.event;
+        let context = {
+            event: event,
+            args: args,
+        }
+        $.get('/webpack/sidebar/templates/events/sidebar-eventDetails.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            sidebar.registerBackButton( ".sidebar-back-btn");
+
+            let titleInputContainer = document.getElementById("sidebar-eventDetails--titleRenderer");
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+
+            let descContainer = document.getElementById("sidebar-eventDetails--descRenderer");
+            let descField = new EditableTextField(descContainer, event.description.longDesc.delta, event.description.longDesc.html, {}, {readOnly: true});
+
+        });
+    });
 
 let showEventParticipants = new ContentHandler("eventParticipants",
     function(sidebar, args, type){
         var event = args.event;
+        let context = {
+            event: event,
+            args: args,
+        }
         //populate
         $.get('/webpack/sidebar/templates/events/sidebar-eventParticipants.hbs', function (data) {
             var template = Handlebars.compile(data);
-            sidebar.sidebarHTML.html(template(event));
+            sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton( ".sidebar-back-btn");
             // find if current user is registered for event
             let notRegisteredSelector = "#sidebar-participate-button-notregistered"
@@ -311,11 +356,13 @@ let addPosting = new ContentHandler("addEventPosting",
 
         let context = {};
         context.event = args.event;
+        context.title = "Dienstposten erstellen";
+        context.args = args;
         var corrupted = false;
 
         var res = {qualifications: {}}
 
-        getDataFromServer("/api/v1/qualification/groupByType", function(context){
+        sidebar.getDataFromServer("/api/v1/qualification/groupByType", function(context){
 
             //filter for appropriate types
             let qualTypeFilters = args.qualTypes;
@@ -341,13 +388,14 @@ let addPosting = new ContentHandler("addEventPosting",
                         handler: function () {
                             const id = document.getElementById("qual-name").selectedOptions[0].id;
                             const data = {
-                                qualifications: [sidebar.findQualByIdInTypeArray(res.qualifications.byType, id)], //array of quals
+                                qualifications: [id], //array of quals
                                 description: $("#posting-description").val(), //string
                             };
                             onConfirm(data);
                         }.bind(args)
                     });
 
+                var levelObject = document.getElementById("qual-level");
                 var q = $("#qual-type");
                 q.on("change",function(e){
                     var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
@@ -358,49 +406,139 @@ let addPosting = new ContentHandler("addEventPosting",
                     typeData.values.forEach(function (el, index){
                         const option = document.createElement('option');
                         option.id = el._id;
+                        option.dataset.qualid = el._id;
                         option.value = el.name;
                         option.innerHTML = el.name;
                         qualNameObject.options[index] = option;
                     });
-
-
                 })
+                var n = $("#qual-name");
+                n.on("change",function(e){
+                    var qual = sidebar.findQualByIdInTypeArray(res.qualifications.byType, e.target.selectedOptions[0].dataset.qualid)
+                    levelObject.value = qual.level;
+                })
+                n.trigger("change");
             })
         }
     })
 
 let showPostingDetails = new ContentHandler("showPostingDetails",
     function(sidebar, args, type){
+        var onDelete = args.callback.onDelete;
         var onConfirm = args.callback.onConfirm;
 
         let context = {};
+        if(args.allowEdit === undefined) args.allowEdit = {};
+        context.user = args.user;
+        context.postingId = args.postingId;
         context.event = args.event;
+        context.allowEdit = args.allowEdit;
+        context.args = args;
         var corrupted = false;
+
+        var hasChanges = false;
+
+        context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
+
+        //find posting
+        let posting = context.event.postings.find(el => {
+            return el._id.toString() === context.postingId;
+        })
+        if(posting === undefined) {
+            posting = {
+                requiredQualifications: [],
+            };
+            corrupted = true;
+        }
+
+        context.posting = posting;
+
+        let matchingQualifications = getMatchingQualifications(user, posting);
+        context.userIsAllowed = (matchingQualifications.length > 0);
+
+
 
         $.get('/webpack/sidebar/templates/events/sidebar-showPostingDetails.hbs', function (data) {
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
+            var t1;
+            var t2;
+            if(args.allowEdit){
+                let currentStartDate = new Date(posting.date.startDate);
+                let currentEndDate = new Date(posting.date.endDate);
+                if (isNaN(currentStartDate.getFullYear()) || isNaN(currentEndDate.getFullYear())) {
+                    currentStartDate = new Date();
+                    currentEndDate = new Date();
+                    corrupted = true;
+                }
+                else {
+                    t1 = document.getElementById("eventinp-timeStart");
+                    t2 = document.getElementById("eventinp-timeEnd");
+                    $(t1).val(currentStartDate.toTimeInputValue())
+                    $(t2).val(currentEndDate.toTimeInputValue())
+                }
 
-            var l = document.getElementById("eventinp-location");
+                if(!posting.assigned.isAssigned) {
+
+                }
+            }
+
+            if(corrupted) {
+                sidebar.addErrorMessage("Corrupted data detected: Failed to find selected posting.", function(html){
+                    //find .sidebar-inner
+                    document.getElementById("sidebar-inner").prepend(html);
+                })
+                return false;
+            }
 
             sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
-            sidebar.registerConfirmButton(".sidebar-confirm",
+
+            args.date = posting.date.startDate;
+
+            let confirmButton = sidebar.registerConfirmButton( ".sidebar-confirm",
                 {
                     customHandler: true,
+                    enabled: (context.allowEdit && !corrupted && hasChanges),
                     handler: function () {
-                        let location = $(l).val();
+                        const data = {
+                            id: context.postingId,
+                            description: $("#posting-description").val(), //string
 
-                        let data = {
-                            location: location,
+                        };
+                        const args = {
+                            date: context.event.date.startDate,
+                            startTime: t1.value,
+                            endTime: t2.value,
                         }
-                        onConfirm(args.event, data, {});
+                        onConfirm(data, args);
                     }.bind(args)
                 });
+
+            let deleteBtn = sidebar.registerDeleteButton(".sidebar-delete",
+                {
+                    customHandler: true,
+                    enabled: context.allowEdit,
+                    handler: function(){
+                        let data = {
+                            id: context.postingId,
+                        }
+                        onDelete(data);
+                    },
+                });
+
+            $(sidebar.sidebarHTML).find("input").each((index, el) => {
+                el.addEventListener("input", function(e){
+                    hasChanges = true;
+                    confirmButton.enable(context.allowEdit && !corrupted);
+                })
+            })
         })
     })
 
+
+eventPlugin.addContentHandler(eventDetails);
 eventPlugin.addContentHandler(showEventParticipants);
 eventPlugin.addContentHandler(addEventParticipant);
 eventPlugin.addContentHandler(showUpdateEventDateContent);

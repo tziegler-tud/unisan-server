@@ -78,7 +78,7 @@ function postUpload (req, res, next) {
 
 //check url access by user group
 // router.use('/*', checkUrlAccess);
-router.get('/clearDocuments', clearUserDocuments)
+router.get('/clearDocuments', clearUserDocuments) //TODO: remove before deployment
 
 router.post('/create', create);
 router.get('/', getAll);
@@ -490,6 +490,15 @@ function removeGroupFromAllUser(req, res, next){
 
 function clearUserDocuments(req, res, next){
     userService.clearDocuments()
+        .then(function(result) {
+            res.status(200).send();
+        })
+        .catch(err => next(err))
+}
+
+
+function transformQuals(req, res, next){
+    userService.replaceQualificationsByRef()
         .then(function(result) {
             res.status(200).send();
         })

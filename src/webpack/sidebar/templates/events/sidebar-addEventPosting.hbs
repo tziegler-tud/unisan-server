@@ -5,7 +5,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
         <div class="sidebar-title">
-            <span class="quill-renderer limitCharacters">{{title.value}}</span>
+            <span class="quill-renderer limitCharacters">{{sidebar.title}}</span>
         </div>
     </div>
     <div id="sidebar-inner" class="sidebar-inner">
@@ -36,9 +36,30 @@
                             <label for="qual-name">Bezeichnung</label>
                             <select class="common-select" id="qual-name" name="qual-name">
                                 {{#each qualifications.byType.[0].values}}
-                                    <option id={{this._id}}>{{name}}</option>
+                                    <option id={{this._id}} data-qualid="{{this._id}}">{{name}}</option>
                                 {{/each}}
                             </select>
+                        </div>
+                        <div class="ak-item ak-qual ak-qual-aquiredDate">
+                            <label for="qual-level">Hierarchie-Ebene</label>
+                            <input class="common-input disabled" id="qual-level" name="qual-level" type="text" disabled value=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title">
+                    Dienstzeit
+                </div>
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="form-item useredit-item form-griditem" id="eventitem-timeStart"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeStart">von:</label>
+                            <input class="common-input timepicker" id="eventinp-timeStart" name="timeStart" type="time" value="{{}}" />
+                            <div class="clear"></div>
+                        </div>
+                        <div class="form-item useredit-item form-griditem" id="eventitem-timeEnd"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeEnd">bis:</label>
+                            <input class="common-input timepicker" id="eventinp-timeEnd" name="timeEnd" type="time" value="21:00" />
+                            <div class="clear"></div>
                         </div>
                     </div>
                 </div>

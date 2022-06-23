@@ -29,7 +29,7 @@ var eventActions = {
             },
         };
 
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/create",
             // make put for safety reasons :-)
             type: 'POST',
@@ -45,22 +45,23 @@ var eventActions = {
         });
     },
 
-    deleteEvent: function(eventid) {
+    deleteEvent: function(eventid, callback) {
+        callback = (callback == null) ? function(){
+            alert("event " + eventid + " deleted.");
+        } : callback;
 
         // build a json object or do something with the form, store in data
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/" + eventid,
             type: 'DELETE',
             success: function(result) {
-                alert("Event " + eventid + " deleted.");
-                window.location.replace("/unisams/events");
+                callback(result);
             }
         });
-
     },
 
     uploadImage: function(eventid){
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/" + eventid + "/uploadUserImage",
             type: 'POST',
             success: function(result) {
@@ -77,7 +78,7 @@ var eventActions = {
             userId: userid,
             args: {},
         };
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/addParticipant",
             // make put for safety reasons :-)
             type: 'POST',
@@ -99,7 +100,7 @@ var eventActions = {
             role: role,
             args: {},
         };
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/changeParticipant",
             // make put for safety reasons :-)
             type: 'POST',
@@ -120,7 +121,7 @@ var eventActions = {
             userId: userid,
             args: {},
         };
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/removeParticipant",
             // make put for safety reasons :-)
             type: 'POST',
@@ -143,7 +144,7 @@ var eventActions = {
         return $.ajax({
             url: "/api/v1/eventmod/addPost",
             // make put for safety reasons :-)
-            type: 'POST',
+            type: 'PUT',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
             data: JSON.stringify(data),
@@ -154,15 +155,26 @@ var eventActions = {
         });
     },
 
-    removePosting: function(eventId, postingId, callback) {
+    updatePosting: function(eventId, postingData, callback, args) {
         callback = (callback == null) ? function(){} : callback;
+
+
+        var startDate = parseHTMLInputDate(args.date, args.startTime);
+        var endDate = parseHTMLInputDate(args.date, args.endTime);
+
+        postingData.date = {
+            startDate: startDate,
+            endDate: endDate,
+        }
         var data = {
             id: eventId,
-            postingId: postingId,
+            posting: postingData,
             args: {},
         };
+
+
         return $.ajax({
-            url: "/api/v1/eventmod/removePost",
+            url: "/api/v1/eventmod/updatePost",
             // make put for safety reasons :-)
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
@@ -175,13 +187,34 @@ var eventActions = {
         });
     },
 
-    assignPost: function(eventId, postingId, userId, qualification, callback) {
+
+    removePosting: function(eventId, postingId, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        var data = {
+            id: eventId,
+            postingId: postingId,
+            args: {},
+        };
+        return $.ajax({
+            url: "/api/v1/eventmod/removePost",
+            // make put for safety reasons :-)
+            type: 'DELETE',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                callback(result);
+                // window.location.reload();
+            }
+        });
+    },
+
+    assignPost: function(eventId, postingId, userId, callback) {
         callback = (callback == null) ? function(){} : callback;
         var data = {
             id: eventId,
             postingId: postingId,
             userId: userId,
-            qualification: qualification,
             args: {},
         };
         return $.ajax({
@@ -228,7 +261,7 @@ var eventActions = {
             key: "description.longDesc.delta",
             value: delta,
         };
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/updateKey/" +id,
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
@@ -254,7 +287,7 @@ var eventActions = {
                 endDate: endDate,
             }
         }
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/updateKey/" +id,
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
@@ -273,7 +306,7 @@ var eventActions = {
             key: key,
             value: value,
         };
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/updateKey/" +id,
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
@@ -285,7 +318,7 @@ var eventActions = {
         });
     },
     uploadFileToStorage: function(id, filename, file, callback){
-        $.ajax({
+        return $.ajax({
             url: "/api/v1/eventmod/" + id + "/uploadFile",
             type: 'POST',
             success: function(result) {

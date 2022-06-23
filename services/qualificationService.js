@@ -95,6 +95,7 @@ async function _delete(id) {
 
 async function groupByType(){
     return Qual.aggregate([
+        {$sort: {level: 1}},
         {
             $group: {
                 _id: "$qualType",
@@ -103,6 +104,9 @@ async function groupByType(){
                 }
             }
         },
+        {
+            $sort: {_id: 1}
+        }
         // {
         //     $addFields:
         //         {

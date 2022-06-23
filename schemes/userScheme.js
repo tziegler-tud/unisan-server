@@ -100,15 +100,8 @@ var UserSchema = new Schema({
     qualifications: [
         {
             qualification: {
-                _id: false,
-                qualType: {
-                    type: String,
-
-                },
-                name: {
-                    type: String,
-
-                },
+                type: Schema.Types.ObjectId,
+                ref: 'Qualifications',
             },
             acquiredDate: {
                 type: Date,

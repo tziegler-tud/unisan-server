@@ -1,0 +1,178 @@
+
+<div id="sidebar" class="sidebar sidebar-event">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span class="quill-renderer limitCharacters">{{sidebar.title}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+<!--                <div class="sidebar-title">-->
+<!--                    <span></span>-->
+<!--                </div>-->
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title participant-heading">
+                    Benötigte Qualifikation
+                </div>
+                <div class="section-content">
+                    <div class="ak-form">
+                        {{#if allowEdit}}
+                            <div class="ak-item ak-qual ak-qual-type">
+                                <label for="qual-type">Typ</label>
+                                <span class="common-viewBox viewBox-disabled" id="qual-type">
+                                    {{posting.requiredQualifications.[0].qualType}}
+                                </span>
+                            </div>
+                            <div class="ak-item ak-qual ak-qual-name">
+                                <label for="qual-name">Bezeichnung</label>
+                                <span class="common-viewBox viewBox-disabled" id="qual-name">
+                                    {{posting.requiredQualifications.[0].name}}
+                                </span>
+                            </div>
+                            <div class="ak-item ak-qual ak-qual-aquiredDate">
+                                <label for="qual-level">Hierarchie-Ebene</label>
+                                <span class="common-viewBox viewBox-disabled" id="qual-level">
+                                    {{posting.requiredQualifications.[0].level}}
+                                </span>
+                            </div>
+                        {{else}}
+                            <div class="ak-item ak-qual ak-qual-type">
+                                <label for="qual-type">Typ</label>
+                                <span class="common-viewBox" id="qual-type">
+                                    {{posting.requiredQualifications.[0].qualType}}
+                                </span>
+                            </div>
+                            <div class="ak-item ak-qual ak-qual-name">
+                                <label for="qual-name">Bezeichnung</label>
+                                <span class="common-viewBox" id="qual-name">
+                                    {{posting.requiredQualifications.[0].name}}
+                                </span>
+                            </div>
+                            <div class="ak-item ak-qual ak-qual-aquiredDate">
+                                <label for="qual-level">Hierarchie-Ebene</label>
+                                <span class="common-viewBox" id="qual-level">
+                                    {{posting.requiredQualifications.[0].level}}
+                                </span>
+                            </div>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title">
+                    Dienstzeit
+                </div>
+                <div class="section-content">
+                    {{#if allowEdit}}
+                        <div class="ak-form">
+                            <div class="form-item useredit-item form-griditem" id="eventitem-timeStart"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeStart">von:</label>
+                                <input class="common-input timepicker" id="eventinp-timeStart" name="timeStart" type="time" value="{{posting.date.startDate}}" />
+                                <div class="clear"></div>
+                            </div>
+                            <div class="form-item useredit-item form-griditem" id="eventitem-timeEnd"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeEnd">bis:</label>
+                                <input class="common-input timepicker" id="eventinp-timeEnd" name="timeEnd" type="time" value="{{posting.date.endDate}}" />
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    {{else}}
+                        <div class="ak-form">
+                            <div class="form-item useredit-item form-griditem" id="eventitem-timeStart">
+                                <label class="form-item-label form-attribute-name nofloat" for="eventinp-timeStart">von:</label>
+                                <span class="common-viewBox" id="qual-level">{{transformTimeString posting.date.startDate}}</span>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="form-item useredit-item form-griditem" id="eventitem-timeEnd"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeEnd">bis:</label>
+                                <span class="common-viewBox" id="qual-level">{{transformTimeString posting.date.endDate}}</span>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title">
+                    Weitere Angaben
+                </div>
+                <div class="section-content">
+                    {{#if allowEdit}}
+                    <div class="ak-form">
+                        <div class="ak-item ak-qual ak-posting-description">
+                            <label for="posting-description">Bemerkung (optional)</label>
+                            <input class="common-input" id="posting-description" name="posting-description" type="text" value="{{posting.description}}"/>
+                        </div>
+                    </div>
+                    {{else}}
+                    {{#stringNotEmpty posting.description}}
+                    <div class="ak-form">
+                        <div class="ak-item ak-qual ak-qual-aquiredDate">
+                            <label for="posting-description">Bemerkung (optional)</label>
+                            <span class="common-viewBox" id="posting-description">
+                                {{posting.description}}
+                            </span>
+                        </div>
+                    </div>
+                    {{/stringNotEmpty}}
+                    {{/if}}
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title">
+                    Anmelden
+                </div>
+                <div class="section-content">
+                    {{#and userIsAllowed (not args.userIsRegistered)}}
+                        <div class="ak-form">
+                            <div class="ak-item ak-qual ak-qual-aquiredDate">
+                                <span class="common-viewBox" id="posting-description">
+                                   Du kannst dich für diesen Posten melden.
+                                </span>
+                            </div>
+                        </div>
+                    {{else}}
+                        <div class="ak-form">
+                            <div class="ak-item ak-qual ak-qual-aquiredDate">
+
+                            <span class="common-viewBox" id="posting-description">
+                                Anmeldung nicht möglich:
+                            {{#if userIsAllowed}}
+                                Du bist für diesen Zeitraum bereits gemeldet.
+                            {{else}}
+                                Du erfüllst nicht die benötigte Qualifikation.
+                            {{/if}}
+                            </span>
+                            </div>
+                        </div>
+                    {{/and}}
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
+            <a class="sidebar-delete sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    delete
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
