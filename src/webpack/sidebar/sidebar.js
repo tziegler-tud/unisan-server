@@ -34,6 +34,7 @@ var Sidebar = function(parentId, content, optionalId){
     this.parent = $('#'+ parentId);
     this.domId = optionalId === undefined ? "sidebar" + SidebarCounter.next() : optionalId;
     this.isActive = false;
+    this.storage = [];
     this.currentState = {
         activeElement: null,
     };
@@ -72,11 +73,53 @@ SidebarPlugin.prototype.addContentHandler = function(contentHandler) {
  *
  * @param type {String}
  * @param handlerFunction {Function}
+ * @param handlerArgs {Object}
+ * @param handlerArgs.callback {Object}
+ * @param handlerArgs.callback.onSave {Function}
+ * @param handlerArgs.callback.onLoad {Function}
  * @constructor
  */
-var ContentHandler = function(type, handlerFunction) {
+var ContentHandler = function(type, handlerFunction, handlerArgs) {
     this.type = type;
     this.fn = handlerFunction;
+    this.inputs = [];
+    if (handlerArgs === undefined) handlerArgs = {};
+    let defaultArgs = {
+        callback: {
+            onSave: function(){
+                let handlerContent = []; //contains key-val pairs (id, value, inputType)
+                let inputs = document.querySelectorAll(".sidebar input");
+                inputs.forEach(el => {
+                    handlerContent.push({
+                        key: el.id,
+                        value: el.value,
+                    })
+                })
+                return handlerContent;
+            },
+            onLoad: function(handlerContent){
+                handlerContent.forEach(entry => {
+                    let el = document.getElementById(entry.key);
+                    if (el === undefined || el === null) {
+
+                    }
+                    else {
+                        el.value = entry.value;
+                    }
+                })
+            },
+        }
+    }
+    this.args = Object.assign(defaultArgs, handlerArgs);
+    this.apply = function(sidebar, args, type){
+        this.fn(sidebar, args, type);
+    }
+    this.save = function(){
+        return this.args.callback.onSave();
+    }
+    this.load = function(handlerContent){
+        return this.args.callback.onLoad(handlerContent);
+    }
     return this;
 }
 
@@ -223,9 +266,29 @@ Sidebar.prototype.addContent = function(type, args){
         return false;
     }
     else {
-        handler.fn(self, args, type)
+        handler.apply(self, args, type)
+        self.currentPage.handler = handler;
     }
 };
+
+Sidebar.prototype.addSubpage = function(type, args) {
+}
+
+Sidebar.prototype.saveContent = function() {
+    //save temporary input contents. We use the handlers onSave callback.
+    let handler = this.currentPage.handler;
+    let handlerContent = handler.onSave();
+    //return content
+    //create storage id
+    let storageObject = {page: this.currentPage, handlerContent: handlerContent}
+    return storageObject;
+}
+
+Sidebar.prototype.loadContent = function(storageObject) {
+    let handler = this.currentPage.handler;
+    let currentPage = storageObject.page;
+    currentPage.handler.onLoad(storageObject.handlerContent)
+}
 
 Sidebar.prototype.setDefault = function(type, args){
     this.defaultPage.type = type;

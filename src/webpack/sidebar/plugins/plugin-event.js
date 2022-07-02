@@ -600,7 +600,8 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
                 })
             })
         })
-    })
+    },
+    {})
 
 
 eventPlugin.addContentHandler(eventDetails);

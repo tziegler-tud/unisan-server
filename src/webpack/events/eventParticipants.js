@@ -129,6 +129,21 @@ let eventParticipants = {
         // window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
 
+        var sidebar = new Sidebar('wrapper', {title: "Test"});
+        sidebar.addPlugin(eventPlugin);
+
+        let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+        // init event sidebar
+        sidebar.addContent("eventDetails", {
+            event: self.pageData.event,
+            user: self.pageData.user,
+            isParticipant: userIsParticipant,
+            callback: {
+            },
+        });
+        if(!(phone.matches || tablet.matches)) sidebar.show();
+        sidebar.setCurrentDefault();
+
         let pageContainer = document.getElementById("eventPage-component-container");
         var eventPage = new EventPage({
             container: pageContainer,
@@ -161,21 +176,6 @@ let eventParticipants = {
         var token = window.lidlRTO.objectManager.createNewObjectToken();
         const dialogDeleteEvent = new lidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
         window.lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
-
-        var sidebar = new Sidebar('wrapper', {title: "Test"});
-        sidebar.addPlugin(eventPlugin);
-
-        let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
-        // init event sidebar
-        sidebar.addContent("eventDetails", {
-            event: self.pageData.event,
-            user: self.pageData.user,
-            isParticipant: userIsParticipant,
-            callback: {
-            },
-        });
-        if(!(phone.matches || tablet.matches)) sidebar.show();
-        sidebar.setCurrentDefault();
 
         switch(event.type.index){
             case 1:
