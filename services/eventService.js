@@ -36,6 +36,8 @@ module.exports = {
     unassignPost,
     delete: _delete,
 
+    getUserEvents,
+    getUserPostings,
     addFileReference,
     removeFileReference,
 };
@@ -335,6 +337,20 @@ async function update(req, id, eventParam) {
     // copy eventParam to event
     Object.assign(event, eventParam);
 
+    //check if date was modified and adjust postings accordingly
+    if (eventParam.date !== undefined) {
+        if (eventParam.startDate !== undefined) {
+            event.postings.forEach(posting => {
+                posting.date.startDate.setUTCFullYear(event.date.startDate.getUTCFullYear());
+                posting.date.startDate.setUTCMonth(event.date.startDate.getUTCMonth());
+                posting.date.startDate.setUTCDate(event.date.startDate.getUTCDate());
+                posting.date.endDate.setUTCFullYear(event.date.endDate.getUTCFullYear());
+                posting.date.endDate.setUTCMonth(event.date.endDate.getUTCMonth());
+                posting.date.endDate.setUTCDate(event.date.endDate.getUTCDate());
+            })
+        }
+    }
+
     return new Promise(function(resolve, reject){
         event.save()
             .then(result=> {
@@ -440,6 +456,7 @@ async function updateKey(req, id, key, value, eventParams) {
             event.set(key, array, {strict: false} );
         }
         else {
+
             let k = event.get(key);
             if (k === undefined) {
                 ojVal = "N/A"
@@ -448,6 +465,18 @@ async function updateKey(req, id, key, value, eventParams) {
                 ojVal = (k.value === undefined) ? k : k.value;
             }
             event.set(key, value, {strict: false} );
+            //check if date was modified and adjust postings accordingly
+            if (key === "date" || key === "date.startDate") {
+                event.postings.forEach(posting => {
+                    posting.date.startDate.setUTCFullYear(event.date.startDate.getUTCFullYear());
+                    posting.date.startDate.setUTCMonth(event.date.startDate.getUTCMonth());
+                    posting.date.startDate.setUTCDate(event.date.startDate.getUTCDate());
+                    posting.date.endDate.setUTCFullYear(event.date.endDate.getUTCFullYear());
+                    posting.date.endDate.setUTCMonth(event.date.endDate.getUTCMonth());
+                    posting.date.endDate.setUTCDate(event.date.endDate.getUTCDate());
+                })
+                event.markModified("postings");
+            }
         }
 
         event.save()
@@ -1293,6 +1322,7 @@ async function removePosting (req, eventId, postingId) {
  * @param args {Object} additional args
  * @param args.ignoreRequiredQualification {boolean} [false] true to allow a user to be assigned that does not match required qualifications
  * @param args.overwrite {boolean} [false] true to overwrite if posting already has assigned user
+ * @param args.allowMultiple {boolean} [false] true to allow assignment if user already has another post overlapping times
  * @returns {Promise<unknown>}
  */
 async function assignPost (req, eventId, postingId, userId, args) {
@@ -1310,6 +1340,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
     let defaultArgs = {
         overwrite: false,
         ignoreRequiredQualification: false,
+        allowMultiple: false,
     }
 
     args = Object.assign(defaultArgs, args)
@@ -1349,19 +1380,22 @@ async function assignPost (req, eventId, postingId, userId, args) {
             isAssigned: true,
         }
 
-        //check if user is already signed up for a differnet post in the same time slot
-        let findUser = event.postings.find(posting => {
-            if (posting.assigned.isAssigned && posting.assigned.user !== undefined) {
-                return (posting.assigned.user.toString() === userId);
-            }
-            else return false;
 
+        //find all upcoming postings of target user
+        let userPostings = await getUserPostings(userId, {
+            selector: "gte",
         })
-        if (findUser) {
-            //already signed up for a different post
-            console.log("Rejected user "+ user.username + " to be assigned to post: User is already assigned to a different post.")
-            throw new Error("User already assigned for a different post.");
-            return;
+
+        //check for overlap
+        let overLap = findOverlap(userPostings, post);
+
+        if(overLap !== undefined) {
+            //overlapping posting found!
+            if (!args.allowMultiple) {
+                console.log("Rejected user "+ user.username + " to be assigned to post: User is already assigned to a different post.")
+                throw new Error("User already assigned for a different post.");
+            }
+
         }
 
         //check if taken
@@ -1420,6 +1454,29 @@ async function assignPost (req, eventId, postingId, userId, args) {
     else {
         //posting not found :(
             reject(new Error("Posting not found."))
+    }
+
+    function findOverlap(userPostings, posting){
+        let overlap = userPostings.find(userPosting => {
+            if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
+                //found overlap
+                return true
+            }
+            if (userPosting.date.endDate < posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
+                //found overlap
+                return true
+            }
+            if (userPosting.date.startDate < posting.date.endDate && userPosting.date.endDate > posting.date.endDate) {
+                //found overlap
+                return true
+            }
+            if (userPosting.date.startDate < posting.date.startDate && userPosting.date.endDate > posting.date.startDate) {
+                //found overlap
+                return true
+            }
+            else return false;
+        })
+        return overlap;
     }
 
     function addParticipant(event, userId, args){
@@ -1569,6 +1626,80 @@ async function unassignPost (req, eventId, userId, postingId) {
         return event;
     }
 }
+
+
+/**
+ * returns all events the user is registered for
+ * @param userId {string}
+ * @param args {Object}
+ * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
+ * @param args.dateFilter {Object} Object to set date filtering
+ * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
+ * @param args.dateFilter.minDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range"].
+ * @returns {Promise<Event[]>}
+ */
+async function getUserEvents(userId, args) {
+    if (args === undefined) args = {};
+
+    let user = await User.findById(userId).select('-hash');
+    // validate
+    if (!user) throw new Error('User not found');
+
+    return matchAny("", {
+        sort: args.sort,
+        dateFilter: args.dateFilter,
+        filter: {
+            filter: "participants.user",
+            value: user.id,
+        }
+    });
+}
+
+/**
+ * returns all postings the current user is assigned to
+ * @param userId
+ * @param args
+ * @param args.dateFilter {Object} Object to set date filtering
+ * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
+ * @param args.dateFilter.minDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range"].
+ * @returns {Promise<Posting[]>}
+ */
+async function getUserPostings(userId, args) {
+    if (args === undefined) args = {};
+    //get all user Events
+    let userEvents = await getUserEvents(userId, args);
+    //extract postings
+    let filteredEvents = userEvents.filter(event => {
+        return (Array.isArray(event.postings) && event.postings.length > 0);
+    })
+    let userPostings = [];
+    filteredEvents.forEach(event => {
+        event.postings.forEach(posting => {
+            if (posting.assigned.isAssigned) {
+                let postUserId = (posting.assigned.user.username === undefined) ? posting.assigned.user : posting.assigned.user.id;
+                if(postUserId.toString() === userId.toString()){
+                    let eventAttr = {
+                        id: event.id,
+                        title: event.title,
+                    };
+
+                    let json = posting.toJSON();
+                    json.event = eventAttr;
+                    userPostings.push(json);
+                }
+            }
+        })
+    })
+    return userPostings;
+}
+
+/**
+ * helpers
+ */
 
 /**
  * returns an array of qualifications with which the user can fill a posting

@@ -40,9 +40,13 @@
                                 {{/each}}
                             </select>
                         </div>
-                        <div class="ak-item ak-qual ak-qual-aquiredDate">
-                            <label for="qual-level">Hierarchie-Ebene</label>
-                            <input class="common-input disabled" id="qual-level" name="qual-level" type="text" disabled value=""/>
+<!--                        <div class="ak-item ak-qual ak-qual-aquiredDate">-->
+<!--                            <label for="qual-level">Hierarchie-Ebene</label>-->
+<!--                            <input class="common-input disabled" id="qual-level" name="qual-level" type="text" disabled value=""/>-->
+<!--                        </div>-->
+                        <div class="ak-item ak-value">
+                            <input class="common-input float " id="allowHigher-checkbox" name="allowHigher-checkbox" type="checkbox" checked/>
+                            <label class="float" for="allowHigher-checkbox">Höhere Qualifikation zulassen</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip tt-left">Erlaubt Nutzern mit einer höherwertigen Qualifikation, sich anzumelden.</span></div>
                         </div>
                     </div>
                 </div>
@@ -54,11 +58,11 @@
                 <div class="section-content">
                     <div class="ak-form">
                         <div class="form-item useredit-item form-griditem" id="eventitem-timeStart"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeStart">von:</label>
-                            <input class="common-input timepicker" id="eventinp-timeStart" name="timeStart" type="time" value="{{}}" />
+                            <input class="common-input timepicker" id="eventinp-timeStart" name="timeStart" type="time" value="{{transformTimeString event.date.startDate}}" />
                             <div class="clear"></div>
                         </div>
                         <div class="form-item useredit-item form-griditem" id="eventitem-timeEnd"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeEnd">bis:</label>
-                            <input class="common-input timepicker" id="eventinp-timeEnd" name="timeEnd" type="time" value="21:00" />
+                            <input class="common-input timepicker" id="eventinp-timeEnd" name="timeEnd" type="time" value="{{transformTimeString event.date.endDate}}" />
                             <div class="clear"></div>
                         </div>
                     </div>
@@ -71,9 +75,13 @@
                 <div class="section-content">
                     <div class="ak-form">
                         <div class="ak-item ak-qual ak-qual-aquiredDate">
-                            <label for="posting-description">Bemerkung (optional)</label>
+                            <label for="posting-description">Bemerkung</label>
                             <input class="common-input" id="posting-description" name="posting-description" type="text"/>
                         </div>
+                    </div>
+                    <div class="ak-item ak-value">
+                        <input class="common-input float " id="isOptional-checkbox" name="isOptional-checkbox" type="checkbox" checked/>
+                        <label class="float" for="isOptional-checkbox">Besetzung ist optional</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip tt-left">Markiert einen Posten als optional.</span></div>
                     </div>
                 </div>
             </div>

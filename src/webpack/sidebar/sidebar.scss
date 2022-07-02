@@ -281,6 +281,7 @@ body{
   }
 }
 
+
 .sidebarButton {
   &.sidebarButton-disabled {
     cursor: not-allowed;
@@ -308,9 +309,25 @@ body{
       //border: 1px solid #c31d34;
     }
   }
+  &.sidebarButton--allowed {
+    button {
+      @include button.ink-color(#3b8d23);
+      @include button.disabled-ink-color(#3b8d23);
+    }
+  }
   &.sidebarButton--custom {
     button {
       @include button.ink-color(#84565E);
     }
   }
+}
+
+.mdcButton--allowed {
+  @include button.ink-color(#3b8d23)
+}
+.mdcButton--delete {
+  @include button.ink-color(#84565E)
+}
+.mdcButton--notAllowed {
+  @include button.ink-color(#858585)
 }

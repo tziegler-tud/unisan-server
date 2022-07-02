@@ -25,7 +25,7 @@ import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
 import {Snackbar} from "../helpers/snackbar";
-import {common, getMatchingQualifications} from "../helpers/helpers";
+import {common, getMatchingQualifications, getDataFromServer} from "../helpers/helpers";
 
 
 let eventParticipants = {
@@ -76,13 +76,17 @@ let eventParticipants = {
             //subscribe as observer to get notification if user changes on server
             let eventPromise = eventProfile.getEventAndSubscribe(ob2);
 
-            Promise.all([eventPromise, userPromise])
+            let userPostings = getDataFromServer("/api/v1/eventmod/userPostings/");
+
+            Promise.all([eventPromise, userPromise, userPostings])
                 .then(results => {
                     let event = results[0];
                     let user = results[1];
+                    let userPostings =results[2];
                     self.pageData = {
                         event: event,
                         user: user,
+                        userPostings: userPostings,
                     };
                     self.buildPage(self.pageData.user, self.pageData.event, args)
                 })
@@ -344,6 +348,9 @@ let eventParticipants = {
                                 let posting = {
                                     requiredQualifications: data.qualifications,
                                     description: data.description,
+                                    allowHigher: data.allowHigher,
+                                    optional: data.optional,
+                                    enabled: data.enabled,
                                     assigned: {
                                         isAssigned: false,
                                     }
@@ -460,10 +467,10 @@ let eventParticipants = {
                 role: "assigned"
             })
 
-            let userPostings = [];
+            let localUserPostings = []
             if (isRegistered) {
                 //find all postings for the current user
-                userPostings = dataList.filter(posting => {
+                localUserPostings = dataList.filter(posting => {
                     if (posting.assigned.isAssigned){
                         let postingUserId = (posting.assigned.user._id === undefined) ? posting.assigned.user : posting.assigned.user._id;
                         return (postingUserId.toString() === self.pageData.user._id);
@@ -472,12 +479,42 @@ let eventParticipants = {
                 })
             }
 
-            function augmentPostingsList(list){
+            //filter out postings concerning the current event
+            let globalUserPostings = self.pageData.userPostings.filter(posting => {
+                return (posting.event.id.toString() !== self.pageData.event.id.toString());
+            })
+
+            function augmentPostingsList(list, localUserPostings, globalUserPostings){
                 let sortedList = list;
                 sortedList.forEach(posting =>{
+                    //check if current user is assigned to this post
+                    posting.isAssignedToSelf = false;
+                    if (posting.assigned.isAssigned) {
+                        posting.isAssignedToSelf = (posting.assigned.user.id.toString() === self.pageData.user._id)
+                    }
                     let matchingQualifications = getMatchingQualifications(self.pageData.user, posting);
                     //check if user has posting at the same time
-                    let overlap = userPostings.find(userPosting => {
+                    let localOverlap = findOverlap(localUserPostings, posting)
+                    if(localOverlap !== undefined) {
+                        //overlap found
+                        posting.userIsBlocked = true;
+                    }
+                    else posting.userIsBlocked = false;
+
+                    let globalOverlap = findOverlap(globalUserPostings, posting)
+                    if(globalOverlap !== undefined) {
+                        //overlap found
+                        posting.userIsBlockedGlobally = true;
+                        posting.globalBlock = globalOverlap;
+                    }
+                    else posting.userIsBlockedGlobally = false;
+                    posting.userIsAllowed = (matchingQualifications.length > 0);
+                    posting.matchingQualifications = matchingQualifications;
+                })
+                return sortedList;
+
+                function findOverlap(postingsList, posting){
+                    return postingsList.find(userPosting => {
                         if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
                             //found overlap
                             return true
@@ -495,19 +532,11 @@ let eventParticipants = {
                             return true
                         }
                         else return false;
-                    })
-                    if(overlap !== undefined) {
-                        //overlap found
-                        posting.userIsBlocked = true;
-                    }
-                    else posting.userIsBlocked = false;
-                    posting.userIsAllowed = (matchingQualifications.length > 0);
-                    posting.matchingQualifications = matchingQualifications;
-                })
-                return sortedList;
+                    });
+                }
             }
 
-            let sortedList = augmentPostingsList(dataList)
+            let sortedList = augmentPostingsList(dataList, localUserPostings, globalUserPostings)
             self.dataList = sortedList;
 
             let dropdownMenus = function(){
@@ -516,24 +545,14 @@ let eventParticipants = {
                     let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
                 });
             }
-            let deletePosting = function(){
+            let deletePost = function(){
                 $('.posting-delete').each(function(){
                     $(this).on("click", function(e){
                         //push changes to server
                         e.preventDefault();
                         e.stopPropagation();
                         let postingId = e.currentTarget.dataset.postingid;
-                        eventActions.removePosting(event.id, postingId, function(){
-                            eventProfile.refreshEvent()
-                                .then(event => {
-                                    self.pageData.event = event;
-                                    self.dataList = event.postings;
-                                    displayPostingsList(self.dataList);
-                                    self.searchbar.hide();
-                                })
-                                .catch(err => {
-                                })
-                        }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                        deletePosting(self.pageData.event, postingId);
                     })
                 });
             }
@@ -555,51 +574,12 @@ let eventParticipants = {
                         e.preventDefault();
                         e.stopPropagation();
                         let element = e.currentTarget;
-                        sidebar.addContent("showPostingDetails", {
-                            postingId: element.dataset.postingid,
-                            event: self.pageData.event,
-                            allowEdit: args.allowEdit,
-                            user: self.pageData.user,
-                            userIsAllowed: element.dataset.userisallowed,
-                            userIsRegistered: isRegistered,
-                            callback: {
-                                onConfirm: function(data){
-                                    let posting = data;
-                                    eventActions.updatePosting(event.id, posting, function(event){
-                                        eventProfile.refreshEvent()
-                                            .then(event => {
-                                                self.pageData.event = event;
-                                                userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                                sidebar.update({event: event, isParticipant: userIsParticipant});
-                                                self.dataList =self.pageData.event.postings;
-                                                displayPostingsList(self.dataList);
-                                                self.searchbar.hide();
-                                            })
-                                            .catch(err => {
-                                            })
-                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
-                                },
-                                onDelete: function(data){
-                                    let postingId = data.id;
-                                    //push changes to server
-                                    eventActions.removePosting(self.pageData.event.id, postingId, function(){
-                                        eventProfile.refreshEvent()
-                                            .then(event => {
-                                                self.pageData.event = event;
-                                                self.dataList = self.pageData.event.postings;
-                                                displayPostingsList(self.dataList);
-                                                self.searchbar.hide();
-                                            })
-                                            .catch(err => {
-                                            })
-                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
-                                }
-                            }
-                        });
-                        sidebar.show();
+                        let postingId = element.dataset.postingid;
+                        showDetailsSidebar(postingId, element);
                     })
                 });
             }
+
 
             let assignCurrentUser = function(){
                 $('.posting-assignCurrentUser').each(function(){
@@ -608,38 +588,9 @@ let eventParticipants = {
                         e.preventDefault();
                         e.stopPropagation();
                         let postingId = e.currentTarget.dataset.postingid;
+                        let userId = self.pageData.user.id;
                         //find posting in local augmented list
-                        let posting = sortedList.find(posting => {
-                            return (posting._id === postingId)
-                        })
-                        if (posting === undefined) {
-                            //posting not found. Something went wrong
-                            console.warn("posting not found in local list. This is most likely due to coding errors. Please fix.");
-                            return false;
-                        }
-                        else {
-                            //posting found
-                            //check if user meets qualification requirement
-                            if (!posting.userIsAllowed) {
-                                console.log("Trying to assign user to event, but required Qualifications are not met. Aborting.")
-                                return false;
-                            }
-                            else {
-                                let qualification = posting.requiredQualifications[0];
-                                eventActions.assignPost(event.id, postingId, self.pageData.user.id, function(){
-                                    eventProfile.refreshEvent()
-                                        .then(event => {
-                                            self.pageData.event = event;
-                                            self.dataList = self.pageData.event.postings;
-                                            displayPostingsList(self.dataList);
-                                            self.searchbar.hide();
-                                        })
-                                        .catch(err => {
-                                        })
-                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
-                            }
-
-                        }
+                        assignUser(self.pageData.event, postingId, userId)
                     })
                 });
             }
@@ -650,17 +601,10 @@ let eventParticipants = {
                         //push changes to server
                         e.preventDefault();
                         e.stopPropagation();
-                        eventActions.unassignPost(event.id, e.currentTarget.dataset.postingid, e.currentTarget.dataset.userid, function(){
-                            eventProfile.refreshEvent()
-                                .then(event => {
-                                    self.pageData.event = event;
-                                    self.dataList = self.pageData.event.postings;
-                                    displayPostingsList(self.dataList);
-                                    self.searchbar.hide();
-                                })
-                                .catch(err => {
-                                })
-                        }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                        let event = self.pageData.event;
+                        let postingId = e.currentTarget.dataset.postingid;
+                        let userId = e.currentTarget.dataset.userid;
+                        unassignPost(event, postingId, userId);
                     })
                 });
             }
@@ -682,61 +626,128 @@ let eventParticipants = {
                     onClick: function (e) {
                         let element = e.currentTarget;
                         e.preventDefault();
-                        sidebar.addContent("showPostingDetails", {
-                            postingId: element.dataset.postingid,
-                            event: self.pageData.event,
-                            allowEdit: args.allowEdit,
-                            user: self.pageData.user,
-                            userIsAllowed: element.dataset.userisallowed,
-                            userIsRegistered: isRegistered,
-                            callback: {
-                                onConfirm: function(data, localArgs){
-                                    let posting = data;
-                                    eventActions.updatePosting(event.id, posting, function(event){
-                                        eventProfile.refreshEvent()
-                                            .then(event => {
-                                                self.pageData.event = event;
-                                                userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
-                                                sidebar.update({event: event, isParticipant: userIsParticipant});
-                                                self.dataList =self.pageData.event.postings;
-                                                displayPostingsList(self.dataList);
-                                                self.searchbar.hide();
-                                            })
-                                            .catch(err => {
-                                            })
-                                    }, {
-                                        date: localArgs.date,
-                                        startTime: localArgs.startTime,
-                                        endTime: localArgs.endTime,
-                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
-                                },
-                                onDelete: function(data){
-                                    let postingId = data.id;
-                                    //push changes to server
-                                    eventActions.removePosting(self.pageData.event.id, postingId, function(){
-                                        eventProfile.refreshEvent()
-                                            .then(event => {
-                                                self.pageData.event = event;
-                                                self.dataList = self.pageData.event.postings;
-                                                displayPostingsList(self.dataList);
-                                                self.searchbar.hide();
-                                            })
-                                            .catch(err => {
-                                            })
-                                    }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
-                                }
-                            }
-                        });
-                        sidebar.show();
+                        //find posting in augmented list
+                        let postingId = element.dataset.postingid;
+                        showDetailsSidebar(postingId, element)
                     }
                 },
-                customHandlers: [deletePosting, dropdownMenus, showParticipant, postDetails, assignCurrentUser, unassignPost]
+                customHandlers: [deletePost, dropdownMenus, showParticipant, postDetails, assignCurrentUser, unassignPost]
             }
+
+
 
             let listContainer = document.getElementById("userlist-container--participants")
             let scrollableList = new ScrollableList(listContainer, "postings", sortedList, scrollArgs, callback)
 
             return scrollableList;
+
+            function showDetailsSidebar(postingId, element) {
+                let augmentedPosting = sortedList.find(e => e._id.toString() === postingId);
+
+                sidebar.addContent("showPostingDetails", {
+                    postingId: postingId,
+                    augmentedPosting: augmentedPosting,
+                    event: self.pageData.event,
+                    allowEdit: args.allowEdit,
+                    user: self.pageData.user,
+                    userIsAllowed: element.dataset.userisallowed,
+                    userIsRegistered: isRegistered,
+                    callback: {
+                        onConfirm: function(data, localArgs){
+                            let posting = data;
+                            eventActions.updatePosting(event.id, posting, function(event){
+                                eventProfile.refreshEvent()
+                                    .then(event => {
+                                        self.pageData.event = event;
+                                        userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
+                                        self.dataList =self.pageData.event.postings;
+                                        displayPostingsList(self.dataList);
+                                        self.searchbar.hide();
+                                        let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
+                                        let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
+                                        sidebar.update({event: event, isParticipant: userIsParticipant, augmentedPosting: newAugmentedPosting});
+                                    })
+                                    .catch(err => {
+                                    })
+                            }, {
+                                date: localArgs.date,
+                                startTime: localArgs.startTime,
+                                endTime: localArgs.endTime,
+                            }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                        },
+                        onDelete: function(data){
+                            let postingId = data.id;
+                            //push changes to server
+                            deletePosting(self.pageData.event, postingId)
+                        },
+                        onAssign: function(data) {
+                            let event = data.event;
+                            let postingId = data.postingId;
+                            let userId = data.userId;
+                            assignUser(event, postingId, userId);
+                        },
+                        onUnassign: function(data) {
+                            let event = data.event;
+                            let postingId = data.postingId;
+                            let userId = data.userId;
+                            unassignUser(event, postingId, userId);
+
+                        }
+                    }
+                });
+                sidebar.show();
+            }
+
+            function assignUser(event, postingId, userId){
+                let augmentedPosting = sortedList.find(e => e._id.toString() === postingId);
+                eventActions.assignPost(event.id, postingId, userId, function(){
+                    eventProfile.refreshEvent()
+                        .then(event => {
+                            self.pageData.event = event;
+                            self.dataList = self.pageData.event.postings;
+                            displayPostingsList(self.dataList);
+                            self.searchbar.hide();
+                            let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
+                            let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
+                            sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
+                        })
+                        .catch(err => {
+                        })
+                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+            }
+
+            function unassignUser(event, postingId, userId) {
+                let augmentedPosting = sortedList.find(e => e._id.toString() === postingId);
+                eventActions.unassignPost(event.id, postingId, userId, function () {
+                    eventProfile.refreshEvent()
+                        .then(event => {
+                            self.pageData.event = event;
+                            self.dataList = self.pageData.event.postings;
+                            displayPostingsList(self.dataList);
+                            self.searchbar.hide();
+                            let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
+                            let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
+                            sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
+                        })
+                        .catch(err => {
+                        })
+                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+            }
+
+            function deletePosting(event, postingId){
+                eventActions.removePosting(event.id, postingId, function(){
+                    eventProfile.refreshEvent()
+                        .then(event => {
+                            self.pageData.event = event;
+                            self.dataList = event.postings;
+                            displayPostingsList(self.dataList);
+                            self.searchbar.hide();
+                            sidebar.showDefault();
+                        })
+                        .catch(err => {
+                        })
+                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+            }
         }
 
     },

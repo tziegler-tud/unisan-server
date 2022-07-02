@@ -986,6 +986,16 @@ posting cards
           flex-flow: column nowrap;
           justify-content: flex-end;
         }
+        .postingscards-menu {
+          .postingscards-menu-item {
+            &.postingscards-menu-item--disabled {
+              &:hover {
+                background-color: #e7e7e7;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
       }
     }
     li.gallery-add-item {

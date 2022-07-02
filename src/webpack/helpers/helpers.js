@@ -224,9 +224,9 @@ var dateFromNow = function(args) {
 }
 
 var getDataFromServer  = function(url, callback){
-
+    if (callback === undefined) callback = function(){};
     // get qualification data from server
-    $.ajax({
+    return $.ajax({
         url: url,
         type: 'GET',
         cache: false,
@@ -235,6 +235,7 @@ var getDataFromServer  = function(url, callback){
         success: callback,
     });
 };
+
 
 /**
  * returns an array of qualifications with which the user can fill a posting

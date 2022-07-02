@@ -172,6 +172,8 @@ router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
 router.get('/userEvents', currentUserEvents);
 router.get('/userEvents/:id', userEvents);
+router.get('/userPostings', currentUserPostings);
+router.get('/userPostings/:id', userPostings);
 router.post('/upcoming', getUpcoming);
 router.post('/past', getPast);
 router.get('/:id', getById);
@@ -215,6 +217,36 @@ function currentUserEvents(req, res, next) {
     eventService.getAllFiltered(args)
         .then(event => {
             event ? res.json(event) : res.sendStatus(404)
+        })
+        .catch(err => {
+            next(err)
+        });
+}
+
+function currentUserPostings(req, res, next) {
+    let args = {
+        dateFilter: {
+            selector: "gte",
+        }
+    }
+    eventService.getUserPostings(req.user._id, args)
+        .then(postings => {
+            postings ? res.json(postings) : res.sendStatus(404)
+        })
+        .catch(err => {
+            next(err)
+        });
+}
+
+function userPostings(req, res, next) {
+    let args = {
+        dateFilter: {
+            selector: "gte",
+        }
+    }
+    eventService.getUserPostings(req.params.id, args)
+        .then(postings => {
+            postings ? res.json(postings) : res.sendStatus(404)
         })
         .catch(err => {
             next(err)

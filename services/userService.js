@@ -39,7 +39,6 @@ module.exports = {
     removeUserGroup,
     addIndividualEventAccess,
     removeIndividualEventAccess,
-
     clearDocuments,
 };
 
@@ -1437,6 +1436,7 @@ async function _delete(req, id) {
 
     })
 }
+
 
 /*
 helpers

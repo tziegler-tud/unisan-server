@@ -386,10 +386,16 @@ let addPosting = new ContentHandler("addEventPosting",
                     {
                         customHandler: true,
                         handler: function () {
+                            const optional = document.getElementById("isOptional-checkbox").checked;
+                            const enabled = true;
+                            const allowHigher = document.getElementById("allowHigher-checkbox").checked;
                             const id = document.getElementById("qual-name").selectedOptions[0].id;
                             const data = {
                                 qualifications: [id], //array of quals
                                 description: $("#posting-description").val(), //string
+                                allowHigher: allowHigher,
+                                optional: optional,
+                                enabled: enabled,
                             };
                             onConfirm(data);
                         }.bind(args)
@@ -426,30 +432,47 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
     function(sidebar, args, type){
         var onDelete = args.callback.onDelete;
         var onConfirm = args.callback.onConfirm;
+        var onAssign = args.callback.onAssign;
+        var onUnassign = args.callback.onUnassign;
 
         let context = {};
         if(args.allowEdit === undefined) args.allowEdit = {};
         context.user = args.user;
+        context.augmentedPosting = args.augmentedPosting;
         context.postingId = args.postingId;
         context.event = args.event;
         context.allowEdit = args.allowEdit;
         context.args = args;
+        context.isAssignedToSelf = false
+
+
         var corrupted = false;
 
         var hasChanges = false;
 
         context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
 
-        //find posting
-        let posting = context.event.postings.find(el => {
-            return el._id.toString() === context.postingId;
-        })
-        if(posting === undefined) {
-            posting = {
-                requiredQualifications: [],
-            };
-            corrupted = true;
+        let posting = context.augmentedPosting;
+        if (context.augmentedPosting === undefined) {
+            //find posting
+            posting = context.event.postings.find(el => {
+                return el._id.toString() === context.postingId;
+            })
+            if(posting === undefined) {
+                posting = {
+                    requiredQualifications: [],
+                };
+                corrupted = true;
+            }
         }
+
+        if (posting.assigned.isAssigned) {
+            //check if self is assigned
+            if (posting.assigned.user.id.toString() === context.user.id.toString()) {
+                context.isAssignedToSelf = true;
+            }
+        }
+
 
         context.posting = posting;
 
@@ -495,6 +518,43 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
             sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
 
+            if(posting.assigned.isAssigned){
+                if (args.allowEdit || context.isAssignedToSelf) {
+                    let unassignButton = new sidebar.registerButton(".sidebar-unassign",
+                        {
+                            type: "delete",
+                            customHandler: true,
+                            handler: function(){
+                                let data = {
+                                    event: context.event,
+                                    userId: context.user.id,
+                                    postingId: context.postingId
+                                }
+                                onUnassign(data);
+                            },
+                            enabled: true,
+                        }
+                    )
+                }
+
+            }
+            else {
+                let assignButton = new sidebar.registerButton(".sidebar-assign",
+                    {
+                        type: "allowed",
+                        customHandler: true,
+                        handler: function(){
+                            let data = {
+                                event: context.event,
+                                userId: context.user.id,
+                                postingId: context.postingId
+                            }
+                            onAssign(data);
+                        },
+                    }
+                )
+            }
+
             args.date = posting.date.startDate;
 
             let confirmButton = sidebar.registerConfirmButton( ".sidebar-confirm",
@@ -502,10 +562,15 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
                     customHandler: true,
                     enabled: (context.allowEdit && !corrupted && hasChanges),
                     handler: function () {
+                        const optional = document.getElementById("isOptional-checkbox").checked;
+                        const enabled = true;
+                        const allowHigher = document.getElementById("allowHigher-checkbox").checked;
                         const data = {
                             id: context.postingId,
                             description: $("#posting-description").val(), //string
-
+                            optional: optional,
+                            enabled: enabled,
+                            allowHigher: allowHigher,
                         };
                         const args = {
                             date: context.event.date.startDate,

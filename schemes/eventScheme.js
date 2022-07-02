@@ -107,6 +107,10 @@ var EventSchema = new Schema({
             description: {
                 type: String,
             },
+            allowHigher: {
+                type: Boolean,
+                default: true,
+            },
             date: {
                 startDate: {
                     type: Date,
@@ -283,6 +287,8 @@ EventSchema.virtual('type.index').get(function() {
     }
     return index;
 });
+
+
 
 FileReference.virtual('thumbnail').get(function(){
     let filetype = this.filetype;

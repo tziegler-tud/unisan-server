@@ -124,7 +124,7 @@ var SidebarButton = function(args) {
     this.enabled = args.enabled;
 
     if (this.selector === undefined) {
-        console.error("Failed to create SidebarButton: Invalid Selector")
+        console.error("Failed to create SidebarButton: No Selector")
         return false;
     }
     let item = document.querySelector(this.selector);
@@ -147,6 +147,9 @@ var SidebarButton = function(args) {
             break;
         case "confirm":
             self.container.classList.add("sidebarButton--confirm");
+            break;
+        case "allowed":
+            self.container.classList.add("sidebarButton--allowed");
             break;
         case "cancel":
             self.container.classList.add("sidebarButton--cancel");

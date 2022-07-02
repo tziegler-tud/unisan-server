@@ -106,6 +106,17 @@ Handlebars.registerHelper('and', function (v1, v2, options) {
     return options.inverse(this);
 });
 
+Handlebars.registerHelper('localAnd', function (v1, v2) {
+    'use strict';
+    return v1 && v2;
+});
+
+Handlebars.registerHelper('localOr', function (v1, v2) {
+    'use strict';
+    return v1 || v2;
+});
+
+
 Handlebars.registerHelper('or', function (v1, v2, options) {
     'use strict';
     if (v1 || v2) {

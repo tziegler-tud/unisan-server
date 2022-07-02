@@ -37,11 +37,15 @@
                                     {{posting.requiredQualifications.[0].name}}
                                 </span>
                             </div>
-                            <div class="ak-item ak-qual ak-qual-aquiredDate">
-                                <label for="qual-level">Hierarchie-Ebene</label>
-                                <span class="common-viewBox viewBox-disabled" id="qual-level">
-                                    {{posting.requiredQualifications.[0].level}}
-                                </span>
+<!--                            <div class="ak-item ak-qual ak-qual-aquiredDate">-->
+<!--                                <label for="qual-level">Hierarchie-Ebene</label>-->
+<!--                                <span class="common-viewBox viewBox-disabled" id="qual-level">-->
+<!--                                    {{posting.requiredQualifications.[0].level}}-->
+<!--                                </span>-->
+<!--                            </div>-->
+                            <div class="ak-item ak-value">
+                                <input class="common-input float " id="allowHigher-checkbox" name="allowHigher-checkbox" type="checkbox" {{#if posting.allowHigher}}checked{{/if}}/>
+                                <label class="float" for="allowHigher-checkbox">Höhere Qualifikation zulassen</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip tt-left">Erlaubt Nutzern mit einer höherwertigen Qualifikation, sich anzumelden.</span></div>
                             </div>
                         {{else}}
                             <div class="ak-item ak-qual ak-qual-type">
@@ -56,12 +60,17 @@
                                     {{posting.requiredQualifications.[0].name}}
                                 </span>
                             </div>
-                            <div class="ak-item ak-qual ak-qual-aquiredDate">
-                                <label for="qual-level">Hierarchie-Ebene</label>
-                                <span class="common-viewBox" id="qual-level">
-                                    {{posting.requiredQualifications.[0].level}}
-                                </span>
+<!--                            <div class="ak-item ak-qual ak-qual-aquiredDate">-->
+<!--                                <label for="qual-level">Hierarchie-Ebene</label>-->
+<!--                                <span class="common-viewBox" id="qual-level">-->
+<!--                                    {{posting.requiredQualifications.[0].level}}-->
+<!--                                </span>-->
+<!--                            </div>-->
+                            <div class="ak-item ak-value">
+                                <input class="common-input float " id="allowHigher-checkbox" name="allowHigher-checkbox" type="checkbox" disabled {{#if posting.allowHigher}}checked{{/if}}/>
+                                <label class="float" for="allowHigher-checkbox">Höhere Qualifikation zulassen</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip tt-left">Erlaubt Nutzern mit einer höherwertigen Qualifikation, sich anzumelden.</span></div>
                             </div>
+
                         {{/if}}
                     </div>
                 </div>
@@ -105,10 +114,15 @@
                     {{#if allowEdit}}
                     <div class="ak-form">
                         <div class="ak-item ak-qual ak-posting-description">
-                            <label for="posting-description">Bemerkung (optional)</label>
+                            <label for="posting-description">Bemerkung</label>
                             <input class="common-input" id="posting-description" name="posting-description" type="text" value="{{posting.description}}"/>
                         </div>
                     </div>
+                    <div class="ak-item ak-value">
+                        <input class="common-input float " id="isOptional-checkbox" name="isOptional-checkbox" type="checkbox" {{#if posting.optional}}checked{{/if}}/>
+                        <label class="float" for="isOptional-checkbox">Besetzung ist optional</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip tt-left">Markiert einen Posten als optional.</span></div>
+                    </div>
+                    <div class="clear"></div>
                     {{else}}
                     {{#stringNotEmpty posting.description}}
                     <div class="ak-form">
@@ -120,38 +134,83 @@
                         </div>
                     </div>
                     {{/stringNotEmpty}}
+                    <div class="ak-item ak-value">
+                        <input class="common-input float " id="isOptional-checkbox" name="isOptional-checkbox" type="checkbox" disabled{{#if posting.optional}}checked{{/if}}/>
+                        <label class="float" for="isOptional-checkbox">Besetzung ist optional</label><div class="float before-icon icon-info icon-small has-tooltip"><span class="tooltip tt-left">Markiert einen Posten als optional.</span></div>
+                    </div>
+                    <div class="clear"></div>
                     {{/if}}
                 </div>
             </div>
             <div class="sidebar-section body-section">
                 <div class="section-title">
-                    Anmelden
+                    Besetzung:
                 </div>
-                <div class="section-content">
-                    {{#and userIsAllowed (not args.userIsRegistered)}}
-                        <div class="ak-form">
-                            <div class="ak-item ak-qual ak-qual-aquiredDate">
-                                <span class="common-viewBox" id="posting-description">
-                                   Du kannst dich für diesen Posten melden.
-                                </span>
+                {{#if posting.assigned.isAssigned}}
+                    <div class="section-content">
+                        <div class="common-viewBox noBorder">
+                            <div class="userDisplay">
+                                <div class="userDisplay-avatar">
+                                    <img src="/data/uploads/user_images/{{posting.assigned.user.id}}/{{posting.assigned.user.id}}.jpg"/>
+                                </div>
+                                <div class="userDisplay-label">
+                                    <div class="userDisplay-label--name">
+                                        <a href="/unisams/user/view/{{posting.assigned.user.username}}" >{{posting.assigned.user.generalData.firstName.value}} {{posting.assigned.user.generalData.lastName.value}}</a>
+
+                                    </div>
+                                    <div class="userDisplay-label--text">
+                                        {{#each posting.requiredQualifications}}{{this.short}}{{#unless @last}}, {{/unless}}{{/each}} | {{transformDateTimeString posting.assigned.date}}
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                        {{#or args.allowEdit isAssignedToSelf}}
+                            <div class="sidebarButton sidebar-unassign">
+                                <button class="mdc-button mdc-button--outlined mdc-button--icon-leading">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                    <span class="mdc-button__label">Abmelden</span>
+                                </button>
+                            </div>
+                        {{/or}}
+                    </div>
+                {{else}}
+
+                <div class="section-content">
+                    {{#and augmentedPosting.userIsAllowed (localAnd (not augmentedPosting.userIsBlocked) (not augmentedPosting.userIsBlockedGlobally))}}
+                        <div class="sidebarButton sidebar-assign">
+                            <button class="mdc-button mdc-button--icon-leading mdc-button--outlined allowed" data-postingId="{{posting._id}}">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon" aria-hidden="true">add_task</i>
+                                <span class="mdc-button__label">Mich anmelden</span>
+                            </button>
                         </div>
                     {{else}}
-                        <div class="ak-form">
-                            <div class="ak-item ak-qual ak-qual-aquiredDate">
-
-                            <span class="common-viewBox" id="posting-description">
-                                Anmeldung nicht möglich:
-                            {{#if userIsAllowed}}
-                                Du bist für diesen Zeitraum bereits gemeldet.
+                        {{#if augmentedPosting.userIsAllowed}}
+                            {{#if augmentedPosting.userIsBlockedGlobally}}
+                                <span class="common-viewBox">Anmeldung nicht möglich: Du bist zur gleichen Zeit für ein anderes Event gemeldet.</span>
+                                <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                    <span class="mdc-button__label">{{augmentedPosting.globalBlock.event.title.value}}</span>
+                                </button>
                             {{else}}
-                                Du erfüllst nicht die benötigte Qualifikation.
+                                <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                    <span class="mdc-button__label">Bereits gemeldet</span>
+                                </button>
                             {{/if}}
-                            </span>
-                            </div>
-                        </div>
+                        {{else}}
+                            <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                <span class="mdc-button__label">Anmeldung nicht&nbsp;möglich</span>
+                            </button>
+                        {{/if}}
                     {{/and}}
                 </div>
+                {{/if}}
             </div>
         </div>
         <div class="sidebar-bottom sidebar-bottom--padding">
