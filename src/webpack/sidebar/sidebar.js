@@ -90,21 +90,47 @@ var ContentHandler = function(type, handlerFunction, handlerArgs) {
                 let handlerContent = []; //contains key-val pairs (id, value, inputType)
                 let inputs = document.querySelectorAll(".sidebar input");
                 inputs.forEach(el => {
+                    let type = el.type;
+                    let value;
+                    switch(type){
+                        case "checkbox":
+                            value = el.checked;
+                            break;
+                        case "date":
+                            value = el.value;
+                            break;
+                        default:
+                            value = el.value;
+                            break;
+                    }
                     handlerContent.push({
-                        key: el.id,
-                        value: el.value,
+                        id: el.id,
+                        value: value,
+                        type: type,
                     })
                 })
                 return handlerContent;
             },
             onLoad: function(handlerContent){
                 handlerContent.forEach(entry => {
-                    let el = document.getElementById(entry.key);
+                    let el = document.getElementById(entry.id);
                     if (el === undefined || el === null) {
 
                     }
                     else {
-                        el.value = entry.value;
+                        let type = entry.type;
+                        let value = entry.value;
+                        switch(type){
+                            case "checkbox":
+                                el.checked = value;
+                                break;
+                            case "date":
+                                el.value = value;
+                                break;
+                            default:
+                                el.value = value;
+                                break;
+                        }
                     }
                 })
             },
@@ -277,7 +303,7 @@ Sidebar.prototype.addSubpage = function(type, args) {
 Sidebar.prototype.saveContent = function() {
     //save temporary input contents. We use the handlers onSave callback.
     let handler = this.currentPage.handler;
-    let handlerContent = handler.onSave();
+    let handlerContent = handler.save();
     //return content
     //create storage id
     let storageObject = {page: this.currentPage, handlerContent: handlerContent}
@@ -287,7 +313,7 @@ Sidebar.prototype.saveContent = function() {
 Sidebar.prototype.loadContent = function(storageObject) {
     let handler = this.currentPage.handler;
     let currentPage = storageObject.page;
-    currentPage.handler.onLoad(storageObject.handlerContent)
+    currentPage.handler.load(storageObject.handlerContent)
 }
 
 Sidebar.prototype.setDefault = function(type, args){
