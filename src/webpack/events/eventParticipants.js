@@ -569,10 +569,9 @@ let eventParticipants = {
             }
 
             let postDetails = function(){
-                $('.posting-details').each(function(){
+                $('.posting-details, .posting-edit').each(function(){
                     $(this).on("click", function(e){
                         e.preventDefault();
-                        e.stopPropagation();
                         let element = e.currentTarget;
                         let postingId = element.dataset.postingid;
                         showDetailsSidebar(postingId, element);
@@ -604,7 +603,7 @@ let eventParticipants = {
                         let event = self.pageData.event;
                         let postingId = e.currentTarget.dataset.postingid;
                         let userId = e.currentTarget.dataset.userid;
-                        unassignPost(event, postingId, userId);
+                        unassignUser(event, postingId, userId);
                     })
                 });
             }

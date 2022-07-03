@@ -1,4 +1,3 @@
-
 <div id="sidebar" class="sidebar sidebar-event">
     <div class="sidebar-top">
         <div class="sidebar-back-btn">
@@ -175,41 +174,50 @@
                         {{/or}}
                     </div>
                 {{else}}
-
-                <div class="section-content">
-                    {{#and augmentedPosting.userIsAllowed (localAnd (not augmentedPosting.userIsBlocked) (not augmentedPosting.userIsBlockedGlobally))}}
-                        <div class="sidebarButton sidebar-assign">
-                            <button class="mdc-button mdc-button--icon-leading mdc-button--outlined allowed" data-postingId="{{posting._id}}">
-                                <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon" aria-hidden="true">add_task</i>
-                                <span class="mdc-button__label">Mich anmelden</span>
-                            </button>
-                        </div>
-                    {{else}}
-                        {{#if augmentedPosting.userIsAllowed}}
-                            {{#if augmentedPosting.userIsBlockedGlobally}}
-                                <span class="common-viewBox">Anmeldung nicht möglich: Du bist zur gleichen Zeit für ein anderes Event gemeldet.</span>
-                                <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                    <div class="section-content">
+                        {{#and augmentedPosting.userIsAllowed (localAnd (not augmentedPosting.userIsBlocked) (not augmentedPosting.userIsBlockedGlobally))}}
+                            <div class="sidebarButton sidebar-assignSelf">
+                                <button id="button--allowed" class="mdc-button mdc-button--icon-leading mdc-button--outlined allowed" data-postingId="{{posting._id}}">
                                     <span class="mdc-button__ripple"></span>
-                                    <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
-                                    <span class="mdc-button__label">{{augmentedPosting.globalBlock.event.title.value}}</span>
+                                    <i class="material-icons mdc-button__icon" aria-hidden="true">add_task</i>
+                                    <span class="mdc-button__label">Mich anmelden</span>
                                 </button>
+                            </div>
+                        {{else}}
+                            {{#if augmentedPosting.userIsAllowed}}
+                                {{#if augmentedPosting.userIsBlockedGlobally}}
+
+    <!--                                <div class="float before-icon icon-info has-tooltip">-->
+    <!--                                    <span class="tooltip tt-left">Anmeldung nicht möglich: Du bist zur gleichen Zeit für ein anderes Event gemeldet.</span>-->
+    <!--                                </div>-->
+                                    <button id="button--blockedGlobally" class="hasMDCTooltip mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                                        <span class="mdc-button__ripple"></span>
+                                        <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                        <span class="mdc-button__label">{{augmentedPosting.globalBlock.event.title.value}}</span>
+                                    </button>
+                                {{else}}
+                                    <button id="button--blockedLocally" class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                                        <span class="mdc-button__ripple"></span>
+                                        <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                        <span class="mdc-button__label">Bereits gemeldet</span>
+                                    </button>
+                                {{/if}}
                             {{else}}
-                                <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                                <button id="button--blockedRequirement" class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
                                     <span class="mdc-button__ripple"></span>
                                     <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
-                                    <span class="mdc-button__label">Bereits gemeldet</span>
+                                    <span class="mdc-button__label">Anmeldung nicht&nbsp;möglich</span>
                                 </button>
                             {{/if}}
-                        {{else}}
-                            <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed mdcButton--notAllowed">
+                        {{/and}}
+                        <div class="sidebarButton sidebar-assign">
+                            <button id="button--allowed" class="mdc-button mdc-button--icon-leading mdc-button--outlined allowed" data-postingId="{{posting._id}}">
                                 <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
-                                <span class="mdc-button__label">Anmeldung nicht&nbsp;möglich</span>
+                                <i class="material-icons mdc-button__icon" aria-hidden="true">add_task</i>
+                                <span class="mdc-button__label">anderen Nutzer anmelden</span>
                             </button>
-                        {{/if}}
-                    {{/and}}
-                </div>
+                        </div>
+                    </div>
                 {{/if}}
             </div>
         </div>

@@ -4,6 +4,7 @@
 );
 @use "@material/button";
 @use "@material/icon-button";
+@use "@material/tooltip/styles";
 
 @include icon-button.core-styles;
 

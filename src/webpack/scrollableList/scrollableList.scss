@@ -888,6 +888,12 @@ posting cards
             font-size: 180%;
             writing-mode: tb-rl;
             transform: rotate(-180deg);
+
+            .label--isOptional {
+              font-size: 80%;
+              display: inline-block;
+              margin-left: 10px;
+            }
           }
         }
 

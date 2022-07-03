@@ -21,6 +21,7 @@
     "@material/snackbar": "8.0.0",
     "@material/textfield": "10.0.0",
     "@material/theme": "8.0.0",
+    "@material/tooltip": "12.0.0",
     "@material/top-app-bar": "8.0.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.18.3",

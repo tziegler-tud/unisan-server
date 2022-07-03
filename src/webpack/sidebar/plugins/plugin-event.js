@@ -16,7 +16,7 @@
  *
  */
 
-import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton} from "../sidebar.js";
+import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton, SidebarTooltip} from "../sidebar.js";
 import {Searchbar} from "../../searchbar/searchbar.js";
 
 import "../sidebar-events.scss";
@@ -30,6 +30,8 @@ import "../../helpers/handlebarsHelpers";
 import {getDataFromServer, getMatchingQualifications} from "../../helpers/helpers";
 import {EditableInputField} from "../../helpers/editableInputField";
 import {EditableTextField} from "../../helpers/editableTextField";
+
+import {MDCTooltip} from '@material/tooltip';
 
 let eventPlugin = new SidebarPlugin("event");
 
@@ -485,6 +487,24 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
             var template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
+            //create tooltips
+            let tooltipSetup = [
+                {   id: "button--blockedGlobally",
+                    content: "Anmeldung nicht möglich: Du bist zur gleichen Zeit für ein anderes Event gemeldet."},
+                {   id: "button--blockedLocally",
+                    content: "Anmeldung nicht möglich: Du bist zur gleichen Zeit für dieses Event bereits gemeldet"},
+                {   id: "button--blockedRequirement",
+                    content: "Anmeldung nicht möglich: Du hast nicht die erforderliche Qualifikation."},
+            ]
+            tooltipSetup.forEach(tt => {
+                let element = document.getElementById(tt.id);
+                if (!(element === undefined || element === null)){
+                    let tooltip = new SidebarTooltip({
+                        anchor: element,
+                        content: tt.content,
+                    });
+                }
+            })
             var t1;
             var t2;
             if(args.allowEdit){
@@ -539,11 +559,28 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
             }
             else {
+                let assignSelfButton = new sidebar.registerButton(".sidebar-assignSelf",
+                    {
+                        type: "allowed",
+                        customHandler: true,
+                        handler: function(){
+                            let data = {
+                                event: context.event,
+                                userId: context.user.id,
+                                postingId: context.postingId
+                            }
+                            onAssign(data);
+                        },
+                    }
+                )
                 let assignButton = new sidebar.registerButton(".sidebar-assign",
                     {
                         type: "allowed",
                         customHandler: true,
                         handler: function(){
+                            //save current sidebar content
+                            let currentContent = sidebar.saveContent();
+                            //show assign user sidebar
                             let data = {
                                 event: context.event,
                                 userId: context.user.id,
