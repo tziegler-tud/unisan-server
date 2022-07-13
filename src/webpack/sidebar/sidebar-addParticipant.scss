@@ -79,3 +79,40 @@
     display: none !important;
   }
 }
+
+//assign user subpage
+
+.sidebar-assignUser {
+  .userSelect-checkLabel-container {
+
+
+    .userSelect-checkLabel {
+      display: none;
+      border: 1px solid #333;
+      padding: 10px 15px;
+
+      &.label-active {
+        display: flex;
+        flex-flow: row wrap;
+      }
+      &.label-isAllowed {
+        color: $allowed-color;
+        background-color: $allowed-color-light;
+        border-color: $allowed-color;
+
+      }
+      &.label-notAllowed {
+        color: $delete-color;
+        border-color: $delete-color;
+        background-color: $delete-color-light;
+      }
+      .userSelect-checkLabel-icon {
+        flex: 0 0 auto;
+        margin-right: 1em;
+      }
+      .userSelect-checkLabel-content {
+
+      }
+    }
+  }
+}

@@ -40,6 +40,8 @@ module.exports = {
     getUserPostings,
     addFileReference,
     removeFileReference,
+
+    checkUserForAssignment,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -1456,29 +1458,6 @@ async function assignPost (req, eventId, postingId, userId, args) {
             reject(new Error("Posting not found."))
     }
 
-    function findOverlap(userPostings, posting){
-        let overlap = userPostings.find(userPosting => {
-            if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
-                //found overlap
-                return true
-            }
-            if (userPosting.date.endDate < posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
-                //found overlap
-                return true
-            }
-            if (userPosting.date.startDate < posting.date.endDate && userPosting.date.endDate > posting.date.endDate) {
-                //found overlap
-                return true
-            }
-            if (userPosting.date.startDate < posting.date.startDate && userPosting.date.endDate > posting.date.startDate) {
-                //found overlap
-                return true
-            }
-            else return false;
-        })
-        return overlap;
-    }
-
     function addParticipant(event, userId, args){
         if (args === undefined) args = {};
         let defaults = {
@@ -1697,9 +1676,102 @@ async function getUserPostings(userId, args) {
     return userPostings;
 }
 
+async function checkUserForAssignment(userId, eventId, postingId, args) {
+    let errMsg = "Failed to check if user is allowed: "
+    if (args === undefined) args = {};
+    let defaultArgs = {
+
+    }
+    args = Object.assign(defaultArgs, args)
+
+    const user = await UserService.getById(userId);
+    if(!user) throw new Error(errMsg + "User not found.");
+
+    const event = await Event.findById(eventId);
+    if (!event) throw new Error(errMsg + 'Event not found');
+    //populate postings
+    event.populate("postings.requiredQualifications");
+
+    //get all user Events
+    let userPostings = await getUserPostings(userId, args);
+
+    let index = event.postings.findIndex(obj => obj.id.toString() === postingId);
+
+    let result = {
+        allowed: false,
+        matchesQualification: false,
+        hasOverlap: undefined,
+        overlap: undefined,
+    }
+
+    if(index > -1) {
+        //found it!
+        let post = event.postings[index];
+        let userMatchesRequirement = false
+        //check if user matches qualification requirement
+        let matchingQualifications = getMatchingQualifications(user, post);
+        if (matchingQualifications.length > 0) {
+            userMatchesRequirement = true;
+        }
+        //find all upcoming postings of target user
+        let userPostings = await getUserPostings(userId, {
+            selector: "gte",
+        })
+
+        //check for overlap
+        let overLap = findOverlap(userPostings, post);
+
+        if (overLap !== undefined || !userMatchesRequirement) {
+            //user rejected
+            result.allowed = false;
+            result.matchesQualification = userMatchesRequirement;
+            result.hasOverlap = (overLap !== undefined);
+            result.overlap = overLap;
+            return result;
+        }
+        else {
+            //user allowed
+            result.allowed = true;
+            result.matchesQualification = userMatchesRequirement;
+            result.hasOverlap = true;
+            result.overlap = overLap;
+            return result;
+        }
+    }
+    else {
+        throw new Error(errMsg + " posting not found.")
+    }
+
+}
+
+
+
 /**
  * helpers
  */
+
+function findOverlap(userPostings, posting){
+    let overlap = userPostings.find(userPosting => {
+        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
+            //found overlap
+            return true
+        }
+        if (userPosting.date.endDate < posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
+            //found overlap
+            return true
+        }
+        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.endDate > posting.date.endDate) {
+            //found overlap
+            return true
+        }
+        if (userPosting.date.startDate < posting.date.startDate && userPosting.date.endDate > posting.date.startDate) {
+            //found overlap
+            return true
+        }
+        else return false;
+    })
+    return overlap;
+}
 
 /**
  * returns an array of qualifications with which the user can fill a posting

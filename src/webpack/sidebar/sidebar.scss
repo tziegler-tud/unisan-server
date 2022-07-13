@@ -227,6 +227,9 @@ body{
               font-size: 90%;
             }
             .section-content {
+              &.section-content--margin {
+                margin-top: 1em;
+              }
               .content-item {
                 display: block;
                 width: 100%;

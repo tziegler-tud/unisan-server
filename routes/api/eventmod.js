@@ -126,6 +126,7 @@ router.post('/addParticipant', checkParticipantAccess, addParticipant);
 router.post('/removeParticipant', checkParticipantAccess, removeParticipant);
 router.post('/assignPost', checkParticipantAccess, assignPost);
 router.post('/unassignPost', checkParticipantAccess, unassignPost);
+router.post('/checkUserForAssignment', checkParticipantAccess, checkUserForAssignment);
 
 // changing role requires editing rights
 router.post('/changeParticipant', checkEventEditRights, changeParticipant);
@@ -407,6 +408,16 @@ function populateParticipants(req, res, next) {
     eventService.populateParticipants(req.params.id)
         .then(function(event) {
             res.json(event);
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function checkUserForAssignment(req, res, next) {
+    eventService.checkUserForAssignment(req.body.userId, req.body.eventId, req.body.postingId)
+        .then(function(result) {
+            res.json(result);
         })
         .catch(err => {
             next(err);

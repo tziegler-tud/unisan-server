@@ -1,0 +1,106 @@
+<div id="sidebar" class="sidebar sidebar-event sidebar-addParticipant sidebar-assignUser">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span class="quill-renderer limitCharacters">{{title.value}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+
+            </div>
+            <div class="sidebar-section">
+                <div class="section-title content-title">
+                    <span></span>
+                </div>
+                <div class="section-content">
+                    <span class="content-item"></span>
+                </div>
+            </div>
+            <div class="sidebar-section body-section addParticipant-container">
+
+                <div class="section-title participant-heading">
+                    Dienstposten besetzen
+                </div>
+
+                <div id="search-container" class="search-container">
+                    <div id="usersearch" class="subpage-searchbar">
+                    </div>
+                    <div id="sidebar-userselect-container" class="userselect-container sidebar-select-container"></div>
+                    <div id="sidebar-userselect-result" class="select-result userselect-result sidebar-select-result"></div>
+                    <div id="sidebar-userselect-checkLabel" class="userSelect-checkLabel-container">
+                        <div id="label-spinner" class="userSelect-checkLabel">
+                            <div class="userSelect-checkLabel-icon common-svgSpinner">
+                                <svg viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a">
+                                            <stop stop-color="#333" stop-opacity="0" offset="0%"/>
+                                            <stop stop-color="#333" stop-opacity=".631" offset="63.146%"/>
+                                            <stop stop-color="#333" offset="100%"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <g fill="none" fill-rule="evenodd">
+                                        <g transform="translate(1 1)">
+                                            <path d="M36 18c0-9.94-8.06-18-18-18" id="Oval-2" stroke="url(#a)" stroke-width="2">
+                                                <animateTransform
+                                                        attributeName="transform"
+                                                        type="rotate"
+                                                        from="0 18 18"
+                                                        to="360 18 18"
+                                                        dur="0.9s"
+                                                        repeatCount="indefinite" />
+                                            </path>
+                                            <circle fill="#333" cx="36" cy="18" r="1">
+                                                <animateTransform
+                                                        attributeName="transform"
+                                                        type="rotate"
+                                                        from="0 18 18"
+                                                        to="360 18 18"
+                                                        dur="0.9s"
+                                                        repeatCount="indefinite" />
+                                            </circle>
+                                        </g>
+                                    </g>
+                                </svg>
+                            </div>
+                            <div class="userSelect-checkLabel-content">wird geprüft...</div>
+                        </div>
+                        <div id="label-isAllowed" class="userSelect-checkLabel label-isAllowed">
+                            <div class="userSelect-checkLabel-icon">
+                                <i class="material-icons mdc-button__icon" aria-hidden="true">add_task</i>
+                            </div>
+                            <div class="userSelect-checkLabel-content">Zuweisung ist möglich.</div>
+                        </div>
+                        <div id="label-notAllowed" class="userSelect-checkLabel label-notAllowed">
+                            <div class="userSelect-checkLabel-icon">
+                                <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                            </div>
+                            <div class="userSelect-checkLabel-content">Zuweisung nicht möglich: </div>
+                            <div id="label-notAllowed-content--text" class="userSelect-checkLabel-content"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
+        </div>
+    </div>
+</div>

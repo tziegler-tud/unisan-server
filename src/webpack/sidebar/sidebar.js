@@ -188,7 +188,7 @@ var ContentHandler = function(type, handlerFunction, handlerArgs) {
     }
     this.args = Object.assign(defaultArgs, handlerArgs);
     this.apply = function(sidebar, args, type){
-        this.fn(sidebar, args, type);
+           return this.fn(sidebar, args, type);
     }
     this.save = function(){
         return this.args.callback.onSave();
@@ -335,16 +335,22 @@ Sidebar.prototype.addContent = function(type, args){
         args: args,
     }
 
-    //look for handler
-    let handler = this.contentHandlers.find(handler => handler.type === type);
-    if (handler === undefined) {
-        console.error("Sidebar error: No handler found for given content type: " + type);
-        return false;
-    }
-    else {
-        handler.apply(self, args, type)
-        self.currentPage.handler = handler;
-    }
+    return new Promise(function(resolve, reject) {
+        //look for handler
+        let handler = self.contentHandlers.find(handler => handler.type === type);
+        if (handler === undefined) {
+            console.error("Sidebar error: No handler found for given content type: " + type);
+            reject();
+        }
+        else {
+            self.currentPage.handler = handler;
+            handler.apply(self, args, type)
+                .then(result => {
+                    resolve(result)
+                })
+        }
+    });
+
 };
 
 /**
@@ -353,7 +359,9 @@ Sidebar.prototype.addContent = function(type, args){
  * @param args
  */
 Sidebar.prototype.addSubpage = function(type, args) {
-
+    let storageObject = this.saveContent();
+    this.addContent(type, args);
+    return storageObject;
 }
 
 Sidebar.prototype.saveContent = function() {
@@ -362,14 +370,17 @@ Sidebar.prototype.saveContent = function() {
     let handlerContent = handler.save();
     //return content
     //create storage id
-    let storageObject = {page: this.currentPage, handlerContent: handlerContent}
+    let storageObject = {page: this.currentPage, handler: handler, handlerContent: handlerContent}
     return storageObject;
 }
 
 Sidebar.prototype.loadContent = function(storageObject) {
-    let handler = this.currentPage.handler;
+    let handler = storageObject.handler;
     let currentPage = storageObject.page;
-    currentPage.handler.load(storageObject.handlerContent)
+    this.addContent(storageObject.page.type, storageObject.page.args)
+        .then(result => {
+            currentPage.handler.load(storageObject.handlerContent)
+        })
 }
 
 Sidebar.prototype.setDefault = function(type, args){
