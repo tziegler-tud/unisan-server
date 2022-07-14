@@ -1073,6 +1073,7 @@ async function addPosting (req, eventId, posting, args) {
         assigned: {
             isAssigned: false,
         },
+        date: posting.date,
         enabled: posting.enabled,
         order: posting.order,
     };
@@ -1752,21 +1753,18 @@ async function checkUserForAssignment(userId, eventId, postingId, args) {
 
 function findOverlap(userPostings, posting){
     let overlap = userPostings.find(userPosting => {
-        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
-            //found overlap
-            return true
+        if (userPosting.date.startDate < posting.date.startDate) { // a starts before b
+            if(userPosting.date.endDate > posting.date.startDate) { //a ends after b starts.
+                return true;
+            }
         }
-        if (userPosting.date.endDate < posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
-            //found overlap
-            return true
+        if (posting.date.startDate < userPosting.date.startDate) { // b starts before a
+            if(posting.date.endDate > userPosting.date.startDate) { //b ends after a starts.
+                return true;
+            }
         }
-        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.endDate > posting.date.endDate) {
-            //found overlap
-            return true
-        }
-        if (userPosting.date.startDate < posting.date.startDate && userPosting.date.endDate > posting.date.startDate) {
-            //found overlap
-            return true
+        if (posting.date.startDate === userPosting.date.startDate) { // b starts together with a
+            return true;
         }
         else return false;
     })

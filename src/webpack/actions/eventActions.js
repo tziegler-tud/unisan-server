@@ -134,8 +134,17 @@ var eventActions = {
         });
     },
 
-    addPosting: function(eventId, postingData, callback) {
+    addPosting: function(eventId, postingData, callback, args) {
         callback = (callback == null) ? function(){} : callback;
+
+        var startDate = parseHTMLInputDate(args.date, args.startTime);
+        var endDate = parseHTMLInputDate(args.date, args.endTime);
+
+        postingData.date = {
+            startDate: startDate,
+            endDate: endDate,
+        }
+
         var data = {
             id: eventId,
             posting: postingData,
@@ -360,6 +369,7 @@ function parseHTMLInputDate(date, time){
     d.setHours(timeHours);
     d.setMinutes(timeMinutes);
     d.setSeconds(0);
+    d.setMilliseconds(0);
 
     return d;
 }

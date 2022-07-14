@@ -282,10 +282,13 @@ let eventParticipants = {
                         isParticipant: userIsParticipant,
                         qualTypes: qualTypes,
                         callback: {
-                            onConfirm: function(data){
+                            onConfirm: function(data, args){
                                 let posting = {
                                     requiredQualifications: data.qualifications,
                                     description: data.description,
+                                    allowHigher: data.allowHigher,
+                                    optional: data.optional,
+                                    enabled: data.enabled,
                                     assigned: {
                                         isAssigned: false,
                                     }
@@ -302,7 +305,7 @@ let eventParticipants = {
                                         })
                                         .catch(err => {
                                         })
-                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                }, args).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                             },
                         },
                     });
@@ -344,7 +347,7 @@ let eventParticipants = {
                         isParticipant: userIsParticipant,
                         qualTypes: qualTypes,
                         callback: {
-                            onConfirm: function(data){
+                            onConfirm: function(data, args){
                                 let posting = {
                                     requiredQualifications: data.qualifications,
                                     description: data.description,
@@ -367,7 +370,7 @@ let eventParticipants = {
                                         })
                                         .catch(err => {
                                         })
-                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                }, args).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
                             },
                         },
                     });
@@ -515,22 +518,40 @@ let eventParticipants = {
 
                 function findOverlap(postingsList, posting){
                     return postingsList.find(userPosting => {
-                        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.startDate > posting.date.startDate) {
-                            //found overlap
-                            return true
+                        if (userPosting.date.startDate < posting.date.startDate) { // a starts before b
+                                if(userPosting.date.endDate > posting.date.startDate) { //a ends after b starts.
+                                    return true;
+                                }
                         }
-                        if (userPosting.date.endDate < posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
-                            //found overlap
-                            return true
+                        if (posting.date.startDate < userPosting.date.startDate) { // b starts before a
+                            if(posting.date.endDate > userPosting.date.startDate) { //b ends after a starts.
+                                return true;
+                            }
                         }
-                        if (userPosting.date.startDate < posting.date.endDate && userPosting.date.endDate > posting.date.endDate) {
-                            //found overlap
-                            return true
+                        if (posting.date.startDate === userPosting.date.startDate) { // b starts together with a
+                            return true;
                         }
-                        if (userPosting.date.startDate < posting.date.startDate && userPosting.date.endDate > posting.date.startDate) {
-                            //found overlap
-                            return true
-                        }
+
+
+                        // //another post starts between this posts start and end.
+                        // if (userPosting.date.startDate <= posting.date.endDate && userPosting.date.startDate >= posting.date.startDate) {
+                        //     //found overlap
+                        //     return true
+                        // }
+                        // //another post ends between this posts start and end. Allow if it ends exactly when post starts, s.t. user can sign up for double shifts
+                        // if (userPosting.date.endDate <= posting.date.endDate && userPosting.date.endDate > posting.date.startDate) {
+                        //     //found overlap
+                        //     return true
+                        // }
+                        // //another post start before the current ends, and
+                        // if (userPosting.date.startDate <= posting.date.endDate && userPosting.date.endDate >= posting.date.endDate) {
+                        //     //found overlap
+                        //     return true
+                        // }
+                        // if (userPosting.date.startDate <= posting.date.startDate && userPosting.date.endDate >= posting.date.startDate) {
+                        //     //found overlap
+                        //     return true
+                        // }
                         else return false;
                     });
                 }

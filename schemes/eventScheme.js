@@ -288,6 +288,20 @@ EventSchema.virtual('type.index').get(function() {
     return index;
 });
 
+EventSchema.pre('save', function(next) {
+    this.postings.forEach(posting => {
+        posting.date.startDate = cleanTime(posting.date.startDate);
+        posting.date.endDate = cleanTime(posting.date.endDate);
+    })
+
+    function cleanTime(date){
+        let d = new Date(date);
+        d.setSeconds(0);
+        d.setMilliseconds(0)
+        return d;
+    }
+    next();
+});
 
 
 FileReference.virtual('thumbnail').get(function(){

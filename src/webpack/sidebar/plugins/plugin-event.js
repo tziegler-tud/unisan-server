@@ -589,6 +589,8 @@ let addPosting = new ContentHandler("addEventPosting",
                             const enabled = true;
                             const allowHigher = document.getElementById("allowHigher-checkbox").checked;
                             const id = document.getElementById("qual-name").selectedOptions[0].id;
+                            const t1 = document.getElementById("eventinp-timeStart");
+                            const t2 = document.getElementById("eventinp-timeEnd");
                             const data = {
                                 qualifications: [id], //array of quals
                                 description: $("#posting-description").val(), //string
@@ -596,7 +598,12 @@ let addPosting = new ContentHandler("addEventPosting",
                                 optional: optional,
                                 enabled: enabled,
                             };
-                            onConfirm(data);
+                            const args = {
+                                date: context.event.date.startDate,
+                                startTime: t1.value,
+                                endTime: t2.value,
+                            }
+                            onConfirm(data, args);
                         }.bind(args)
                     });
 
