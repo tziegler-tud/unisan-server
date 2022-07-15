@@ -2,6 +2,8 @@
  * @namespace: editableInputField
  */
 
+import "./editableInputField.scss";
+
 /**
  * constructor for EditableInputField objects
  *

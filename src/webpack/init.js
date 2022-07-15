@@ -3,7 +3,10 @@ import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer"
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
 import {Snackbar} from "./helpers/snackbar";
+import {UserProfile} from "./userprofile/userprofile";
 var lidlRTO = window.lidlRTO;
+
+const Handlebars = require("handlebars");
 
 if (window.dockerArgs === undefined) {
     window.dockerArgs = {}
@@ -67,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     //get current user
     var user;
-    var profile = new window.profile.Profile(window.userId);
+    var profile = new UserProfile(window.userId);
     window.currentUserProfile = profile;
     // create new observer
     var observer = new lidlObserver(function(u){

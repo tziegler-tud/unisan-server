@@ -1,6 +1,6 @@
 import {MDCDrawer} from "@material/drawer";
 import "./drawer.scss";
-
+const Handlebars = require("handlebars");
 
 var Drawer = function(context){
     var drawer;

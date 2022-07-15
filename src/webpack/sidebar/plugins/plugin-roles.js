@@ -2,6 +2,7 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
+import {Searchbar} from "../../searchbar/searchbar";
 import {getDataFromServer} from "../../helpers/helpers";
 
 let rolesPlugin = new SidebarPlugin("roles");
@@ -110,7 +111,7 @@ var addUser  = new ContentHandler("addUserToGroup",
                 //setup searchbar
                 let searchContainer = document.getElementById("search-container")
                 let searchbarContainer = document.getElementById("usersearch");
-                var searchbar = new common.Searchbar(searchbarContainer, {
+                var searchbar = new Searchbar(searchbarContainer, {
                     onInput: {
                         enabled: true,
                         callback: function (inputValue) {

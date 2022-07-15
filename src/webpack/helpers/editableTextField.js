@@ -2,6 +2,8 @@
  * @namespace: editableTextField
  */
 
+import "./editableTextField.scss";
+
 /**
  * constructor for EditableTextField objects
  *

@@ -1,6 +1,6 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
-
+import {UserProfile} from "../userprofile/userprofile";
 import {userActions} from "../actions/userActions";
 
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
@@ -13,7 +13,7 @@ $(document).ready (function () {
     var actions = window.actions;
 
     var currentExploredUser;
-    var profile = new window.profile.Profile(window.exploreUserId);
+    var profile = new UserProfile(window.exploreUserId);
     var sidebar = new Sidebar('wrapper', "test");
     sidebar.addPlugin(userPlugin);
 

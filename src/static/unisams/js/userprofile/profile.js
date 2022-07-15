@@ -105,7 +105,7 @@
      * Service function to get the user data. Only one api call is done at a time.
      *
      * @params subscribe {Boolean}
-     * @params obj {Object} subscribing object. Must implement a "update" function
+     * @params obj {Object} subscribing object. Must implement an "update" function
      *
      * @returns {Promise<Object|String>}
      */
@@ -119,7 +119,7 @@
             let fail = function (reason) {
                 reject(reason);
             };
-          if (self.currentViewedUser.user === undefined) {
+            if (self.currentViewedUser.user === undefined) {
               // check if request is already pending
               if (self.pendingUserRequest.isActive) {
                   self.pendingUserRequest.subscribe()
@@ -139,10 +139,10 @@
                           fail(reason)
                       })
               }
-          }
-          else {
+            }
+            else {
               resolve(self.currentViewedUser.user)
-          }
+            }
         });
 
     };

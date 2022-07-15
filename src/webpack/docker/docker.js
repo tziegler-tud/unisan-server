@@ -1,6 +1,7 @@
 import {Drawer} from "./drawer"
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+const Handlebars = require("handlebars");
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 

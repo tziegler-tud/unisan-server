@@ -2,6 +2,8 @@ import "./eventDetails.scss";
 
 var lidlRTO = window.lidlRTO;
 
+import {UserProfile} from "../userprofile/userprofile";
+
 import {Snackbar} from "../helpers/snackbar";
 import {DropdownMenu} from "../helpers/dropdownMenu";
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
@@ -44,7 +46,7 @@ let eventDetails = {
             self.pageData = {};
             var lidlRTO = window.lidlRTO;
             var user;
-            var userProfile = new window.profile.Profile(window.userId);
+            var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
             // create new observer
             var ob1 = new lidlObserver(function (u) {
@@ -273,7 +275,7 @@ let eventDetails = {
                 }
             };
             let titleInputContainer = document.getElementById("eventtitle-input");
-            let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
 
             let eventDate = function(component){
                 $("#eventDateEditor").on("click", function(){

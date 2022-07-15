@@ -1,27 +1,16 @@
 extends ../layout
 
 block page_includes
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
-    script(src="/static/unisams/js/actions.js")
-    script(src="/static/unisams/js/eventActions.js")
-
     script(src="/dist/event.js")
-    script(src="/static/unisams/js/editableTextField.js")
-    script(src="/static/unisams/js/editableInputField.js")
 
     script(src="/lib/editorjs/editor.js")
     link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editor.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableTextField.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/editor/editableInputField.css')
 
     script(src="/dist/event_style.js")
-    //// Main Quill library
-    //script(src='//cdn.quilljs.com/1.3.6/quill.js')
     // Theme included stylesheets
     link(href='/lib/quill/quill.snow-custom.css' rel='stylesheet')
     link(href='/lib/quill/quill.bubble-custom.css' rel='stylesheet')
     //link(href='/lib/quill/quill.core.css' rel='stylesheet')
-
     script(type="module" src='/lib/quill/quill.js')
 
     script.

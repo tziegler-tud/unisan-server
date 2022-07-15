@@ -4,6 +4,7 @@ import {MDCTextFieldIcon} from '@material/textfield/icon';
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
+const Handlebars = require("handlebars");
 
 import {eventActions} from "../actions/eventActions";
 

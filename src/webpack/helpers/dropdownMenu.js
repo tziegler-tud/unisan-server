@@ -10,7 +10,7 @@ import "./dropdownMenu.scss"
  * @param {String} [eventType = "click"] type of event to attach to the trigger. Jquery event types valid, e.g. "click", "hover", etc...
  * @param {String} [triggerSelector= targetSelector] jquery selector for element(s) to register the event handler on.
  * @param {Object} [args] JSON containing strings to pass as optional args. valid keys are: "classes" - addtionial classes to add to the target when triggered, whitespace seperated.
- * @returns {common.DropdownMenu}
+ * @returns {DropdownMenu}
  * @constructor
  */
 var DropdownMenu = function(container, eventType, triggerSelector, args){

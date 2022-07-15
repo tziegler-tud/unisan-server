@@ -6,6 +6,7 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 
 import {userActions} from "../actions/userActions";
+const Handlebars = require("handlebars");
 
 
 $(document).ready (function () {

@@ -1,0 +1,76 @@
+@import '../color-rules';
+@import '../variables';
+
+.editableInputField {
+  position: relative;
+  background-color: #fff;
+  &.event-title {
+    margin: 0 0 0 -15px;
+  }
+
+  p,ul,ol,pre,blockquote,h1,h2,h3,h4,h5,h6 {
+    margin: 0;
+    padding: 0;
+  }
+
+  ol, ul {
+    padding-left: 1.5em;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  &.input-hidden {
+    padding: 24px 15px;
+    &.allow-editing {
+      @include transition(border, 250ms);
+      border: 1px solid transparent;
+      &:hover {
+        border: 1px solid #CCC;
+        cursor: pointer;
+      }
+    }
+  }
+  &.input-active {
+    .text-editor {
+      padding: 12px 0;
+    }
+  }
+
+
+
+  .editableInputField-dialog-container {
+    position: absolute;
+    left: 100%;
+    bottom: 0;
+    color: #AAA;
+    border: 1px solid #AAA;
+    border-left: none;
+    background-color: #f9f9f9;
+    font-size: 60%;
+    display: flex;
+    flex-flow: column nowrap;
+    z-index: 20;
+
+    .editableInputField-dialog-button {
+      //float: left;
+      padding: 4px;
+      flex: 0 0 auto;
+      svg {
+        padding: 2px;
+        color: #333;
+        display: block;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        &:hover {
+          outline: 1px solid #AAA;
+        }
+      }
+    }
+    .editableInputField-dialog-confirmButton {
+      //border-right: 1px solid #AAA;
+    }
+  }
+}

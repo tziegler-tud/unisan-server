@@ -3,6 +3,8 @@ import "./eventParticipants.scss";
 
 var lidlRTO = window.lidlRTO;
 
+import {UserProfile} from "../userprofile/userprofile";
+
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
@@ -28,6 +30,7 @@ import {Snackbar} from "../helpers/snackbar";
 import {common, getMatchingQualifications, getDataFromServer} from "../helpers/helpers";
 
 
+
 let eventParticipants = {
     title: "eventParticipants",
     pageData: {},
@@ -43,7 +46,7 @@ let eventParticipants = {
             self.pageData = {};
             var lidlRTO = window.lidlRTO;
             var user;
-            var userProfile = new window.profile.Profile(window.userId);
+            var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
             // create new observer
             var ob1 = new lidlObserver(function (u) {

@@ -1,0 +1,79 @@
+@import '../color-rules';
+@import '../variables';
+
+.editableTextField-heading {
+  margin-bottom: .5em;
+  font-size: 110%;
+  color: #333;
+  padding: 0 12px;
+}
+.editableTextField {
+  position: relative;
+  margin: 0 0;
+  background-color: #fff;
+
+  p,ul,ol,pre,blockquote,h1,h2,h3,h4,h5,h6 {
+    margin: 0;
+    padding: 0;
+  }
+
+  ol, ul {
+    padding-left: 1.5em;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  &.editor-hidden {
+    padding: 12px 0;
+
+    &.allow-editing {
+      padding: 24px 0;
+      @include transition(outline, 250ms);
+      outline: 1px solid transparent;
+      &:hover {
+        outline: 1px solid #CCC;
+        cursor: pointer;
+      }
+    }
+  }
+  &.editor-active {
+    margin-bottom: 3em;
+  }
+
+
+
+  .editableTextField-dialog-container {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    color: #AAA;
+    border: 1px solid #AAA;
+    border-top: none;
+    background-color: #f9f9f9;
+
+    display: flex;
+    flex-flow: row nowrap;
+
+    .editableTextField-dialog-button {
+      //float: left;
+      flex: 0 0 auto;
+      padding: 4px;
+      svg {
+        padding: 2px;
+        color: #333;
+        display: block;
+        width: 1.5em;
+        height: 1.5em;
+        cursor: pointer;
+        &:hover {
+          outline: 1px solid #AAA;
+        }
+      }
+    }
+    .editableTextField-dialog-confirmButton {
+      //border-right: 1px solid #AAA;
+    }
+  }
+}

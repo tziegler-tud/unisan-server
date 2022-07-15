@@ -2,7 +2,6 @@ extends ../../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_index.css')
-    script(src="static/unisams/js/index.js")
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/protocol.css')
 
@@ -40,12 +39,15 @@ block content
                                                             .item-property.title.gallery-heading.protocol-heading= document.title
                                                                 .gallery-heading-inner.date= document.dateTimeString
                                                             .gallery-item-actions
-                                                                .dropdown-menu.menu-below
-                                                                    button.mdc-icon-button.dropdown-button.material-icons(title='More options', data-mdc-ripple-is-unbounded='true') more_vert
-                                                                    .userprofile-dropdown
-                                                                        .dropdown-container
-                                                                            .dropdown-entry.last
-                                                                                a.before-icon.icon-delete.documentDeleteBtn(id="deleteProtocol" + document.id, data-id=document.id) löschen
+                                                                .dropdown-menu.mdc-menu-surface--anchor
+                                                                    button.eventcard-menu-button.card-menu-button.mdc-icon-button.material-icons
+                                                                        .mdc-icon-button__ripple
+                                                                        |  more_vert
+                                                                    .mdc-menu.mdc-dropdown-menu.mdc-menu-surface
+                                                                        ul.mdc-list.mdc-list--icon-list(role='menu', aria-hidden='true', aria-orientation='vertical', tabindex='-1')
+                                                                            li.mdc-list-item.event-show(id="deleteProtocol" + document.id, role='menuitem', data-id=document.id)
+                                                                                span.mdc-list-item__graphic.material-icons delete
+                                                                                span.mdc-list-item__text löschen
                                                             //.item-property.gallery-text.completion= document.completion
                                                             //    | % abgeschlossen
                                         .add-smt-button.gallery-add-item.protocol-add

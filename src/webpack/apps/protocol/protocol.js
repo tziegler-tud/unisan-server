@@ -1,10 +1,13 @@
 import {MDCRipple} from '@material/ripple';
+import {DropdownMenu} from "../../helpers/dropdownMenu";
 $(document).ready (function () {
 
   const dropdowns = [].map.call(document.querySelectorAll(".dropdown-button"), function (el) {
     var token = lidlRTO.objectManager.createNewObjectToken();
     const container = $(el).closest(".dropdown-menu");
-    const drop = new common.DropdownMenu(container, "click", el);
+
+    const drop = new DropdownMenu(container, "click", el);
+
     lidlRTO.objectManager.addObject(drop, token);
   });
 
