@@ -3,6 +3,7 @@ import "./sidebar.scss";
 import "./sidebar-logs.scss";
 
 import {phone, tablet} from "../helpers/variables";
+import {refJSON} from "../helpers/helpers";
 import {MDCTooltip} from "@material/tooltip";
 
 let SidebarCounter = {
@@ -882,7 +883,7 @@ Sidebar.prototype.createSelectDelimiter = function(classes){
  */
 
 var findExistingValues = function(doc, key) {
-    const val = common.refJSON(doc,key);
+    const val = refJSON(doc,key);
     if (val){
         // if key refers to array, do not find values.
         if (Array.isArray(val)) return undefined;

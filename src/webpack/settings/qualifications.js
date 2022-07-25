@@ -4,7 +4,8 @@ import {ScrollableList} from "../scrollableList/scrollableList";
 import {Sidebar} from "../sidebar/sidebar";
 import {qualificationPlugin} from "../sidebar/plugins/plugin-qualifications.js";
 
-import {common} from "../helpers/helpers";
+import {escapeSelector} from "../helpers/helpers";
+import {Preloader} from "../helpers/preloader"
 
 import {actions, qualificationActions} from "../actions/actions";
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
@@ -14,6 +15,8 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 let qualifications = {
     init: function() {
         $(document).ready(function () {
+            let plr  = new Preloader();
+            plr.show();
 
             //debug line, remove before flight
             console.log("loading js module: settings.qualifications");
@@ -94,7 +97,7 @@ let qualifications = {
                                             const cb = {
                                                 onConfirm: function(res){
                                                     qualificationActions.removeQualification(key, value, args,function(){
-                                                        $("#qualId" + common.escapeSelector(qualId)).remove();
+                                                        $("#qualId" + escapeSelector(qualId)).remove();
                                                         sidebar.showDefault();
                                                     });
                                                     lidlRTO.objectManager.removeObject(dialog_token);
@@ -121,6 +124,7 @@ let qualifications = {
                         scrollArgs = Object.assign(args, scrollArgs);
                         let scrollableList = new ScrollableList(subContainer, "qualification", listData, scrollArgs, callback)
                     });
+                    plr.hide();
                 }
             });
         });

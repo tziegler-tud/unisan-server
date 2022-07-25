@@ -1,0 +1,27 @@
+.lidl-pageSlider-container {
+
+  width: 100%;
+  overflow-X: hidden;
+
+  .lidl-pageSlider-inner {
+    width: 100%; //overwritten by js
+    overflow: hidden;
+    display: flex;
+    flex-flow: row wrap;
+
+    -webkit-transition: 250ms ease;
+    -moz-transition: 250ms ease;
+    -o-transition: 250ms ease;
+    transition: 250ms ease;
+
+      .lidl-pageSlider-page {
+
+        flex: 1 1 20%;
+      }
+  }
+
+  .page-hidden {
+    //display: none;
+  }
+}
+

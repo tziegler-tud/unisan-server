@@ -5,12 +5,17 @@ import {MDCTextFieldIcon} from '@material/textfield/icon';
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
+import {PageSlider as lidlPageSlider} from "/src/lib/lidl-modules/pageSlider/pageSlider";
+
+
 import {userActions} from "../actions/userActions";
 const Handlebars = require("handlebars");
 
 
 $(document).ready (function () {
     //setupTimePickerWidget()
+    var lidlRTO = window.lidlRTO;
 
     let pagesliderContainer = document.getElementById("pageslider-container-01");
     $.get('/webpack/user/templates/addUser/addUser-container.hbs', function (data) {
@@ -25,7 +30,7 @@ $(document).ready (function () {
 
 function buildPageSlider(container) {
     let token = lidlRTO.objectManager.createNewObjectToken();
-    let pageslider = new lidl.PageSlider(container, token);
+    let pageslider = new lidlPageSlider(container, token);
     pageslider.setCallback({
         onComplete: function(data){
 

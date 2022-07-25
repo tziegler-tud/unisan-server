@@ -2,7 +2,7 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
-import {getDataFromServer} from "../../helpers/helpers";
+import {getDataFromServer, stringToBoolean} from "../../helpers/helpers";
 
 let userPlugin = new SidebarPlugin("user");
 
@@ -188,7 +188,7 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
                             var title = r.options[r.selectedIndex].dataset.title;
 
                             var funcArgs = {
-                                isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                                isArray: stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                                 noIndex: true
                             };
                             var val = {
@@ -272,7 +272,7 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
                         handler: function () {
                             var key = catKey + "." + r.value;
                             var funcArgs = {
-                                isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                                isArray: stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                                 noIndex: true
                             };
                             var val = {
@@ -379,7 +379,7 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                         customHandler: true,
                         handler: function () {
                             var funcArgs = {
-                                isArray: common.stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
+                                isArray: stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                                 noIndex: true
                             };
                             var val = {

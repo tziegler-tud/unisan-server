@@ -3,6 +3,7 @@
  */
 
 import "./editableInputField.scss";
+import "./editor.scss";
 
 /**
  * constructor for EditableInputField objects

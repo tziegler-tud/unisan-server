@@ -2,7 +2,7 @@ import "./scrollableList.scss";
 import "./scrollableListMobile.scss";
 const Handlebars = require("handlebars");
 import "../helpers/handlebarsHelpers";
-import {common} from "../helpers/helpers";
+import {refJSON} from "../helpers/helpers";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 import {phone, tablet} from "../helpers/variables";
 
@@ -38,7 +38,7 @@ let ScrollableListCounter = {
  * @param {Object} [callback] callback object
  * @param {Object} [callback.listItem] Callback object for generated list items
  * @param {function[]} [callback.customHandlers] Array of functions to be applied
- * @returns {Window.common.ScrollableList}
+ * @returns {ScrollableList}
  * @constructor
  */
 var ScrollableList = function(container,type, data,  args, callback){
@@ -357,8 +357,8 @@ var sortData = function(data, sortingObject){
     {
         //sort ascending
         data.sort(function(a,b){
-            if (common.refJSON(a,property) < common.refJSON(b,property)) return -1;
-            if (common.refJSON(a,property) > common.refJSON(b,property)) return 1;
+            if (refJSON(a,property) < refJSON(b,property)) return -1;
+            if (refJSON(a,property) > refJSON(b,property)) return 1;
             return 0;
         })
     }
@@ -367,8 +367,8 @@ var sortData = function(data, sortingObject){
             //sort descending
             //sort ascending
             data.sort(function(a,b){
-                if (common.refJSON(a,property) < common.refJSON(b,property)) return 1;
-                if (common.refJSON(a,property) > common.refJSON(b,property)) return -1;
+                if (refJSON(a,property) < refJSON(b,property)) return 1;
+                if (refJSON(a,property) > refJSON(b,property)) return -1;
                 return 0;
             })
         }

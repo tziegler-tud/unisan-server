@@ -6,7 +6,7 @@ import {notifications} from "./notifications";
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
-    var common = window.common;
+
 
 
     //setup module specific loaders

@@ -10,7 +10,7 @@ let view = {
     init: function() {
         $(document).ready(function () {
             var lidlRTO = window.lidlRTO;
-            var common = window.common;
+
             var actions = window.actions;
 
 

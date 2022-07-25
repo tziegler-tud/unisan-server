@@ -1,7 +1,3 @@
-let common = window.common;
-
-
-
 var userActions = {
 
     addUser: function (data, args) {

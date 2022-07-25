@@ -8,6 +8,8 @@ import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-obse
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 
 import {ScrollableList} from "../scrollableList/scrollableList";
+import {EditableInputField} from "../helpers/editableInputField";
+import {EditableTextField} from "../helpers/editableTextField";
 import {Searchbar} from "../searchbar/searchbar";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
@@ -62,7 +64,7 @@ let eventSettings = {
                 let userIsParticipant = eventProfile.checkIfUserIsRegistered(window.user);
 
                 let titleInputContainer = document.getElementById("eventtitle-input");
-                let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+                let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
 
                 const deleteContent = {
                     title: "Event löschen",

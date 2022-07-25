@@ -12,7 +12,7 @@ $(document).ready (function () {
 
     function buildPage(result) {
         var lidlRTO = window.lidlRTO;
-        var common = window.common;
+
         var actions = window.actions;
 
         var sidebar = new Sidebar('wrapper', "test");

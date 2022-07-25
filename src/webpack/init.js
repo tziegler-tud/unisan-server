@@ -4,6 +4,7 @@ import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-obse
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
 import {Snackbar} from "./helpers/snackbar";
 import {UserProfile} from "./userprofile/userprofile";
+import {Preloader} from "./helpers/preloader";
 var lidlRTO = window.lidlRTO;
 
 const Handlebars = require("handlebars");
@@ -100,7 +101,7 @@ window.lidlRTO = lidlRTO;
 
 $(window).on('load',function() {
     console.log("finished loading, hiding preloader");
-    var plr = common.preloader();
+    var plr = new Preloader();
     setTimeout(plr.hide,0);
 
 });

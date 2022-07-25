@@ -2,9 +2,7 @@ import {Sidebar} from "../sidebar/sidebar";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 
 import {groupActions} from "../actions/actions";
-
-var common = window.common;
-var actions = window.actions;
+import {Preloader} from "../helpers/preloader"
 
 
 let groups = {

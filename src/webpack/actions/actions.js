@@ -1,4 +1,4 @@
-let common = window.common;
+
 import {groupActions} from "./groupActions"
 import {userActions} from "./userActions"
 import {eventActions} from "./eventActions"
