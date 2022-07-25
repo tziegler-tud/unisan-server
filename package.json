@@ -46,7 +46,7 @@
     "image-thumbnail": "^1.0.14",
     "jquery-ui": "^1.13.1",
     "material-icons-font": "^2.1.0",
-    "moment": "^2.29.3",
+    "moment": "^2.29.4",
     "mongodb": "4.1.2",
     "mongoose": "6.2.10",
     "mongoose-plugin-autoinc-fix": "^1.2.1",
