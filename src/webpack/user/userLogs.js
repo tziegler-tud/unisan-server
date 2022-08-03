@@ -1,17 +1,16 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {UserProfile} from "../userprofile/userprofile";
-import {userActions} from "../actions/userActions";
+import {actions, userActions} from "../actions/actions";
 import {ScrollableList} from "../scrollableList/scrollableList"
 
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {DropdownMenu} from "../helpers/dropdownMenu";
 
 $(document).ready (function () {
     var lidlRTO = window.lidlRTO;
-    var common = window.common;
-    var actions = window.actions;
 
     var currentExploredUser;
     var profile = new UserProfile(window.exploreUserId);
@@ -42,7 +41,7 @@ $(document).ready (function () {
         currentExploredUser = user;
         var userid = window.exploreUserId;
 
-        var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+        const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
         //get Logs for user
         actions.getLogs(user.id, "ALL", {

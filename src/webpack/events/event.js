@@ -3,7 +3,6 @@ import "./event.scss";
 //load settings modules
 import {eventDetails} from "./eventDetails.js";
 import {eventParticipants} from "./eventParticipants.js";
-import {eventPostings} from "./eventPostings.js";
 import {eventLogs} from "./eventLogs.js";
 import {eventSettings} from "./eventSettings.js";
 

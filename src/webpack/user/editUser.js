@@ -17,6 +17,8 @@ import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 import {DropdownMenu} from "../helpers/dropdownMenu";
 
+import {escapeSelector, refJSON} from "../helpers/helpers";
+
 import {userActions} from "../actions/userActions";
 
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
@@ -26,8 +28,6 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
-    var common = window.common;
-    var actions = window.actions;
 
     var currentExploredUser;
     var profile = new UserProfile(window.exploreUserId);
@@ -59,7 +59,7 @@ $(document).ready (function () {
 
         const deleteContent = {
             title: "Nutzer löschen",
-            message: "U sure bro?",
+            message: "Diese Aktion kann nicht rückgängig gemacht werden. Alle Daten, die mit diesem Nutzer verknüpft sind, werden gelöscht. Fortfahren?",
             titleArg: "",
             messageArg: ""
         };
@@ -68,7 +68,7 @@ $(document).ready (function () {
             userid: userid,
             callback: {
                 onConfirm: function () {
-                    actions.deleteUser(userid)
+                    userActions.deleteUser(userid)
                 }
             }
         };
@@ -89,8 +89,8 @@ $(document).ready (function () {
             userid: userid,
             callback: {
                 onConfirm: function (res) {
-                    actions.removeDBKey(userid, res.event.target.dataset.attributekey, {}, function () {
-                            $("#useritem-" + common.escapeSelector(res.event.target.dataset.attributekey)).remove()
+                    userActions.removeDBKey(userid, res.event.target.dataset.attributekey, {}, function () {
+                            $("#useritem-" + escapeSelector(res.event.target.dataset.attributekey)).remove()
                         }
                     );
                 }
@@ -127,7 +127,6 @@ $(document).ready (function () {
         });
 
 
-        // var addDBKey_sidebar = new common.Sidebar('wrapper', {title: "Test"});
         let addDBKey_sidebar = new Sidebar('wrapper', "test");
         addDBKey_sidebar.addPlugin(userPlugin);
 
@@ -158,7 +157,7 @@ $(document).ready (function () {
                                             noIndex: false,
                                             keyId: self.dataset.keyId
                                         };
-                                        actions.updateQualification(userid, key, value, args, function () {
+                                        userActions.updateQualification(userid, key, value, args, function () {
 
                                         });
                                     },
@@ -178,8 +177,8 @@ $(document).ready (function () {
                                             userid: userid,
                                             callback: {
                                                 onConfirm: function (res) {
-                                                    actions.removeQualification(userid, key, data, args, function () {
-                                                        $("#qualId" + common.escapeSelector(data.id)).remove();
+                                                    userActions.removeQualification(userid, key, data, args, function () {
+                                                        $("#qualId" + escapeSelector(data.id)).remove();
                                                     });
                                                     lidlRTO.objectManager.removeObject(dialog_token);
                                                     addDBKey_sidebar.hide()
@@ -205,7 +204,7 @@ $(document).ready (function () {
                     userid: userid,
                     callback: {
                         onConfirm: function (userid, key, value, args) {
-                            actions.insertDBKey(userid, key, value, args);
+                            userActions.insertDBKey(userid, key, value, args);
                         }
                     }
                 },
@@ -225,7 +224,7 @@ $(document).ready (function () {
                                 isArray: true,
                                 noIndex: true
                             };
-                            actions.insertDBKey(userid, key, value, args);
+                            userActions.insertDBKey(userid, key, value, args);
                         }
                     }
                 },
@@ -241,7 +240,7 @@ $(document).ready (function () {
                     catKey: self.dataset.catkey,
                     callback: {
                         onConfirm: function (userid, key, value, args) {
-                            actions.insertDBKey(userid, key, value, args);
+                            userActions.insertDBKey(userid, key, value, args);
                         }
                     }
                 },
@@ -261,7 +260,7 @@ $(document).ready (function () {
                             args = {
 
                             };
-                            actions.addQualification(userid, key, value, args, function () {
+                            userActions.addQualification(userid, key, value, args, function () {
 
                             });
                         }
@@ -289,7 +288,7 @@ $(document).ready (function () {
                             var args = {
                                 //isArray: false
                             };
-                            actions.updateDBKey(userid, key, value, args, function (response) {
+                            userActions.updateDBKey(userid, key, value, args, function (response) {
                                 let user = response.result;
                                 addDBKey_sidebar.hide();
                                 $(e.currentTarget).find(".userkey-entry-value").html(value.value);
@@ -316,8 +315,8 @@ $(document).ready (function () {
                                 userid: userid,
                                 callback: {
                                     onConfirm: function (res) {
-                                        actions.removeDBKey(userid, key, data, args, function () {
-                                            $("#userkey-" + common.escapeSelector(key)).remove();
+                                        userActions.removeDBKey(userid, key, data, args, function () {
+                                            $("#userkey-" + escapeSelector(key)).remove();
                                         });
                                         lidlRTO.objectManager.removeObject(dialog_token);
                                         addDBKey_sidebar.showDefault(true);
@@ -342,7 +341,7 @@ $(document).ready (function () {
             var key = self.dataset.key;
 
 
-            var field = common.refJSON(currentExploredUser, key);
+            var field = refJSON(currentExploredUser, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
                     userid: userid,
@@ -378,8 +377,8 @@ $(document).ready (function () {
                                 userid: userid,
                                 callback: {
                                     onConfirm: function (res) {
-                                        actions.removeDBKey(userid, key, data, args, function () {
-                                            $("#userkey-" + common.escapeSelector(key)).remove();
+                                        userActions.removeDBKey(userid, key, data, args, function () {
+                                            $("#userkey-" + escapeSelector(key)).remove();
                                         });
                                         lidlRTO.objectManager.removeObject(dialog_token);
                                     }
@@ -407,11 +406,11 @@ $(document).ready (function () {
             var key = btn.element.dataset.attributekey;
             var val = btn.element.dataset.attributeval;
             var confirm = btn.element.dataset.confirm;
-            var inp = $("#userinp-" + common.escapeSelector(key));
+            var inp = $("#userinp-" + escapeSelector(key));
 
             var generalAction = function () {
                 var value = btn.element.dataset.attributekey;
-                actions.updateDBKey(userid, value, inp.val());
+                userActions.updateDBKey(userid, value, inp.val());
             };
 
             var InplaceAction = function () {
@@ -451,13 +450,13 @@ $(document).ready (function () {
             var key = btn.element.dataset.attributekey;
             var val = btn.element.dataset.attributeval;
             btn.addAction("click", function () {
-                var inp = $("#userinp-" + common.escapeSelector(key));
+                var inp = $("#userinp-" + escapeSelector(key));
                 inp.val(btn.element.dataset.attributeval);
                 inp.trigger("inputReset");
                 btn.disable();
 
             });
-            var inp = $("#userinp-" + common.escapeSelector(key));
+            var inp = $("#userinp-" + escapeSelector(key));
             inp.data("resetVal", inp.val());
             inp.on("input", function () {
                 btn.enable();
@@ -496,7 +495,7 @@ $(document).ready (function () {
                                 userid: userid,
                                 callback: {
                                     onConfirm: function () {
-                                        actions.updateDBKey(userid, key, value, args, function () {
+                                        userActions.updateDBKey(userid, key, value, args, function () {
                                             location.replace("/unisams/user/edit/" + userid);
                                         });
                                     }
@@ -521,7 +520,7 @@ $(document).ready (function () {
                     key: "userRole",
                     callback: {
                         onConfirm: function (data, args) {
-                            userActions.setRole(data, args)
+                            user.setRole(data, args)
                                 .then()
                                 .fail(function(jqxhr, textstatus, error){
                                     let msg = (jqxhr.responseJSON.message ? jqxhr.responseJSON.message : jqxhr.responseText);

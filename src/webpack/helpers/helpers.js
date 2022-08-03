@@ -260,39 +260,43 @@ var getMatchingQualifications = function(user, posting) {
    return matchingQualifications;
 }
 
-var common = {
-    escapeSelector: function(selector){
-        return selector.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
-    },
-    //find key in json by string in dot-notation
-    refJSON: function (obj, str) {
-        return str.split(".").reduce(function(o, x) { return o[x] }, obj);
-    },
+var escapeSelector = function(selector){
+    return selector.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
+};
+//find key in json by string in dot-notation
+var refJSON = function (obj, str) {
+    return str.split(".").reduce(function(o, x) { return o[x] }, obj);
+};
 
-    stringToBoolean: function (string){
-        var bool = undefined;
-        var msg;
-        try {
-            if (typeof (string) !== "string") {
-                msg = "Argument of type 'string' expected, but " + typeof (string) + "found.";
-                throw new TypeError(msg);
-            }
-            //convert to lowercase
-            string = string.toLowerCase();
-            if (string === "true" || string === "1") {
-                return true;
-            }
-            else if (string === "false" || string === "0") {
-                return false;
-            }
-            msg = ("failed to parse string.");
-            throw new Error(msg);
+var stringToBoolean = function (string){
+    var bool = undefined;
+    var msg;
+    try {
+        if (typeof (string) !== "string") {
+            msg = "Argument of type 'string' expected, but " + typeof (string) + "found.";
+            throw new TypeError(msg);
         }
-        catch(e) {
-            console.error("Caught exception: "+ msg);
+        //convert to lowercase
+        string = string.toLowerCase();
+        if (string === "true" || string === "1") {
+            return true;
         }
-        return bool;
-    },
+        else if (string === "false" || string === "0") {
+            return false;
+        }
+        msg = ("failed to parse string.");
+        throw new Error(msg);
+    }
+    catch(e) {
+        console.error("Caught exception: "+ msg);
+    }
+    return bool;
+};
+
+var common = {
+    escapeSelector: escapeSelector,
+    refJSON: refJSON,
+    strinToBoolean: stringToBoolean,
 }
 
 Date.prototype.toDateInputValue = (function() {
@@ -310,4 +314,4 @@ Date.prototype.toTimeInputValue = (function() {
 
 
 
-export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, common}
+export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, escapeSelector, refJSON, stringToBoolean, common}

@@ -48,6 +48,7 @@ var eventActions = {
     deleteEvent: function(eventid, callback) {
         callback = (callback == null) ? function(){
             alert("event " + eventid + " deleted.");
+            window.location.replace("/unisams/events");
         } : callback;
 
         // build a json object or do something with the form, store in data
@@ -55,7 +56,7 @@ var eventActions = {
             url: "/api/v1/eventmod/" + eventid,
             type: 'DELETE',
             success: function(result) {
-                callback(result);
+                callback(result)
             }
         });
     },

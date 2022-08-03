@@ -14,7 +14,6 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
-    var common = window.common;
     var actions = window.actions;
 
     var currentExploredUser;

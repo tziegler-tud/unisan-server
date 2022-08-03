@@ -1,4 +1,5 @@
 import {MDCTextField} from '@material/textfield';
+import {Preloader} from "./helpers/preloader";
 
 document.addEventListener("DOMContentLoaded", function(event) {
     console.log("js active, removing noscript fallback");
@@ -14,6 +15,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 window.onload = function() {
     console.log("finished loading, hiding preloader");
-    var plr = common.preloader();
+    var plr = new Preloader();
     setTimeout(plr.hide,0);
 };

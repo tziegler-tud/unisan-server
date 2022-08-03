@@ -11,7 +11,7 @@ import {advanced} from "./advanced.js";
 
 $(document).ready (function () {
     var lidlRTO = window.lidlRTO;
-    var common = window.common;
+
     var actions = window.actions;
 
 

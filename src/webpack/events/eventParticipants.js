@@ -4,6 +4,7 @@ import "./eventParticipants.scss";
 var lidlRTO = window.lidlRTO;
 
 import {UserProfile} from "../userprofile/userprofile";
+import {Preloader} from "../helpers/preloader";
 
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
@@ -38,6 +39,8 @@ let eventParticipants = {
     init: function (args) {
         let self = this;
         $(document).ready(function () {
+            let plr = new Preloader();
+            plr.show();
             //debug line, remove before flight
             console.log("loading js module: " + self.title);
 
@@ -92,6 +95,7 @@ let eventParticipants = {
                         userPostings: userPostings,
                     };
                     self.buildPage(self.pageData.user, self.pageData.event, args)
+                    plr.hide();
                 })
                 .catch(function (reason) {
                     console.error("Failed to retrieve data:" + reason)

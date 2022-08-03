@@ -3,7 +3,7 @@ import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 
 import {groupActions} from "../actions/actions";
 
-var common = window.common;
+
 var actions = window.actions;
 
 

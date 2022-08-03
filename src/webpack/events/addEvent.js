@@ -4,14 +4,22 @@ import {MDCTextFieldIcon} from '@material/textfield/icon';
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
+
+import {EditableTextField} from "../helpers/editableTextField";
+import {EditableInputField} from "../helpers/editableInputField";
+
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer"
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
+import {PageSlider as lidlPageSlider} from "/src/lib/lidl-modules/pageSlider/pageSlider";
+
 const Handlebars = require("handlebars");
 
 import {eventActions} from "../actions/eventActions";
 
-var common = window.common;
-
 
 $(document).ready (function () {
+    var lidlRTO = window.lidlRTO;
     //setupTimePickerWidget()
     $("#eventinp-date").val(new Date().toDateInputValue())
     // $("#eventinp-timeStart").val(new Date().toDateInputValue())
@@ -31,7 +39,7 @@ $(document).ready (function () {
 
 function buildPageSlider(container) {
     let token = lidlRTO.objectManager.createNewObjectToken();
-    let pageslider = new lidl.PageSlider(container, token);
+    let pageslider = new lidlPageSlider(container, token);
     pageslider.setCallback({
         onComplete: function(data){
             const regex = / Uhr/g;
@@ -70,7 +78,7 @@ function buildPageSlider(container) {
                 let page3 = pageslider.addPage(template());
 
                 var editableTextFieldContainer = document.getElementById("eventitem-longdesc");
-                var longDescInput = new common.EditableTextField(editableTextFieldContainer, {}, "", {}, {active: true, disableButtons: true});
+                var longDescInput = new EditableTextField(editableTextFieldContainer, {}, "", {}, {active: true, disableButtons: true});
                 page3.setOnSaveCallback(function(){
                     page3.addObject("longDescDelta", longDescInput.getQuill().getContents())
                     page3.addObject("longDescVal", longDescInput.getQuill().getText());

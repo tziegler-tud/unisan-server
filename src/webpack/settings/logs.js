@@ -1,7 +1,6 @@
 var lidlRTO = window.lidlRTO;
-var common = window.common;
-var actions = window.actions;
 
+import {Preloader} from "../helpers/preloader"
 import {ScrollableList} from "../scrollableList/scrollableList";
 
 import {Sidebar} from "../sidebar/sidebar";
@@ -11,6 +10,8 @@ import {logPlugin} from "../sidebar/plugins/plugin-logs";
 let logs = {
     init: function() {
         $(document).ready(function () {
+            let plr  = new Preloader();
+            plr.show();
 
             //debug line, remove before flight
             console.log("loading js module: settings.logs");
@@ -49,7 +50,8 @@ let logs = {
                             }
                         }
                     }
-                    let scrollableList = new ScrollableList(container, "logDetails", result, args, callback)
+                    let scrollableList = new ScrollableList(container, "logDetails", result, args, callback);
+                    plr.hide();
                 }
             });
         });

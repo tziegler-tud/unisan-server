@@ -229,8 +229,6 @@ let eventDetails = {
         function buildPageEdit(user, event, args) {
             const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
-            // var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
-
             const deleteContent = {
                 title: "Event löschen",
                 message: "Dieser Vorgang kann nicht rückgängig gemacht werden. Fortfahren?",

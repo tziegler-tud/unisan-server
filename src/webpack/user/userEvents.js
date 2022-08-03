@@ -6,11 +6,12 @@ import {UserProfile} from "../userprofile/userprofile";
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {DropdownMenu} from "../helpers/dropdownMenu";
 
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
-    var common = window.common;
+
     var actions = window.actions;
 
     var currentExploredUser;
@@ -41,7 +42,7 @@ $(document).ready (function () {
             window.DockerElement.addDockerSubPage("user", user, {}, undefined, {currentUser: {edit: window.allowedit}});
         }
 
-        var ddMenu = common.DropdownMenu(".dropdown-menu", "click");
+        const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
         var addDBKey_sidebar = new Sidebar('wrapper', "test");
         addDBKey_sidebar.addPlugin(userPlugin);

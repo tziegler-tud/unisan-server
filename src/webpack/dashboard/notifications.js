@@ -8,7 +8,7 @@ import deLocale from '@fullcalendar/core/locales/de';
 let notifications = {
     init: function () {
         $(document).ready(function () {
-            var common = window.common;
+
             var actions = window.actions;
 
             //debug line, remove before flight

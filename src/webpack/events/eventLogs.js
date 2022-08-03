@@ -10,6 +10,7 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 
+import {Preloader} from "../helpers/preloader";
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
@@ -27,6 +28,8 @@ let eventLogs = {
     init: function (args) {
         let self = this;
         $(document).ready(function () {
+            let plr = new Preloader();
+            plr.show();
             //debug line, remove before flight
             console.log("loading js module: " + self.title);
 
@@ -95,7 +98,8 @@ let eventLogs = {
                             }
                         }
                     }
-                    let scrollableList = new ScrollableList(container, "log", result, args, callback)
+                    let scrollableList = new ScrollableList(container, "log", result, args, callback);
+                    plr.hide();
                 }
             }
         })
