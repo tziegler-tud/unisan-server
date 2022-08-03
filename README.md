@@ -6,33 +6,33 @@ github.com/SoulKa
 
 
 ### Purpose
-Extension of the publicly available website [unisan-dresden.de](https://www.unisan-dresden.de) with backbone api and frontend for a sophisticated web-based management application.
+Extension of the publicly available website [unisan-dresden.de](https://www.unisan-dresden.de) with backbone api and frontend for a sophisticated web-based management application. Specific aims will be determinded along the way - let's see where this is going.
 
 Planned features include a user management, event mangement, an eLearning area and CMS for the public website.
-#### Current state (02.02.2020):
-- working on user management
+#### Current state (03.08.2022):
+- user management and event management implemented with most features
+- new planned feature: resource and inventory management
+- working on dashboard
 
 #### Planned:
-- calendar and event management
-- web-based CMS for public website
-- eLearning area providing course materials and information
-- user documentation
+- user management (implemented)
+- calendar and event management (implemented)
+- web-based CMS for public website (de-continued)
+- eLearning area providing course materials and information (planned)
+- user documentation (will be ready for release, whenever that may be)
 
 ### Tech
 
 
 #### Dependencies
 
-Our project uses [LESS](http://lesscss.org/) to generate css files.
+Our project uses [SASS](https://sass-lang.com/) and webpack.
 
 ##### Backend
 NodeJS version: 8.10.0\
 ES2017
 
-npm modules:
-- passport.js 0.4.0
-- pug 2.0.0
-- check package.json for furtherer dependencies
+check package.json for npm dependencies
 
 ##### Frontend
 
