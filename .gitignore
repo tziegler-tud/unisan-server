@@ -4,3 +4,4 @@ bin/sessions/*
 src/**/build/
 src/data/uploads/
 logs/*
+config/config.json
