@@ -65,6 +65,12 @@ var SidebarPlugin = function(name) {
     return this;
 }
 
+/**
+ *
+ * adds a content handler to the sidebar plugin instance.
+ *
+ * @param contentHandler [ContentHandler] content handler
+ */
 SidebarPlugin.prototype.addContentHandler = function(contentHandler) {
     this.handlers.push(contentHandler);
 }
@@ -305,6 +311,10 @@ var SidebarButton = function(args) {
     }
 }
 
+/**
+ * disables the button
+ * @param disable {Boolean} Default: true. If set to false, no action is taken.
+ */
 SidebarButton.prototype.disable = function(disable){
     if(disable === undefined) disable = true;
     if(disable) {
@@ -314,7 +324,10 @@ SidebarButton.prototype.disable = function(disable){
     }
 }
 
-
+/**
+ * enables the button
+ * @param enable {Boolean} Default: true. If set to false, no action is taken.
+ */
 SidebarButton.prototype.enable = function(enable){
     if(enable === undefined) enable = true;
     if(enable) {
@@ -365,6 +378,11 @@ Sidebar.prototype.addSubpage = function(type, args) {
     return storageObject;
 }
 
+/**
+ * saves the current sidebar content by using the save method of the associated content handler. returns a storage object containing the data, handler and page information.
+ * use this together with loadContent method to temporarily store sidebar inputs and restore them later. Note that this is not persistent, i.e. cannot be used after page reload.
+ * @returns {{handler: ContentHandler, handlerContent: {Object}, page: (*|{args: Object, type: String})}}
+ */
 Sidebar.prototype.saveContent = function() {
     //save temporary input contents. We use the handlers onSave callback.
     let handler = this.currentPage.handler;
@@ -375,6 +393,11 @@ Sidebar.prototype.saveContent = function() {
     return storageObject;
 }
 
+/**
+ * loads a sidebar page and handler and fills it with previously stored data. use together with saveContent method.
+ *
+ * @param storageObject {{handler: ContentHandler, handlerContent: {Object}, page: (*|{args: Object, type: String})}}
+ */
 Sidebar.prototype.loadContent = function(storageObject) {
     let handler = storageObject.handler;
     let currentPage = storageObject.page;
@@ -384,12 +407,20 @@ Sidebar.prototype.loadContent = function(storageObject) {
         })
 }
 
+/**
+ * sets a specific sidebar page as default.
+ * @param type {String}
+ * @param args {Object}
+ */
 Sidebar.prototype.setDefault = function(type, args){
     this.defaultPage.type = type;
     this.defaultPage.args = args;
     this.hasDefault = true;
 }
 
+/**
+ * sets the current sidebar page as default.
+ */
 Sidebar.prototype.setCurrentDefault = function(){
     this.defaultPage.type = this.currentPage.type;
     this.defaultPage.args = this.currentPage.args;
@@ -501,11 +532,18 @@ Sidebar.prototype.addErrorMessage = function(msg, insertFunc, overwrite, warning
         }
     }
 };
-
+/**
+ *
+ * @param selector
+ */
 Sidebar.prototype.enableOptional = function(selector){
     $(selector).addClass("optional-enabled");
 };
 
+/**
+ *
+ * @param selector
+ */
 Sidebar.prototype.disableOptional = function(selector){
     $(selector).removeClass("optional-enabled");
 };
@@ -960,6 +998,9 @@ var disableViewBox = function(elements) {
     else func(elements)
 };
 
+/**
+ * resets all input on the current sidebar page.
+ */
 Sidebar.prototype.resetCurrentPage = function(){
     this.addContent(this.currentPage.type, this.currentPage.args);
 }
