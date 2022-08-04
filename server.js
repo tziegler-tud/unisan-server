@@ -17,13 +17,6 @@ var errorHandler = require("./helpers/error-handler");
 global.appRoot = path.resolve(__dirname);
 
 // include routes here
-var indexRouter = require('./routes/public/index');
-var teamRouter = require('./routes/public/team');
-var sanRouter = require('./routes/public/san');
-var courseRouter = require('./routes/public/courses');
-var contactRouter = require('./routes/public/contact');
-var impressumRouter = require('./routes/public/impressum');
-var datenschutzRouter = require('./routes/public/datenschutz');
 
 const loginRouter = require('./routes/unisams/login');
 const mainRouter = require('./routes/unisams/index');
@@ -126,15 +119,6 @@ webAuth = function(req, res, next){
 // data folder requires authentication
 server.use('/data/*', apiAuth);
 server.use(express.static(path.join(__dirname, 'src')));
-
-server.use('/', indexRouter);
-server.use('/team', teamRouter);
-server.use('/san', sanRouter);
-server.use('/kurse', courseRouter);
-server.use('/kontakt', contactRouter);
-server.use('/info/impressum', impressumRouter);
-server.use('/info/datenschutz', datenschutzRouter);
-
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
