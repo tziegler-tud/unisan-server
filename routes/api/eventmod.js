@@ -227,7 +227,7 @@ function currentUserEvents(req, res, next) {
 function currentUserPostings(req, res, next) {
     let args = {
         dateFilter: {
-            selector: "gte",
+            selector: "all",
         }
     }
     eventService.getUserPostings(req.user._id, args)
@@ -242,7 +242,7 @@ function currentUserPostings(req, res, next) {
 function userPostings(req, res, next) {
     let args = {
         dateFilter: {
-            selector: "gte",
+            selector: "all",
         }
     }
     eventService.getUserPostings(req.params.id, args)

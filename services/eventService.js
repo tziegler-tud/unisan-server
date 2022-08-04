@@ -124,7 +124,7 @@ async function getById(id) {
  * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
  * @param args.dateFilter.minDate {Date} end of Date range to filter for. Defaults to current Date
  * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
- * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range"].
+ * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range", "all"].
  * @returns {Promise<Query|*|number>}
  */
 async function matchAny(matchString, args){
@@ -143,7 +143,7 @@ async function matchAny(matchString, args){
     }
 
     if (args.dateFilter === undefined) args.dateFilter = {}
-    if(args.dateFilter.selector === undefined || typeof(args.dateFilter.selector) !== "string") {
+    if(args.dateFilter.selector === undefined || typeof(args.dateFilter.selector) !== "string" || args.dateFilter.selector === "all") {
         //invalid paramters for date filtering. ignore
     }
     else {
