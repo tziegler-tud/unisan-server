@@ -6,6 +6,7 @@ src/data/uploads/
 src/data/event_files
 src/data/event_images
 src/data/user_images
+src/data/tmp
 dataBackup/
 logs/*
 config/config.json
