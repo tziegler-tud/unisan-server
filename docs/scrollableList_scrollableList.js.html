@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: scrollableList/scrollableList.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: scrollableList/scrollableList.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import "./scrollableList.scss";
+import "./scrollableListMobile.scss";
+const Handlebars = require("handlebars");
+import "../helpers/handlebarsHelpers";
+import {refJSON} from "../helpers/helpers";
+import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
+import {phone, tablet} from "../helpers/variables";
+
+
+let ScrollableListCounter = {
+    counter: 0,
+    next: function(){
+        this.counter++;
+        return this.counter;
+    },
+    current: function(){
+        return this.counter;
+    }
+}
+
+/**
+ * constructor for ScrollableList objects
+ *
+ * @param {HTMLElement} container - container dom element
+ * @param {String} type - type of data. ["user", "event", "qualification"]
+ * @param {Object} data - iterateable object containing data for list entries
+ * @param {Object} args constructor args
+ * @param [args.enableMobile = false] {Boolean} true to render mobile version.
+ * @param [args.view = "list"] {String} choose between "list" and "cards" view
+ * @param [args.height = "fixed"] {String} limits container dimensions. Options: "full": expand to fill parent container, "fixed": fixed height, use fixedHeight parameter to set a value
+ * @param [args.fixedHeight = "40em"] {String} css-parseable value. Requires "height" parameter to be set to "fixed".
+ * @param args.sorting {Object} sorting object
+ * @param args.sorting.property {String} property to be sorted
+ * @param args.sorting.direction {String} direction. Either "asc" or "desc"
+ * @param [args.acl] {Object} Contains additional information for rendering purposes, usually concerning user access rights. This object is passed to the template as Object named "acl".
+ * @param args.hasTitle {Boolean} true if title is provided
+ * @param args.title {String} title of scrollable List. Requires hasTitle to be set to true.
+ * @param {Object} [callback] callback object
+ * @param {Object} [callback.listItem] Callback object for generated list items
+ * @param {function[]} [callback.customHandlers] Array of functions to be applied
+ * @returns {ScrollableList}
+ * @constructor
+ */
+var ScrollableList = function(container,type, data,  args, callback){
+    if (container === undefined) throw new Error("cannot instantiate list without container");
+    if (type === undefined) type = "qualification";
+    this.id = ScrollableListCounter.next();
+
+    args = applyArgs(args);
+
+    container.classList.add("scrollableList");
+    this.args = args;
+    this.data = data;
+    // this.initialData = jQuery.extend(true, {}, data);
+    this.initialData = data.slice();
+    this.callback = callback;
+    this.container = container;
+    this.type = type;
+    this.viewUrl = "";
+    this.templateUrl = applyType(type, this);
+    this.sorting = args.sorting;
+    this.view = applyView(args.view, args.enableMobile);
+    // buildHTML(this, data, args);
+    this.sort(this.sorting.property, this.sorting.direction, true)
+    var self = this;
+
+    return this;
+};
+
+
+ScrollableList.prototype.setView = function(view){
+    let self = this;
+    if (view === undefined || typeof (view) !== "string") view = "list"
+    if (view === "cards") {
+        this.view = "cards";
+    }
+    else {
+        self.view = "list"
+        if(self.args.enableMobile){
+            if(phone.matches){
+                self.view = "mobileList"
+            }
+        }
+    }
+    buildHTML(this, this.data, this.args);
+}
+
+var applyView = function(view, enableMobile) {
+    if (view === undefined || typeof (view) !== "string") view = "list"
+    if (view === "list") {
+        if (enableMobile) {
+            if (phone.matches) {
+                view = "mobileList"
+            }
+        }
+    }
+    return view;
+}
+
+
+var applyType = function(type, self) {
+    let url = {list: "", cards: ""}
+    switch(type) {
+        case "userQualification":
+            url.list = '/webpack/scrollableList/templates/userQualificationList.hbs'
+            break;
+        case "qualification":
+            url.list = '/webpack/scrollableList/templates/qualificationList.hbs'
+            break;
+        case "log":
+            url.list = '/webpack/scrollableList/templates/logList.hbs'
+            break;
+        case "user":
+            url.list = '/webpack/scrollableList/templates/userList.hbs'
+            break;
+        case "participants":
+            url.list = '/webpack/scrollableList/templates/participantsList.hbs';
+            break;
+        case "postings":
+            url.list = '/webpack/scrollableList/templates/postingsList.hbs';
+            url.cards = '/webpack/scrollableList/templates/postingsListCards.hbs';
+            url.mobile = '/webpack/scrollableList/templates/postingsListMobile.hbs';
+            break;
+        case "event":
+            url.mobile = '/webpack/scrollableList/templates/eventListMobile.hbs'
+            url.list = '/webpack/scrollableList/templates/eventList.hbs'
+            url.cards = '/webpack/scrollableList/templates/eventCards.hbs'
+            self.viewUrl = "/unisams/events/view/:id"
+            break;
+        case "logDetails":
+            url.list = '/static/unisams/js/scrollableList/templates/logdetailsList.hbs'
+            break;
+    }
+    return url;
+}
+
+var applyArgs = function(args){
+    let defaultArgs = {
+        enableSorting: true,
+        enableMobile: false,
+        enableDropdowns: false,
+        view: "list",
+        height: "fixed",
+        fixedHeight: "40em",
+        sorting: {
+            property: null,
+            direction: 0,
+        },
+        acl: {},
+        hasTitle: false,
+        title: "test",
+    }
+    if (args===undefined) {
+        return defaultArgs;
+    }
+    // else {
+    //     args.enableSorting = (args.enableSorting === undefined || typeof(args.enableSorting) !== "boolean") ? defaultArgs.enableSorting : args.enableSorting;
+    //     args.fullHeight = (args.fullHeight === undefined || typeof(args.fullHeight) !== "boolean") ? defaultArgs.enableSorting : args.enableSorting;
+    // }
+    return Object.assign(defaultArgs, args);
+};
+
+var buildHTML = function(self, data, args){
+    var handleData = {
+        listdata: data,
+        acl: self.args.acl,
+        args: args,
+    };
+
+    switch(self.view) {
+        case "cards":
+            $.get(self.templateUrl.cards, function (data) {
+                var template = Handlebars.compile(data);
+                buildCards(self, template(handleData))
+            });
+            break;
+        default:
+        case "list":
+            // render list template
+            $.get(self.templateUrl.list, function (data) {
+                var template = Handlebars.compile(data);
+                buildList(self, template(handleData))
+            });
+            break;
+        case "mobileList":
+            $.get(self.templateUrl.mobile, function (data) {
+                var template = Handlebars.compile(data);
+                buildMobile(self, template(handleData))
+            });
+    }
+
+    function buildList(self, html) {
+        //append to container
+        self.container.innerHTML = html;
+        self.adjustList();
+        setupEventHandlers(self)
+        //if sorting is applied, mark the column accordingly by setting dom class
+        if(self.sorting.direction !== 0 &amp;&amp; self.sorting.property != null) {
+            //find header column and add class
+            $(self.container).find(".scrollableList-header-column").each(function(index){
+                let c = (self.sorting.direction === 1) ? "sort-asc" : "sort-desc";
+                if (this.dataset.property === self.sorting.property) this.classList.add(c);
+            });
+        }
+
+    }
+    function buildCards(self, html) {
+        //append to container
+        self.container.innerHTML = html;
+        cardEventHandlers(self)
+    }
+
+    function buildMobile(self, html) {
+        //append to container
+        self.container.innerHTML = html;
+        setupEventHandlers(self)
+        //if sorting is applied, mark the column accordingly by setting dom class
+    }
+
+    return true;
+}
+
+ScrollableList.prototype.adjustList = function() {
+    if(this.args.enableMobile) {
+        if(this.view === "mobileList") {
+            if (!phone.matches) {
+                this.setView("list")
+            }
+            else return
+        }
+        if(phone.matches &amp;&amp; this.view === "list") {
+            this.setView(this.view);
+            return;
+        }
+    }
+    let self = this;
+    // set width of first row
+    let row = self.container.getElementsByClassName("scrollableList-top")[0];
+    let listContent = self.container.getElementsByClassName("scrollableList-content")[0];
+
+    let height = "40em"; //fallback
+    let marginBottom = 20;
+
+    let heightSetting = self.args.height;
+    if(phone.matches) {
+        heightSetting = "mobile";
+        height = "unset";
+    }
+
+    if(heightSetting === "full"){
+        //use all available viewport height.
+        //get viewport height
+        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        //get height of top navigation and topbar element
+        //TODO: remove dom id dependency
+
+        // let navHeight = document.getElementById("nav-top").clientHeight +1;
+        let topBarHeight = window.DockerElement.getTopBarHeight();
+        let contentHeight = document.getElementById("content1-heading").clientHeight;
+        let spacers = $(".scrollableList--spacer");
+        let spacerHeight = 0;
+        spacers.each(function(element){
+            spacerHeight = spacerHeight + this.clientHeight;
+        })
+
+        //calc remaining height in px  5px offset to compensate borders
+        height = vh - (topBarHeight + contentHeight + spacerHeight + row.clientHeight + marginBottom +5) + "px";
+    }
+    if (heightSetting === "fixed") {
+        //use fixedHeight param
+        height = self.args.fixedHeight;
+    }
+    $(self.container).css({
+        "margin": "0 0 "+ marginBottom +"px 0",
+    })
+    //set element height
+    $(listContent).css({
+        "max-height": height,
+        "overflow": "auto",
+    });
+    //wait for changes to apply
+    let p = new Promise(function(resolve, reject) {
+        setTimeout(resolve,200);
+    })
+    //get scollbar width
+    p.then(()=> {
+        let scrollbarWidth = listContent.offsetWidth - listContent.clientWidth;
+        $(row).css({
+            "width": "auto",
+            "padding-right": scrollbarWidth + "px",
+        })
+    });
+}
+
+ScrollableList.prototype.sort = function(property, direction, forceRebuild) {
+    let self = this;
+    if(property === undefined || property === null) direction = 0;
+    if(forceRebuild === undefined) forceRebuild = false;
+    if (typeof(direction)==="string") {
+        switch(direction){
+            case "asc":
+                direction = 1;
+                break;
+            case "desc":
+                direction = -1;
+                break;
+            default:
+                direction = 0;
+        }
+    }
+    let sortObj = {
+        property: property,
+        direction: direction,
+    }
+    if(direction === 0)
+    {
+        //remove any sorting
+        if(forceRebuild){
+            buildHTML(self, self.initialData, self.args)
+        }
+        else {
+
+            if (self.sorting.direction !== 0) {
+                buildHTML(self, self.initialData, self.args)
+            }
+        }
+    }
+    else {
+        let sortedData = sortData(self.data, sortObj);
+        self.data = sortedData;
+        buildHTML(self, sortedData, self.args);
+    }
+    this.sorting = {
+        property: property,
+        direction: direction,
+    }
+}
+
+/**
+ *
+ * @param data {Object} iterable object containing data to be sorted
+ * @param sortingObject {Object} sorting Object
+ * @param sortingObject.property {String} property to be sorted for
+ * @param sortingObject.direction {String} direction (1: asc, -1: desc)
+ *
+ * @returns {Object} the sorted data
+ */
+var sortData = function(data, sortingObject){
+    let property = sortingObject.property;
+    let direction = sortingObject.direction;
+    if(property === undefined || property === null) direction = 0;
+    if(direction !== -1 &amp;&amp; direction !== 1) {
+        console.warn("sidebar sorting subroutine error: Invalid argument received: direction: "+ direction)
+        return data;
+    }
+    if(direction === 1)
+    {
+        //sort ascending
+        data.sort(function(a,b){
+            if (refJSON(a,property) &lt; refJSON(b,property)) return -1;
+            if (refJSON(a,property) > refJSON(b,property)) return 1;
+            return 0;
+        })
+    }
+    else {
+        if (direction === -1) {
+            //sort descending
+            //sort ascending
+            data.sort(function(a,b){
+                if (refJSON(a,property) &lt; refJSON(b,property)) return 1;
+                if (refJSON(a,property) > refJSON(b,property)) return -1;
+                return 0;
+            })
+        }
+    }
+    return data;
+}
+
+var sortByColumn = function(self, headerElement) {
+    //get property from header element
+    let property = headerElement.dataset.property;
+    if(property === undefined) {
+        console.warn("failed to sort list: header property not set.")
+        return false;
+    }
+    if(self.sorting.property === property) {
+        //currently sorted by this property
+        if (self.sorting.direction === 1) {
+            //currently sorted in asc direction, reverse
+            //sort desc
+            self.sort(property, "desc")
+        }
+        else if (self.sorting.direction === -1) {
+            //currently sorted in desc direction, remove sorting
+            //revert sorting to initial state
+            self.sort(null, 0)
+        }
+    }
+    else {
+        //currently not sorted by this property, sort asc
+        self.sort(property, "asc");
+    }
+}
+
+var setupEventHandlers = function(self){
+    $(window).on('resize',function(){
+        self.adjustList();
+    });
+    if(self.args.enableSorting) {
+        $(".scrollableList-header-column").on("click", function(e){
+            sortByColumn(self, e.currentTarget);
+        })
+    }
+    if(self.callback){
+        if(self.callback.listItem) {
+            if(self.callback.listItem.onClick !== undefined) {
+                $(".scrollableList-item").on("click", function(e){
+                    self.callback.listItem.onClick(e)
+                });
+            }
+        }
+        if(self.callback.customHandlers !== undefined &amp;&amp; Array.isArray(self.callback.customHandlers)) {
+            self.callback.customHandlers.forEach(function(handler){
+                handler(self);
+            });
+        }
+    }
+
+};
+
+var cardEventHandlers = function(self){
+
+    if(self.viewUrl) {
+        $(".viewKey-item").on("click", function(){
+            const viewkey = this.dataset.viewkey;
+            let url = self.viewUrl.replace(":id", viewkey);
+            window.location = url;
+        })
+    }
+    if(self.callback){
+        if(self.callback.listItem) {
+            if(self.callback.listItem.onClick !== undefined) {
+                $(".scrollableList-item").on("click", function(e){
+                    self.callback.listItem.onClick(e)
+                });
+            }
+        }
+        if(self.callback.customHandlers !== undefined &amp;&amp; Array.isArray(self.callback.customHandlers)) {
+            self.callback.customHandlers.forEach(function(handler){
+                handler(self);
+            });
+        }
+    }
+    if(self.args.enableDropdowns) {
+        $('.card-menu-container').each(function(){
+            let trigger = $(this).find(".card-menu-button").first();
+            let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
+        });
+
+    }
+
+
+};
+
+export{ScrollableList}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ContentHandler.html">ContentHandler</a></li><li><a href="Counter.html">Counter</a></li><li><a href="dateFromNow.html">dateFromNow</a></li><li><a href="Docker.html">Docker</a></li><li><a href="DropdownMenu.html">DropdownMenu</a></li><li><a href="EditableInputField.html">EditableInputField</a></li><li><a href="EditableTextField.html">EditableTextField</a></li><li><a href="Navigation.html">Navigation</a></li><li><a href="ScrollableList.html">ScrollableList</a></li><li><a href="Searchbar.html">Searchbar</a></li><li><a href="Sidebar.html">Sidebar</a></li><li><a href="SidebarButton.html">SidebarButton</a></li><li><a href="SidebarPlugin.html">SidebarPlugin</a></li><li><a href="SidebarTooltip.html">SidebarTooltip</a></li><li><a href="Userlist.html">Userlist</a></li><li><a href="UserProfile.html">UserProfile</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubpageEventHandlers">addSubpageEventHandlers</a></li><li><a href="global.html#checkDataValidity">checkDataValidity</a></li><li><a href="global.html#checkQualificationDataValidity">checkQualificationDataValidity</a></li><li><a href="global.html#createSelectDelimiter">createSelectDelimiter</a></li><li><a href="global.html#disableViewBox">disableViewBox</a></li><li><a href="global.html#findExistingValues">findExistingValues</a></li><li><a href="global.html#getMatchingQualifications">getMatchingQualifications</a></li><li><a href="global.html#populateUserKeys">populateUserKeys</a></li><li><a href="global.html#sortData">sortData</a></li><li><a href="global.html#transformDateTimeString">transformDateTimeString</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Thu Aug 04 2022 11:14:52 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: helpers/editableTextField.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: helpers/editableTextField.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @namespace: editableTextField
+ */
+
+import "./editableTextField.scss";
+import "./editor.scss";
+
+/**
+ * constructor for EditableTextField objects
+ *
+ * @param {HTMLElement}container - container dom element
+ * @param {Object} deltaContent - delta object to set as content
+ * @param {String} htmlContent - html content for rendering
+ * @param {Object} callback - callbacks to be executed when dialog buttons are used. currently, only 'onConfirm' is supported
+ * @param {Object} args - readOnly: [false] disable input., active: [false] initialize with active editor, disableButtons: [false] disables dialog buttons
+ * @returns {Window.EditableTextField}
+ * @constructor
+ */
+var EditableTextField = function(container, deltaContent, htmlContent, callback, args){
+    if (container === undefined) throw new Error("cannot instantiate search bar without container");
+    callback === undefined ? this.callback = {onConfirm: function(){console.log("no callback given")}}: this.callback = callback;
+    this.id = EditableTextField.counter.next();
+    args = applyArgs(args);
+    container.classList.add("editableTextField", "editor-hidden");
+    if(!args.readOnly) {
+        container.classList.add("allow-editing");
+    }
+    this.args = args;
+    this.container = container;
+    this.deltaContent = deltaContent;
+    this.htmlContent = htmlContent;
+    this.domElements = {};
+
+    //deactivate on default
+    if (args.active === true){
+        this.activate();
+    }
+    else {
+        this.deactivate();
+    }
+
+    var self = this;
+
+    return this;
+};
+EditableTextField.counter = {
+    current: 0,
+    next: function(){
+        this.current++;
+        return this.current;
+    }
+};
+
+var applyArgs = function(args){
+    let defaults = {
+        active: false,
+        disableButtons: false,
+        readOnly: false,
+        limit: 0,
+    }
+    args = (args === undefined) ? {}: args;
+    return Object.assign(defaults, args);
+};
+
+var buildHTML = function(self){
+
+    let id = self.id;
+    let buttonContainer = document.createElement("div");
+    buttonContainer.className = "editableTextField-dialog-container";
+    buttonContainer.id= "editableTextField-dialog-container"+id;
+    if (self.args.disableButtons === true) buttonContainer.style.display = "none";
+
+    //add confirm button
+    let confirmButton = document.createElement("div");
+    confirmButton.className = "editableTextField-dialog-button editableTextField-dialog-confirmButton";
+    confirmButton.innerHTML = "&lt;svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-check\">&lt;polyline points=\"20 6 9 17 4 12\">&lt;/polyline>&lt;/svg>"
+
+    //add cancel button
+    let cancelButton = document.createElement("div");
+    cancelButton.className = "editableTextField-dialog-button editableTextField-dialog-cancelButton";
+    cancelButton.innerHTML = "&lt;svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x\">&lt;line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\">&lt;/line>&lt;line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\">&lt;/line>&lt;/svg>"
+
+    buttonContainer.append(confirmButton);
+    buttonContainer.append(cancelButton);
+
+    self.dialogDOM = {
+        container: buttonContainer,
+        confirmButton: confirmButton,
+        cancelButton: cancelButton,
+    }
+
+    return buttonContainer;
+};
+
+var setupEventHandlers = function(self, EditableTextFieldHTML){
+    self.dialogDOM.confirmButton.addEventListener("click", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        self.callback.onConfirm(self);
+        self.deactivate();
+    })
+    self.dialogDOM.cancelButton.addEventListener("click", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        self.deactivate();
+    })
+};
+
+EditableTextField.prototype.isActive = function(){
+    return this.isactive;
+};
+
+EditableTextField.prototype.activate = function(){
+    var self = this;
+    if(self.args.readOnly) return false;
+    self.isactive = true;
+    let container = this.container;
+    container.classList.remove("editor-hidden");
+    container.classList.add("editor-active");
+    let quillcontainer = document.createElement("div");
+    quillcontainer.className = "text-editor"
+    container.innerHTML = "";
+    container.append(quillcontainer);
+
+    var toolbarOptions = [
+        ['bold', 'italic', 'underline'/*, 'strike'*/],        // toggled buttons
+        // ['blockquote', 'code-block'],
+        // ['link', 'image'],
+        [ 'link', 'image', 'video' ],
+
+        // [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        // [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+        // [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+        // [{ 'direction': 'rtl' }],                         // text direction
+
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+
+        ['clean']                                         // remove formatting button
+    ];
+
+    const quill = new Quill(quillcontainer, {
+        theme: 'snow',
+        // theme: 'bubble',
+        modules: {
+            toolbar: toolbarOptions,
+        },
+        bounds: quillcontainer,
+
+    });
+    quill.setContents(this.deltaContent);
+
+    //build dialog buttons
+    var buttons = buildHTML(this);
+    setupEventHandlers(this, buttons);
+
+    //append to container
+    container.append(buttons);
+    self.quill = quill;
+}
+EditableTextField.prototype.deactivate = function(){
+    let self = this;
+    this.isactive = false;
+    this.quill = undefined;
+    //create div
+    let textContainer = document.createElement("div");
+    textContainer.className = "quill-render-text ql-editor";
+    textContainer.insertAdjacentHTML("beforeend", self.htmlContent)
+    self.container.innerHTML = "";
+    self.container.classList.add("editor-hidden");
+    self.container.classList.remove("editor-active");
+    self.container.append(textContainer);
+
+    self.container.addEventListener("click", function(e){
+        e.preventDefault();
+        if(!self.isactive){
+            self.activate();
+        }
+    });
+
+    //preserve link behaviour
+    $(self.container).find("a").on("click", function(e){
+        e.stopPropagation();
+    })
+}
+
+EditableTextField.prototype.getQuill = function() {
+    return this.quill;
+}
+
+EditableTextField.prototype.reset = function(container, deltaContent, htmlContent, callback, args) {
+    let resetObj = this.constructor(container, deltaContent, htmlContent, callback, args);
+    return resetObj;
+};
+
+export {EditableTextField}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ContentHandler.html">ContentHandler</a></li><li><a href="Counter.html">Counter</a></li><li><a href="dateFromNow.html">dateFromNow</a></li><li><a href="Docker.html">Docker</a></li><li><a href="DropdownMenu.html">DropdownMenu</a></li><li><a href="EditableInputField.html">EditableInputField</a></li><li><a href="EditableTextField.html">EditableTextField</a></li><li><a href="Navigation.html">Navigation</a></li><li><a href="ScrollableList.html">ScrollableList</a></li><li><a href="Searchbar.html">Searchbar</a></li><li><a href="Sidebar.html">Sidebar</a></li><li><a href="SidebarButton.html">SidebarButton</a></li><li><a href="SidebarPlugin.html">SidebarPlugin</a></li><li><a href="SidebarTooltip.html">SidebarTooltip</a></li><li><a href="Userlist.html">Userlist</a></li><li><a href="UserProfile.html">UserProfile</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubpageEventHandlers">addSubpageEventHandlers</a></li><li><a href="global.html#checkDataValidity">checkDataValidity</a></li><li><a href="global.html#checkQualificationDataValidity">checkQualificationDataValidity</a></li><li><a href="global.html#createSelectDelimiter">createSelectDelimiter</a></li><li><a href="global.html#disableViewBox">disableViewBox</a></li><li><a href="global.html#findExistingValues">findExistingValues</a></li><li><a href="global.html#getMatchingQualifications">getMatchingQualifications</a></li><li><a href="global.html#populateUserKeys">populateUserKeys</a></li><li><a href="global.html#sortData">sortData</a></li><li><a href="global.html#transformDateTimeString">transformDateTimeString</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Thu Aug 04 2022 11:14:52 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

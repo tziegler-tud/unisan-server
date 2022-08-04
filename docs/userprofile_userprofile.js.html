@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: userprofile/userprofile.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: userprofile/userprofile.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+// data aggregation for all the user-profile linked scripts.
+//obviously, we need to fetch the user. Might reduce data to the one really needed later on by using a dedicated api call.
+
+
+
+/**
+ * Constructor of profile element. Instantiate this for one call of a profile-related request.
+ *
+ * Singleton
+ *
+ * @constructor
+ *
+ */
+
+var UserProfile = function(userId){
+    // find the userid
+    this.currentViewedUser = {};
+    this.currentViewedUser.userId = userId;
+    this.observers = [];
+    /**
+     *
+     * @type {{resolve: resolve, subscribe: (function(): Promise&lt;Object|String>), subscribers: {resolve: [], reject: []}, reject: reject, isActive: boolean}}
+     */
+    this.pendingUserRequest = {
+        isActive: false,
+        subscribers: {
+            resolve: [],
+            reject: [],
+        },
+        subscribe: function(){
+            // allow subscribing to request while it is pending.
+            let res;
+            let rej;
+            let p = new Promise(function(resolve,reject){
+                res = resolve;
+                rej = reject;
+            });
+            this.subscribers.resolve.push(res);
+            this.subscribers.reject.push(rej);
+            return p;
+        },
+        resolve: function(context){
+            this.isActive=false;
+            //push result to all subscribers.
+            this.subscribers.resolve.forEach(function(el){
+                el(context);
+            });
+            this.subscribers.resolve = [];
+            this.subscribers.reject = [];
+        },
+        reject: function(context){
+            this.isActive=false;
+            //push result to all subscribers.
+            this.subscribers.reject.forEach(function(el){
+                el(context);
+            });
+            this.subscribers.resolve = [];
+            this.subscribers.reject = [];
+        },
+    };
+    return this;
+};
+
+
+
+var getUserFromServer = function(self, userId){
+    self.pendingUserRequest.isActive = true;
+    let url = "/api/v1/usermod/" + userId;
+    return new Promise(function(resolve, reject){
+        $.ajax({
+            url: url,
+            type: 'GET',
+            cache: false,
+            isModified: false,
+            data: {},
+            success: function (context) {
+                self.pendingUserRequest.resolve(context);
+                resolve(context);
+            },
+            error: function(context){
+                self.pendingUserRequest.reject(context.status);
+                reject(context);
+            }
+        });
+    })
+};
+
+
+
+var subscribeToPendingRequest = function(self){
+    return new Promise(function(resolve,reject){
+        if(!self.pendingUserRequest) reject("No pending user request.");
+        else {
+
+        }
+    })
+};
+
+/**
+ *
+ * Service function to get the user data. Only one api call is done at a time.
+ *
+ * @params subscribe {Boolean}
+ * @params obj {Object} subscribing object. Must implement an "update" function
+ *
+ * @returns {Promise&lt;Object|String>}
+ */
+UserProfile.prototype.getUser = function(){
+    var self = this;
+    return new Promise(function(resolve, reject){
+        let returnUser = function (user) {
+            self.currentViewedUser.user = user;
+            resolve(self.currentViewedUser.user);
+        };
+        let fail = function (reason) {
+            reject(reason);
+        };
+        if (self.currentViewedUser.user === undefined) {
+          // check if request is already pending
+          if (self.pendingUserRequest.isActive) {
+              self.pendingUserRequest.subscribe()
+                  .then(function(context){
+                      returnUser(context)
+                  })
+                  .catch(function(reason){
+                      fail(reason)
+                  })
+          }
+          else {
+              getUserFromServer(self, self.currentViewedUser.userId)
+                  .then(function(context){
+                      returnUser(context)
+                  })
+                  .catch(function(reason){
+                      fail(reason)
+                  })
+          }
+        }
+        else {
+          resolve(self.currentViewedUser.user)
+        }
+    });
+
+};
+
+/**
+ *
+ * Service function to get the user data. Only one api call is done at a time.
+ * Callee is subscribed as observer to be notified if user data changes
+ *
+ * @params subscribe {Boolean}
+ * @params obj {Object} subscribing object. Must implement a "update" function
+ *
+ * @returns {Promise&lt;Object|String>}
+ */
+
+UserProfile.prototype.getUserAndSubscribe = function(observer){
+    this.observers.push(observer);
+    return this.getUser();
+
+};
+
+UserProfile.prototype.refreshUser = function(){
+    var self = this;
+    return new Promise(function(resolve, reject) {
+        let returnUser = function (user) {
+            self.currentViewedUser.user = user;
+            resolve(self.currentViewedUser.user);
+        };
+        let fail = function (reason) {
+            reject(reason);
+        };
+        getUserFromServer(self, self.currentViewedUser.userId)
+            .then(function (context) {
+                returnUser(context)
+            })
+            .catch(function (reason) {
+                fail(reason)
+            })
+    });
+};
+
+UserProfile.prototype.notifyObservers = function(){
+    let self = this;
+    this.getUser().then(function(user){
+        self.observers.forEach(function(ob){
+            ob.update(user)
+        })}
+    ).catch(function(){
+
+    });
+};
+
+UserProfile.prototype.updateDBKey = function(keyIdentifier, value, args, callback){
+    callback = (callback == null) ? function(){} : callback;
+    var self = this;
+    var data = {
+        key: keyIdentifier,
+        value: value,
+        args: args,
+    };
+    $.ajax({
+        url: "/api/v1/usermod/updateKey/" + self.currentViewedUser.userId,
+        // make put for safety reasons :-)
+        type: 'PUT',
+        contentType: "application/json; charset=UTF-8",
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function(result) {
+            self.refreshUser().then(function(){
+                self.notifyObservers();
+            }).catch(reason => console.error(reason));
+            callback();
+        }
+    });
+};
+
+module.exports = {UserProfile};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ContentHandler.html">ContentHandler</a></li><li><a href="Counter.html">Counter</a></li><li><a href="dateFromNow.html">dateFromNow</a></li><li><a href="Docker.html">Docker</a></li><li><a href="DropdownMenu.html">DropdownMenu</a></li><li><a href="EditableInputField.html">EditableInputField</a></li><li><a href="EditableTextField.html">EditableTextField</a></li><li><a href="Navigation.html">Navigation</a></li><li><a href="ScrollableList.html">ScrollableList</a></li><li><a href="Searchbar.html">Searchbar</a></li><li><a href="Sidebar.html">Sidebar</a></li><li><a href="SidebarButton.html">SidebarButton</a></li><li><a href="SidebarPlugin.html">SidebarPlugin</a></li><li><a href="SidebarTooltip.html">SidebarTooltip</a></li><li><a href="Userlist.html">Userlist</a></li><li><a href="UserProfile.html">UserProfile</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubpageEventHandlers">addSubpageEventHandlers</a></li><li><a href="global.html#checkDataValidity">checkDataValidity</a></li><li><a href="global.html#checkQualificationDataValidity">checkQualificationDataValidity</a></li><li><a href="global.html#createSelectDelimiter">createSelectDelimiter</a></li><li><a href="global.html#disableViewBox">disableViewBox</a></li><li><a href="global.html#findExistingValues">findExistingValues</a></li><li><a href="global.html#getMatchingQualifications">getMatchingQualifications</a></li><li><a href="global.html#populateUserKeys">populateUserKeys</a></li><li><a href="global.html#sortData">sortData</a></li><li><a href="global.html#transformDateTimeString">transformDateTimeString</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Thu Aug 04 2022 11:14:52 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

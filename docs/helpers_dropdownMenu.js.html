@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: helpers/dropdownMenu.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: helpers/dropdownMenu.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Corner, MDCMenu} from '@material/menu';
+import "./dropdownMenu.scss"
+
+/**
+ *
+ * Dropdown menu constructor.
+ *
+ *
+ * @param {String} container Container element housing the mdc domtree. This should be a wrapper of the actual mdc menu
+ * @param {String} [eventType = "click"] type of event to attach to the trigger. Jquery event types valid, e.g. "click", "hover", etc...
+ * @param {String} [triggerSelector= targetSelector] jquery selector for element(s) to register the event handler on.
+ * @param {Object} [args] JSON containing strings to pass as optional args. valid keys are: "classes" - addtionial classes to add to the target when triggered, whitespace seperated.
+ * @returns {DropdownMenu}
+ * @constructor
+ */
+var DropdownMenu = function(container, eventType, triggerSelector, args){
+
+    args = args === undefined ? {} : args;
+    this.args = applyArgs(args);
+    this.containerSelector = container;
+    this.eventType = typeof(eventType) === "undefined" ? "click" : eventType;
+    this.triggerSelector = triggerSelector === undefined ? container : triggerSelector;
+    this.enabled = this.args.enabled;
+
+    this.init();
+
+    return this;
+};
+
+DropdownMenu.prototype.disable = function(){
+    this.enabled = false;
+}
+
+DropdownMenu.prototype.enable = function(){
+    this.enabled = false;
+}
+
+DropdownMenu.prototype.open = function(){
+
+}
+
+var applyArgs = function(args){
+    let defaultArgs = {
+        classes: "",
+        enabled: true,
+        anchorCorner: Corner.BOTTOM_LEFT,
+        fixed: false,
+    }
+    args = (args === undefined) ? {}: args;
+    return Object.assign(defaultArgs, args);
+}
+
+DropdownMenu.prototype.init = function() {
+    let self = this;
+    let container = $(self.containerSelector);
+    let trigger = $(self.triggerSelector);
+
+    self.container = container;
+    self.trigger = trigger;
+
+    //find mdc container
+    let menuElement = $(container).find(".mdc-menu")[0];
+    if(!menuElement) {
+        console.warn("Failed to build DropdownMenu: no root element found. Aborting...");
+        return false;
+    }
+    self.menu = new MDCMenu(menuElement);
+    self.menu.setAnchorCorner(self.args.anchorCorner);
+
+    if(self.args.fixed) {
+        self.menu.setFixedPosition(true);
+    }
+
+    trigger.each(function(){
+        registerEvent(self, self.eventType, trigger);
+    });
+
+};
+
+var registerEvent = function (self, eventType, target) {
+    $(target).on(eventType, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(self.args.classes){
+            $(self.container).toggleClass(self.args.classes);
+        }
+        self.menu.open = true;
+    });
+};
+
+export{DropdownMenu, Corner}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ContentHandler.html">ContentHandler</a></li><li><a href="Counter.html">Counter</a></li><li><a href="dateFromNow.html">dateFromNow</a></li><li><a href="Docker.html">Docker</a></li><li><a href="DropdownMenu.html">DropdownMenu</a></li><li><a href="EditableInputField.html">EditableInputField</a></li><li><a href="EditableTextField.html">EditableTextField</a></li><li><a href="Navigation.html">Navigation</a></li><li><a href="ScrollableList.html">ScrollableList</a></li><li><a href="Searchbar.html">Searchbar</a></li><li><a href="Sidebar.html">Sidebar</a></li><li><a href="SidebarButton.html">SidebarButton</a></li><li><a href="SidebarPlugin.html">SidebarPlugin</a></li><li><a href="SidebarTooltip.html">SidebarTooltip</a></li><li><a href="Userlist.html">Userlist</a></li><li><a href="UserProfile.html">UserProfile</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubpageEventHandlers">addSubpageEventHandlers</a></li><li><a href="global.html#checkDataValidity">checkDataValidity</a></li><li><a href="global.html#checkQualificationDataValidity">checkQualificationDataValidity</a></li><li><a href="global.html#createSelectDelimiter">createSelectDelimiter</a></li><li><a href="global.html#disableViewBox">disableViewBox</a></li><li><a href="global.html#findExistingValues">findExistingValues</a></li><li><a href="global.html#getMatchingQualifications">getMatchingQualifications</a></li><li><a href="global.html#populateUserKeys">populateUserKeys</a></li><li><a href="global.html#sortData">sortData</a></li><li><a href="global.html#transformDateTimeString">transformDateTimeString</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Thu Aug 04 2022 11:14:52 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
