@@ -5,7 +5,7 @@
 github.com/SoulKa
 
 ### front-end docs
-(https://tziegler-tud.github.io/unisan-server/)
+https://tziegler-tud.github.io/unisan-server/
 
 
 ### Purpose
