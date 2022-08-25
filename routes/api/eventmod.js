@@ -173,6 +173,7 @@ router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
 router.get('/userEvents', currentUserEvents);
 router.get('/userEvents/:id', userEvents);
+router.post('/userEvents', userEventsAdvanced);
 router.get('/userPostings', currentUserPostings);
 router.get('/userPostings/:id', userPostings);
 router.post('/upcoming', getUpcoming);
@@ -213,7 +214,7 @@ function currentUserEvents(req, res, next) {
         value: req.user._id,
     }
     let args = {
-        filter: userFilter
+        filter: userFilter,
     }
     eventService.getAllFiltered(args)
         .then(event => {
@@ -223,6 +224,8 @@ function currentUserEvents(req, res, next) {
             next(err)
         });
 }
+
+
 
 function currentUserPostings(req, res, next) {
     let args = {
@@ -261,6 +264,36 @@ function userEvents(req, res, next) {
     }
     eventService.getAllFiltered(userFilter)
         .then(event => event ? res.json(event) : res.sendStatus(404))
+        .catch(err => next(err));
+}
+
+function userEventsAdvanced(req, res, next) {
+    var userid;
+    if (req.body.userid === undefined) {
+        userid = req.user.id;
+    }
+    else userid = req.body.userid;
+
+    let userFilter = {
+        filter: "participants",
+        value: userid,
+        sort: req.body.sort,
+
+    }
+    let amount = req.body.amount ? req.body.amount : undefined;
+    eventService.getAllFiltered(userFilter)
+        .then(event => {
+            if(event) {
+                if (amount !== undefined) {
+                    let res = event.splice(0,amount)
+                }
+                else res = event;
+                res.json(res)
+            }
+            else {
+                res.sendStatus(404)
+            }
+        })
         .catch(err => next(err));
 }
 

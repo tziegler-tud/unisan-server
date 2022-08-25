@@ -1,0 +1,39 @@
+<div class="dashPage-component dashWidget-news">
+    <div class="dashPage-component-inner">
+        <div class="dashPage-component-header"><span>Mein nächstes Event:</span></div>
+        <div class="dashPage-component-item">
+            <div class="dashinfo-item-inner dash-item-eventPreview">
+                <div class="gallery-item viewKey-item cards-item" data-viewkey={{event.id}}>
+                    <div class="inner">
+                        <!--                    <div class="image"><img src="/data/uploads/event_images/{{event.id}}/{{event.id}}.jpg"/></div>-->
+                        <div class="image-overlay"></div>
+                        <div class="item-property title gallery-heading eventcard-heading">
+                            {{{event.title.html}}}
+                            <div class="gallery-heading-inner date">{{{event.type.value}}}</div>
+                            <div class="gallery-heading-inner date">{{{event.dateRangeString}}}</div>
+                        </div>
+                        <div class="gallery-item-actions">
+                            <div class="eventcard-menu-container card-menu-container mdc-menu-surface--anchor">
+                                <button class="eventcard-menu-button card-menu-button mdc-icon-button material-icons">
+                                    <div class="mdc-icon-button__ripple"></div>
+                                    more_vert
+                                </button>
+                                <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
+                                    <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                        <li class="mdc-list-item event-show" role="menuitem" data-eventid="{{event._id}}">
+                                        <span class="mdc-list-item__graphic material-icons">
+                                            info
+                                        </span>
+                                            <span class="mdc-list-item__text">Event anzeigen</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="eventinfo-item-spacer"></div>
+        </div>
+    </div>
+</div>

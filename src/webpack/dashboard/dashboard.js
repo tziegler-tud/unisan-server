@@ -30,6 +30,14 @@ $(document).ready (function () {
     let jsmodule = window.jsmodule;
     if (jsmodule === undefined) jsmodule = {};
 
+
+    let defaultArgs = {
+        allowEdit: false,
+        edit: false,
+    };
+    let args = Object.assign(defaultArgs, jsmodule.args);
+
+
     if(!jsmodule.module === "dashboard") {
         console.error("invalid jsmodule information: Expected 'settings', but found " + jsmodule.module)
         return false;
@@ -39,7 +47,7 @@ $(document).ready (function () {
         //see if corresponding loader is present
         let loader = loaders.find(e => e.title === el);
         if (loader !== undefined) {
-            loader.loader.init();
+            loader.loader.init(args);
         }
     })
 

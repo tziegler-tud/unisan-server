@@ -358,8 +358,13 @@ Sidebar.prototype.addContent = function(type, args){
         }
         else {
             self.currentPage.handler = handler;
-            handler.apply(self, args, type)
-                .then(result => {
+            let handlerResult = handler.apply(self, args, type) //this should return a promise. wrap if not
+            if (handlerResult === undefined) {
+                handlerResult = new Promise(function(resolve, reject) {
+                    resolve()
+                });
+            }
+            handlerResult.then(result => {
                     resolve(result)
                 })
         }
