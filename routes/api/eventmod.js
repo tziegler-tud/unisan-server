@@ -259,7 +259,7 @@ function userPostings(req, res, next) {
 
 function userEvents(req, res, next) {
     let userFilter = {
-        filter: "participants",
+        filter: "participants.user",
         value: req.params.userid,
     }
     eventService.getAllFiltered(userFilter)
@@ -274,21 +274,33 @@ function userEventsAdvanced(req, res, next) {
     }
     else userid = req.body.userid;
 
-    let userFilter = {
-        filter: "participants",
-        value: userid,
-        sort: req.body.sort,
+    let matchString = "";
 
+    let userFilter = {
+        filter: "participants.user",
+        value: userid,
     }
-    let amount = req.body.amount ? req.body.amount : undefined;
-    eventService.getAllFiltered(userFilter)
+
+    let dateFilter = {
+        selector: "gte",
+        date: Date.now(),
+    };
+
+    let args = {
+        filter: userFilter,
+        sort: req.body.sort,
+        dateFilter: dateFilter,
+    }
+    let amount = (req.body.amount !== undefined) ? req.body.amount : undefined;
+    eventService.matchAny(matchString, args)
         .then(event => {
             if(event) {
+                let response;
                 if (amount !== undefined) {
-                    let res = event.splice(0,amount)
+                    response = event.splice(0,amount)
                 }
-                else res = event;
-                res.json(res)
+                else response = event;
+                res.json(response)
             }
             else {
                 res.sendStatus(404)

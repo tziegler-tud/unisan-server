@@ -5,6 +5,7 @@ import {Searchbar} from "../searchbar/searchbar";
 import {dateFromNow} from "../helpers/helpers";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
+
 import "/src/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
 
 let events = {
@@ -18,7 +19,7 @@ let events = {
                 console.log("loading js module: dashboard.events");
 
                 self.view = "both";
-                self.sort = "-date.startDate";
+                self.sort = "date.startDate";
                 self.calendar = null;
                 self.upcomingList = null;
                 self.pastList = null;

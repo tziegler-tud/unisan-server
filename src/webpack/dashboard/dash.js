@@ -8,6 +8,9 @@ import {Observer as lidlObserver} from "../../lib/lidl-modules/observer/lidl-obs
 import {Snackbar} from "../helpers/snackbar";
 import {EventRequest} from "../events/eventRequest";
 
+import "./dash.scss";
+
+
 
 var actions = window.actions;
 

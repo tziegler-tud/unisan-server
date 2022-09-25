@@ -11,18 +11,12 @@
  *
 */
 
-*, ::after, ::before {
+.evoCalendarNamespace *, ::after, ::before {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-html, body {
-    padding: 0;
-    margin: 0;
-}
-body {
-    
-}
-input:focus, textarea:focus, button:focus {
+
+.evoCalendarNamespace input:focus, textarea:focus, button:focus {
     outline: none;
 }
 .evo-calendar {

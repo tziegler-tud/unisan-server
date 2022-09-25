@@ -122,7 +122,7 @@ async function getById(id) {
  * @param args.filter {Object} universal mongodb filter object to be applied to query
  * @param args.dateFilter {Object} Object to set date filtering
  * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
- * @param args.dateFilter.minDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.minDate {Date} start of Date range to filter for. Defaults to current Date
  * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
  * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range", "all"].
  * @returns {Promise<Query|*|number>}

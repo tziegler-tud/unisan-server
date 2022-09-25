@@ -97,7 +97,7 @@ var Component = function(componentId, componentType, data, args){
                 //show next event
                 //get next user event
 
-                let nextEvent = getNextEvent(self.data.user).then(result => {
+                let nextEvent = getNextEvent(self.data.user.id).then(result => {
                     handleData.event = result;
                     templateUrl = "/webpack/dashboard/pageModules/eventPreview.hbs";
                     $.get(templateUrl, function (templateData) {
@@ -171,7 +171,7 @@ var getNextEvent = function (userid){
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(events) {
-                resolve(events)
+                resolve(events[0])
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
