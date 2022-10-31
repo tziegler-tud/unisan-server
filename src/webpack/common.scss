@@ -1,6 +1,8 @@
+@use "animations";
 @import "color-rules";
 @import "variables";
 @import "fonts";
+
 
 $textHoverColor: $col2;
 
@@ -48,6 +50,141 @@ a {
   display: flex;
   flex-flow: row nowrap;
 }
+}
+
+
+.nav-top {
+
+  color:            $page-font-color;
+  width:            100%;
+  flex:             0 0 100%;
+  order:            2;
+  height:           $topnav-height;
+  margin:           0;
+  //box-shadow:       10px 0 5px grey;
+  background-color: $page-bg-color-v2;
+  border-bottom:    1px solid $menu-border-color;
+  position:         relative;
+  z-index:          8;
+
+  font-size:        100%;
+
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-end;
+
+  @media #{$desktop, $tablet-landscape} {
+    order: 1;
+  }
+
+  .nav-element {
+    font-size: 100%;
+    flex: 1 1 auto;
+
+    .nav-element-inner {
+      margin: .5em;
+      //height: calc(100% - 1em);
+
+      .nav-item {
+        display: flex;
+        position: relative;
+
+        .nav-span, .nav-a, .nav-svg {
+          align-self: flex-end;
+          display: inline-block;
+          margin-right: .5em;
+        }
+
+        .nav-svg {
+          height: 1em;
+        }
+
+        &.label-container {
+          font-size: 75%;
+          span {
+            float: left;
+            margin: 0;
+
+            &.acc1 {
+              color: #444;
+            }
+
+            &.acc2 {
+              color: $col1;
+            }
+            &.acc3 {
+              color: #444;
+            }
+          }
+        }
+        &.usermenu-container {
+          width: 100%;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: flex-start;
+
+          .usermenu-label {
+            font-size: 110%;
+            flex: 0 0 auto;
+            border-bottom: 1px solid transparent;
+            &:hover {
+              cursor:         pointer;
+              border-bottom:  1px solid $col2;
+
+              @include transition(200ms);
+            }
+
+            .usermenu-username {
+              display:            inline-block;
+              text-decoration:    none;
+              color:              $col1;
+              font-size:          90%;
+              font-weight:        bold;
+            }
+          }
+          .usermenu-dropdown-button {
+            flex: 0 0 auto;
+          }
+        }
+      }
+    }
+  }
+
+
+  .nav-image {
+    flex: 0 0 30%;
+    height: 100%;
+
+    a {
+      width: 100%;
+      height: 100%;
+      display: block;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    img {
+      float: left;
+      height: 100%;
+    }
+  }
+
+  .right {
+    flex: 1 1 auto;
+  }
+
+  .menu-button {
+
+    width: 70px;
+    height: 100%;
+
+    color: inherit;
+
+    position: absolute;
+    right: 10px;
+  }
 }
 
 #content-wrapper {
@@ -219,6 +356,172 @@ special classes
 /* common styling */
 
 
+.content-link {
+
+  color:              white;
+  background-color:   $link-bg-color;
+  display:            inline-block;
+  padding:            1em 1em;
+  margin:             1em;
+  font-weight:        normal;
+  font-size:          100%;
+
+  @media #{$desktop, $tablet-landscape} {
+  font-size:          100%;
+}
+
+  @include transition(background-color,100ms);
+  a {
+
+    display:        inline-block;
+    color: white;
+
+  }
+
+  svg.icon {
+    width: 1em;
+    margin-right: .5em;
+  }
+
+  &:hover {
+
+
+    background-color: $link-hover-color;
+    cursor:         pointer;
+
+
+    @include transition(background-color,200ms);
+
+  }
+
+  &.slim {
+
+    color:              white;
+    background-color:   $link-bg-color;
+    display:            inline-block;
+    padding:            0.5em 1em;
+    margin:             .5em .5em;
+
+    @include transition(background-color,100ms);
+    a {
+
+      display:        inline-block;
+      color: white;
+
+    }
+    &:hover {
+
+
+      background-color: $link-hover-color;
+      cursor:         pointer;
+      @include transition(background-color,200ms);
+
+    }
+
+    &.light {
+      background-color:   transparent;
+      color:              $akzent-color;
+      border:             1px solid $akzent-color;
+      &:hover {
+        background-color: $link-hover-color-light;
+        cursor:         pointer;
+        @include transition(background-color,200ms);
+      }
+    }
+  }
+
+  &.light {
+    background-color:   transparent;
+    color:              $akzent-color;
+    border:             1px solid $akzent-color;
+    display:            inline-block;
+    padding:            0.5em 1em;
+    margin:             .5em .5em;
+
+
+
+    &.inverse {
+      color: #fff;
+      border-color:    #fff;
+    }
+    &:not(.disable-animation, .slim) {
+      @include animations.sweep-to-right($akzent-color,.5s);
+    }
+  }
+
+  &.style1 {
+    background-color:   $col1;
+    color:              #fff;
+
+    &:hover {
+      background-color: $col3;
+    }
+  }
+
+  &.style2 {
+    background-color:   $col3;
+    color:              #fff;
+
+    &:hover {
+      background-color: $col3_light;
+    }
+  }
+
+  &.float {
+    float: left;
+  }
+}
+
+
+a.inline-link {
+
+  display:            inline-block;
+
+  text-decoration:    none;
+  color:              $col1;
+  font-size:          90%;
+  font-weight:        bold;
+  border-bottom:      1px solid transparent;
+
+  @include transition(200ms);
+
+  &:hover {
+    cursor:         pointer;
+    border-bottom:  1px solid $col2;
+
+    @include transition(200ms);
+  }
+
+
+
+  &.internal {
+
+  }
+
+  &.external {
+
+
+
+
+
+    &::before {
+      display:        inline-block;
+      width:          1em;
+      height:         1em;
+      float:          left;
+      margin-right:   .5ex;
+      margin-left:    .5ex;
+
+      $currentCol_uri: $col2; //svg stroke color
+
+      content: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 127.16653 128.65965"><g stroke="#{$currentCol_uri}" stroke-width="6" fill="none"><path d="m59.144 3.1302h-56.674v123.23h56.497"/><path d="m26.128 63.335h97.102"/><path d="m86.51 99.881 36.37-36.37-36.194-36.193"/></g></svg>');
+
+    }
+  }
+}
+
+
+
 /**
 user display
  */
@@ -287,9 +590,9 @@ user display
       &.toggleButton-checked {
         background-color: #eaeaea !important;
         color: #333 !important;
-        //border-top: 1px solid @col1 !important;
-        //border-right: 1px solid @col1 !important;
-        //border-bottom: 1px solid @col1 !important;
+        //border-top: 1px solid $col1 !important;
+        //border-right: 1px solid $col1 !important;
+        //border-bottom: 1px solid $col1 !important;
       }
     }
   }
@@ -303,7 +606,7 @@ user display
     //    &.ui-checkboxradio-checked {
     //        color: #333;
     //        background-color: #f5f5f5;
-    //        border: 1px solid @col1;
+    //        border: 1px solid $col1;
     //    }
     //}
     svg {
@@ -1048,3 +1351,4 @@ common btn styling
 .relative {
   position: relative;
 }
+

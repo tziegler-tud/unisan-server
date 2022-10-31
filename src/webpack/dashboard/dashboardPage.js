@@ -110,18 +110,27 @@ var Component = function(componentId, componentType, data, args){
                         })
                     });
                 })
-
-
-
-
-
-
-
                 break;
-            case (DashPage.componentTypes.LOCATION):
-                break;
+            case (DashPage.componentTypes.ACTIVITY):
+                //show activity report
 
-            case (DashPage.componentTypes.FILES):
+                let activityReport = getActivityReport(self.data.user.id).then(result => {
+                    handleData.event = result;
+                    templateUrl = "/webpack/dashboard/pageModules/eventPreview.hbs";
+                    $.get(templateUrl, function (templateData) {
+                        template = Handlebars.compile(templateData);
+                        self.container.innerHTML = template(handleData);
+                        let callback = {};
+                        //custom handlers
+                        self.args.handlers.forEach(function(handler){
+                            handler(self);
+                        })
+                    });
+                })
+                break;
+            case (DashPage.componentTypes.NOTIFICATIONS):
+                break;
+            case (DashPage.componentTypes.UPCOMINGEVENTS):
                 break;
             case (DashPage.componentTypes.GENERIC):
                 //Create empty module
@@ -150,6 +159,7 @@ DashPage.componentTypes = {
     NOTIFICATIONS: "2",
     EVENTPREVIEW:  "3",
     UPCOMINGEVENTS:"4",
+    ACTIVITY:      "5",
     GENERIC:       "0",
 };
 
@@ -166,6 +176,33 @@ var getNextEvent = function (userid){
     return new Promise(function(resolve, reject){
         $.ajax({
             url: "/api/v1/eventmod/userEvents",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(events) {
+                resolve(events[0])
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
+                reject(errorThrown)
+            }
+        });
+    })
+}
+
+
+var getActivityReport = function (userid){
+    let self = this;
+    let url;
+    let data = {
+        targetId: userid,
+        logType: "1",
+    }
+    //get user list from server
+    return new Promise(function(resolve, reject){
+        $.ajax({
+            url: "/api/v1/logs/target",
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',

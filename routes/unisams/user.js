@@ -42,6 +42,8 @@ router.get("/view/:username/:url", legacyRedirect);
 router.get("/edit/:username", legacyRedirect);
 router.get("/edit/:username/:url", legacyRedirect);
 
+router.get('/current', currentRedirect);
+router.get('/current/:url', currentRedirect);
 router.get('/:username', profile);
 router.get('/:username/logs', userLogs);
 router.get('/:username/settings', userSettings);
@@ -54,6 +56,12 @@ module.exports = router;
 
 function legacyRedirect(req, res, next) {
     var newPath = baseUrl + "/" + req.params.username;
+    if (req.params.url) newPath = newPath + "/" + req.params.url;
+    res.redirect(newPath);
+}
+
+function currentRedirect(req, res, next) {
+    var newPath = baseUrl + "/" + req.user.username;
     if (req.params.url) newPath = newPath + "/" + req.params.url;
     res.redirect(newPath);
 }
@@ -107,6 +115,7 @@ function addUser(req, res, next) {
         .catch(err =>  next(err))
 
 }
+
 
 function profile(req, res, next) {
     AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.READ)

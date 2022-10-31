@@ -35,6 +35,46 @@ async function getAll() {
 }
 
 /**
+ * @param complexFilterObject {Object[]} array of universal mongodb filters object to be applied to query
+ * @param args {Object}
+ * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
+ *
+ * @returns {Promise<void>}
+ */
+async function getAllFiltered(complexFilterObject, args){
+    let loglist;
+    //we allow complex filtering with this function.
+    complexFilterObject = (complexFilterObject === undefined) ? {} : complexFilterObject;
+    args = (args === undefined) ? {} : args;
+
+    //parse filters to Mongo format
+    let filterArray = [];
+
+    complexFilterObject.forEach(function(filter) {
+        let universalFilter = {};
+        if (filter.filter === undefined || filter.value === undefined) {
+            //invalid, ignore entry
+        }
+        else {
+            universalFilter[filter.filter] = filter.value;
+            filterArray.push(universalFilter);
+        }
+    })
+
+    //apply filter
+    loglist = Event.find().and(filterArray);
+
+    if (args.sort) {
+        loglist = loglist.sort(args.sort);
+    }
+
+    return loglist;
+
+
+
+}
+
+/**
  * Gets a log entry by its id
  * @param {id} id id of the event
  */

@@ -1,6 +1,8 @@
 import {MDCTextField} from '@material/textfield';
 import {Preloader} from "./helpers/preloader";
 
+import "./common.scss";
+
 document.addEventListener("DOMContentLoaded", function(event) {
     console.log("js active, removing noscript fallback");
     document.body.classList.remove("no-js");

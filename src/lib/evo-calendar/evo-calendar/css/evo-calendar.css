@@ -11,7 +11,12 @@
  *
 */
 
-.evoCalendarNamespace *, ::after, ::before {
+.evoCalendarNamespace *  {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.evoCalendarNamespace *::after, .evoCalendarNamespace *::before {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
