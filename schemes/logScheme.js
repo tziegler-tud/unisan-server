@@ -194,7 +194,7 @@ LogSchema.virtual('description').get(function() {
 
             case "userAddQualification":
                 fullDescription.en = "user " + authorizedUser + " added qualification : "  + this.action.value + " to user "+ target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation" + this.action.value + " zu Nutzer " + target + " hinzugefügt";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation " + this.action.value + " zu Nutzer " + target + " hinzugefügt";
 
                 shortDescription.en = authorizedUser + " added " + this.action.value + " to " + target;
                 shortDescription.de = authorizedUser + " hat " + this.action.value + " zu " + target + " hinzugefügt";
@@ -208,7 +208,7 @@ LogSchema.virtual('description').get(function() {
 
             case "userUpdateQualification":
                 fullDescription.en = "user " + authorizedUser + " changed qualification : "  + this.action.value + " of user "+ target +".";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation" + this.action.value + " von Nutzer " + target + " geändert.";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation " + this.action.value + " von Nutzer " + target + " geändert.";
 
                 shortDescription.en = authorizedUser + " changed " + this.action.value + " of " + target;
                 shortDescription.de = authorizedUser + " hat " + this.action.value + " von " + target + " geändert";
@@ -222,7 +222,7 @@ LogSchema.virtual('description').get(function() {
 
             case "userRemoveQualification":
                 fullDescription.en = "user " + authorizedUser + " removed qualification : "  + this.action.value + " of user "+ target +".";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation" + this.action.value + " von Nutzer " + target + " entfernt.";
+                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation " + this.action.value + " von Nutzer " + target + " entfernt.";
 
                 shortDescription.en = authorizedUser + " removed " + this.action.value + " of " + target;
                 shortDescription.de = authorizedUser + " hat " + this.action.value + " von " + target + " entfernt";
@@ -407,7 +407,7 @@ LogSchema.virtual('description').get(function() {
             {
                 let qualificationName = this.action.value;
                 let targetUser = this.action.key;
-                if (authorizedUser === targetUser) {
+                if (authorizedUser !== targetUser) {
                     fullDescription.en = authorizedUser +" has assigned " + targetUser + " to an event posting: " + qualificationName;
                     fullDescription.de = authorizedUser + " hat " + targetUser + " für einen Posten angemeldet: " + qualificationName;
                     shortDescription.en = authorizedUser + " assigned " + targetUser + " as " + qualificationName;
@@ -434,7 +434,7 @@ LogSchema.virtual('description').get(function() {
                 let qualificationName = this.action.value;
                 let targetUser = this.action.key;
 
-                if (authorizedUser === targetUser) {
+                if (authorizedUser !== targetUser) {
                     fullDescription.en = authorizedUser +" has unassigned " + targetUser + " from event posting: " + qualificationName;
                     fullDescription.de = authorizedUser + " hat " + targetUser + " von einem Posten abgemeldet: " + qualificationName;
                     shortDescription.en = authorizedUser + " unassigned " + targetUser + " from " + qualificationName;

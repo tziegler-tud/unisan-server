@@ -1,0 +1,16 @@
+<div class="dashPage-component dashWidget-activity">
+    <div class="dashPage-component-inner">
+        <div class="dashPage-component-header"><span>Benachrichtigungen</span></div>
+        <div class="dashPage-component-item">
+            <div class="dashinfo-item-inner dash-item-activity">
+                {{#each data}}
+                    <div class="dashinfo-activity-entry">
+<!--                        <span>{{this.description.fullDescription.de}}</span>-->
+                        <span>{{this.description.fullDescription.de}}</span>
+                    </div>
+                {{/each}}
+            </div>
+            <div class="eventinfo-item-spacer"></div>
+        </div>
+    </div>
+</div>

@@ -681,6 +681,7 @@ async function addQualification(req, id, qualificationObject,  args) {
     args = Object.assign(defaults, args);
 
     const user = await User.findById(id);
+    const qualification = await Qualifications.findById(qualificationObject.qualification);
 
     // validate
     if (!user) throw new Error('User not found');
@@ -688,11 +689,11 @@ async function addQualification(req, id, qualificationObject,  args) {
     return new Promise(function(resolve, reject) {
         let errHeader = "Failed to add Qualification: ";
         // validate input
-        if (qualificationObject === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
+        if (qualification === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
 
         let ojVal = undefined;
-        let newVal = qualificationObject.qualification.name;
-        let logKey = qualificationObject.qualification.qualType;
+        let newVal = qualification.name;
+        let logKey = qualification.qualType;
 
         //get user qualification array
         let qualArray = user.qualifications;

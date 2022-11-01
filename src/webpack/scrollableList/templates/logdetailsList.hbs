@@ -4,6 +4,7 @@
             <div class="inner">
                 <div class="item-property scrollableList-header-column userlist-ch date" data-property="timestamp">Datum</div>
                 <div class="item-property scrollableList-header-column userlist-ch user" data-property="authorizedUser.generalData.firstName.value">Nutzer</div>
+<!--                <div class="item-property scrollableList-header-column userlist-ch logtype" data-property="logType">logType</div>-->
                 <div class="item-property scrollableList-header-column userlist-ch type" data-property="action.actionDetail">Art</div>
                 <div class="item-property scrollableList-header-column userlist-ch description" data-property="target.targetType">target type</div>
                 <div class="item-property scrollableList-header-column userlist-ch description" data-property="target.title">target object</div>
@@ -24,6 +25,9 @@
                     <div class="item-property item-container authorizedUser">
                         <span class=" item-container-element">{{this.authorizedUser.username}}</span>
                     </div>
+<!--                    <div class="item-property item-container logType">-->
+<!--                        <span class=" item-container-element">{{this.logType}}</span>-->
+<!--                    </div>-->
                     <div class="item-property logType">
                         <span class=" item-container-element">{{this.action.actionDetail}}</span>
                     </div>

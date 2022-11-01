@@ -88,6 +88,10 @@ let dash = {
             {
                 size: "half",
             })
+        dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
+            {
+                size: "full",
+            })
     },
     updatePage: function(user, args){
         this.buildPage(user, args)

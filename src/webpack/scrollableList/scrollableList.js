@@ -128,7 +128,7 @@ var applyType = function(type, self) {
             self.viewUrl = "/unisams/events/view/:id"
             break;
         case "logDetails":
-            url.list = '/static/unisams/js/scrollableList/templates/logdetailsList.hbs'
+            url.list = '/webpack/scrollableList/templates/logdetailsList.hbs'
             break;
     }
     return url;

@@ -115,8 +115,8 @@ var Component = function(componentId, componentType, data, args){
                 //show activity report
 
                 let activityReport = getActivityReport(self.data.user.id).then(result => {
-                    handleData.event = result;
-                    templateUrl = "/webpack/dashboard/pageModules/eventPreview.hbs";
+                    handleData.data = result;
+                    templateUrl = "/webpack/dashboard/pageModules/activity.hbs";
                     $.get(templateUrl, function (templateData) {
                         template = Handlebars.compile(templateData);
                         self.container.innerHTML = template(handleData);
@@ -127,6 +127,10 @@ var Component = function(componentId, componentType, data, args){
                         })
                     });
                 })
+                break;
+            case (DashPage.componentTypes.OPENINGS):
+                //show available postings
+
                 break;
             case (DashPage.componentTypes.NOTIFICATIONS):
                 break;
@@ -160,6 +164,7 @@ DashPage.componentTypes = {
     EVENTPREVIEW:  "3",
     UPCOMINGEVENTS:"4",
     ACTIVITY:      "5",
+    OPENINGS:      "6",
     GENERIC:       "0",
 };
 
@@ -196,19 +201,31 @@ var getActivityReport = function (userid){
     let self = this;
     let url;
     let data = {
-        targetId: userid,
-        logType: "1",
+        filter: [
+            {
+                filter: "logType",
+                value: {"$in": ["activity"]}
+            },
+            {
+                filter: "target.targetObjectId",
+                value: userid,
+            }
+        ],
+        args: {
+            or: true,
+        }
+
     }
     //get user list from server
     return new Promise(function(resolve, reject){
         $.ajax({
-            url: "/api/v1/logs/target",
+            url: "/api/v1/logs/get/filter",
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
             data: JSON.stringify(data),
-            success: function(events) {
-                resolve(events[0])
+            success: function(result) {
+                resolve(result)
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);

@@ -623,7 +623,7 @@ async function addParticipant(req, id, userId, args) {
             }
 
             log = new Log({
-                type: "modification",
+                type: "activity",
                 action: {
                     objectType: "event",
                     actionType: "modify",
@@ -659,7 +659,7 @@ async function addParticipant(req, id, userId, args) {
                 })
         }
         log = new Log({
-            type: "modification",
+            type: "activity",
             action: {
                 objectType: "event",
                 actionType: "modify",
@@ -739,7 +739,7 @@ async function removeParticipant(req, id, userId, args) {
         event.participants.splice(index, 1);
         //create log
         let log = new Log({
-            type: "modification",
+            type: "activity",
             action: {
                 objectType: "event",
                 actionType: "modify",
@@ -877,7 +877,7 @@ async function addFileReference(req, event, filename, filetype, size, args) {
 
             //create log
             let log = new Log({
-                type: "modification",
+                type: "activity",
                 action: {
                     objectType: "event",
                     actionType: "modify",
@@ -961,7 +961,7 @@ async function removeFileReference(req, event, filename, args) {
         .then( event => {
             //create log
             let log = new Log({
-                type: "modification",
+                type: "activity",
                 action: {
                     objectType: "event",
                     actionType: "modify",
@@ -1119,7 +1119,7 @@ async function addPosting (req, eventId, posting, args) {
                 .then(result => {
                     resolve(event);
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
@@ -1216,7 +1216,7 @@ async function updatePosting (req, eventId, postingData, args) {
                 .then(result => {
                     resolve();
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
@@ -1286,7 +1286,7 @@ async function removePosting (req, eventId, postingId) {
                         .then(result => {
                             resolve();
                             let log = new Log({
-                                type: "modification",
+                                type: "activity",
                                 action: {
                                     objectType: "event",
                                     actionType: "modify",
@@ -1426,7 +1426,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
             updatedEvent.save()
                 .then(result => {
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
@@ -1545,7 +1545,7 @@ async function unassignPost (req, eventId, userId, postingId) {
             updatedEvent.save()
                 .then(result => {
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
