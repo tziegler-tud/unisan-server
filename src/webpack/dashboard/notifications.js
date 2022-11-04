@@ -1,105 +1,90 @@
-import { Calendar } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
-import deLocale from '@fullcalendar/core/locales/de';
+import {Sidebar} from "../sidebar/sidebar";
+import {userPlugin} from "../sidebar/plugins/plugin-user";
+import {phone, tablet} from "../helpers/variables";
+import {eventPlugin} from "../sidebar/plugins/plugin-event";
+import {DashPage} from "./dashboardPage";
+import {UserProfile} from "../userprofile/userprofile";
+import {Observer as lidlObserver} from "../../lib/lidl-modules/observer/lidl-observer";
+import {Snackbar} from "../helpers/snackbar";
+import {EventRequest} from "../events/eventRequest";
+import "../helpers/handlebarsHelpers";
+
+import "./dash.scss";
 
 
 let notifications = {
-    init: function () {
+    title: "notifications",
+    pageData: {},
+    init: function (args) {
+        let self  = this;
         $(document).ready(function () {
-
-            var actions = window.actions;
 
             //debug line, remove before flight
             console.log("loading js module: dashboard.notifications");
-            displayCalendar(window.userid, "");
+
+            self.pageData = {};
+            var lidlRTO = window.lidlRTO;
+            var user;
+            var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
+
+            // create new observer
+            var ob1 = new lidlObserver(function (u) {
+                user = u;
+                self.pageData.user = user;
+                self.updatePage(self.pageData.user, args)
+            });
+            window.snackbar = new Snackbar();
+
+            // get user data from user service
+            //subscribe as observer to get notification if user changes on server
+            let userPromise = userProfile.getUserAndSubscribe(ob1);
+
+            window.userProfile = userProfile;
+
+            userPromise.then(user=> {
+                self.pageData.user = user;
+                self.buildPage(self.pageData.user, args);
+            })
+                .catch(function (reason) {
+                    console.error("Failed to retrieve data:" + reason)
+                })
 
         })
+    },
+    buildPage: function(user, args) {
+        let self = this;
+        var lidlRTO = window.lidlRTO;
+
+        var sidebar = new Sidebar('wrapper', {title: "test"});
+        sidebar.addPlugin(userPlugin);
+
+        sidebar.addContent("user", {
+            userid: self.pageData.user.id,
+        });
+        if(phone.matches || tablet.matches) {
+            sidebar.hide();
+        }
+        else {
+            sidebar.show();
+        }
+
+        let pageContainer = document.getElementById("dashPage-component-container");
+        var dashPage = new DashPage({
+            container: pageContainer,
+            sidebar: sidebar,
+            data: {user: user},
+            args: {},
+        });
+        window.dashPage = dashPage;
+
+        dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
+            {
+                size: "full",
+            })
+    },
+    updatePage: function(user, args){
+        this.buildPage(user, args)
     }
 };
-
-function displayCalendar(userid, filter) {
-    var handleData = {};
-    let sort = "date.startDate";
-    let url;
-    let dateFilterObj = {
-        // selector: "gte"
-    }
-    let userFilter = {
-        filter: "participants.user",
-        value: userid
-    }
-    let data = {
-        filter: filter,
-        args: {
-            sort: sort,
-            dateFilter: dateFilterObj,
-            filter: userFilter,
-        }};
-    //get user list from server
-    $.ajax({
-        url: "/api/v1/eventmod/filter",
-        type: 'POST',
-        contentType: "application/json; charset=UTF-8",
-        dataType: 'json',
-        data: JSON.stringify(data),
-        success: function(events) {
-            let args = {
-                height: "full",
-                sorting: {
-                    property: sort,
-                    direction: 1,
-                }
-            }
-            let callback = {
-                listItem: {
-                    onClick: function(e){
-                        let self = e.currentTarget;
-                        e.preventDefault();
-
-                    }
-                }
-            }
-            let calendarEvents = events.map(function(event){
-                return {
-                    id: event.id,
-                    title: event.title.value,
-                    groupId: event.type.value,
-                    start: event.date.startDate,
-                    end: event.date.endDate,
-                }
-
-            })
-            var calendarEl = document.getElementById('calendar');
-            let calendar = new Calendar(calendarEl, {
-                plugins: [ dayGridPlugin, timeGridPlugin, listPlugin ],
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listWeek'
-                },
-                locale: deLocale,
-                eventSources: [
-
-                    // your event source
-                    {
-                        events: calendarEvents,
-                        // color: 'black',     // an option!
-                        // textColor: 'yellow' // an option!
-                    }
-
-                    // any other event sources...
-
-                ]
-            });
-            calendar.render();
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
-        }
-    });
-}
 
 export {notifications}

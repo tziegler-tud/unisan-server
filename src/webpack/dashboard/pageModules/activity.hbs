@@ -1,14 +1,38 @@
 <div class="dashPage-component dashWidget-activity">
     <div class="dashPage-component-inner">
-        <div class="dashPage-component-header"><span>Benachrichtigungen</span></div>
+        <div class="dashPage-component-header"><span>Aktivität</span></div>
         <div class="dashPage-component-item">
             <div class="dashinfo-item-inner dash-item-activity">
-                {{#each data}}
-                    <div class="dashinfo-activity-entry">
-<!--                        <span>{{this.description.fullDescription.de}}</span>-->
-                        <span>{{this.description.fullDescription.de}}</span>
+                {{#if args.limitAmount}}
+                    {{#limitedEach data args.limitAmount}}
+                        {{#stringNotEmpty this.description.fullDescription.template.de}}
+                            <div class="dashinfo-activity-entry">
+                                <div class="dashinfo-activity-body">
+                                    <span>{{HtmlFromTemplate this.description.fullDescription.template.de this.description.variables this}}</span>
+                                </div>
+                                <div class="dashinfo-activity-timestamp">
+                                    {{transformDateTimeString this.timestamp}}
+                                </div>
+                            </div>
+                        {{/stringNotEmpty}}
+                    {{/limitedEach}}
+                    <div class="dashinfo-button-container">
+                        <a href="dashboard/notifications" class="dashinfo-button dashinfo-button--more dashinfo-item-activity--more content-link style3">Mehr anzeigen</a>
                     </div>
-                {{/each}}
+                {{else}}
+                    {{#each data}}
+                        {{#stringNotEmpty this.description.fullDescription.template.de}}
+                            <div class="dashinfo-activity-entry">
+                                <div class="dashinfo-activity-body">
+                                    <span>{{HtmlFromTemplate this.description.fullDescription.template.de this.description.variables this}}</span>
+                                </div>
+                                <div class="dashinfo-activity-timestamp">
+                                    {{transformDateTimeString this.timestamp}}
+                                </div>
+                            </div>
+                        {{/stringNotEmpty}}
+                    {{/each}}
+                {{/if}}
             </div>
             <div class="eventinfo-item-spacer"></div>
         </div>

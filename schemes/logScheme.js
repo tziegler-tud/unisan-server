@@ -91,14 +91,25 @@ var LogSchema = new Schema({
 
 LogSchema.virtual('description').get(function() {
 
-    let fullDescription = {en: "", de: ""},
-        shortDescription = {en: "", de: ""},
+    let fullDescription = {template: {de: "", en: ""},  en: "", de: ""},
+        shortDescription = {template: {de: "", en: ""}, en: "", de: ""},
         actionDescription = {en: "", de: ""};
+
+    let variables = {
+
+    }
 
     let minDescription = "", logType = "";
 
     //try if authorizedUser was populated
     let authorizedUser = (this.authorizedUser.username) ? this.authorizedUser.username : this.authorizedUser;
+    let authorizedUserId = (this.authorizedUser.id) ? this.authorizedUser.id : this.authorizedUser;
+
+    variables.authorizedUser = {
+        type: variableTypes.USER,
+        value: authorizedUser,
+        ref: authorizedUserId,
+    };
 
 
 
@@ -114,32 +125,46 @@ LogSchema.virtual('description').get(function() {
             this.target.targetObject = {id: str + this.target.targetObjectId, username: str +this.target.targetObjectId};
         }
         let target = this.populated("target.targetObject") || deleted  ? this.target.targetObject.username : this.target.targetObject;
-        let optionalApostrophe = "";
+        let optionalApostrophe = "s";
         if (typeof(target.username) === "string"){
             if(target.username.slice(-1) === "s"){
-                optionalApostrophe = "'";
+                optionalApostrophe = "'s";
             }
+        }
+
+
+        variables.target = {
+            type: variableTypes.USER,
+            value: target,
+            ref: this.target.targetObjectId
         }
 
         switch(this.action.actionDetail) {
             case "userCreate":
-                fullDescription.en = "user " + authorizedUser + " created new user: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat einen neuen Nutzer erstellt: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat einen neuen User erstellt: $target";
+                fullDescription.template.en = "$authorizedUser created new user: $target";
+                fullDescription.en = authorizedUser + " created new user: " + target;
+                fullDescription.de = authorizedUser + " hat einen neuen User erstellt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat $target angelegt";
                 shortDescription.en = authorizedUser + " created user: " + target;
                 shortDescription.de = authorizedUser + " hat " + target + " angelegt";
 
                 actionDescription.en = "created user: " + target;
-                actionDescription.de = authorizedUser + "angelegt";
+                actionDescription.de = authorizedUser + " angelegt";
 
                 minDescription = target;
-                logType = "Nutzer angelegt";
+                logType = "User angelegt";
                 break;
             case "userDelete":
                 let username = this.action.originalValue;
-                fullDescription.en = "user " + authorizedUser + " deleted user: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Nutzer entfernt: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat User entfernt: $target";
+                fullDescription.en = authorizedUser + " deleted user: " + target;
+                fullDescription.de = authorizedUser + " hat User entfernt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat $target entfernt";
                 shortDescription.en = authorizedUser + " deleted user: " + target;
                 shortDescription.de = authorizedUser + " hat " + target + " entfernt";
 
@@ -147,10 +172,9 @@ LogSchema.virtual('description').get(function() {
                 actionDescription.de = authorizedUser + "entfernt";
 
                 minDescription = username;
-                logType = "Nutzer entfernt";
+                logType = "User entfernt";
                 break;
             case "userModify":
-
                 let tagText = "";
                 switch(this.action.tag){
                     case "<DELETED>":
@@ -162,14 +186,33 @@ LogSchema.virtual('description').get(function() {
                         break;
                     case "<UPDATE>":
                     default:
-
-
                 }
-                fullDescription.en = "user " + authorizedUser + " changed " + this.action.key + " of user : " + target + " from " + this.action.originalValue + " to " + this.action.value;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat " + this.action.key + " von Nutzer: " + target + " von " + this.action.originalValue + " auf " + this.action.value +" geändert";
+                variables = Object.assign(variables,{
+                    attribute: {
+                        type: variableTypes.ATTRIBUTE,
+                        value: this.action.key,
+                    },
+                    value1: {
+                        type: variableTypes.VALUE,
+                        value: this.action.originalValue,
+                    },
+                    value2: {
+                        type: variableTypes.VALUE,
+                        value: this.action.value,
+                    },
+                    optionalApostrophe: {
+                        type: variableTypes.TEXT,
+                        value: optionalApostrophe
+                    },
+                });
 
+                fullDescription.template.de = "$authorizedUser hat $attribute von Nutzer: $target von $value1 auf $value2 geändert";
+                fullDescription.en = authorizedUser + " changed " + this.action.key + " of user : " + target + " from " + this.action.originalValue + " to " + this.action.value;
+                fullDescription.de = authorizedUser + " hat " + this.action.key + " von Nutzer: " + target + " von " + this.action.originalValue + " auf " + this.action.value +" geändert";
+
+                shortDescription.template.de = "$authorizedUser änderte $target $optionalApostrophe $attribute auf $value2";
                 shortDescription.en = authorizedUser + " changed " + this.action.key + " of " + target + " to " + this.action.value;
-                shortDescription.de = authorizedUser + " änderte " + target + optionalApostrophe + "s " + this.action.key + " auf " + this.action.value;
+                shortDescription.de = authorizedUser + " änderte " + target + optionalApostrophe + this.action.key + " auf " + this.action.value;
 
                 actionDescription.en = "changed " + this.action.key + " from " + this.action.originalValue + " to " + this.action.value;
                 actionDescription.de = this.action.key + " von " + this.action.originalValue + " zu " + this.action.value + " geändert";
@@ -179,11 +222,20 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userImageModify":
-                fullDescription.en = "user " + authorizedUser + " changed profile picture of user : " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat das Profilbild von Nutzer: " + target + " geändert";
+                variables = Object.assign(variables,{
+                    optionalApostrophe: {
+                        type: variableTypes.TEXT,
+                        value: optionalApostrophe
+                    },
+                });
 
+                fullDescription.template.de = "$authorizedUser hat das Profilbild von Nutzer: $target geändert";
+                fullDescription.en = authorizedUser + " changed profile picture of user : " + target;
+                fullDescription.de = authorizedUser + " hat das Profilbild von Nutzer: " + target + " geändert";
+
+                shortDescription.template.de = "$authorizedUser hat $target $optionalApostrophe Profilbild geändert";
                 shortDescription.en = authorizedUser + " changed picture of " + target;
-                shortDescription.de = authorizedUser + " hat " + target + optionalApostrophe + "s Profilbild geändert";
+                shortDescription.de = authorizedUser + " hat " + target + optionalApostrophe + " Profilbild geändert";
 
                 actionDescription.en = "profile picture changed";
                 actionDescription.de = "Profilbild geändert";
@@ -193,9 +245,17 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userAddQualification":
-                fullDescription.en = "user " + authorizedUser + " added qualification : "  + this.action.value + " to user "+ target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation " + this.action.value + " zu Nutzer " + target + " hinzugefügt";
+                variables = Object.assign(variables,{
+                    qualification: {
+                        type: variableTypes.QUALIFICATION,
+                        value: this.action.value,
+                    },
+                });
+                fullDescription.template.de = "$authorizedUser hat Qualifikation $qualification zu $target hinzugefügt";
+                fullDescription.en = authorizedUser + " added qualification : "  + this.action.value + " to user "+ target;
+                fullDescription.de = authorizedUser + " hat Qualifikation " + this.action.value + " zu " + target + " hinzugefügt";
 
+                shortDescription.template.de = "$authorizedUser hat $qualification zu $target hinzugefügt";
                 shortDescription.en = authorizedUser + " added " + this.action.value + " to " + target;
                 shortDescription.de = authorizedUser + " hat " + this.action.value + " zu " + target + " hinzugefügt";
 
@@ -207,9 +267,18 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userUpdateQualification":
-                fullDescription.en = "user " + authorizedUser + " changed qualification : "  + this.action.value + " of user "+ target +".";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation " + this.action.value + " von Nutzer " + target + " geändert.";
+                variables = Object.assign(variables,{
+                    qualification: {
+                        type: variableTypes.QUALIFICATION,
+                        value: this.action.value,
+                    },
+                });
 
+                fullDescription.template.de = "$authorizedUser hat Qualifikation $qualification von User $target geändert.";
+                fullDescription.en = authorizedUser + " changed qualification : "  + this.action.value + " of user "+ target +".";
+                fullDescription.de = authorizedUser + " hat Qualifikation " + this.action.value + " von User " + target + " geändert.";
+
+                shortDescription.template.de = "$authorizedUser hat $qualification von $target geändert";
                 shortDescription.en = authorizedUser + " changed " + this.action.value + " of " + target;
                 shortDescription.de = authorizedUser + " hat " + this.action.value + " von " + target + " geändert";
 
@@ -221,9 +290,18 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userRemoveQualification":
-                fullDescription.en = "user " + authorizedUser + " removed qualification : "  + this.action.value + " of user "+ target +".";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Qualifikation " + this.action.value + " von Nutzer " + target + " entfernt.";
+                variables = Object.assign(variables,{
+                    qualification: {
+                        type: variableTypes.QUALIFICATION,
+                        value: this.action.value,
+                    },
+                });
 
+                fullDescription.template.de = "$authorizedUser hat Qualifikation $qualification von $target entfernt";
+                fullDescription.en = authorizedUser + " removed qualification : "  + this.action.value + " of user "+ target;
+                fullDescription.de = authorizedUser + " hat Qualifikation " + this.action.value + " von " + target + " entfernt";
+
+                shortDescription.template.de = "$authorizedUser hat $qualification von $target entfernt";
                 shortDescription.en = authorizedUser + " removed " + this.action.value + " of " + target;
                 shortDescription.de = authorizedUser + " hat " + this.action.value + " von " + target + " entfernt";
 
@@ -235,9 +313,17 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userGroupAdd":
-                fullDescription.en = "user " + authorizedUser + " added user : " + target +" to group " + this.action.value;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " zur Gruppe " + this.action.value + " hinzugefügt";
+                variables = Object.assign(variables,{
+                    group: {
+                        type: variableTypes.GROUP,
+                        value: this.action.value,
+                    },
+                });
+                fullDescription.template.de = "$authorizedUser hat $target zur Gruppe $group hinzugefügt";
+                fullDescription.en = authorizedUser + " added user : " + target +" to group " + this.action.value;
+                fullDescription.de = authorizedUser + " hat " + target + " zur Gruppe " + this.action.value + " hinzugefügt";
 
+                shortDescription.template.de = "$authorizedUser hat $target zu $group hinzugefügt";
                 shortDescription.en = authorizedUser + " added " + target + " to " + this.action.value;
                 shortDescription.de = authorizedUser + " hat " + target + " zu " + this.action.value + " hinzugefügt";
 
@@ -249,9 +335,17 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userGroupDelete":
-                fullDescription.en = "user " + authorizedUser + " removed user : " + target +" from group " + this.action.value;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat " + target + " von Gruppe " + this.action.value + " entfernt";
+                variables = Object.assign(variables,{
+                    group: {
+                        type: variableTypes.GROUP,
+                        value: this.action.value,
+                    },
+                });
+                fullDescription.template.de = "$authorizedUser hat $target von Gruppe $group entfernt";
+                fullDescription.en = authorizedUser + " removed user : " + target +" from group " + this.action.value;
+                fullDescription.de = authorizedUser + " hat " + target + " von Gruppe " + this.action.value + " entfernt";
 
+                shortDescription.template.de = "$authorizedUser hat $target von $group entfernt";
                 shortDescription.en = authorizedUser + " removed " + target + " from " + this.action.value;
                 shortDescription.de = authorizedUser + " hat " + target + " von " + this.action.value + " entfernt";
 
@@ -263,11 +357,23 @@ LogSchema.virtual('description').get(function() {
                 break;
 
             case "userRoleModify":
-                fullDescription.en = "user " + authorizedUser + " changed role of user : " + target +" to " + this.action.value;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat die Rolle von " + target + " auf " + this.action.value + " geändert";
+                variables = Object.assign(variables,{
+                    role: {
+                        type: variableTypes.GROUP,
+                        value: this.action.value,
+                    },
+                    optionalApostrophe: {
+                        type: variableTypes.TEXT,
+                        value: optionalApostrophe
+                    },
+                });
+                fullDescription.template.de = "$authorizedUser hat die Rolle von $target auf $role geändert";
+                fullDescription.en = authorizedUser + " changed role of user : " + target +" to " + this.action.value;
+                fullDescription.de = authorizedUser + " hat die Rolle von " + target + " auf " + this.action.value + " geändert";
 
+                shortDescription.template.de = "$authorizedUser hat $target $optionalApostrophe Rolle auf $role geändert";
                 shortDescription.en = authorizedUser + " changed role of " + target + " to " + this.action.value;
-                shortDescription.de = authorizedUser + " hat " + target + "'s Rolle auf " + this.action.value + " geändert";
+                shortDescription.de = authorizedUser + " hat " + target + optionalApostrophe + " Rolle auf " + this.action.value + " geändert";
 
                 actionDescription.en = "changed role to " + this.action.value;
                 actionDescription.de = "Rolle geändert auf: " + this.action.value;
@@ -288,11 +394,22 @@ LogSchema.virtual('description').get(function() {
         }
         let target = this.populated("target.targetObject")|| deleted ? this.target.targetObject.title.value : this.target.targetObject;
         let targetUser;
+
+        variables.target = {
+            type: variableTypes.EVENT,
+            value: target,
+            ref: this.target.targetObjectId
+        }
+
+
         switch(this.action.actionDetail) {
             case "eventCreate":
-                fullDescription.en = "user " + authorizedUser + " created new event: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat ein neues Event erstellt: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat ein neues Event erstellt: $target";
+                fullDescription.en = authorizedUser + " created new event: " + target;
+                fullDescription.de = authorizedUser + " hat ein neues Event erstellt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Event $target angelegt";
                 shortDescription.en = authorizedUser + " created Event: " + target;
                 shortDescription.de = authorizedUser + " hat Event '" + target + "' angelegt";
 
@@ -303,9 +420,12 @@ LogSchema.virtual('description').get(function() {
                 logType = "Event angelegt";
                 break;
             case "eventDelete":
-                fullDescription.en = "user " + authorizedUser + " removed event: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat ein Event entfernt: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat ein Event entfernt: $target";
+                fullDescription.en = authorizedUser + " removed event: " + target;
+                fullDescription.de = authorizedUser + " hat ein Event entfernt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Event $target entfernt";
                 shortDescription.en = authorizedUser + " removed event: " + target;
                 shortDescription.de = authorizedUser + " hat Event '" + target + "' entfernt";
 
@@ -316,9 +436,12 @@ LogSchema.virtual('description').get(function() {
                 logType = "Event entfernt";
                 break;
             case "eventModify":
-                fullDescription.en = "user " + authorizedUser + " changed event '" + target + "'";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Event '" + target + "' geändert.";
 
+                fullDescription.template.de = "$authorizedUser hat Event $target geändert";
+                fullDescription.en = authorizedUser + " changed event '" + target + "'";
+                fullDescription.de = authorizedUser + " hat Event '" + target + "' geändert";
+
+                shortDescription.template.de = "$authorizedUser hat $target geändert";
                 shortDescription.en = authorizedUser + " changed '" + target + "'";
                 shortDescription.de = authorizedUser + " hat '" + target + "' geändert";
 
@@ -329,11 +452,21 @@ LogSchema.virtual('description').get(function() {
                 logType = "Event geändert";
                 break;
             case "eventAddParticipant":
-
                 targetUser = this.action.key;
 
+                variables = Object.assign(variables,{
+                    targetUser: {
+                        type: variableTypes.USER,
+                        value: targetUser,
+                        ref: targetUser,
+                    }
+                });
+
+                fullDescription.template.de = "$targetUser nimmt am Event: $target teil";
                 fullDescription.en = targetUser + " registered for event " + target;
-                fullDescription.de = targetUser + " nimmt am Event: " + target +" teil.";
+                fullDescription.de = targetUser + " nimmt am Event: " + target +" teil";
+
+                shortDescription.template.de = "$targetUser nimmt an $target teil";
                 shortDescription.en = targetUser + " registered for event " + target;
                 shortDescription.de = targetUser + " nimmt an " + target + " teil";
 
@@ -345,8 +478,17 @@ LogSchema.virtual('description').get(function() {
                 break;
             case "eventRemoveParticipant":
                 targetUser = this.action.key;
+                variables = Object.assign(variables,{
+                    targetUser: {
+                        type: variableTypes.USER,
+                        value: targetUser
+                    }
+                });
+                fullDescription.template.de = "$targetUser nimmt nicht mehr am Event: $target teil";
                 fullDescription.en = targetUser + " unregistered for event " + target;
                 fullDescription.de = targetUser + " nimmt nicht mehr am Event: " + target +" teil.";
+
+                shortDescription.template.de = "$targetUser nimmt nicht an $target teil";
                 shortDescription.en = targetUser + " unregistered for event " + target;
                 shortDescription.de = targetUser + " nimmt nicht an " + target + " teil";
 
@@ -359,9 +501,22 @@ LogSchema.virtual('description').get(function() {
             case "eventChangeParticipantRole":
                 targetUser = this.action.key;
                 let role = this.action.value;
-                fullDescription.en = "user " + authorizedUser + " changed role of " + targetUser + " to " + role + " for event: " + target ;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Rolle von " + targetUser + " auf " + role + " für Event: " + target + " geändert";
+                variables = Object.assign(variables,{
+                    targetUser: {
+                        type: variableTypes.USER,
+                        value: targetUser,
+                        ref: targetUser,
+                    },
+                    role: {
+                        type: variableTypes.GROUP,
+                        value: role
+                    }
+                });
+                fullDescription.template.de = "$authorizedUser hat Rolle von $targetUser auf $role für Event: $target geändert";
+                fullDescription.en = authorizedUser + " changed role of " + targetUser + " to " + role + " for event: " + target ;
+                fullDescription.de = authorizedUser + " hat Rolle von " + targetUser + " auf " + role + " für Event: " + target + " geändert";
 
+                shortDescription.template.de = "$target: $targetUser ist jetzt $role";
                 shortDescription.en = target + ": role of " + targetUser + " changed to " + role;
                 shortDescription.de = target + ": " + targetUser + " ist jetzt " + role;
 
@@ -374,11 +529,20 @@ LogSchema.virtual('description').get(function() {
             case "eventAddPost":
                 {
                     let qualificationName = this.action.key;
+                    variables = Object.assign(variables,{
+                        qualificationName: {
+                            type: variableTypes.QUALIFICATION,
+                            value: qualificationName,
+                        }
+                    });
 
-                    fullDescription.en = authorizedUser +" has created an event posting: " + qualificationName;
-                    fullDescription.de = authorizedUser + " hat einen Dienstposten hinzugefügt: " + qualificationName;
-                    shortDescription.en = "posting added: " + qualificationName;
-                    shortDescription.de = "Dienstposten hinzugefügt: " + qualificationName;
+                    fullDescription.template.de = "$target: $authorizedUser hat einen Dienstposten hinzugefügt: $qualificationName";
+                    fullDescription.en = target + ": " + authorizedUser +" has created an event posting: " + qualificationName;
+                    fullDescription.de = target + ": " + authorizedUser + " hat einen Dienstposten hinzugefügt: " + qualificationName;
+
+                    shortDescription.template.de = "$target: Dienstposten hinzugefügt: $qualificationName";
+                    shortDescription.en = target + ": posting added: " + qualificationName;
+                    shortDescription.de = target + ": Dienstposten hinzugefügt: " + qualificationName;
 
                     actionDescription.en = "posting added: " + qualificationName;
                     actionDescription.de = "Dienstposten hinzugefügt: " + qualificationName;
@@ -390,11 +554,20 @@ LogSchema.virtual('description').get(function() {
             case "eventRemovePost":
                 {
                     let qualificationName = this.action.key;
+                    variables = Object.assign(variables,{
+                        qualificationName: {
+                            type: variableTypes.QUALIFICATION,
+                            value: qualificationName,
+                        }
+                    });
 
-                    fullDescription.en = authorizedUser +" has removed an event posting: " + qualificationName;
-                    fullDescription.de = authorizedUser + " hat einen Dienstposten entfernt: " + qualificationName;
-                    shortDescription.en = "posting removed: " + qualificationName;
-                    shortDescription.de = "Dienstposten entfernt: " + qualificationName;
+                    fullDescription.template.de = "$target: $authorizedUser hat einen Dienstposten entfernt: $qualificationName";
+                    fullDescription.en = target + ": " + authorizedUser +" has removed an event posting: " + qualificationName;
+                    fullDescription.de = target + ": " + authorizedUser + " hat einen Dienstposten entfernt: " + qualificationName;
+
+                    shortDescription.template.de = "$target: Dienstposten entfernt: $qualificationName";
+                    shortDescription.en = target + ": " + "posting removed: " + qualificationName;
+                    shortDescription.de = target + ": " + "Dienstposten entfernt: " + qualificationName;
 
                     actionDescription.en = "posting removed: " + qualificationName;
                     actionDescription.de = "Dienstposten added: " + qualificationName;
@@ -407,15 +580,33 @@ LogSchema.virtual('description').get(function() {
             {
                 let qualificationName = this.action.value;
                 let targetUser = this.action.key;
+                variables = Object.assign(variables,{
+                    targetUser: {
+                        type: variableTypes.USER,
+                        value: targetUser,
+                        ref: targetUser,
+                    },
+                    qualificationName: {
+                        type: variableTypes.QUALIFICATION,
+                        value: qualificationName,
+                    }
+                });
+
                 if (authorizedUser !== targetUser) {
-                    fullDescription.en = authorizedUser +" has assigned " + targetUser + " to an event posting: " + qualificationName;
-                    fullDescription.de = authorizedUser + " hat " + targetUser + " für einen Posten angemeldet: " + qualificationName;
-                    shortDescription.en = authorizedUser + " assigned " + targetUser + " as " + qualificationName;
-                    shortDescription.de = authorizedUser + " hat " + targetUser + "als " + qualificationName + " angemeldet";
+                    fullDescription.template.de = "$target: $authorizedUser hat $targetUser für einen Posten angemeldet: $qualificationName";
+                    fullDescription.en = target + ": " + authorizedUser +" has assigned " + targetUser + " to an event posting: " + qualificationName;
+                    fullDescription.de = target + ": " + authorizedUser + " hat " + targetUser + " für einen Posten angemeldet: " + qualificationName;
+
+                    shortDescription.template.de = "$target: $authorizedUser hat $targetUser als $qualificationName angemeldet";
+                    shortDescription.en = target + ": " + authorizedUser + " assigned " + targetUser + " as " + qualificationName;
+                    shortDescription.de = target + ": " + authorizedUser + " hat " + targetUser + "als " + qualificationName + " angemeldet";
                 }
                 else {
+                    fullDescription.template.de = "$target: $targetUser hat sich für einen Posten angemeldet: $qualificationName";
                     fullDescription.en = targetUser + " has signed up for an event posting: " + qualificationName;
                     fullDescription.de = targetUser + " hat sich für einen Posten angemeldet: " + qualificationName;
+
+                    shortDescription.template.de = "$target: $targetUser hat sich als $qualificationName angemeldet";
                     shortDescription.en = targetUser + " signed up for " + qualificationName;
                     shortDescription.de = targetUser + "hat sich als " + qualificationName + " angemeldet";
                 }
@@ -433,12 +624,26 @@ LogSchema.virtual('description').get(function() {
             {
                 let qualificationName = this.action.value;
                 let targetUser = this.action.key;
+                variables = Object.assign(variables,{
+                    targetUser: {
+                        type: variableTypes.USER,
+                        value: targetUser,
+                        ref: targetUser,
+                    },
+                    qualificationName: {
+                        type: variableTypes.QUALIFICATION,
+                        value: qualificationName,
+                    }
+                });
 
                 if (authorizedUser !== targetUser) {
-                    fullDescription.en = authorizedUser +" has unassigned " + targetUser + " from event posting: " + qualificationName;
-                    fullDescription.de = authorizedUser + " hat " + targetUser + " von einem Posten abgemeldet: " + qualificationName;
-                    shortDescription.en = authorizedUser + " unassigned " + targetUser + " from " + qualificationName;
-                    shortDescription.de = authorizedUser + " hat " + targetUser + "abgemeldet: " + qualificationName;
+                    fullDescription.template.de = "$target: $authorizedUser hat $targetUser von einem Posten abgemeldet: $qualificationName";
+                    fullDescription.en = target + ": " + authorizedUser +" has unassigned " + targetUser + " from event posting: " + qualificationName;
+                    fullDescription.de = target + ": " + authorizedUser + " hat " + targetUser + " von einem Posten abgemeldet: " + qualificationName;
+
+                    shortDescription.template.de = "$target: $authorizedUser hat $targetUser abgemeldet: $qualificationName";
+                    shortDescription.en = target + ": " + authorizedUser + " unassigned " + targetUser + " from " + qualificationName;
+                    shortDescription.de = target + ": " + authorizedUser + " hat " + targetUser + "abgemeldet: " + qualificationName;
                 }
                 else {
                     fullDescription.en = targetUser + " has signed up for an event posting: " + qualificationName;
@@ -459,9 +664,17 @@ LogSchema.virtual('description').get(function() {
 
             case "eventAddFile":
                 if (!this.action.value) this.action.value = "_filename_not_found";
-                fullDescription.en = "user " + authorizedUser + " added file " + this.action.value + " to event '" + target + "'";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Datei " + this.action.value + " zu Event '" + target + "' hinzugefügt.";
+                variables = Object.assign(variables,{
+                    filename: {
+                        type: variableTypes.QUALIFICATION,
+                        value: this.action.value,
+                    }
+                });
+                fullDescription.template.de = "$authorizedUser hat Datei $filename zu $target hinzugefügt";
+                fullDescription.en = authorizedUser + " added file " + this.action.value + " to event '" + target + "'";
+                fullDescription.de = authorizedUser + " hat Datei " + this.action.value + " zu Event '" + target + "' hinzugefügt.";
 
+                shortDescription.template.de = "$authorizedUser hat eine Datei zu $target hinzufügt";
                 shortDescription.en = authorizedUser + " added file to '" + target + "'";
                 shortDescription.de = authorizedUser + " hat eine Datei zu '" + target + "' hinzufügt";
 
@@ -474,11 +687,19 @@ LogSchema.virtual('description').get(function() {
 
             case "eventRemoveFile":
                 if (!this.action.value) this.action.value = "_filename_not_found";
-                fullDescription.en = "user " + authorizedUser + " removed file " + this.action.value + "from event '" + target + "'";
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Datei " + this.action.value + " von Event '" + target + "' entfernt.";
+                variables = Object.assign(variables,{
+                    filename: {
+                        type: variableTypes.QUALIFICATION,
+                        value: this.action.value,
+                    }
+                });
+                fullDescription.template.de = "$authorizedUser hat Datei $filename von $target entfernt.";
+                fullDescription.en = authorizedUser + " removed file " + this.action.value + "from event '" + target + "'";
+                fullDescription.de = authorizedUser + " hat Datei " + this.action.value + " von Event '" + target + "' entfernt.";
 
+                shortDescription.template.de = "$authorizedUser hat eine Datei von $target entfernt";
                 shortDescription.en = authorizedUser + " removed file from '" + target + "'";
-                shortDescription.de = authorizedUser + " hat eine Datei von'" + target + "' entfernt";
+                shortDescription.de = authorizedUser + " hat eine Datei von '" + target + "' entfernt";
 
                 actionDescription.en = "removed file: " + target;
                 actionDescription.de = "Datei entfernt: " + target;
@@ -503,11 +724,21 @@ LogSchema.virtual('description').get(function() {
         let target = this.populated("target.targetObject") ? this.target.targetObject.title : this.action.key;
         let targetGroup;
         let permission = this.action.value;
+
+        variables.target = {
+            type: variableTypes.GROUP,
+            value: target,
+            ref: this.target.targetObjectId
+        }
+
         switch (this.action.actionDetail) {
             case "groupAdd":
-                fullDescription.en = "user " + authorizedUser + " created new userGroup: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat eine neue Gruppe erstellt: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat eine neue Gruppe erstellt: $target";
+                fullDescription.en = authorizedUser + " created new userGroup: " + target;
+                fullDescription.de = authorizedUser + " hat eine neue Gruppe erstellt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Gruppe $target erstellt";
                 shortDescription.en = authorizedUser + " created userGroup: " + target;
                 shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' erstellt";
 
@@ -518,9 +749,12 @@ LogSchema.virtual('description').get(function() {
                 logType = "Gruppe erstellt";
                 break;
             case "groupRemove":
-                fullDescription.en = "user " + authorizedUser + " removed userGroup: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat eine Gruppe entfernt: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat eine Gruppe entfernt: $target";
+                fullDescription.en = authorizedUser + " removed userGroup: " + target;
+                fullDescription.de = authorizedUser + " hat eine Gruppe entfernt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Gruppe $target entfernt";
                 shortDescription.en = authorizedUser + " removed userGroup: " + target;
                 shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' entfernt";
 
@@ -531,9 +765,12 @@ LogSchema.virtual('description').get(function() {
                 logType = "Gruppe entfernt";
                 break;
             case "groupModify":
-                fullDescription.en = "user " + authorizedUser + " changed userGroup: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat eine Gruppe geändert: " + target;
 
+                fullDescription.template.de = "$authorizedUser hat eine Gruppe geändert: $target";
+                fullDescription.en = authorizedUser + " changed userGroup: " + target;
+                fullDescription.de = authorizedUser + " hat eine Gruppe geändert: " + target;
+
+                shortDescription.de = "$authorizedUser hat Gruppe $target geändert";
                 shortDescription.en = authorizedUser + " changed userGroup: " + target;
                 shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' geändert";
 
@@ -544,9 +781,17 @@ LogSchema.virtual('description').get(function() {
                 logType = "Gruppe geändert";
                 break;
             case "groupAddPermission":
-                fullDescription.en = "user " + authorizedUser + " added permission: " + permission + "to userGroup: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Berechtigung zu Gruppe " + target + " hinzugefügt: " + permission;
+                variables = Object.assign(variables,{
+                    permission: {
+                        type: variableTypes.GROUP,
+                        value: permission,
+                    }
+                });
+                fullDescription.template.de = "$authorizedUser hat eine Berechtigung zu Gruppe $target hinzugefügt: $permission";
+                fullDescription.en = authorizedUser + " added permission: " + permission + "to userGroup: " + target;
+                fullDescription.de = authorizedUser + " hat eine Berechtigung zu Gruppe " + target + " hinzugefügt: " + permission;
 
+                shortDescription.template.de = authorizedUser + " hat Berechtigung'" + permission + "' zu " + target + "hinzugefügt";
                 shortDescription.en = authorizedUser + " added permission: " + permission + " to " + target;
                 shortDescription.de = authorizedUser + " hat Berechtigung'" + permission + "' zu " + target + "hinzugefügt";
 
@@ -557,9 +802,17 @@ LogSchema.virtual('description').get(function() {
                 logType = "Berechtigung hinzugefügt";
                 break;
             case "groupRemovePermission":
-                fullDescription.en = "user " + authorizedUser + " removed permission: " + permission + "to userGroup: " + target;
-                fullDescription.de = "Nutzer " + authorizedUser + " hat Berechtigung von Gruppe " + target + " entfernt: " + permission;
+                variables = Object.assign(variables,{
+                    permission: {
+                        type: variableTypes.GROUP,
+                        value: permission,
+                    }
+                });
+                fullDescription.template.de = "$authorizedUser hat Berechtigung von Gruppe $target entfernt: $permission";
+                fullDescription.en = authorizedUser + " removed permission: " + permission + "to userGroup: " + target;
+                fullDescription.de = authorizedUser + " hat Berechtigung von Gruppe " + target + " entfernt: " + permission;
 
+                shortDescription.template.de = "$authorizedUser hat Berechtigung $permission von $target entfernt";
                 shortDescription.en = authorizedUser + " removed permission: " + permission + " to " + target;
                 shortDescription.de = authorizedUser + " hat Berechtigung'" + permission + "' von " + target + "entfernt";
 
@@ -572,13 +825,12 @@ LogSchema.virtual('description').get(function() {
         }
     }
 
-
-
     let description = {
         fullDescription: fullDescription,
         shortDescription: shortDescription,
         actionDescription: actionDescription,
         min: minDescription,
+        variables: variables,
         logType: logType,
     }
 
@@ -673,3 +925,13 @@ module.exports = mongoose.model('Log', LogSchema);
 //
 // });
 // module.exports = user;
+
+variableTypes = {
+    USER: "USER",
+    EVENT: "EVENT",
+    QUALIFICATION: "QUALIFICATION",
+    GROUP: "GROUP",
+    ATTRIBUTE: "ATTRIBUTE",
+    TEXT: "TEXT",
+    VALUE: "VALUE",
+}

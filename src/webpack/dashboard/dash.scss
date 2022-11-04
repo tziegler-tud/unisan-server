@@ -93,6 +93,17 @@ $item-bg: #fff;
                 }
               }
             }
+            .dashinfo-button-container {
+              display: flex;
+              flex-flow: row nowrap;
+              justify-content: center;
+
+
+              &.dashinfo-button {
+                flex: 0 0 auto;
+              }
+            }
+
             .dashinfo-item-spacer {
               margin-top: 1em;
             }
@@ -349,3 +360,59 @@ $item-bg: #fff;
 /**
 special classes
  */
+
+.dash-item-activity {
+  .dashinfo-activity-entry {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    padding: .4em .5em;
+    cursor: default;
+
+    &:hover {
+      background-color: $text-hover-color-light;
+      @include transition(250ms);
+    }
+
+    .dashinfo-activity-body {
+      flex: 1 1 auto;
+      display: block;
+      color: #777;
+    }
+    .dashinfo-activity-timestamp {
+      flex: 0 1 auto;
+      font-size: 80%;
+      color: #999;
+    }
+
+  }
+}
+
+
+.hb-templater {
+
+  &.hb-templater-link {
+
+  }
+  &.hb-templater--USER {
+    color: #444;
+  }
+  &.hb-templater--EVENT {
+
+  }
+  &.hb-templater--GROUP {
+
+  }
+  &.hb-templater--QUALIFICATION {
+
+  }
+  &.hb-templater--ATTRIBUTE {
+
+  }
+  &.hb-templater--TEXT {
+    font-style: italic;
+  }
+  &.hb-templater--VALUE {
+    font-style: italic;
+  }
+}

@@ -7,6 +7,7 @@ import {UserProfile} from "../userprofile/userprofile";
 import {Observer as lidlObserver} from "../../lib/lidl-modules/observer/lidl-observer";
 import {Snackbar} from "../helpers/snackbar";
 import {EventRequest} from "../events/eventRequest";
+import "../helpers/handlebarsHelpers";
 
 import "./dash.scss";
 
@@ -91,6 +92,7 @@ let dash = {
         dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
             {
                 size: "full",
+                limitAmount: 10,
             })
     },
     updatePage: function(user, args){

@@ -75,9 +75,7 @@ var Component = function(componentId, componentType, data, args){
         var templateUrl ="";
         var template;
         let handleData = data;
-        handleData.args = {
-            allowEdit: self.args.allowEdit,
-        };
+        handleData.args = args;
 
         switch(componentType) {
             case (DashPage.componentTypes.NEWS):

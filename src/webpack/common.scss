@@ -333,6 +333,7 @@ content sections
 special classes
  */
 
+
 .unisams-label {
   span {
     float: left;
@@ -467,6 +468,19 @@ special classes
     }
   }
 
+  &.style3 {
+    background-color:   transparent;
+    color:              #999;
+    border: 1px solid #AAA;
+    padding: 0.4em 0.5em;
+
+    &:hover {
+      background-color: transparent;
+      color: #999;
+
+    }
+  }
+
   &.float {
     float: left;
   }
@@ -499,11 +513,6 @@ a.inline-link {
   }
 
   &.external {
-
-
-
-
-
     &::before {
       display:        inline-block;
       width:          1em;
