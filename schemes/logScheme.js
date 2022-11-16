@@ -122,7 +122,7 @@ LogSchema.virtual('description').get(function() {
         if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
             let str = "<DELETED>";
             deleted = true;
-            this.target.targetObject = {id: str + this.target.targetObjectId, username: str +this.target.targetObjectId};
+            this.target.targetObject = {id: str + this.target.targetObjectId, username: this.action.originalValue ? this.action.originalValue : str +this.target.targetObjectId};
         }
         let target = this.populated("target.targetObject") || deleted  ? this.target.targetObject.username : this.target.targetObject;
         let optionalApostrophe = "s";
@@ -158,7 +158,7 @@ LogSchema.virtual('description').get(function() {
                 logType = "User angelegt";
                 break;
             case "userDelete":
-                let username = this.action.originalValue;
+                variables.target.ref = undefined;
 
                 fullDescription.template.de = "$authorizedUser hat User entfernt: $target";
                 fullDescription.en = authorizedUser + " deleted user: " + target;
@@ -171,7 +171,7 @@ LogSchema.virtual('description').get(function() {
                 actionDescription.en = "delted user: " + target;
                 actionDescription.de = authorizedUser + "entfernt";
 
-                minDescription = username;
+                minDescription = target;
                 logType = "User entfernt";
                 break;
             case "userModify":
@@ -390,7 +390,7 @@ LogSchema.virtual('description').get(function() {
         if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
             let str = "<DELETED>";
             deleted = true;
-            this.target.targetObject = {id: str + this.target.targetObjectId, title: {value: str +this.target.targetObjectId}};
+            this.target.targetObject = {id: str + this.target.targetObjectId, title: {value: this.action.value ? this.action.value : str +this.target.targetObjectId}};
         }
         let target = this.populated("target.targetObject")|| deleted ? this.target.targetObject.title.value : this.target.targetObject;
         let targetUser;
@@ -420,6 +420,8 @@ LogSchema.virtual('description').get(function() {
                 logType = "Event angelegt";
                 break;
             case "eventDelete":
+
+                variables.target.ref = undefined;
 
                 fullDescription.template.de = "$authorizedUser hat ein Event entfernt: $target";
                 fullDescription.en = authorizedUser + " removed event: " + target;
@@ -481,7 +483,8 @@ LogSchema.virtual('description').get(function() {
                 variables = Object.assign(variables,{
                     targetUser: {
                         type: variableTypes.USER,
-                        value: targetUser
+                        value: targetUser,
+                        ref: targetUser,
                     }
                 });
                 fullDescription.template.de = "$targetUser nimmt nicht mehr am Event: $target teil";

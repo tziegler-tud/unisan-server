@@ -1,3 +1,5 @@
+import "./userprofile.scss";
+
 import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
@@ -5,12 +7,25 @@ import {MDCTextFieldIcon} from '@material/textfield/icon';
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
+import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 import {PageSlider as lidlPageSlider} from "/src/lib/lidl-modules/pageSlider/pageSlider";
 
 
 import {userActions} from "../actions/userActions";
 const Handlebars = require("handlebars");
+
+import {
+    Uppload,
+    Local,
+    Camera,
+    URL,
+    xhrUploader,
+    Crop,
+    en,
+
+} from "uppload";
 
 
 $(document).ready (function () {
@@ -125,7 +140,7 @@ function buildPageSlider(container) {
                 //get 4th page
                 $.get('/webpack/user/templates/addUser/addUser-img.hbs', function (data) {
                     var template = Handlebars.compile(data);
-                    let page3 = pageslider.addPage(template());
+                    let page4 = pageslider.addPage(template());
 
                     var args2 = {
                         userid: "",
@@ -155,48 +170,73 @@ function buildPageSlider(container) {
                     });
                     // const icon = new MDCTextFieldIcon(document.querySelector('.mdc-text-field-icon'));
 
-
-                    var token2 = lidlRTO.objectManager.createNewObjectToken();
-                    const dialog02 = new lidl.Dialog(token2, ".imgUpload", 'imageUpload', content2, args2);
-                    lidlRTO.objectManager.addObject(dialog02, token2);
-
-
-                    var manualUploader = new qq.FineUploader({
-                        element: document.getElementById('imgUpload-' + token2),
-                        template: 'qq-template-manual-trigger',
-                        request: {
-                            method: 'POST',
+                    const uploader = new Uppload({
+                        lang: en,
+                        call: ".changeProfilePicture",
+                        defaultService: "local",
+                        uploader: xhrUploader({
                             endpoint: '/api/v1/usermod/tmp/uploadUserImage',
-                            inputName: 'image'
-
-                        },
-                        thumbnails: {
-                            placeholders: {
-                                waitingPath: '/lib/fineUploader/placeholders/waiting-generic.png',
-                                notAvailablePath: '/lib/fineUploader/placeholders/not_available-generic.png'
-                            }
-                        },
-                        autoUpload: false,
-                        debug: true,
-                        multiple: false,
-
-                        callbacks: {
-                            onComplete: function (id, name, responseJSON) {
-                                let tmpkey = responseJSON.tmpkey;
-                                alert(tmpkey);
-                                const items = $(".userProfileImage");
-                                $(items).each(function () {
-                                    const src = '/data/uploads/tmp/' + tmpkey + '.jpg';
-                                    $(this).attr("src", src + "?t=" + new Date().getTime());
-                                });
-                                $("#userimg_tmpkey").val(tmpkey);
-                                dialog02.confirmAndClose();
-                            }
-                        }
+                            fileKeyName: "image",
+                            method: "POST"
+                        })
                     });
-                    qq(document.getElementById("confirmBtn" + token2)).attach("click", function () {
-                        manualUploader.uploadStoredFiles();
+                    uploader.use([new Local(), new Camera(), new URL()]);
+                    uploader.use([
+                        new Crop({
+                            aspectRatio: 1
+                        }),
+                    ]);
+                    uploader.on("upload", function(){
+                        const items = $(".userProfileImage");
+                        let src;
+                        $(items).each(function (img) {
+                            src = $(this).attr("src");
+                            $(this).attr("src", src + "?t=" + new Date().getTime());
+                        });
                     });
+
+
+                    // var token2 = lidlRTO.objectManager.createNewObjectToken();
+                    // const dialog02 = new lidlDialog(token2, ".imgUpload", 'imageUpload', content2, args2);
+                    // lidlRTO.objectManager.addObject(dialog02, token2);
+                    //
+                    //
+                    // var manualUploader = new qq.FineUploader({
+                    //     element: document.getElementById('imgUpload-' + token2),
+                    //     template: 'qq-template-manual-trigger',
+                    //     request: {
+                    //         method: 'POST',
+                    //         endpoint: '/api/v1/usermod/tmp/uploadUserImage',
+                    //         inputName: 'image'
+                    //
+                    //     },
+                    //     thumbnails: {
+                    //         placeholders: {
+                    //             waitingPath: '/lib/fineUploader/placeholders/waiting-generic.png',
+                    //             notAvailablePath: '/lib/fineUploader/placeholders/not_available-generic.png'
+                    //         }
+                    //     },
+                    //     autoUpload: false,
+                    //     debug: true,
+                    //     multiple: false,
+                    //
+                    //     callbacks: {
+                    //         onComplete: function (id, name, responseJSON) {
+                    //             let tmpkey = responseJSON.tmpkey;
+                    //             alert(tmpkey);
+                    //             const items = $(".userProfileImage");
+                    //             $(items).each(function () {
+                    //                 const src = '/data/uploads/tmp/' + tmpkey + '.jpg';
+                    //                 $(this).attr("src", src + "?t=" + new Date().getTime());
+                    //             });
+                    //             $("#userimg_tmpkey").val(tmpkey);
+                    //             dialog02.confirmAndClose();
+                    //         }
+                    //     }
+                    // });
+                    // qq(document.getElementById("confirmBtn" + token2)).attach("click", function () {
+                    //     manualUploader.uploadStoredFiles();
+                    // });
                 });
             });
 

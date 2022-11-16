@@ -194,8 +194,13 @@ var Docker = function(dockerArgs){
         },
         remove: function(id){
             let index = this.subpages.findIndex(e=> e.id === id);
-            this.subpages.splice(index, 1);
-            return id;
+            if(index > -1) {
+                let subpageDomElement = document.getElementById(this.subpages[index].id);
+                subpageDomElement.remove();
+                this.subpages.splice(index, 1);
+                return id;
+            }
+            else return false;
         },
         show: function(id){
             let page = this.findById(id);

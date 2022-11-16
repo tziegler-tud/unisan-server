@@ -41,6 +41,7 @@ async function getAll() {
  * @param args {Object}
  * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
  * @param args.or {Boolean} if set to true, filters will be applied with as OR. False for AND
+ * @param args.limit {Number} limit results to specified number
  *
  * @returns {Promise<void>}
  */
@@ -86,6 +87,9 @@ async function getAllFiltered(complexFilterObject, args){
 
     if (args.sort) {
         loglist = loglist.sort(args.sort);
+    }
+    if(args.limit) {
+        loglist = loglist.limit(args.limit)
     }
 
     return loglist;

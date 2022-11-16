@@ -9,6 +9,8 @@ import {
 
 } from "uppload";
 
+import "./userprofile.scss";
+
 import {UserProfile} from "../userprofile/userprofile";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";

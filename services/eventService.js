@@ -24,6 +24,8 @@ module.exports = {
     create,
     update,
     updateKey,
+    updateTitle,
+    updateDescription,
     matchAny,
     populateParticipants,
     addParticipant,
@@ -80,6 +82,7 @@ async function getUpcoming() {
  */
 async function getAllFiltered(args){
     let defaults = {
+        sort: undefined,
     }
     args = (args === undefined) ? {}: args;
     args = Object.assign(defaults, args);
@@ -300,12 +303,16 @@ async function create(req, eventParam) {
                     );
                 fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
                     if (err) {
-                        throw err;
+                        console.warn("Failed to create directory: " + '/src/data/uploads/event_images/' + event._id.toString());
                     }
                     else {
                         fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', (err) => {
-                            if (err) throw err;
-                            console.log('dummy image copied to new event');
+                            if (err)  {
+                                console.warn("Failed to copy dummy image to event.");
+                            }
+                            else {
+
+                            }
                         });
                     }
                 });
@@ -514,6 +521,105 @@ async function updateKey(req, id, key, value, eventParams) {
     })
 
 }
+
+async function updateTitle(req, id, title) {
+    const event = await Event.findById(id);
+    // validate
+    if (!event) throw new Error('Event not found');
+
+    // validate input
+    if (!title) throw new Error('no value given');
+    let ojVal = event.title.value;
+
+
+    let newTitle = Object.assign(event.title, title)
+    let newVal = newTitle.value;
+    let logKey = "title"
+    let key = "title";
+
+    return new Promise(function(resolve, reject){
+        event.set("title", newTitle, {strict: false} );
+        event.save()
+            .then(event => {
+                // create log
+                resolve(event);
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "event",
+                        actionType: "modify",
+                        actionDetail: "eventModify",
+                        key: logKey,
+                        fullKey: key,
+                        originalValue: ojVal,
+                        value:  newVal,
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "event",
+                        targetObject: event._id,
+                        targetObjectId: event._id,
+                        targetModel: "Event",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            })
+            .catch(err => reject(err));
+    })
+}
+
+
+async function updateDescription(req, id, descriptionObject) {
+    const event = await Event.findById(id);
+    // validate
+    if (!event) throw new Error('Event not found');
+    // validate input
+    if (!descriptionObject) throw new Error('no value given');
+    let ojVal = event.description.longDesc.value ? event.description.longDesc.value : event.description.shortDesc.value;
+    let newDescription = Object.assign(event.description, descriptionObject)
+    let newVal = newDescription.longDesc.value ? newDescription.longDesc.value : newDescription.shortDesc.value;
+    let logKey = "description";
+    let key = "description";
+
+    return new Promise(function(resolve, reject){
+        event.set("description", newDescription, {strict: false});
+        event.save()
+            .then(event => {
+                // create log
+                resolve(event);
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "event",
+                        actionType: "modify",
+                        actionDetail: "eventModify",
+                        key: logKey,
+                        fullKey: key,
+                        originalValue: ojVal,
+                        value:  newVal,
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "event",
+                        targetObject: event._id,
+                        targetObjectId: event._id,
+                        targetModel: "Event",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            })
+            .catch(err => reject(err));
+    })
+}
+
 
 
 async function populateParticipants(id) {
@@ -790,6 +896,7 @@ async function _delete(req, id) {
                     actionDetail: "eventDelete",
                     key: event.id,
                     value: event.title.value,
+                    originalValue: event.title.value,
                     tag: "<DELETE>"
                 },
                 authorizedUser: req.user,

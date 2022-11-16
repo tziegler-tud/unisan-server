@@ -149,7 +149,7 @@ UserSchema.post('save', function(error, doc, next) {
     throw new Error(error);
 });
 
-UserSchema.plugin(autoIncrement.plugin, { model: 'User', field: 'generalData.memberId.value', startAt: 30, incrementBy: 1});
+UserSchema.plugin(autoIncrement.plugin, { model: 'User', field: 'generalData.memberId.value', startAt: 30, incrementBy: 1, unique: false});
 
 UserSchema.set('toJSON', { virtuals: true });
 

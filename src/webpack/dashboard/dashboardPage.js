@@ -112,7 +112,7 @@ var Component = function(componentId, componentType, data, args){
             case (DashPage.componentTypes.ACTIVITY):
                 //show activity report
 
-                let activityReport = getActivityReport(self.data.user.id).then(result => {
+                let activityReport = getActivityReport(self.data.user.id, args.limitAmount).then(result => {
                     handleData.data = result;
                     templateUrl = "/webpack/dashboard/pageModules/activity.hbs";
                     $.get(templateUrl, function (templateData) {
@@ -195,14 +195,14 @@ var getNextEvent = function (userid){
 }
 
 
-var getActivityReport = function (userid){
+var getActivityReport = function (userid, limit){
     let self = this;
     let url;
     let data = {
         filter: [
             {
                 filter: "logType",
-                value: {"$in": ["activity"]}
+                value: {"$in": ["activity", "modification"]}
             },
             {
                 filter: "target.targetObjectId",
@@ -211,6 +211,7 @@ var getActivityReport = function (userid){
         ],
         args: {
             or: true,
+            limit: limit,
         }
 
     }

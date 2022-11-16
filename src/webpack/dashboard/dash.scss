@@ -96,7 +96,9 @@ $item-bg: #fff;
             .dashinfo-button-container {
               display: flex;
               flex-flow: row nowrap;
-              justify-content: center;
+              &.center {
+                justify-content: center;
+              }
 
 
               &.dashinfo-button {

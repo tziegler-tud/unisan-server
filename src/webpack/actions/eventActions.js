@@ -264,6 +264,43 @@ var eventActions = {
 
     },
 
+    saveTitle: function(id, data, callback){
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function(){}
+        var postData = {
+            delta: data.delta,
+            value: data.value,
+        };
+        return $.ajax({
+            url: "/api/v1/eventmod/updateTitle/" +id,
+            type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(postData),
+            success: function(result) {
+                callback.onSuccess(result);
+            }
+        });
+    },
+    saveDescription: function(id, data, callback){
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function(){}
+        var postData = {
+            longDesc: data.longDesc,
+            shortDesc: data.shortDesc,
+        }
+        return $.ajax({
+            url: "/api/v1/eventmod/updateDescription/" +id,
+            type: 'PUT',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(postData),
+            success: function(result) {
+                callback.onSuccess(result);
+            }
+        });
+    },
+
     saveDelta: function(id, delta, callback){
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function(){}

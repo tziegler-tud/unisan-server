@@ -139,6 +139,8 @@ router.delete('/removePost', checkParticipantAccess, removePost);
 //modification. need general or individual editing rights
 router.put('/:id', checkEventEditRights, update);
 router.put('/updateKey/:id', checkEventEditRights, updateKey);
+router.put('/updateTitle/:id', checkEventEditRights, updateTitle);
+router.put('/updateDescription/:id', checkEventEditRights, updateDescription);
 router.delete('/:id', checkEventEditRights, _delete);
 
 /**
@@ -319,6 +321,22 @@ function update(req, res, next) {
 
 function updateKey(req, res, next) {
     eventService.updateKey(req, req.params.id, req.body.key, req.body.value, {})
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => next(err));
+}
+
+function updateTitle(req, res, next) {
+    eventService.updateTitle(req, req.params.id, req.body)
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => next(err));
+}
+
+function updateDescription(req, res, next) {
+    eventService.updateDescription(req, req.params.id, req.body)
         .then(result => {
             res.json(result)
         })

@@ -191,7 +191,8 @@ async function create(req, userParam, args) {
         //create user dir
         fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
             if (err) {
-                throw err;
+                console.error("Failed to create directory: " + '/src/data/uploads/user_images/' + user._id.toString());
+
             }
             else {
                 //check if tmp image exists
@@ -235,8 +236,9 @@ async function create(req, userParam, args) {
                 function copyDummyImage(){
                     // copies the dummy user image to user directory
                     fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
-                        if (err) throw err;
-                        console.log('dummy image copied to new user');
+                        if (err) {
+                            console.warn("Failed to copy dummy user image: '/src/data/user_images/dummy.jpg': File not found.")
+                        }
                     });
                 }
             }
@@ -1402,7 +1404,8 @@ async function _delete(req, id) {
         let deleteUser = User.findByIdAndRemove(id);
         let deleteUserACL = UserACL.deleteOne({user: id});
         Promise.all([deleteUser, deleteUserACL])
-            .then(function (user) {
+            .then(function (resultArray) {
+                let user = resultArray[0];
                 resolve(user);
                 console.log("Deleted user with id: " + user._id);
                 //create log

@@ -118,7 +118,7 @@ let eventDetails = {
 
         function buildPageCommon(user, event, args) {
             // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
-            window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
+            self.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
         }
 
         function buildPageView(user, event, args) {
@@ -251,19 +251,18 @@ let eventDetails = {
 
             let cb = {
                 onConfirm: function(editableInputField){
-                    let delta = editableInputField.getQuill().getText();
-                    let key = "title.value";
-                    eventActions.updateKey(event.id, key, delta, {})
-                    delta = editableInputField.getQuill().getContents();
-                    key = "title.delta";
-                    eventActions.updateKey(event.id, key, delta, {
+                    let data = {
+                        delta: editableInputField.getQuill().getContents(),
+                        value: editableInputField.getQuill().getText(),
+                    }
+                    eventActions.saveTitle(event.id, data, {
                         onSuccess: function(result){
                             editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
                             //update docker nav
                             window.eventProfile.refreshEvent()
                                 .then(function(ev){
                                     event = ev;
-                                    window.DockerElement.subpageHandler.update(eventDockerPageId, "event", event)
+                                    window.DockerElement.subpageHandler.update(self.pageData.eventSubpageId, "event", event)
                                 })
                                 .catch(function(err){
                                     throw new Error(err)

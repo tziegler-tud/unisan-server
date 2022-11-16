@@ -97,11 +97,14 @@ var Component = function(componentId, componentType, data, args){
                     }
                     let callback = {
                         onConfirm: function(editableTextField){
-                            let delta = editableTextField.getQuill().getText();
-                            let key = "description.longDesc.value";
-                            eventActions.updateKey(event.id, key, delta, {})
-                            delta = editableTextField.getQuill().getContents();
-                            eventActions.saveDelta(event.id, delta, {
+                            let data = {
+                                shortDesc: {},
+                                longDesc: {
+                                    value: editableTextField.getQuill().getText(),
+                                    delta: editableTextField.getQuill().getContents(),
+                                }
+                            }
+                            eventActions.saveDescription(event.id, data, {
                                 onSuccess: function(result){
                                     editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
                                 }

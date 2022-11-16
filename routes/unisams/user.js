@@ -167,7 +167,7 @@ function profile(req, res, next) {
                                     res.redirect(newPath);
                                 } else {
                                     //give up
-                                    res.send("user not found");
+                                    next({status:404, message: "User not found"});
                                 }
                             })
                             .catch(err=> next(err));
