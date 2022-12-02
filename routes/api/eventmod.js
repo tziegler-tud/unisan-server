@@ -276,7 +276,9 @@ function userEventsAdvanced(req, res, next) {
     }
     else userid = req.body.userid;
 
-    let matchString = "";
+    if (req.body.args === undefined) req.body.args = {};
+    req.body = Object.assign(req.body.args, req.body);
+    let matchString = req.body.matchString ? req.body.matchString : "";
 
     let userFilter = {
         filter: "participants.user",
@@ -288,8 +290,15 @@ function userEventsAdvanced(req, res, next) {
         date: Date.now(),
     };
 
+    let filterArray = [];
+    let filter = req.body.filter;
+    if (!Array.isArray(filterArray)){
+        filterArray = [filter, userFilter]
+    }
+    else filterArray.push(userFilter);
+
     let args = {
-        filter: userFilter,
+        filter: filterArray,
         sort: req.body.sort,
         dateFilter: dateFilter,
     }

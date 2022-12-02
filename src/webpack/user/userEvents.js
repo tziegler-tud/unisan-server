@@ -9,6 +9,10 @@ import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
 import {DropdownMenu} from "../helpers/dropdownMenu";
+import {actions} from "../actions/actions";
+import {ScrollableList} from "../scrollableList/scrollableList";
+import {dateFromNow} from "../helpers/helpers";
+import {Searchbar} from "../searchbar/searchbar";
 
 $(document).ready (function () {
 
@@ -49,5 +53,88 @@ $(document).ready (function () {
         var addDBKey_sidebar = new Sidebar('wrapper', "test");
         addDBKey_sidebar.addPlugin(userPlugin);
 
+        let container = document.getElementById("eventlist-container");
+        let searchbarContainer = document.getElementById("eventsearch");
+        let scrollableList;
+        let listArgs = {
+            height: "fixed",
+            fixedHeight: "500px",
+            sorting: {
+                property: "date.startDate",
+                direction: 1,
+            }
+        }
+        let listCallback = {
+            listItem: {
+                onClick: function(e){
+                    let self = e.currentTarget;
+                    e.preventDefault();
+                    window.location = "/unisams/events/view/"+self.dataset.id;
+                }
+            }
+        }
+
+        getEvents(user.id, {sort: "date.startDate"})
+            .then(events => {
+                //get event history
+                scrollableList = new ScrollableList(container, "event", events, listArgs, listCallback)
+            })
+
+        let filterDate = dateFromNow({weeks: -4});
+        let searchbar = new Searchbar(searchbarContainer, {
+            onInput: {
+                enabled: true,
+                callback: function(inputValue){
+                    getEvents(user.id, {matchString: inputValue})
+                        .then(events => {
+                            scrollableList = new ScrollableList(container, "event", events, listArgs, listCallback)
+                        })
+                        .catch(err => {
+                            reject(err)
+                        })
+                },
+            },
+        });
+
+    }
+    function getEvents (userid, options){
+        let defaultOptions = {
+            filter: {},
+            matchString: "",
+        }
+        options = Object.assign(defaultOptions, options)
+        let self = this;
+        let url;
+        let dateFilterObj = options.dateFilter;
+        let userFilter = {
+            filter: "participants.user",
+            value: userid
+        }
+        let data = {
+            userid: userid,
+            matchString: options.matchString,
+            filter: options.filter,
+            args: {
+                sort: options.sort,
+                dateFilter: dateFilterObj,
+                filter: userFilter,
+            }};
+        //get user list from server
+        return new Promise(function(resolve, reject){
+            $.ajax({
+                url: "/api/v1/eventmod/userevents/",
+                type: 'POST',
+                contentType: "application/json; charset=UTF-8",
+                dataType: 'json',
+                data: JSON.stringify(data),
+                success: function(events) {
+                    resolve(events)
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
+                    reject(errorThrown)
+                }
+            });
+        })
     }
 });

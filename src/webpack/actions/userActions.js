@@ -120,6 +120,27 @@ var userActions = {
         });
     },
 
+    updateCurrentUserPassword: function (userid, currentPassword, newPassword, args, callback) {
+        callback = (callback == null) ? function () {
+        } : callback;
+        var data = {
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+            args: args,
+        };
+        return $.ajax({
+            url: "/api/v1/usermod/updateCurrentUserPassword/",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                callback(result)
+            }
+        });
+    },
+
     insertDBKey: function (userid, keyIdentifier, value, args, callback) {
         callback = (callback == null) ? function () {
         } : callback;

@@ -140,6 +140,7 @@ var ContentHandler = function(type, handlerFunction, handlerArgs) {
     this.type = type;
     this.fn = handlerFunction;
     this.inputs = [];
+    this.validators = [];
     if (handlerArgs === undefined) handlerArgs = {};
     let defaultArgs = {
         callback: {
@@ -191,17 +192,48 @@ var ContentHandler = function(type, handlerFunction, handlerArgs) {
                     }
                 })
             },
-        }
+        },
+        validators: [],
     }
+
+
     this.args = Object.assign(defaultArgs, handlerArgs);
     this.apply = function(sidebar, args, type){
-           return this.fn(sidebar, args, type);
+           return this.fn(sidebar, args, type, this);
     }
     this.save = function(){
         return this.args.callback.onSave();
     }
     this.load = function(handlerContent){
         return this.args.callback.onLoad(handlerContent);
+    }
+    this.removeCustomValidators = function(){
+        this.validators = [];
+    }
+    this.addCustomValidator = function(func, callback) {
+        this.validators.push({function: func, callback: callback});
+    }
+    this.validate = function(){
+        var valid = true;
+        this.validators.forEach(function(validator){
+            //execute validator function
+            try {
+                let result = validator.function()
+                if(typeof(result)==="boolean") result = {state: result, reason: "failed"}
+                if(result.state) {
+                    validator.callback.onSuccess()
+                }
+                else {
+                    validator.callback.onFailure(result.reason);
+                    valid = false;
+                }
+            }
+            catch(e) {
+                console.error("callback error: " + e)
+                return false;
+            }
+        })
+        return valid;
     }
     return this;
 }
@@ -216,7 +248,6 @@ Sidebar.prototype.addPlugin = function(sidebarPlugin){
     sidebarPlugin.handlers.forEach(function(handler){
         sidebar.addContentHandler(handler);
     })
-
 }
 
 /**

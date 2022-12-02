@@ -27,7 +27,7 @@ let ScrollableListCounter = {
  * @param {Object} args constructor args
  * @param [args.enableMobile = false] {Boolean} true to render mobile version.
  * @param [args.view = "list"] {String} choose between "list" and "cards" view
- * @param [args.height = "fixed"] {String} limits container dimensions. Options: "full": expand to fill parent container, "fixed": fixed height, use fixedHeight parameter to set a value
+ * @param [args.height = "fixed"] {String} limits container dimensions. Options: "full": expand to fill parent container, "fixed": fixed height, use fixedHeight parameter to set a value, "force-fixed": like fixed, but does not collapse
  * @param [args.fixedHeight = "40em"] {String} css-parseable value. Requires "height" parameter to be set to "fixed".
  * @param args.sorting {Object} sorting object
  * @param args.sorting.property {String} property to be sorted
@@ -238,13 +238,15 @@ ScrollableList.prototype.adjustList = function() {
     let row = self.container.getElementsByClassName("scrollableList-top")[0];
     let listContent = self.container.getElementsByClassName("scrollableList-content")[0];
 
-    let height = "40em"; //fallback
+    let maxHeight = "40em"; //fallback
+    let height = "auto";
     let marginBottom = 20;
 
     let heightSetting = self.args.height;
     if(phone.matches) {
         heightSetting = "mobile";
-        height = "unset";
+        maxHeight = "unset";
+        height = "auto";
     }
 
     if(heightSetting === "full"){
@@ -264,10 +266,15 @@ ScrollableList.prototype.adjustList = function() {
         })
 
         //calc remaining height in px  5px offset to compensate borders
-        height = vh - (topBarHeight + contentHeight + spacerHeight + row.clientHeight + marginBottom +5) + "px";
+        maxHeight = vh - (topBarHeight + contentHeight + spacerHeight + row.clientHeight + marginBottom +5) + "px";
     }
     if (heightSetting === "fixed") {
         //use fixedHeight param
+        maxHeight = self.args.fixedHeight;
+        height = "auto";
+    }
+    if(heightSetting === "force-fixed") {
+        maxHeight = self.args.fixedHeight;
         height = self.args.fixedHeight;
     }
     $(self.container).css({
@@ -275,9 +282,11 @@ ScrollableList.prototype.adjustList = function() {
     })
     //set element height
     $(listContent).css({
-        "max-height": height,
+        "max-height": maxHeight,
+        "height": height,
         "overflow": "auto",
     });
+
     //wait for changes to apply
     let p = new Promise(function(resolve, reject) {
         setTimeout(resolve,200);
