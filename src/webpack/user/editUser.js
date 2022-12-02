@@ -9,6 +9,8 @@ import {
 
 } from "uppload";
 
+import "./userprofile.scss";
+
 import {UserProfile} from "../userprofile/userprofile";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
@@ -283,6 +285,7 @@ $(document).ready (function () {
                     combinedKey: self.dataset.combinedkey,
                     value: self.dataset.value,
                     isCustomEntry: self.dataset.iscustomentry,
+                    isRemoveable: self.dataset.removeable,
                     callback: {
                         onConfirm: function (userid, key, value) {
                             var args = {

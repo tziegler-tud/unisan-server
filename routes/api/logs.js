@@ -4,6 +4,8 @@ const passport = require('passport');
 var router = express.Router();
 const bodyParser = require("body-parser");
 const logService = require("../../services/logService");
+const authService = require("../../services/authService");
+const userService = require("../../services/userService");
 
 var app = express();
 
@@ -12,9 +14,12 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+//hooked at /api/v1/logs
+
 // routes
 router.get('/get', getAll);
 router.post('/get/target', getTargetLogs);
+router.post('/get/filter', getFilteredLogs);
 router.get('/get/:id', getById);
 router.delete("/all", _deleteAll);
 router.delete("/:id", _delete);
@@ -46,6 +51,15 @@ function getTargetLogs(req, res, next){
         .catch(function(err){
             next(err);
         })
+}
+
+function getFilteredLogs(req, res, next){
+    if (req.body.filter === undefined) req.body.filter = "";
+    logService.getAllFiltered(req.body.filter, req.body.args)
+        .then(function(resultlist) {
+            res.json(resultlist);
+        })
+        .catch(err => next(err));
 }
 
 function _delete(req, res, next) {

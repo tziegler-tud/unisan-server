@@ -8,6 +8,8 @@
 @use "@material/textfield/helper-text";
 @use "@material/textfield/icon";
 
+@import "uppload/dist/uppload.css";
+@import "uppload/dist/themes/light.css";
 
 @import "../variables";
 
@@ -29,4 +31,20 @@
 
 .submit-button {
   @include button.container-fill-color(#c31d34);
+}
+
+.addUser-img {
+  max-width: 10em;
+  img {
+    width: 100%;
+    border-radius: 50%;
+  }
+}
+
+#userimg_tmpkey {
+  display: none;
+}
+
+.form-item {
+  margin-bottom: 1.5em;
 }

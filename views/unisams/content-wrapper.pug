@@ -2,18 +2,34 @@
     #nav-top.nav-top.nav-collapsing.nav-big.nav-active.desktop
         #nav-label.nav-element.label
             .nav-element-inner
-                span.acc1 uni
-                span.acc2 Sams
-                span.acc3 |  alpha v0.1r
-        #nav-right.nav-element.right
+                #unisams-label.nav-item.label-container
+                    span.nav-span.acc1 uni
+                    span.nav-span.acc2 Sams
+                    span.nav-span.acc3 |  alpha v0.1r
+                    div.clear
+        #nav-mid.nav-element.mid
             .nav-element-inner
-                #changeLang.nav-item
-                #userinfo.nav-item
-                    svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user") <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                #userinfo.nav-item.usermenu-container
+                    if user
+                        #topNav-dropdown.usermenu-dropdown.dropdown-menu.mdc-menu-surface--anchor
+                            .usermenu-label.dropdown-btn.topNav-dropdown-trigger
+                                svg.nav-svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user") <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                                a#username.nav-a.usermenu-username= user.username
+                                svg.nav-svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down") <polyline points="6 9 12 15 18 9"></polyline></svg>
 
-                    if locals.user
-                        a#username.inline-link(href="/unisams/user/view/"+user.username)= user.username
+                            .mdc-menu.mdc-dropdown-menu.mdc-menu-surface
+                                ul.mdc-list.mdc-list--icon-list.mdc-list--dense(role='menu', aria-hidden='true', aria-orientation='vertical', tabindex='-1')
+                                    li.mdc-list-item.navTop-dropdown--user(role='menuitem')
+                                        span.mdc-list-item__ripple
+                                        span.mdc-list-item__graphic.material-icons contact_page
+                                        span.mdc-list-item__text Meine Akte
+                                    li.mdc-list-item.menu-entry-delete.navTop-dropdown--logout(role='menuitem')
+                                        span.mdc-list-item__ripple
+                                        span.mdc-list-item__graphic.material-icons logout
+                                        span.mdc-list-item__text Logout
                     else
-                        a#username.inline-link login
-                    div#logout
+                        .usermenu-label
+                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user") <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                            a#username.inline-link login
+        #nav-right.nav-element.right
     block content

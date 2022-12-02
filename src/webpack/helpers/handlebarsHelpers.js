@@ -125,6 +125,60 @@ Handlebars.registerHelper('or', function (v1, v2, options) {
     return options.inverse(this);
 });
 
+Handlebars.registerHelper('HtmlFromTemplate', function (template, vars, log, options) {
+    //find vars
+    let htmlString = template;
+    if(vars === undefined){
+        vars = {};
+    }
+    Object.keys(vars).forEach(function(key){
+        let name = key;
+        let type = vars[key].type;
+        let value = vars[key].value;
+        let ref = vars[key].ref;
+        //find name with $-prefix
+        let htmlSnippet = "";
+        if(ref){
+            htmlSnippet = "<a href='"+ createRef(ref, type) + "' class='inline-link hb-templater hb-templater-link hb-templater--"+type + "' " + addRef(ref) + ">"+ value + "</a>";
+        }
+        else  htmlSnippet = "<span class='hb-templater hb-templater--"+type + "'> " + value + "</span>";
+        let regex = new RegExp("\\$" + name + "\\b", "g");
+        htmlString = htmlString.replace(regex, htmlSnippet);
+    })
+    function addRef(ref){
+        if(ref) {
+            return "data-ref='" + ref + "'";
+        }
+        else return "";
+    }
+    function createRef(ref, type){
+        if(!ref) return "";
+        let refUrl = "";
+        switch(type){
+            case "USER":
+                refUrl = "/unisams/user/" + ref;
+                break;
+            case "EVENT":
+                refUrl = "/unisams/events/" + ref;
+                break;
+            case "GROUP":
+            default:
+                break;
+        }
+        return refUrl;
+    }
+    return new Handlebars.SafeString(htmlString);
+});
+
+Handlebars.registerHelper("limitedEach", function(context, limit, options) {
+    var ret = "";
+    var limitIndex = Math.min(context.length, limit);
+    for (var i = 0, j = limitIndex; i < j; i++) {
+        ret = ret + options.fn(context[i]);
+    }
+
+    return ret;
+});
 
 
 // Legacy dateTime transformer for comparison, in case anything goes wrong

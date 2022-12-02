@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const db = require('../schemes/mongo');
+const mongoose = require('mongoose');
 const log = require('../utils/log');
 const AuthService = require('./authService');
 
@@ -16,6 +17,7 @@ module.exports = {
     delete: _delete,
     deleteAll: _deleteAll,
     getTargetLogs,
+    getAllFiltered,
     getTargetLogsById,
     addModelUser,
 };
@@ -32,6 +34,68 @@ async function getAll() {
         path: 'authorizedUser',
         select: 'generalData username',
     }).sort({"timestamp": -1});
+}
+
+/**
+ * @param complexFilterObject {Object[]} array of universal mongodb filters object to be applied to query
+ * @param args {Object}
+ * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
+ * @param args.or {Boolean} if set to true, filters will be applied with as OR. False for AND
+ * @param args.limit {Number} limit results to specified number
+ *
+ * @returns {Promise<void>}
+ */
+async function getAllFiltered(complexFilterObject, args){
+    let loglist;
+    //we allow complex filtering with this function.
+    complexFilterObject = (complexFilterObject === undefined) ? {} : complexFilterObject;
+    args = (args === undefined) ? {} : args;
+    let defaultArgs = {
+        sort: {"timestamp": -1},
+        or: false,
+    }
+    args = Object.assign(defaultArgs, args);
+
+    //parse filters to Mongo format
+    let filterArray = [];
+
+    complexFilterObject.forEach(function(filter) {
+        let universalFilter = {};
+        if (filter.filter === undefined || filter.value === undefined) {
+            //invalid, ignore entry
+        }
+        else {
+            universalFilter[filter.filter] = filter.value;
+            filterArray.push(universalFilter);
+        }
+    })
+
+    //apply filter
+    if(args.or) {
+        loglist = dbLog.find().or(filterArray).populate({
+            path: 'authorizedUser',
+            select: 'generalData username',
+        });
+    }
+    else {
+        loglist = dbLog.find().and(filterArray).populate({
+            path: 'authorizedUser',
+            select: 'generalData username',
+        });
+    }
+
+
+    if (args.sort) {
+        loglist = loglist.sort(args.sort);
+    }
+    if(args.limit) {
+        loglist = loglist.limit(args.limit)
+    }
+
+    return loglist;
+
+
+
 }
 
 /**
@@ -95,6 +159,7 @@ async function getTargetLogs(target, logType){
  * @returns {Promise<void>}
  */
 async function getTargetLogsById(targetId, logType){
+    let id = mongoose.Types.ObjectId(targetId);
 
     if (logType === undefined || logType === "ALL"){
         return dbLog.find({"target.targetObject": targetId}).populate({
@@ -105,13 +170,29 @@ async function getTargetLogsById(targetId, logType){
             select: "username"
         }).sort({"timestamp": -1});
     }
-    return dbLog.find({logType: logType, "target.targetObject": targetId}).populate({
-        path: 'authorizedUser',
-        select: 'generalData username',
-    }).populate({
-        path: 'target.targetObject',
-        select: "username"
-    }).sort({"timestamp": -1});
+    else {
+        let filter = {};
+        if (Array.isArray(logType)){
+            filter = {
+                logType: logType,
+                "target.targetObject": {$in: logType}
+            }
+        }
+        else {
+            filter = {
+                logType: logType,
+                "target.targetObject": id
+            }
+        }
+        return dbLog.find({logType: logType, "target.targetObject": id}).populate({
+            path: 'authorizedUser',
+            select: 'generalData username',
+        }).populate({
+            path: 'target.targetObject',
+            select: "username"
+        }).sort({"timestamp": -1});
+    }
+
 }
 
 async function getEventLogs(event, type){

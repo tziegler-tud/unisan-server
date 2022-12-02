@@ -1,0 +1,39 @@
+@use "hover.css/scss/hover.scss";
+
+/**
+animations from hover.css
+ */
+
+/* Sweep To Right */
+@mixin sweep-to-right($activeColor, $mediumDuration) {
+  @include hover.hacks();
+  position: relative;
+  @include hover.prefixed(transition-property, color);
+  @include hover.prefixed(transition-duration, $mediumDuration);
+
+  &:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: $activeColor;
+    @include hover.prefixed(transform, scaleX(0));
+    @include hover.prefixed(transform-origin, 0 50%);
+    @include hover.prefixed(transition-property, transform);
+    @include hover.prefixed(transition-duration, $mediumDuration);
+    @include hover.prefixed(transition-timing-function, ease-out);
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: white;
+
+    &:before {
+      @include hover.prefixed(transform, scaleX(1));
+    }
+  }
+}

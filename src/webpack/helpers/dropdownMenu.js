@@ -39,6 +39,26 @@ DropdownMenu.prototype.open = function(){
 
 }
 
+DropdownMenu.prototype.addHandler = function(selector, func, funcArgs){
+    let self = this;
+    let errMsg = "Failed to add Handler to dropdown menu: ";
+    //selector is an id or class name
+    if (selector === undefined) {
+        console.warn(errMsg + "selector is undefined");
+        return false;
+    }
+    let target = $(this.container).find(selector);
+    if (target === undefined) {
+        console.warn(errMsg + "selector returned undefined.");
+        return false;
+    }
+    //target found
+    target.on("click", function(){
+        func(funcArgs, self);
+    })
+    return true;
+}
+
 var applyArgs = function(args){
     let defaultArgs = {
         classes: "",

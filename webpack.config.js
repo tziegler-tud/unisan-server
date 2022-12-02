@@ -53,6 +53,8 @@ module.exports = {
 
         protocolEditor: "./src/webpack/apps/protocol/protocol-editor.js",
         protocolEditor_style: "./src/webpack/apps/protocol/protocol-editor.scss",
+
+        user: "./src/webpack/userpage/user.js",
     },
     output: {
         path: path.join(__dirname, "./src/dist"),

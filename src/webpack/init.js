@@ -1,3 +1,5 @@
+import "./common.scss";
+
 import {Docker} from "./docker/docker"
 import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
 import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer"
@@ -5,6 +7,10 @@ import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
 import {Snackbar} from "./helpers/snackbar";
 import {UserProfile} from "./userprofile/userprofile";
 import {Preloader} from "./helpers/preloader";
+import {DropdownMenu} from "./helpers/dropdownMenu";
+
+
+
 var lidlRTO = window.lidlRTO;
 
 const Handlebars = require("handlebars");
@@ -95,6 +101,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
             adjustWrapper();
         })
         .catch(err => console.log(err));
+
+    //initalize top-nav dropdown
+    const navDrop = new DropdownMenu("#topNav-dropdown", "click", ".topNav-dropdown-trigger", {});
+    navDrop.addHandler(".navTop-dropdown--user", function(){
+        window.location = "/unisams/user/current";
+    }, {});
+    navDrop.addHandler(".navTop-dropdown--logout", function(){
+        window.location = "/unisams/logout";
+    }, {});
 });
 
 window.lidlRTO = lidlRTO;

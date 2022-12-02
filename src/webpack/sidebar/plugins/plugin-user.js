@@ -1,8 +1,11 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
+import "../sidebar-user.scss";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getDataFromServer, stringToBoolean} from "../../helpers/helpers";
+import {MDCTextField} from "@material/textfield";
+import {MDCTextFieldHelperText} from "@material/textfield/helper-text";
 
 let userPlugin = new SidebarPlugin("user");
 
@@ -339,6 +342,7 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
         var subKey = args.subKey;
         var value = args.value;
         var isCustomEntry = args.isCustomEntry;
+        var isRemoveable = args.isRemoveable;
         var onConfirm = args.callback.onConfirm;
         var onDelete = args.callback.onDelete;
 
@@ -402,7 +406,6 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                     {
                         customHandler: true,
                         handler: function () {
-
                             // delete array entry
                             data = {
                                 title: key
@@ -410,7 +413,8 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                             if (corrupted) {
                             }
                             onDelete(args.userid, key, data);
-                        }
+                        },
+                        enabled: isRemoveable,
                     });
 
                 q.addEventListener("change", function(e){
@@ -879,7 +883,111 @@ let changeRole = new ContentHandler("UserChangeRole",
             });
         };
     });
+let changeUserPassword = new ContentHandler("UserChangePassword",
+    function(sidebar, args, type, contentHandler) {
+        var userId = args.userid;
+        var onConfirm = args.callback.onConfirm;
+        var corrupted = false;
 
+        var res = {};
+
+        getDataFromServer("/api/v1/usermod/"+ userId,function(context){
+            res.exploreUser = context;
+            action(res)
+        });
+
+        var action = function(context) {
+            $.get('/webpack/sidebar/templates/user/sidebar-updateUserPassword.hbs', function (data) {
+
+                var template = Handlebars.compile(data);
+                sidebar.sidebarHTML.html(template(context));
+
+                const currentPwField = new MDCTextField(document.querySelector('#passwordCurrent'));
+                const pwField = new MDCTextField(document.querySelector('#password'));
+                const pwCheck = new MDCTextField(document.querySelector('#passwordCheck'));
+                const pwCheckHelper = new MDCTextFieldHelperText(document.querySelector('#passwordCheck-helper'));
+
+                let customValidator = function(current, pw1, pw2){
+                    /*
+                    resons:
+                        1 - pwds do not match
+                        2 - pwcheck empty
+                        2 - regex not passed
+                     */
+                    let result = {state: true, reason: 0}
+                    //entered pwds must match
+                    if (pw1 !== pw2) {
+                        result = {state: false, reason: 1}
+                    }
+                    if (pwCheck.value.length === 0) result = {state: false, reason: 2}
+                    //pw must have 8 characters and min 1 number
+                    let pwReg = new RegExp("^(((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})");
+                    if (!pwReg.test(pw1))  result = {state: false, reason: 3};
+
+                    //new password must not match the current one
+                    if(pw1 === current) result = {state: false, reason: 4};
+
+                    return result;
+                };
+                let customValidatorCallback = {
+                    onSuccess: function(){
+                        data = {
+                            current: currentPwField.value,
+                            pw: pwField.value,
+                            check: pwCheck.value,
+                        };
+                        onConfirm(args.userid, data);
+                    },
+                    onFailure: function(reason){
+                        switch(reason){
+                            case 1:
+                                pwCheck.helperTextContent = "Passwörter stimmen nicht überein";
+                                pwCheck.valid = false;
+                                break;
+                            case 2:
+                                pwCheck.helperTextContent = "Passwort wiederholen";
+                                pwCheck.valid = false;
+                                break;
+                            case 3:
+                                pwField.helperTextContent = "Mindestens 8 Zeichen, davon mind. 1 Zahl und 1 Buchstabe";
+                                pwCheck.helperTextContent = "Passwort wiederholen";
+                                pwField.valid = false;
+                                pwCheck.valid = false;
+                                break;
+                            case 4:
+                                pwField.helperTextContent = "Das neue Passwort darf nicht dem Aktuellen entsprechen.";
+                                pwCheck.helperTextContent = "Passwort wiederholen";
+                                pwField.valid = false;
+                                pwCheck.valid = false;
+                                break;
+                            default:
+                                pwCheck.helperTextContent = "failed. Error" + reason;
+                                pwCheck.valid = false;
+                                break;
+                        }
+                    }
+                };
+
+                contentHandler.removeCustomValidators();
+                contentHandler.addCustomValidator(function(){
+                    return customValidator(currentPwField.value, pwField.value, pwCheck.value)},
+                    customValidatorCallback
+                )
+
+                sidebar.registerBackButton( ".sidebar-back-btn");
+                let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+                sidebar.registerConfirmButton( ".sidebar-confirm",
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            //check
+                            contentHandler.validate();
+                        }.bind(args)
+                    });
+
+            });
+        };
+    });
 
 userPlugin.addContentHandler(showUser);
 userPlugin.addContentHandler(addUser);
@@ -894,6 +1002,7 @@ userPlugin.addContentHandler(viewDbKey);
 userPlugin.addContentHandler(addQualification);
 userPlugin.addContentHandler(viewQualification);
 userPlugin.addContentHandler(updateQualification);
+userPlugin.addContentHandler(changeUserPassword);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 

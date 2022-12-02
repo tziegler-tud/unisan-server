@@ -1,4 +1,3 @@
-
 // data aggregation for all the user-profile linked scripts.
 //obviously, we need to fetch the user. Might reduce data to the one really needed later on by using a dedicated api call.
 

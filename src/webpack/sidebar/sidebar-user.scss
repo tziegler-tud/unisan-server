@@ -53,15 +53,15 @@
         color: #AAA;
         font-size: 110%;
         font-variant: small-caps;
-
       }
-
       .section-content {
         .content-item {
           display: block;
           width: 100%;
         }
-
+        .useredit-item-passwordField {
+          margin-bottom: 1em;
+        }
       }
     }
   }

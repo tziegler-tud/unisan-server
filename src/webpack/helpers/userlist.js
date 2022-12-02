@@ -1,4 +1,6 @@
 import "./userlist.scss";
+const Handlebars = require("handlebars");
+import "../helpers/handlebarsHelpers";
 
 import {MDCMenu} from '@material/menu';
 

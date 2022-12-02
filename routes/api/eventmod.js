@@ -139,6 +139,8 @@ router.delete('/removePost', checkParticipantAccess, removePost);
 //modification. need general or individual editing rights
 router.put('/:id', checkEventEditRights, update);
 router.put('/updateKey/:id', checkEventEditRights, updateKey);
+router.put('/updateTitle/:id', checkEventEditRights, updateTitle);
+router.put('/updateDescription/:id', checkEventEditRights, updateDescription);
 router.delete('/:id', checkEventEditRights, _delete);
 
 /**
@@ -173,6 +175,7 @@ router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
 router.get('/userEvents', currentUserEvents);
 router.get('/userEvents/:id', userEvents);
+router.post('/userEvents', userEventsAdvanced);
 router.get('/userPostings', currentUserPostings);
 router.get('/userPostings/:id', userPostings);
 router.post('/upcoming', getUpcoming);
@@ -213,7 +216,7 @@ function currentUserEvents(req, res, next) {
         value: req.user._id,
     }
     let args = {
-        filter: userFilter
+        filter: userFilter,
     }
     eventService.getAllFiltered(args)
         .then(event => {
@@ -224,10 +227,12 @@ function currentUserEvents(req, res, next) {
         });
 }
 
+
+
 function currentUserPostings(req, res, next) {
     let args = {
         dateFilter: {
-            selector: "gte",
+            selector: "all",
         }
     }
     eventService.getUserPostings(req.user._id, args)
@@ -242,7 +247,7 @@ function currentUserPostings(req, res, next) {
 function userPostings(req, res, next) {
     let args = {
         dateFilter: {
-            selector: "gte",
+            selector: "all",
         }
     }
     eventService.getUserPostings(req.params.id, args)
@@ -256,11 +261,62 @@ function userPostings(req, res, next) {
 
 function userEvents(req, res, next) {
     let userFilter = {
-        filter: "participants",
+        filter: "participants.user",
         value: req.params.userid,
     }
     eventService.getAllFiltered(userFilter)
         .then(event => event ? res.json(event) : res.sendStatus(404))
+        .catch(err => next(err));
+}
+
+function userEventsAdvanced(req, res, next) {
+    var userid;
+    if (req.body.userid === undefined) {
+        userid = req.user.id;
+    }
+    else userid = req.body.userid;
+
+    if (req.body.args === undefined) req.body.args = {};
+    req.body = Object.assign(req.body.args, req.body);
+    let matchString = req.body.matchString ? req.body.matchString : "";
+
+    let userFilter = {
+        filter: "participants.user",
+        value: userid,
+    }
+
+    let dateFilter = {
+        selector: "gte",
+        date: Date.now(),
+    };
+
+    let filterArray = [];
+    let filter = req.body.filter;
+    if (!Array.isArray(filterArray)){
+        filterArray = [filter, userFilter]
+    }
+    else filterArray.push(userFilter);
+
+    let args = {
+        filter: filterArray,
+        sort: req.body.sort,
+        dateFilter: dateFilter,
+    }
+    let amount = (req.body.amount !== undefined) ? req.body.amount : undefined;
+    eventService.matchAny(matchString, args)
+        .then(event => {
+            if(event) {
+                let response;
+                if (amount !== undefined) {
+                    response = event.splice(0,amount)
+                }
+                else response = event;
+                res.json(response)
+            }
+            else {
+                res.sendStatus(404)
+            }
+        })
         .catch(err => next(err));
 }
 
@@ -274,6 +330,22 @@ function update(req, res, next) {
 
 function updateKey(req, res, next) {
     eventService.updateKey(req, req.params.id, req.body.key, req.body.value, {})
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => next(err));
+}
+
+function updateTitle(req, res, next) {
+    eventService.updateTitle(req, req.params.id, req.body)
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => next(err));
+}
+
+function updateDescription(req, res, next) {
+    eventService.updateDescription(req, req.params.id, req.body)
         .then(result => {
             res.json(result)
         })

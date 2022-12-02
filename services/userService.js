@@ -21,10 +21,12 @@ module.exports = {
     getManyById,
     getAllFiltered,
     getById,
+    getUserHash,
     getByUsername,
     getByUsernameWithHash,
     create,
     update,
+    updatePassword,
     deleteKey,
     deleteArrayElement,
     updateKey,
@@ -102,6 +104,14 @@ async function getById(id) {
     //populate userGroups
     return User.findById(id).select('-hash').populate("qualifications.qualification");
 
+}
+
+async function getUserHash(user){
+    if (user === undefined) return false;
+    //check if user object or id was provided
+    let id = user.id? user.id : user;
+
+    return User.findById(id).select("hash");
 }
 
 /**
@@ -191,7 +201,8 @@ async function create(req, userParam, args) {
         //create user dir
         fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
             if (err) {
-                throw err;
+                console.error("Failed to create directory: " + '/src/data/uploads/user_images/' + user._id.toString());
+
             }
             else {
                 //check if tmp image exists
@@ -235,8 +246,9 @@ async function create(req, userParam, args) {
                 function copyDummyImage(){
                     // copies the dummy user image to user directory
                     fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
-                        if (err) throw err;
-                        console.log('dummy image copied to new user');
+                        if (err) {
+                            console.warn("Failed to copy dummy user image: '/src/data/user_images/dummy.jpg': File not found.")
+                        }
                     });
                 }
             }
@@ -285,6 +297,62 @@ async function update(req, id, userParam) {
                         actionType: "modify",
                         actionDetail: "userModify",
                         key: "",
+                        fullKey: "",
+                        originalValue: "",
+                        value: "",
+                        tag: "<OVERWRITE>"
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "user",
+                        targetObject: user._id,
+                        targetObjectId: user._id,
+                        targetModel: "User",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            })
+            .catch(err => reject(err))
+    })
+}
+
+
+/**
+ * Updates an existing user
+ * @param req {Object} express request
+ * @param {number} id The id of the existing user
+ * @param {String} password Plaintext password. The password is hashed before beeing stored.
+ */
+async function updatePassword(req, id, password) {
+
+    const user = await User.findById(id);
+    // validate
+    if (!user) throw new Error('User not found');
+    let critical = true
+    let userParam = {};
+    // hash password if it was entered
+    if (password) {
+        userParam.hash = await bcrypt.hash(password, 10);
+    }
+    else return false;
+    return new Promise(function(resolve, reject) {
+        // copy userParam properties to user
+        Object.assign(user, userParam);
+        user.save()
+            .then(user => {
+                resolve(user)
+                //create log
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "user",
+                        actionType: "modify",
+                        actionDetail: "userPasswordModify",
+                        key: "password",
                         fullKey: "",
                         originalValue: "",
                         value: "",
@@ -681,6 +749,7 @@ async function addQualification(req, id, qualificationObject,  args) {
     args = Object.assign(defaults, args);
 
     const user = await User.findById(id);
+    const qualification = await Qualifications.findById(qualificationObject.qualification);
 
     // validate
     if (!user) throw new Error('User not found');
@@ -688,11 +757,11 @@ async function addQualification(req, id, qualificationObject,  args) {
     return new Promise(function(resolve, reject) {
         let errHeader = "Failed to add Qualification: ";
         // validate input
-        if (qualificationObject === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
+        if (qualification === undefined) throw new Error(errHeader + 'Invalid parameters given for: qualificationObject');
 
         let ojVal = undefined;
-        let newVal = qualificationObject.qualification.name;
-        let logKey = qualificationObject.qualification.qualType;
+        let newVal = qualification.name;
+        let logKey = qualification.qualType;
 
         //get user qualification array
         let qualArray = user.qualifications;
@@ -1401,7 +1470,8 @@ async function _delete(req, id) {
         let deleteUser = User.findByIdAndRemove(id);
         let deleteUserACL = UserACL.deleteOne({user: id});
         Promise.all([deleteUser, deleteUserACL])
-            .then(function (user) {
+            .then(function (resultArray) {
+                let user = resultArray[0];
                 resolve(user);
                 console.log("Deleted user with id: " + user._id);
                 //create log

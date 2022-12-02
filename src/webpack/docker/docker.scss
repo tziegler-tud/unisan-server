@@ -1,0 +1,311 @@
+@import "../color-rules";
+@import "../variables";
+
+
+
+.nav-docker {
+
+  flex: 0 0 100%;
+  position: relative;
+
+  border-right: 1px solid $menu-border-color;
+
+  background-color: $docker-bg-color;
+
+  z-index: 6;
+  color: $docker-font-color;
+
+  @media #{$desktop, $tablet-landscape} {
+    flex: 0 0 $docker-width;
+    max-width: $docker-width;
+  }
+
+  .docker-wrapper {
+
+
+    width: 100%;
+
+
+    @media #{$desktop, $tablet-landscape} {
+      height: 100vh;
+    }
+
+    .docker-inner {
+      margin: 0;
+      width: 100%;
+
+      .docker-top {
+        border-bottom: 1px solid $menu-border-color;
+        width: 100%;
+        display: flex;
+        flex-flow: row wrap;
+
+        > div:hover {
+          &:hover {
+            background-color: #fAfAfA;
+            cursor: pointer;
+          }
+        }
+
+        .docker-top-btn {
+          flex: 0 0 $topnav-height;
+          border-right: 1px solid $menu-border-color;
+          float: left;
+
+          svg {
+            display: block;
+            height: 33%;
+            margin: 33% 33%;
+          }
+        }
+
+        .docker-top-label {
+          border-left: none;
+
+          flex: 1 1 auto;
+
+          display: block;
+          float: left;
+
+          position: relative;
+
+          .docker-top-label-wrapper {
+
+            position: absolute;
+            top: 50%;
+            left: 2em;
+            transform: translateY(-50%);
+
+
+            img {
+              display: block;
+              float: left;
+              width: 1.5em;
+              margin-right: 1em;
+            }
+
+            span {
+              font-size: 120%;
+              display: block;
+              float: left;
+            }
+          }
+        }
+      }
+
+      .docker-content {
+        position: relative;
+        .docker-mainPage {
+
+        }
+        .docker-subPage-container {
+          display: flex;
+          flex-flow: column nowrap;
+          //position: absolute;
+          .docker-subpage {
+            &.subpage-active {
+              display: block;
+            }
+          }
+        }
+      }
+
+      .docker-elementContainer {
+
+        &.collapsing {
+
+          &.expanded  {
+            .docker-mainElement {
+              border-bottom-width: 0 !important;
+            }
+            .docker-subElementContainer {
+
+              border-bottom: 1px solid #AAA;
+              height: auto;
+            }
+          }
+          .docker-subElementContainer {
+            overflow: hidden;
+            height: 0;
+            background-color: $docker-background-color2;
+
+            @include transition(height, 500ms);
+          }
+
+        }
+
+      }
+    }
+  }
+}
+
+
+.docker-mobile, .docker-desktop {
+  position: relative;
+  .docker-mainPage {
+
+  }
+  .docker-subPage-container {
+    display: flex;
+    flex-flow: column nowrap;
+    //position: absolute;
+    .docker-subpage {
+      &.subpage-active {
+        display: block;
+      }
+    }
+  }
+  .docker-elementContainer {
+
+    &.collapsing {
+
+      &.expanded {
+        .docker-mainElement {
+          border-bottom-width: 0 !important;
+        }
+
+        .docker-subElementContainer {
+
+          border-bottom: 1px solid #AAA;
+          height: auto;
+        }
+      }
+
+      .docker-subElementContainer {
+        overflow: hidden;
+        height: 0;
+        background-color: #f9f9f9;
+
+        @media #{$desktop, $tablet-landscape} {
+          background-color: $docker-background-color2;
+        }
+
+        @include transition(height, 500ms);
+      }
+
+    }
+
+    &.docker-container-active {
+      .docker-mainElement {
+
+        &:before {
+          width: 5px;
+        }
+      }
+
+    }
+
+    .docker-subElementContainer {
+      background-color: $docker-background-color2;
+    }
+
+    .docker-element {
+      cursor: pointer;
+      position: relative;
+
+      @include transition(background-color, 300ms);
+
+      a {
+        padding: 1em 10%;
+        display: block;
+      }
+
+      &:before {
+        content: "";
+        width: 0;
+        height: 100%;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        background-color: $tabs-highlight-color;
+
+        @include transition(width, 350ms);
+      }
+
+      &.docker-element-active {
+        &:before {
+          width: 5px;
+        }
+      }
+
+      &:hover {
+
+        background-color: $docker-hover-color;
+
+      }
+
+      &#docker-home {
+
+        box-shadow: 0 0 4px grey;
+        margin-bottom: 4px;
+
+        a {
+          padding: 25% 25%;
+          width: 50%;
+        }
+
+        img {
+          width: 100%;
+        }
+      }
+
+      svg {
+        color: $col1;
+        width: 1em;
+        display: block;
+        margin-right: 1em;
+        float: left;
+      }
+
+      span.docker-element-label {
+        display: block;
+        float: left;
+      }
+
+      &.docker-mainElement {
+        font-size: 100%;
+        border-bottom: 1px solid #AAA;
+      }
+
+      &.docker-subElement {
+        font-size: 90%;
+
+        a {
+          margin-left: 1em;
+        }
+
+        &:before {
+          background-color: $subtabs-highlight-color;
+        }
+
+        &:hover {
+          background-color: $docker-hover-color2;
+        }
+      }
+    }
+  }
+}
+
+
+
+/* color specific options */
+
+
+
+/* no js fallbacks */
+
+#no-js-header {
+
+}
+
+.no-js #no-js-header {
+  display: block !important;
+}
+
+.no-js #nav-static {
+  display: none;
+}
+
+

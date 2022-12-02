@@ -13,6 +13,7 @@ var fs = require('fs-extra');
 
 const upload = require(appRoot + "/config/multer");
 const AuthService = require("../../services/authService");
+const bcrypt = require("bcrypt");
 
 
 
@@ -93,6 +94,9 @@ router.post('/getKey/:id', getKey);
 // router.use("/*", checkWriteAccess);
 router.put('/:id', update);
 router.post('/:id/uploadUserImage', upload.single('image'), postUpload);
+
+router.post('/updateCurrentUserPassword', updateCurrentUserPassword);
+router.post('/updateUserPassword', updateUserPassword);
 
 router.put('/updateKey/:id', updateKey);
 
@@ -193,6 +197,56 @@ function update(req, res, next) {
             next(err);
         })
 }
+
+function updateCurrentUserPassword(req, res, next) {
+    //routine for the current user updating its own password. requires the current password to be correct.
+    //auth
+    if (!req.body.currentPassword || !req.body.newPassword) {
+        return false;
+    }
+    let password = req.body.currentPassword;
+    let newPassword = req.body.newPassword;
+    authService.checkUserWriteAccess(req.user, "self", true)
+        .then(result => {
+
+            userService.getUserHash(req.user)
+                .then(user=> {
+                    //verify password is correct
+                    bcrypt.compare(password, user.hash)
+                        .then(result => {
+                            if(result) {
+                                //password matches. set new Password
+                                userService.updatePassword(req, req.user.id, newPassword)
+                                    .then(result => {
+                                        res.json({})
+                                    })
+                                    .catch(err => {
+                                        next(err)
+                                    });
+                            }
+                            else {
+                                let err = {name: "ValidationError", message: "Validation failed."}
+                                next(err);
+                            }
+                        })
+                        .catch(err => {
+                            next(err);
+                        })
+                })
+
+
+            // userService.update(req, req.params.id, req.body)
+            //     .then(() => res.json({}))
+            //     .catch(err => next(err));
+        })
+        .catch(err =>{
+            next(err);
+        })
+}
+
+function updateUserPassword(req, res, next) {
+}
+
 
 function getKey(req, res, next) {
     //auth

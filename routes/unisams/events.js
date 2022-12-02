@@ -273,8 +273,14 @@ function eventDetails(req, res, next) {
                         })
                     })
             }
+            else {
+                //event not found
+                next({status:404, message: "Event not found"});
+            }
         })
-        .catch(err => next(err));
+        .catch(err => {
+            next(err)
+        });
 }
 
 function editEvent(req, res, next) {

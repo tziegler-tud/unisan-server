@@ -24,6 +24,8 @@ module.exports = {
     create,
     update,
     updateKey,
+    updateTitle,
+    updateDescription,
     matchAny,
     populateParticipants,
     addParticipant,
@@ -80,6 +82,7 @@ async function getUpcoming() {
  */
 async function getAllFiltered(args){
     let defaults = {
+        sort: undefined,
     }
     args = (args === undefined) ? {}: args;
     args = Object.assign(defaults, args);
@@ -122,9 +125,9 @@ async function getById(id) {
  * @param args.filter {Object} universal mongodb filter object to be applied to query
  * @param args.dateFilter {Object} Object to set date filtering
  * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
- * @param args.dateFilter.minDate {Date} end of Date range to filter for. Defaults to current Date
+ * @param args.dateFilter.minDate {Date} start of Date range to filter for. Defaults to current Date
  * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
- * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range"].
+ * @param args.dateFilter.selector {String} String denoting how to filter. Accepts: ["match", "gte", "lte", "range", "all"].
  * @returns {Promise<Query|*|number>}
  */
 async function matchAny(matchString, args){
@@ -132,18 +135,30 @@ async function matchAny(matchString, args){
     let eventlist;
     let dateFilter = {};
     let universalFilter = {};
+    let universalFilterArray = [];
 
-    if (args.filter===undefined || args.filter.filter === undefined || args.filter.value === undefined) {
+    if (args.filter===undefined) {
 
     }
     else {
-        let filterObj = {};
-        filterObj[args.filter.filter] = args.filter.value;
-        universalFilter = filterObj;
-    }
+        if (Array.isArray(args.filter)) {
+            args.filter.forEach(filter => {
+                if (filter.filter === undefined || filter.value === undefined) {
 
+                } else {
+                    let filterObj = {};
+                    filterObj[filter.filter] = filter.value;
+                    universalFilterArray.push(filterObj);
+                }
+            })
+        } else if (args.filter.filter === undefined || args.filter.value === undefined) {
+            let filterObj = {};
+            filterObj[args.filter.filter] = args.filter.value;
+            universalFilterArray = [filterObj]
+        }
+    }
     if (args.dateFilter === undefined) args.dateFilter = {}
-    if(args.dateFilter.selector === undefined || typeof(args.dateFilter.selector) !== "string") {
+    if(args.dateFilter.selector === undefined || typeof(args.dateFilter.selector) !== "string" || args.dateFilter.selector === "all") {
         //invalid paramters for date filtering. ignore
     }
     else {
@@ -199,20 +214,17 @@ async function matchAny(matchString, args){
 
     //if filter is empty, return all results
     if (matchString.length === 0) {
-        eventlist = Event.find().and([dateFilter, universalFilter]);
+        eventlist = Event.find().and([dateFilter]).and(universalFilterArray);
     }
     else {
         //filter user by given string, using title and type
         // eventlist = Event.find().and([dateFilter, universalFilter]).or([{'title.value': { $regex: matchString, $options: "-i" }}, {'type.value': { $regex: matchString, $options: "-i" }}])
-        eventlist = Event.find().and([dateFilter, universalFilter, {'title.value': { $regex: matchString, $options: "-i" }}]); //dont filter for type
+        eventlist = Event.find().and([dateFilter, {'title.value': { $regex: matchString, $options: "-i" }}]).and(universalFilterArray); //dont filter for type
     }
 
     if (args.sort) {
         eventlist = eventlist.sort(args.sort);
     }
-
-
-
     return eventlist;
 }
 
@@ -300,12 +312,16 @@ async function create(req, eventParam) {
                     );
                 fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
                     if (err) {
-                        throw err;
+                        console.warn("Failed to create directory: " + '/src/data/uploads/event_images/' + event._id.toString());
                     }
                     else {
                         fs.copyFile(appRoot + '/src/data/event_images/dummy.jpg', appRoot + '/src/data/uploads/event_images/'+ event._id + '/' + event._id + '.jpg', (err) => {
-                            if (err) throw err;
-                            console.log('dummy image copied to new event');
+                            if (err)  {
+                                console.warn("Failed to copy dummy image to event.");
+                            }
+                            else {
+
+                            }
                         });
                     }
                 });
@@ -515,6 +531,105 @@ async function updateKey(req, id, key, value, eventParams) {
 
 }
 
+async function updateTitle(req, id, title) {
+    const event = await Event.findById(id);
+    // validate
+    if (!event) throw new Error('Event not found');
+
+    // validate input
+    if (!title) throw new Error('no value given');
+    let ojVal = event.title.value;
+
+
+    let newTitle = Object.assign(event.title, title)
+    let newVal = newTitle.value;
+    let logKey = "title"
+    let key = "title";
+
+    return new Promise(function(resolve, reject){
+        event.set("title", newTitle, {strict: false} );
+        event.save()
+            .then(event => {
+                // create log
+                resolve(event);
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "event",
+                        actionType: "modify",
+                        actionDetail: "eventModify",
+                        key: logKey,
+                        fullKey: key,
+                        originalValue: ojVal,
+                        value:  newVal,
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "event",
+                        targetObject: event._id,
+                        targetObjectId: event._id,
+                        targetModel: "Event",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            })
+            .catch(err => reject(err));
+    })
+}
+
+
+async function updateDescription(req, id, descriptionObject) {
+    const event = await Event.findById(id);
+    // validate
+    if (!event) throw new Error('Event not found');
+    // validate input
+    if (!descriptionObject) throw new Error('no value given');
+    let ojVal = event.description.longDesc.value ? event.description.longDesc.value : event.description.shortDesc.value;
+    let newDescription = Object.assign(event.description, descriptionObject)
+    let newVal = newDescription.longDesc.value ? newDescription.longDesc.value : newDescription.shortDesc.value;
+    let logKey = "description";
+    let key = "description";
+
+    return new Promise(function(resolve, reject){
+        event.set("description", newDescription, {strict: false});
+        event.save()
+            .then(event => {
+                // create log
+                resolve(event);
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "event",
+                        actionType: "modify",
+                        actionDetail: "eventModify",
+                        key: logKey,
+                        fullKey: key,
+                        originalValue: ojVal,
+                        value:  newVal,
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "event",
+                        targetObject: event._id,
+                        targetObjectId: event._id,
+                        targetModel: "Event",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            })
+            .catch(err => reject(err));
+    })
+}
+
+
 
 async function populateParticipants(id) {
     let event = Event.findById(id).populate({
@@ -623,7 +738,7 @@ async function addParticipant(req, id, userId, args) {
             }
 
             log = new Log({
-                type: "modification",
+                type: "activity",
                 action: {
                     objectType: "event",
                     actionType: "modify",
@@ -659,7 +774,7 @@ async function addParticipant(req, id, userId, args) {
                 })
         }
         log = new Log({
-            type: "modification",
+            type: "activity",
             action: {
                 objectType: "event",
                 actionType: "modify",
@@ -739,7 +854,7 @@ async function removeParticipant(req, id, userId, args) {
         event.participants.splice(index, 1);
         //create log
         let log = new Log({
-            type: "modification",
+            type: "activity",
             action: {
                 objectType: "event",
                 actionType: "modify",
@@ -790,6 +905,7 @@ async function _delete(req, id) {
                     actionDetail: "eventDelete",
                     key: event.id,
                     value: event.title.value,
+                    originalValue: event.title.value,
                     tag: "<DELETE>"
                 },
                 authorizedUser: req.user,
@@ -877,7 +993,7 @@ async function addFileReference(req, event, filename, filetype, size, args) {
 
             //create log
             let log = new Log({
-                type: "modification",
+                type: "activity",
                 action: {
                     objectType: "event",
                     actionType: "modify",
@@ -961,7 +1077,7 @@ async function removeFileReference(req, event, filename, args) {
         .then( event => {
             //create log
             let log = new Log({
-                type: "modification",
+                type: "activity",
                 action: {
                     objectType: "event",
                     actionType: "modify",
@@ -1119,7 +1235,7 @@ async function addPosting (req, eventId, posting, args) {
                 .then(result => {
                     resolve(event);
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
@@ -1216,7 +1332,7 @@ async function updatePosting (req, eventId, postingData, args) {
                 .then(result => {
                     resolve();
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
@@ -1286,7 +1402,7 @@ async function removePosting (req, eventId, postingId) {
                         .then(result => {
                             resolve();
                             let log = new Log({
-                                type: "modification",
+                                type: "activity",
                                 action: {
                                     objectType: "event",
                                     actionType: "modify",
@@ -1426,7 +1542,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
             updatedEvent.save()
                 .then(result => {
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",
@@ -1545,7 +1661,7 @@ async function unassignPost (req, eventId, userId, postingId) {
             updatedEvent.save()
                 .then(result => {
                     let log = new Log({
-                        type: "modification",
+                        type: "activity",
                         action: {
                             objectType: "event",
                             actionType: "modify",

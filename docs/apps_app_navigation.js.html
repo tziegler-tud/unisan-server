@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: apps/app_navigation.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: apps/app_navigation.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import "./app_navigation.scss";
+
+import {MDCList} from "@material/list";
+import {MDCTopAppBar} from "@material/top-app-bar";
+import {MDCDrawer} from "@material/drawer";
+import {MDCRipple} from "@material/ripple";
+
+import {phone, tablet} from "../helpers/variables";
+
+
+/**
+ *
+ * @param context
+ * @param version
+ * @returns {Navigation}
+ * @constructor
+ */
+var Navigation = function(context, version){
+    let self = this;
+    let url;
+    switch (version) {
+        case "public":
+            url = '/webpack/apps/templates/navigation_public.hbs'
+            break
+        default:
+            url = '/webpack/apps/templates/navigation.hbs'
+    }
+    //load drawer template and attach to body
+    self.initialize = $.get(url, function (data) {
+        var template = Handlebars.compile(data);
+        // $(".app-drawer-container").prepend(template(context));
+        $(".app-page-wrapper").prepend(template(context));
+        // const list = MDCList.attachTo(document.querySelector('.mdc-list'));
+        // list.wrapFocus = true;
+        const topAppBarElement = document.querySelector('.mdc-top-app-bar');
+        const topAppBar =  new MDCTopAppBar(topAppBarElement);
+        const drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'))
+        const listEl = document.querySelector('.mdc-drawer .mdc-list');
+        const mainContentEl = document.querySelector('.app-content-container');
+        listEl.addEventListener('click', (event) => {
+            // mainContentEl.querySelector('input, button').focus();
+        });
+
+        document.body.addEventListener('MDCDrawer:closed', () => {
+            // mainContentEl.querySelector('input, button').focus();
+        });
+        // const buttonRipple = new MDCRipple(document.querySelector('.mdc-button'));
+
+        topAppBar.setScrollTarget(mainContentEl);
+        topAppBar.listen('MDCTopAppBar:nav', () => {
+            drawer.open = !drawer.open;
+        });
+
+        if(!phone.matches) {
+            //open drawer intially on desktop screen sizes
+            drawer.open = true;
+        }
+
+        self.drawer = drawer;
+        self.topAppBar = topAppBar;
+
+        self.adjustWrapper(topAppBar);
+        $(window).on('resize',function(){
+            self.adjustWrapper(topAppBar);
+        });
+    });
+    return self;
+}
+
+Navigation.prototype.adjustWrapper = function(topAppBar){
+    //get viewport height
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    //get height of top navigation and topbar element
+    let navHeight = topAppBar.foundation.adapter.getTopAppBarHeight();
+    $(".app-content-container").css({
+        height: (vh - navHeight) + "px",
+        "padding-top": navHeight + "px"
+    })
+}
+export{Navigation}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ContentHandler.html">ContentHandler</a></li><li><a href="Counter.html">Counter</a></li><li><a href="dateFromNow.html">dateFromNow</a></li><li><a href="Docker.html">Docker</a></li><li><a href="DropdownMenu.html">DropdownMenu</a></li><li><a href="EditableInputField.html">EditableInputField</a></li><li><a href="EditableTextField.html">EditableTextField</a></li><li><a href="Navigation.html">Navigation</a></li><li><a href="ScrollableList.html">ScrollableList</a></li><li><a href="Searchbar.html">Searchbar</a></li><li><a href="Sidebar.html">Sidebar</a></li><li><a href="SidebarButton.html">SidebarButton</a></li><li><a href="SidebarPlugin.html">SidebarPlugin</a></li><li><a href="SidebarTooltip.html">SidebarTooltip</a></li><li><a href="Userlist.html">Userlist</a></li><li><a href="UserProfile.html">UserProfile</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubpageEventHandlers">addSubpageEventHandlers</a></li><li><a href="global.html#checkDataValidity">checkDataValidity</a></li><li><a href="global.html#checkQualificationDataValidity">checkQualificationDataValidity</a></li><li><a href="global.html#createSelectDelimiter">createSelectDelimiter</a></li><li><a href="global.html#disableViewBox">disableViewBox</a></li><li><a href="global.html#findExistingValues">findExistingValues</a></li><li><a href="global.html#getMatchingQualifications">getMatchingQualifications</a></li><li><a href="global.html#populateUserKeys">populateUserKeys</a></li><li><a href="global.html#sortData">sortData</a></li><li><a href="global.html#transformDateTimeString">transformDateTimeString</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Thu Aug 04 2022 11:35:33 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
