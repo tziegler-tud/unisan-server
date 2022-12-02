@@ -285,6 +285,7 @@ $(document).ready (function () {
                     combinedKey: self.dataset.combinedkey,
                     value: self.dataset.value,
                     isCustomEntry: self.dataset.iscustomentry,
+                    isRemoveable: self.dataset.removeable,
                     callback: {
                         onConfirm: function (userid, key, value) {
                             var args = {

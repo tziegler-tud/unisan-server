@@ -94,7 +94,7 @@ block content
                                                                         - var keyTitle = val.title
                                                                         - var combinedKey = subsecKey + "." + key
                                                                         - var value = val.value
-                                                                        li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-title=keyTitle, data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
+                                                                        li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-title=keyTitle, data-catkey=secKey, data-subkey=subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true" data-removeable="true")
                                                                             a.inner()
                                                                                 .item-property.userkey-entry-title
                                                                                     span= keyTitle
@@ -120,7 +120,7 @@ block content
                                                                     - var keyTitle = val.title
                                                                     - var combinedKey = secKey + "." + key
                                                                     - var value = val.value
-                                                                    li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=keyTitle, data-value=value, data-type=val.type)
+                                                                    li.user-entry.usercontact-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-key=combinedKey, data-keyid= val.id, data-title=keyTitle, data-value=value, data-type=val.type data-removeable="true")
                                                                         a.inner()
                                                                             .item-property.userkey-entry-title
                                                                                 span= keyTitle
@@ -150,7 +150,7 @@ block content
                                                                         - var combinedKey = subsecKey + "." + key
                                                                         - var keyTitle = val.title
                                                                         - var value = val.value
-                                                                        li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey= subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true")
+                                                                        li.user-entry.userkey-entry(id="userkey-" + combinedKey, data-isarray="true", data-catkey=secKey, data-subkey= subKey, data-key=combinedKey, data-keyid= val.id, data-value=value, data-iscustomentry="true" data-removeable="true")
                                                                             a.inner()
                                                                                 .item-property.userkey-entry-title
                                                                                     span= keyTitle

@@ -179,8 +179,7 @@ function displayEventList(events, list, container, sort){
         }
     }
 
-    let scrollableList = new ScrollableList(container, "event", events, args, callback)
-    return scrollableList;
+    return new ScrollableList(container, "event", events, args, callback)
 }
 
 function displayCalendar(events, calendar, container){

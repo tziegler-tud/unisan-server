@@ -1,6 +1,17 @@
 import "./snackbar.scss";
 import {MDCSnackbar} from '@material/snackbar';
 
+/**
+ * Snackbar
+ * @param options
+ * @param options.timeout {Number} timeout in ms
+ * @param options.closeOnEscape {Boolean} true to close sidebar if action button is clicked
+ * @param options.actionButton {Object}
+ * @param options.actionButton.display {Boolean} true to show action button
+ * @param options.actionButton.text {String} action button text
+ * @returns {Snackbar}
+ * @constructor
+ */
 var Snackbar = function(options){
 
     let defaultOptions = {
@@ -8,7 +19,7 @@ var Snackbar = function(options){
         closeOnEscape: false,
         actionButton: {
             display: false,
-            text: "",
+            text: "Okay",
         }
     }
     this.options = (options === undefined) ? {}: options;
@@ -47,6 +58,19 @@ var Snackbar = function(options){
     return this;
 }
 
+/**
+ *
+ * shows the snackbar with given content
+ *
+ * @param message {String} snackbar message
+ * @param options {Object}
+ * @param options.timeout {Number} timeout in ms
+ * @param options.closeOnEscape {Boolean} true to close sidebar if action button is clicked
+ * @param options.actionButton {Object}
+ * @param options.actionButton.display {Boolean} true to show action button
+ * @param options.actionButton.text {String} action button text
+ * @returns {boolean}
+ */
 Snackbar.prototype.show = function(message, options) {
     let self = this;
     let snackbar = self.snackbar;
@@ -78,12 +102,27 @@ Snackbar.prototype.show = function(message, options) {
     snackbar.open()
 }
 
-Snackbar.prototype.showError = function(jqxhr, textstatus, error){
+/**
+ *
+ * shows an error in the snackbar
+ *
+ * @param jqxhr {Object} jqxhr object
+ * @param textstatus {String} string containing status message
+ * @param error {Error} error Object
+ * @param options {Object}
+ * @param options.timeout {Number} timeout in ms
+ * @param options.closeOnEscape {Boolean} true to close sidebar if action button is clicked
+ * @param options.actionButton {Object}
+ * @param options.actionButton.display {Boolean} true to show action button
+ * @param options.actionButton.text {String} action button text
+ * @returns {boolean}
+ */
+Snackbar.prototype.showError = function(jqxhr, textstatus, error, options){
     let self = this;
     let snackbar = self.snackbar;
     let message = jqxhr.responseJSON.message;
     let text = (error ? error: "Error " + jqxhr.status) +": " + (message ? message : jqxhr.responseText);
-    let options = {
+    let defaultOptions = {
         timeout: -1,
         closeOnEscape: true,
         actionButton: {
@@ -91,6 +130,8 @@ Snackbar.prototype.showError = function(jqxhr, textstatus, error){
             text: "Nagut",
         }
     }
+    options = (options === undefined) ? {}: options;
+    options = Object.assign(defaultOptions, options);
     this.show(text, options);
 }
 

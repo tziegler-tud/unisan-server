@@ -3,10 +3,9 @@ const LocalStrategy =   require('passport-local').Strategy;
 const bcrypt =          require ('bcrypt');
 const userService = require('../services/userService');
 
-passport.use(
 
-    // @louis I made the login function async because of performance reasons. An attacker could spam the login and this would block the server due to a synchronous (blocking) bcrypt call!
-    new LocalStrategy(
+// @louis I made the login function async because of performance reasons. An attacker could spam the login and this would block the server due to a synchronous (blocking) bcrypt call!
+passport.use(new LocalStrategy(
         {
             usernameField: 'username',
             passwordField: 'password',
@@ -37,8 +36,8 @@ passport.use(
 
         }
     )
-
 );
+
 
 // tell passport how to serialize the user
 passport.serializeUser((user, done) => {

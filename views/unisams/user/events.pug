@@ -3,8 +3,12 @@ extends ../layout
 block page_includes
 
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    script(src="/dist/userEvents.js")
+    script(src="/dist/user.js")
     script.
+        window.jsmodule = {
+            module: "user",
+            loaders: ["events"],
+        };
         window.exploreUserId = "#{exploreUser.id}";
         window.dockerArgs.activeContainer = "userprofileContainer";
         window.dockerArgs.activeElementId = "userprofileEvents";
@@ -45,6 +49,24 @@ block content
                                                 .clear
 
                                     .clear
-                        #content1-text.sec-content
+                section#sec2
+                    #sec-content2.subpage-container
+                        .subpage-topbar
+                            .topbar-heading
+                                h3 Angemeldet
+                            .subpage-options.topbar-element
+                            #eventsearch--upcoming.searchbar-container.topbar-element
+                        #content2-text.sec-content
                             .subpage-content
-                                .userlogs-container
+                                #eventlist-container--upcoming.eventlist-container
+
+                section#sec3
+                    #sec-content3.subpage-container
+                        .subpage-topbar
+                            .topbar-heading
+                                h3 Kürzlich Teilgenommen
+                            .subpage-options.topbar-element
+                            #eventsearch--past.searchbar-container.topbar-element
+                        #content3-text.sec-content
+                            .subpage-content
+                                #eventlist-container--past.eventlist-container

@@ -21,10 +21,12 @@ module.exports = {
     getManyById,
     getAllFiltered,
     getById,
+    getUserHash,
     getByUsername,
     getByUsernameWithHash,
     create,
     update,
+    updatePassword,
     deleteKey,
     deleteArrayElement,
     updateKey,
@@ -102,6 +104,14 @@ async function getById(id) {
     //populate userGroups
     return User.findById(id).select('-hash').populate("qualifications.qualification");
 
+}
+
+async function getUserHash(user){
+    if (user === undefined) return false;
+    //check if user object or id was provided
+    let id = user.id? user.id : user;
+
+    return User.findById(id).select("hash");
 }
 
 /**
@@ -287,6 +297,62 @@ async function update(req, id, userParam) {
                         actionType: "modify",
                         actionDetail: "userModify",
                         key: "",
+                        fullKey: "",
+                        originalValue: "",
+                        value: "",
+                        tag: "<OVERWRITE>"
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "user",
+                        targetObject: user._id,
+                        targetObjectId: user._id,
+                        targetModel: "User",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
+            })
+            .catch(err => reject(err))
+    })
+}
+
+
+/**
+ * Updates an existing user
+ * @param req {Object} express request
+ * @param {number} id The id of the existing user
+ * @param {String} password Plaintext password. The password is hashed before beeing stored.
+ */
+async function updatePassword(req, id, password) {
+
+    const user = await User.findById(id);
+    // validate
+    if (!user) throw new Error('User not found');
+    let critical = true
+    let userParam = {};
+    // hash password if it was entered
+    if (password) {
+        userParam.hash = await bcrypt.hash(password, 10);
+    }
+    else return false;
+    return new Promise(function(resolve, reject) {
+        // copy userParam properties to user
+        Object.assign(user, userParam);
+        user.save()
+            .then(user => {
+                resolve(user)
+                //create log
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "user",
+                        actionType: "modify",
+                        actionDetail: "userPasswordModify",
+                        key: "password",
                         fullKey: "",
                         originalValue: "",
                         value: "",

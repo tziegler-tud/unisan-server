@@ -135,16 +135,28 @@ async function matchAny(matchString, args){
     let eventlist;
     let dateFilter = {};
     let universalFilter = {};
+    let universalFilterArray = [];
 
-    if (args.filter===undefined || args.filter.filter === undefined || args.filter.value === undefined) {
+    if (args.filter===undefined) {
 
     }
     else {
-        let filterObj = {};
-        filterObj[args.filter.filter] = args.filter.value;
-        universalFilter = filterObj;
-    }
+        if (Array.isArray(args.filter)) {
+            args.filter.forEach(filter => {
+                if (filter.filter === undefined || filter.value === undefined) {
 
+                } else {
+                    let filterObj = {};
+                    filterObj[filter.filter] = filter.value;
+                    universalFilterArray.push(filterObj);
+                }
+            })
+        } else if (args.filter.filter === undefined || args.filter.value === undefined) {
+            let filterObj = {};
+            filterObj[args.filter.filter] = args.filter.value;
+            universalFilterArray = [filterObj]
+        }
+    }
     if (args.dateFilter === undefined) args.dateFilter = {}
     if(args.dateFilter.selector === undefined || typeof(args.dateFilter.selector) !== "string" || args.dateFilter.selector === "all") {
         //invalid paramters for date filtering. ignore
@@ -202,20 +214,17 @@ async function matchAny(matchString, args){
 
     //if filter is empty, return all results
     if (matchString.length === 0) {
-        eventlist = Event.find().and([dateFilter, universalFilter]);
+        eventlist = Event.find().and([dateFilter]).and(universalFilterArray);
     }
     else {
         //filter user by given string, using title and type
         // eventlist = Event.find().and([dateFilter, universalFilter]).or([{'title.value': { $regex: matchString, $options: "-i" }}, {'type.value': { $regex: matchString, $options: "-i" }}])
-        eventlist = Event.find().and([dateFilter, universalFilter, {'title.value': { $regex: matchString, $options: "-i" }}]); //dont filter for type
+        eventlist = Event.find().and([dateFilter, {'title.value': { $regex: matchString, $options: "-i" }}]).and(universalFilterArray); //dont filter for type
     }
 
     if (args.sort) {
         eventlist = eventlist.sort(args.sort);
     }
-
-
-
     return eventlist;
 }
 
