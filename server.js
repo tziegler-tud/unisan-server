@@ -18,6 +18,7 @@ global.appRoot = path.resolve(__dirname);
 
 // include routes here
 
+const indexRouter = require('./routes/index/index');
 const loginRouter = require('./routes/unisams/login');
 const mainRouter = require('./routes/unisams/index');
 const dashboardRouter = require('./routes/unisams/dashboard');
@@ -142,7 +143,6 @@ server.use("/unisams/*", function(req, res, next) {
 // webpage error handler
 server.use("/unisams", errorHandler.webErrorHandler);
 
-
 //API calls
 server.use('/api/v1', authRouter);
 server.use('/api/v1/*', apiAuth);
@@ -161,6 +161,9 @@ server.use("/api", function(req, res, next) {
 });
 // api error handler
 server.use("/api", errorHandler.apiErrorHandler);
+
+//forwarding
+server.use("/", indexRouter);
 
 
 
