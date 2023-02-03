@@ -1,11 +1,10 @@
-var express = require('express');
-var uuid = require('uuid');
-const passport = require('passport');
+import express from 'express';
 var router = express.Router();
-const bodyParser = require("body-parser");
-const logService = require("../../services/logService");
-const authService = require("../../services/authService");
-const userService = require("../../services/userService");
+import uuid from 'uuid';
+import bodyParser from "body-parser";
+import userService from "../../services/userService.js";
+import logService from "../../services/logService.js";
+import authService from "../../services/authService.js";
 
 var app = express();
 
@@ -84,4 +83,4 @@ function addModelUser(req, res, next){
 }
 
 
-module.exports = router;
+export default router;

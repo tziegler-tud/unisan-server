@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const userService = require('../../services/userService');
-const authService = require('../../services/authService');
+import userService from "../../services/userService.js";
+import authService from "../../services/authService.js";
 
-var path = require('path');
+import path from 'path';
 
 
 
@@ -32,7 +32,7 @@ router.post('/addUserGroup/:id', addUserGroup);
 router.post('/setUserRole/:id', setUserRole);
 router.post('/addGroupToAllUser', addGroupToAllUser);
 
-module.exports = router;
+export default router;
 
 function addUserGroup(req, res, next){
     userService.addUserGroup(req, req.params.id, req.body.userGroupId)

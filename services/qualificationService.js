@@ -1,8 +1,10 @@
-const db = require('../schemes/mongo');
+
+import db from '../schemes/mongo.js';
+
 
 const Qual = db.Qualifications;
 
-module.exports = {
+export default {
     getAll,
     getById,
     getByType,

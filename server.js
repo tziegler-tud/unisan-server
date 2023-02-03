@@ -1,57 +1,56 @@
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const logger = require('morgan');
-const session = require("express-session");
-const FileStore = require('session-file-store')(session);
-const uuid = require('uuid');
-const multer = require('multer');
-const fs = require('fs');
+import createError from 'http-errors';
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import logger from 'morgan';
+import session from "express-session";
+import SessionFileStore from "session-file-store";
+const FileStore = SessionFileStore(session);
+import uuid from 'uuid';
 
+import fs from 'fs';
+import {fileURLToPath} from "url";
 
-var errorHandler = require("./helpers/error-handler");
-
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 global.appRoot = path.resolve(__dirname);
+
+import multer from 'multer';
+import errorHandler from "./helpers/error-handler.js";
+
+
 
 // include routes here
 
-const indexRouter = require('./routes/index/index');
-const loginRouter = require('./routes/unisams/login');
-const mainRouter = require('./routes/unisams/index');
-const dashboardRouter = require('./routes/unisams/dashboard');
-var userManagementRouter = require('./routes/unisams/user');
-var eventManagementRouter = require('./routes/unisams/events');
-var settingsRouter = require('./routes/unisams/settings');
-var protocolRouter = require('./routes/unisams/protocol');
+import indexRouter from './routes/index/index.js';
+import loginRouter from './routes/unisams/login.js';
+import mainRouter from './routes/unisams/index.js';
+import dashboardRouter from './routes/unisams/dashboard.js';
+import userManagementRouter from './routes/unisams/user.js';
+import eventManagementRouter from './routes/unisams/events.js';
+import settingsRouter from './routes/unisams/settings.js';
+import protocolRouter from './routes/unisams/protocol.js';
 
-var publicProtocolRouter = require('./routes/unisams/protocol_public');
+import publicProtocolRouter from './routes/unisams/protocol_public.js';
 
-
-var authRouter = require('./routes/api/auth');
-var userACLRouter = require('./routes/api/userACL');
-var accessRightsRouter = require('./routes/api/accessrights');
-var userGroupRouter = require('./routes/api/userGroup');
-var userApiRouter = require('./routes/api/usermod');
-var eventApiRouter = require('./routes/api/eventmod');
-var qualificationApiRouter = require('./routes/api/qualification');
-var userDatasetApiRouter = require('./routes/api/userDataset');
-var logsRouter = require('./routes/api/logs');
-var protocolApiRouter = require('./routes/api/protocol');
+import authRouter from './routes/api/auth.js';
+import userACLRouter from './routes/api/userACL.js';
+import accessRightsRouter from './routes/api/accessrights.js';
+import userGroupRouter from './routes/api/userGroup.js';
+import userApiRouter from './routes/api/usermod.js';
+import eventApiRouter from './routes/api/eventmod.js';
+import qualificationApiRouter from './routes/api/qualification.js';
+import userDatasetApiRouter from './routes/api/userDataset.js';
+import logsRouter from './routes/api/logs.js';
+import protocolApiRouter from './routes/api/protocol.js';
 
 
 //initialize server
 var server = express();
 
 
-const passport = require('./config/passport');
-const i18n = require ("./config/i18n");
-const upload = require("./config/multer");
-
-
-server.use(i18n.init);
+import passport from './config/passport.js';
+import upload from "./config/multer.js";
 
 
 
@@ -96,7 +95,7 @@ server.use(passport.initialize());
 server.use(passport.session());
 
 
-apiAuth = function(req, res, next){
+let apiAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
     res.status(401).send();
     // res.redirect('/unisams/login');
@@ -106,7 +105,7 @@ apiAuth = function(req, res, next){
 };
 
 
-webAuth = function(req, res, next){
+let webAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
     req.session.redirectTo = req.originalUrl; //strange bug setting favicon as url, disable until fixed
     req.session.save(function(){
@@ -178,4 +177,4 @@ server.use("/", indexRouter);
 // use(errorHandler());
 
 
-module.exports = server;
+export default server;

@@ -1,8 +1,11 @@
-const multer = require("multer");
-var fs = require('fs-extra');
+import multer from "multer";
+import fs from 'fs-extra';
+import path from "path";
+import {fileURLToPath} from "url";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dir = path.resolve(__dirname, "../src/data/uploads/tmp");
 //create directories if not exists
-let dir = appRoot + "/src/data/uploads/tmp/";
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }
@@ -18,4 +21,4 @@ var storage = multer.diskStorage({
 });
 var upload = multer({storage: storage});
 
-module.exports = upload;
+export default upload;

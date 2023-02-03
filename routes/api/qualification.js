@@ -1,6 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const qualificationService = require('../../services/qualificationService');
+import express from 'express';
+var router = express.Router();
+import qualificationService from "../../services/qualificationService.js";
 
 // routes
 router.post('/create', create);
@@ -14,7 +14,7 @@ router.delete('/:id', _delete);
 
 
 
-module.exports = router;
+export default router;
 
 function create(req, res, next) {
   qualificationService.create(req.body)

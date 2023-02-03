@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 /** @typedef {{ qualType: string, name: string }} UserDatasetSchema */
 
@@ -26,4 +26,4 @@ var UserDatasetSchema = new Schema({
 
 UserDatasetSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('UserDataset',UserDatasetSchema);
+export default mongoose.model('UserDataset',UserDatasetSchema);

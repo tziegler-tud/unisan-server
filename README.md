@@ -32,7 +32,7 @@ Planned features include a user management, event mangement, an eLearning area a
 Our project uses [SASS](https://sass-lang.com/) and webpack.
 
 ##### Backend
-NodeJS version: 8.10.0\
+Noder >= 16
 ES2017
 
 check package.json for npm dependencies

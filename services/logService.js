@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
-const mongoose = require('mongoose');
-const log = require('../utils/log');
-const AuthService = require('./authService');
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
+import mongoose from "mongoose";
+import AuthService from './authService.js';
+import Log from '../utils/log.js';
 
 const UserGroup = db.UserGroup;
 const User = db.User;
@@ -10,7 +10,7 @@ const dbLog = db.Log;
 
 
 
-module.exports = {
+export default {
     getAll,
     getById,
     create,

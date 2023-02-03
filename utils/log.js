@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
 
 const UserGroup = db.UserGroup;
 const dbLog = db.Log;
@@ -115,5 +115,5 @@ class Log {
 
 }
 
-module.exports = Log;
+export default Log;
 

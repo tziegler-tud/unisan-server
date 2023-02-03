@@ -80,9 +80,11 @@ let operations = {
     }
 }
 
-module.exports.rolesMap = rolesMap;
-module.exports.rolesEnum = rolesEnum;
-module.exports.groupsEnum = groupsEnum;
-module.exports.groupActionsEnum = groupActionsEnum;
-module.exports.roles = roles;
-module.exports.operations = operations;
+export default {
+    rolesMap : rolesMap,
+    rolesEnum : rolesEnum,
+    groupsEnum : groupsEnum,
+    groupActionsEnum : groupActionsEnum,
+    roles : roles,
+    operations : operations,
+}

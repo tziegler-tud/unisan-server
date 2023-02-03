@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const { convertDeltaToHtml } = require('node-quill-converter');
-const humanFileSize = require("../helpers/humanFileSize");
+import { convertDeltaToHtml } from 'node-quill-converter';
+import humanFileSize from "../helpers/humanFileSize.js";
 
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
 /** @typedef {{ title: {title: string, value: string}, description: {shortDesc: string, longDesc: string}, date: {startDate: Date, endDate: Date}, participants: User[], createdDate: Date}} EventScheme */
@@ -360,4 +360,4 @@ EventSchema.post('save', function(error, doc, next) {
 EventSchema.set('toJSON', { virtuals: true, getters: true });
 FileReference.set('toJSON', { virtuals: true, getters: true });
 
-module.exports = mongoose.model('Event', EventSchema);
+export default mongoose.model('Event', EventSchema);

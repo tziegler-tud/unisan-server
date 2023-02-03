@@ -1,12 +1,10 @@
-var express = require('express');
-var uuid = require('uuid');
-const passport = require('passport');
+import express from 'express';
 var router = express.Router();
-const bodyParser = require("body-parser");
-const userGroupService = require("../../services/userGroupService");
-const aclService = require("../../services/aclService");
-const authService = require("../../services/authService");
-const AuthService = require("../../services/authService");
+import uuid from 'uuid';
+import bodyParser from "body-parser";
+import userGroupService from "../../services/userGroupService.js";
+import aclService from "../../services/aclService.js";
+import AuthService from "../../services/authService.js";
 
 var app = express();
 
@@ -97,7 +95,7 @@ function getUserACL(req, res, next){
 }
 
 function getCurrentAcl(req, res, next){
-    authService.auth(req.user, authService.operations.user.READSELF)
+    AuthService.auth(req.user, AuthService.operations.user.READSELF)
         .then(result => {
             aclService.getUserACL(req.user.id, false)
                 .then(userACL => userACL ? res.json(userACL) : res.sendStatus(404))
@@ -109,7 +107,7 @@ function getCurrentAcl(req, res, next){
 }
 
 function getCurrentDockerArgs(req, res, next){
-    authService.auth(req.user, authService.operations.user.READSELF)
+    AuthService.auth(req.user, AuthService.operations.user.READSELF)
         .then(result => {
             aclService.getUserACL(req.user.id, false)
                 .then(userACL => userACL ? res.json(userACL.docker) : res.sendStatus(404))
@@ -169,4 +167,4 @@ function updateAllUser(req, res, next){
         .catch(err => next(err))
 }
 
-module.exports = router;
+export default router;

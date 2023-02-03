@@ -1,11 +1,9 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const eventService = require('../../services/eventService');
-const AuthService = require ("../../services/authService");
-const AclService = require ("../../services/aclService");
+import bodyParser from "body-parser";
+import eventService from "../../services/eventService.js";
+import AuthService from "../../services/authService.js";
+import AclService from "../../services/aclService.js";
 
 var app = express();
 
@@ -16,7 +14,7 @@ app.use(bodyParser.json());
 
 
 
-auth = function(req, res, next){
+let auth = function(req, res, next){
     if (!req.isAuthenticated()) {
         req.session.redirectTo = '/unisams';
         console.log("");
@@ -187,7 +185,7 @@ router.get('/edit/:id/:url', legacyRedirect);
 
 
 
-module.exports = router;
+export default router;
 
 function legacyRedirect(req, res, next){
     var newPath = baseUrl + "/" + req.params.id;

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const authEnums = require('../services/authEnums');
+import mongoose from "mongoose";
+import authEnums from '../services/authEnums.js';
 
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
@@ -97,4 +97,4 @@ UserACLSchema.methods.updateDockerObject = function(){
 
 UserACLSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('UserACL', UserACLSchema);
+export default mongoose.model('UserACL', UserACLSchema);

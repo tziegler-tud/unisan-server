@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-const bodyParser = require("body-parser");
+import express from 'express';
+const router = express.Router();
+import bodyParser from "body-parser";
 
 var app = express();
 
@@ -17,4 +17,4 @@ router.all('/', function(req, res, next) {
   res.redirect('/unisams')
 });
 
-module.exports = router;
+export default router;

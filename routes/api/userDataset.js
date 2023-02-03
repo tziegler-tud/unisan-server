@@ -1,6 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const userDatasetService = require('../../services/userDatasetService');
+import express from 'express';
+var router = express.Router();
+import userDatasetService from "../../services/userDatasetService.js";
 
 // routes
 router.post('/create', create);
@@ -16,7 +16,7 @@ router.delete('/:id', _deleteNode);
 
 
 
-module.exports = router;
+export default router;
 
 function create(req, res, next) {
     userDatasetService.insertNode(req.body)
