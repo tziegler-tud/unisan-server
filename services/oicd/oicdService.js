@@ -1,9 +1,9 @@
-var express = require('express');
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const ProviderModule = import("oidc-provider");
-
+import express from 'express';
+var router = express.Router();
+import bcrypt from 'bcrypt';
+import bodyParser from "body-parser";
+import passport from 'passport';
+import ProviderModule from "oidc-provider";
 
 class OidcService {
     constructor(){

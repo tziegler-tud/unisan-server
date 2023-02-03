@@ -1,4 +1,4 @@
-var uuid = require('uuid');
+import uuid from 'uuid';
 
 class Account {
     constructor(id, profile) {
