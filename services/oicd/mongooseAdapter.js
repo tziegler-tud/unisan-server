@@ -1,4 +1,15 @@
-class MyAdapter {
+import db from '../../schemes/mongo.js';
+const OicdAccount = db.OicdAccount;
+
+const grantable = new Set([
+    'access_token',
+    'authorization_code',
+    'refresh_token',
+    'device_code',
+    'backchannel_authentication_request',
+]);
+
+class MongooseAdapter {
 
     /**
      *
@@ -28,7 +39,31 @@ class MyAdapter {
      * @param {integer} expiresIn Number of seconds intended for this model to be stored.
      *
      */
-    async upsert(id, payload, expiresIn) {
+    upsert(id, payload, expiresIn) {
+
+        return new Promise(function(resolve, reject){
+            let expiresAt;
+
+            if (expiresIn) {
+                expiresAt = new Date(Date.now() + (expiresIn * 1000));
+            }
+
+            let account = new OicdAccount({
+                accountId: id,
+                payload: payload,
+                expiresAfterSeconds: expiresIn,
+                expiresAt: expiresAt,
+            })
+
+            account.save()
+                .then(result => {
+                    resolve(result);
+                })
+                .catch(err => {
+                    reject(err);
+                })
+        })
+
 
         /**
          *
@@ -164,7 +199,11 @@ class MyAdapter {
      *
      */
     async find(id) {
-
+        const account = await OicdAccount.find({accountId: id});
+        if(account) {
+            return account;
+        }
+        else return undefined;
     }
 
     /**
@@ -179,7 +218,11 @@ class MyAdapter {
      *
      */
     async findByUserCode(userCode) {
-
+        const account = await OicdAccount.find({"payload.userCode": userCode});
+        if(account) {
+            return account;
+        }
+        else return undefined;
     }
 
     /**
@@ -193,7 +236,11 @@ class MyAdapter {
      *
      */
     async findByUid(uid) {
-
+        const account = await OicdAccount.find({"payload.uid": uid});
+        if(account) {
+            return account;
+        }
+        else return undefined;
     }
 
     /**
@@ -208,7 +255,14 @@ class MyAdapter {
      *
      */
     async consume(id) {
-
+        let account = await OicdAccount.find({accountId: id})
+        if (account){
+            account.consumed = true;
+            account.save();
+        }
+        else {
+            console.log("consume account: Account " + id + " not found.")
+        }
     }
 
     /**
@@ -221,8 +275,16 @@ class MyAdapter {
      * @param {string} id Identifier of oidc-provider model
      *
      */
-    async destroy(id) {
-
+    destroy(id) {
+        return new Promise(function(resolve, reject){
+            OicdAccount.findOneAndRemove({accountId: id})
+                .then(result => {
+                    resolve()
+                })
+                .catch(err => {
+                    reject(err);
+                })
+        })
     }
 
     /**
@@ -235,9 +297,17 @@ class MyAdapter {
      * @param {string} grantId the grantId value associated with a this model's instance
      *
      */
-    async revokeByGrantId(grantId) {
-
+    revokeByGrantId(grantId) {
+        return new Promise(function(resolve, reject){
+            OicdAccount.findOneAndRemove({"payload.grantId": grantId})
+                .then(result => {
+                    resolve()
+                })
+                .catch(err => {
+                    reject(err);
+                })
+        })
     }
 }
 
-export default MyAdapter;
+export default MongooseAdapter;

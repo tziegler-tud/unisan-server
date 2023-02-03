@@ -12,6 +12,8 @@ import uuid from 'uuid';
 
 var errorHandler = require("./helpers/error-handler");
 
+import oidcService from "./services/oicd/oicdService.js";
+
 
 import fs from 'fs';
 import {fileURLToPath} from "url";
@@ -127,6 +129,9 @@ const oidcService = require("./services/oicd/oicdService");
 // data folder requires authentication
 server.use('/data/*', apiAuth);
 server.use(express.static(path.join(__dirname, 'src')));
+
+import oicdRouter from "./routes/oicd/index.js"
+server.use("/oicd", oicdRouter);
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls

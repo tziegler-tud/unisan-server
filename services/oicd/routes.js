@@ -2,37 +2,44 @@
 import { strict as assert } from 'node:assert';
 import * as querystring from 'node:querystring';
 import { inspect } from 'node:util';
-
 import { urlencoded } from 'express'; // eslint-disable-line import/no-unresolved
+import {SessionNotFound} from "oidc-provider/lib/helpers/errors.js";
 
-const account = require('./account.js');
+import Account from './account.js';
+
 
 const body = urlencoded({ extended: false });
 
 const keys = new Set();
+const debug = (obj) => querystring.stringify(Object.entries(obj).reduce((acc, [key, value]) => {
+    keys.add(key);
+    if (!value) return acc;
+    acc[key] = inspect(value, { depth: null });
+    return acc;
+}, {}), '<br/>', ': ', {
+    encodeURIComponent(value) { return keys.has(value) ? `<strong>${value}</strong>` : value; },
+});
 
 export default (app, provider) => {
-    const { constructor: { errors: { SessionNotFound } } } = provider;
+    if(!provider){
+        provider = {
+                    constructor: {
+                        errors: {
 
-    app.use((req, res, next) => {
-        const orig = res.render;
-        // you'll probably want to use a full blown render engine capable of layouts
-        res.render = (view, locals) => {
-            app.render(view, locals, (err, html) => {
-                if (err) throw err;
-                orig.call(res, '_layout', {
-                    ...locals,
-                    body: html,
-                });
-            });
-        };
-        next();
-    });
+                        }
+                    }
+                }
+    }
 
     function setNoCache(req, res, next) {
         res.set('cache-control', 'no-store');
         next();
     }
+
+    app.get("/test", function(req, res, next){
+        console.log("hit the test endpoint")
+        res.status(200).json({message: "test endpoint"})
+    })
 
     app.get('/interaction/:uid', setNoCache, async (req, res, next) => {
         try {
@@ -58,7 +65,7 @@ export default (app, provider) => {
                     });
                 }
                 case 'consent': {
-                    return res.render('interaction', {
+                    return res.render('oicd/interaction', {
                         client,
                         uid,
                         details: prompt.details,
@@ -81,7 +88,8 @@ export default (app, provider) => {
 
     app.post('/interaction/:uid/login', setNoCache, body, async (req, res, next) => {
         try {
-            const { prompt: { name } } = await provider.interactionDetails(req, res);
+            const details = await provider.interactionDetails(req, res);
+            const name = details.name;
             assert.equal(name, 'login');
             const account = await Account.findByLogin(req.body.login);
 

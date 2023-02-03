@@ -10,6 +10,7 @@ import UserGroup from './userGroupScheme.js';
 import UserACL from './userACLScheme.js';
 import Log from './logScheme.js';
 import Protocol from './protocolScheme.js'
+import OicdAccount from './oicdAccountScheme.js'
 
 mongoose.set('debug', false);
 
@@ -40,4 +41,5 @@ export default {
     UserACL: UserACL,
     Log: Log,
     Protocol: Protocol,
+    OicdAccount: OicdAccount,
 };
