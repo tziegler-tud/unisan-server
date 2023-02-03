@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
@@ -32,4 +32,4 @@ UserGroupSchema.post('save', function(error, doc, next) {
 
 UserGroupSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('UserGroup', UserGroupSchema);
+export default mongoose.model('UserGroup', UserGroupSchema);

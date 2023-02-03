@@ -1,19 +1,18 @@
-const express = require('express');
-const router = express.Router();
-const userService = require('../../services/userService');
-const uploadService = require('../../services/uploadService');
-const authService = require('../../services/authService');
-const LogService = require('../../services/logService');
-const GroupService = require('../../services/userGroupService');
-const aclService = require('../../services/aclService');
-const Log = require('../../utils/log');
+import express from 'express';
+var router = express.Router();
+import bcrypt from 'bcrypt';
+import bodyParser from "body-parser";
+import userService from "../../services/userService.js";
+import LogService from '../../services/logService.js';
+import AuthService from "../../services/authService.js";
+import UserGroupService from "../../services/userGroupService.js";
+import aclService from "../../services/aclService.js";
+import Log from '../../utils/log.js';
 
-var path = require('path');
-var fs = require('fs-extra');
+import path from 'path';
+import fs from 'fs-extra';
 
-const upload = require(appRoot + "/config/multer");
-const AuthService = require("../../services/authService");
-const bcrypt = require("bcrypt");
+import upload from "../../config/multer.js";
 
 
 
@@ -116,11 +115,11 @@ router.post('/removeGroupFromAllUser', removeGroupFromAllUser);
 //role modification requires appropriate access rights
 router.post('/setUserRole/:id', setUserRole);
 
-module.exports = router;
+export default router;
 
 function create(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.CREATE)
+    AuthService.auth(req.user, AuthService.operations.user.CREATE)
         .then(result => {
             //req.body might contain args argument, strip it from body
             let args = (req.body.args === undefined ? {} : req.body.args);
@@ -139,7 +138,7 @@ function create(req, res, next) {
 
 function getAll(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.READ)
+    AuthService.auth(req.user, AuthService.operations.user.READ)
         .then(result => {
             userService.getAll()
                 .then(users => res.json(users))
@@ -160,7 +159,7 @@ function getCurrent(req, res, next) {
 
 function getById(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.READ)
+    AuthService.auth(req.user, AuthService.operations.user.READ)
         .then(result => {
             userService.getById(req.params.id)
                 .then(user => user ? res.json(user) : res.sendStatus(404))
@@ -174,7 +173,7 @@ function getById(req, res, next) {
 
 function getByName(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.READ)
+    AuthService.auth(req.user, AuthService.operations.user.READ)
         .then(result => {
             userService.getByUsername(req.params.username)
                 .then(user => user ? res.json(user) : res.sendStatus(404))
@@ -187,7 +186,7 @@ function getByName(req, res, next) {
 
 function update(req, res, next) {
     //auth
-    authService.checkUserWriteAccess(req.user, req.params.id, true)
+    AuthService.checkUserWriteAccess(req.user, req.params.id, true)
         .then(result => {
             userService.update(req, req.params.id, req.body)
                 .then(() => res.json({}))
@@ -206,7 +205,7 @@ function updateCurrentUserPassword(req, res, next) {
     }
     let password = req.body.currentPassword;
     let newPassword = req.body.newPassword;
-    authService.checkUserWriteAccess(req.user, "self", true)
+    AuthService.checkUserWriteAccess(req.user, "self", true)
         .then(result => {
 
             userService.getUserHash(req.user)
@@ -250,7 +249,7 @@ function updateUserPassword(req, res, next) {
 
 function getKey(req, res, next) {
     //auth
-    authService.auth(req.user, authService.operations.user.READ)
+    AuthService.auth(req.user, AuthService.operations.user.READ)
         .then(result => {
             userService.getKey(req.params.id, req.body.key)
                 .then(() => res.json({}))
@@ -269,7 +268,7 @@ function updateKey(req, res, next) {
     //auth
     else {
         let critical = (req.body.key === "password" || req.body.key === "username");
-        authService.checkUserWriteAccess(req.user, req.params.id, critical)
+        AuthService.checkUserWriteAccess(req.user, req.params.id, critical)
             .then(result => {
                 userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
                     .then((result) => res.json({result}))
@@ -284,7 +283,7 @@ function updateKey(req, res, next) {
 
 function addQualification(req, res, next) {
     //auth
-    authService.checkUserWriteAccess(req.user, req.params.id, false)
+    AuthService.checkUserWriteAccess(req.user, req.params.id, false)
         .then(result => {
             userService.addQualification(req, req.params.id, req.body.data, req.body.args)
                 .then((result) => res.json({result}))
@@ -297,7 +296,7 @@ function addQualification(req, res, next) {
 
 function updateQualification(req, res, next) {
     //auth
-    authService.checkUserWriteAccess(req.user, req.params.id, false)
+    AuthService.checkUserWriteAccess(req.user, req.params.id, false)
         .then(result => {
             userService.updateQualification(req, req.params.id, req.body.id, req.body.data, req.body.args)
                 .then((result) => res.json({result}))
@@ -310,7 +309,7 @@ function updateQualification(req, res, next) {
 
 function removeQualification(req, res, next) {
     //auth
-    authService.checkUserWriteAccess(req.user, req.params.id, false)
+    AuthService.checkUserWriteAccess(req.user, req.params.id, false)
         .then(result => {
             userService.removeQualification(req, req.params.id, req.body.id, req.body.args)
                 .then((result) => res.json({result}))
@@ -330,7 +329,7 @@ function deleteKey(req, res, next) {
     else {
         let critical = (req.body.key === "password" || req.body.key === "username");
         //auth
-        authService.checkUserWriteAccess(req.user, req.params.id, critical)
+        AuthService.checkUserWriteAccess(req.user, req.params.id, critical)
             .then(result => {
                 if (req.body.isArray) {
                     userService.deleteArrayElement(req, req.params.id, req.body.key, req.body.args)
@@ -351,7 +350,7 @@ function deleteKey(req, res, next) {
 
 function matchAny(req, res, next){
     //auth
-    authService.auth(req.user, authService.operations.user.READ)
+    AuthService.auth(req.user, AuthService.operations.user.READ)
         .then(result => {
             if (req.body.filter === undefined) req.body.filter = "";
             userService.matchAny(req.body.filter, req.body.args)
@@ -367,7 +366,7 @@ function matchAny(req, res, next){
 
 function filterByGroup(req, res, next){
     //auth
-    authService.auth(req.user, authService.operations.user.READ)
+    AuthService.auth(req.user, AuthService.operations.user.READ)
         .then(result => {
             if (req.body.filter === undefined) req.body.filter = "";
             userService.filterByGroup(req.body.filter, req.body.groupId, req.body.args)
@@ -388,9 +387,9 @@ function addUserGroup(req, res, next){
         next(err);
     }
     //get user group form id
-    GroupService.getById(req.body.userGroupId)
+    UserGroupService.getById(req.body.userGroupId)
         .then(group => {
-            authService.checkUserGroupWriteAccess(req.user, req.params.id, group, true)
+            AuthService.checkUserGroupWriteAccess(req.user, req.params.id, group, true)
                 .then(result => {
                     userService.addUserGroup(req, req.params.id, group)
                         .then(function(user) {
@@ -416,9 +415,9 @@ function removeUserGroup(req, res, next){
         next(err);
     }
     //get user group form id
-    GroupService.getById(req.body.userGroupId)
+    UserGroupService.getById(req.body.userGroupId)
         .then(group => {
-            authService.checkUserGroupWriteAccess(req.user, req.params.id, group, false)
+            AuthService.checkUserGroupWriteAccess(req.user, req.params.id, group, false)
                 .then(result => {
                     userService.removeUserGroup(req, req.params.id, req.body.userGroupId)
                         .then(function (user) {
@@ -453,7 +452,7 @@ function setUserRole(req, res, next){
 }
 
 function _delete(req, res, next) {
-    authService.checkUserDeleteAccess(req.user, req.params.id)
+    AuthService.checkUserDeleteAccess(req.user, req.params.id)
         .then(result => {
             userService.delete(req, req.params.id)
                 .then(() => res.json({}))
@@ -471,7 +470,7 @@ function addGroupToAllUser(req, res, next){
         next(err);
     }
     //get user group form id
-    GroupService.getById(req.body.userGroupId)
+    UserGroupService.getById(req.body.userGroupId)
         .then(group => {
             //get user list
             userService.getAll()
@@ -479,7 +478,7 @@ function addGroupToAllUser(req, res, next){
                     let promiseArray = [];
                     userlist.forEach(function (user) {
                         promiseArray.push(new Promise(function (resolve, reject) {
-                            authService.checkUserGroupWriteAccess(req.user, user, group, true)
+                            AuthService.checkUserGroupWriteAccess(req.user, user, group, true)
                                 .then(result => {
                                     userService.addUserGroup(req, user.id, group)
                                         .then(user => {
@@ -510,7 +509,7 @@ function removeGroupFromAllUser(req, res, next){
         next(err);
     }
     //get user group form id
-    GroupService.getById(req.body.userGroupId)
+    UserGroupService.getById(req.body.userGroupId)
         .then(group => {
             //get user list
             userService.getAll()
@@ -518,7 +517,7 @@ function removeGroupFromAllUser(req, res, next){
                     let promiseArray = [];
                     userlist.forEach(function (user) {
                         promiseArray.push(new Promise(function (resolve, reject) {
-                            authService.checkUserGroupWriteAccess(req.user, user, group, false)
+                            AuthService.checkUserGroupWriteAccess(req.user, user, group, false)
                                 .then(result => {
                                     userService.removeUserGroup(req, user.id, group)
                                         .then(user => {

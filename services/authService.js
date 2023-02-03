@@ -1,8 +1,7 @@
-const Mongoose = require('mongoose')
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
-
-const aclService = require("./aclService");
+import bcrypt from 'bcrypt';
+import Mongoose from "mongoose";
+import db from '../schemes/mongo.js';
+import aclService from "./aclService.js";
 
 const UserGroup = db.UserGroup;
 const UserACL = db.UserACL;
@@ -947,5 +946,5 @@ authService.roles = roles;
 authService.operations = operations;
 authService.rolesEnum = rolesEnum;
 authService.rolesMap = rolesMap;
-module.exports = authService;
+export default authService;
 

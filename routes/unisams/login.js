@@ -1,8 +1,8 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
+import uuid from 'uuid';
+import passport from 'passport';
+import bodyParser from "body-parser";
 
 var app = express();
 
@@ -48,4 +48,4 @@ router.all("/logout", function(req, res, next) {
 
 
 
-module.exports = router;
+export default router;

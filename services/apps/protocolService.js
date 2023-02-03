@@ -1,9 +1,8 @@
-const bcrypt = require('bcrypt');
-const db = require('../../schemes/mongo');
-const log = require('../../utils/log');
-const AuthService = require('../authService');
-const userService = require('../../services/userService');
-
+import bcrypt from 'bcrypt';
+import db from '../../schemes/mongo.js';
+import AuthService from '../authService.js';
+import userService from "../userService.js";
+import Log from '../../utils/log.js';
 
 const UserGroup = db.UserGroup;
 const User = db.User;
@@ -11,7 +10,7 @@ const Protocol = db.Protocol;
 
 
 
-module.exports = {
+export default {
     getAll,
     getById,
     create,

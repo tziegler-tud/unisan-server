@@ -1,10 +1,14 @@
-const config = require('../config/config.json');
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
+import AuthService from './authService.js';
+import LogService from "./logService.js";
+import aclService from "./aclService.js";
+import UserService from "./userService.js";
+import Log from '../utils/log.js';
 
 const UserDataset = db.UserDataset;
 
-module.exports = {
+export default {
     getRoot,
     getChildren,
     getAll,

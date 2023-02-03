@@ -1,14 +1,16 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-const { v1: uuidv1, v2: uuidv4 } = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const eventService = require('../../services/eventService');
-const uploadService = require('../../services/uploadService');
-const AuthService = require('../../services/authService');
-const imageThumbnail = require('image-thumbnail');
+import passport from 'passport';
+import bodyParser from "body-parser";
+import eventService from "../../services/eventService.js";
+import AuthService from "../../services/authService.js";
 
-const got = require('got');
+import imageThumbnail from 'image-thumbnail';
+import got from 'got';
+import path from 'path';
+import fs from 'fs-extra';
+
+import upload from "../../config/multer.js";
 
 var app = express();
 
@@ -18,11 +20,6 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.raw());
 
-
-var path = require('path');
-var fs = require('fs-extra');
-
-const upload = require(appRoot + "/config/multer");
 
 function checkUrlAccess(req, res, next){
     AuthService.auth(req.user,req.method,req.originalUrl)
@@ -184,7 +181,7 @@ router.get('/:id', getById);
 
 
 
-module.exports = router;
+export default router;
 
 function create(req, res, next) {
     eventService.create(req, req.body)

@@ -1,17 +1,17 @@
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
+import AuthService from './authService.js';
+import LogService from "./logService.js";
+import aclService from "./aclService.js";
+import UserService from "./userService.js";
+import Log from '../utils/log.js';
 
-const UserService = require("./userService");
-const aclService = require("./aclService");
-const AuthService = require("./authService");
-const Log = require("../utils/log");
-const LogService = require("./logService");
 
 const UserGroup = db.UserGroup;
 
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
 
-module.exports = {
+export default {
     getAll,
     getById,
     update,

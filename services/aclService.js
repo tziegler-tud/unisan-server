@@ -1,9 +1,9 @@
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
-const AuthEnums = require("./authEnums");
-const Log = require("../utils/log");
-const LogService = require("./logService");
-const userService = require("./userService");
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
+import LogService from "./logService.js";
+import Log from '../utils/log.js';
+import AuthEnums from "./authEnums.js";
+import userService from "./userService.js";
 
 const UserGroup = db.UserGroup;
 const UserACL = db.UserACL;
@@ -13,7 +13,7 @@ const User = db.User;
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
 
 
-module.exports = {
+export default {
     getAll,
     getAllFiltered,
     getManyByUserId,

@@ -1,13 +1,15 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const userService = require('../../services/userService');
-const qualificationService = require('../../services/qualificationService');
-const logService = require('../../services/logService');
-const userGroupService = require('../../services/userGroupService');
-const AclService = require("../../services/aclService");
+import uuid from 'uuid';
+import bodyParser from "body-parser";
+import userService from "../../services/userService.js";
+import AclService from "../../services/aclService.js";
+import AuthService from "../../services/authService.js";
+import logService from '../../services/logService.js';
+import userGroupService from "../../services/userGroupService.js";
+import qualificationService from "../../services/qualificationService.js";
+import Log from '../../utils/log.js';
+
 
 var app = express();
 
@@ -18,7 +20,7 @@ app.use(bodyParser.json());
 
 
 
-auth = function(req, res, next){
+let auth = function(req, res, next){
     if (!req.isAuthenticated()) {
         req.session.redirectTo = '/unisams';
         console.log("");
@@ -178,4 +180,4 @@ function editRoleAdvanced(req, res, next) {
 
 
 
-module.exports = router;
+export default router;

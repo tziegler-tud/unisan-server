@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-plugin-autoinc-fix');
+import mongoose from "mongoose";
+import autoIncrement from "mongoose-plugin-autoinc-fix";
 
 const Schema = mongoose.Schema;
 
@@ -901,7 +901,7 @@ LogSchema.plugin(autoIncrement.plugin, { model: 'Log', field: 'logId', startAt: 
 
 LogSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('Log', LogSchema);
+export default mongoose.model('Log', LogSchema);
 
 
 
@@ -929,7 +929,7 @@ module.exports = mongoose.model('Log', LogSchema);
 // });
 // module.exports = user;
 
-variableTypes = {
+const variableTypes = {
     USER: "USER",
     EVENT: "EVENT",
     QUALIFICATION: "QUALIFICATION",

@@ -31,4 +31,4 @@ function humanFileSize(bytes, si=false, dp=1) {
     return bytes.toFixed(dp) + ' ' + units[u];
 }
 
-module.exports = humanFileSize;
+export default humanFileSize;

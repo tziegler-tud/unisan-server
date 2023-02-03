@@ -1,7 +1,7 @@
-const passport =        require('passport');
-const LocalStrategy =   require('passport-local').Strategy;
-const bcrypt =          require ('bcrypt');
-const userService = require('../services/userService');
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import userService from '../services/userService.js';
 
 
 // @louis I made the login function async because of performance reasons. An attacker could spam the login and this would block the server due to a synchronous (blocking) bcrypt call!
@@ -52,4 +52,4 @@ passport.deserializeUser((id, done) => {
         .catch(err => console.log(err))
 });
 
-module.exports = passport;
+export default passport;

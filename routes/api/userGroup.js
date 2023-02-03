@@ -1,10 +1,9 @@
-var express = require('express');
-var uuid = require('uuid');
-const passport = require('passport');
+import express from 'express';
 var router = express.Router();
-const bodyParser = require("body-parser");
-const userGroupService = require("../../services/userGroupService");
-const AuthService = require("../../services/authService");
+import uuid from 'uuid';
+import bodyParser from "body-parser";
+import userGroupService from "../../services/userGroupService.js";
+import AuthService from "../../services/authService.js";
 
 var app = express();
 
@@ -142,4 +141,4 @@ function getAssignedUser (req, res, next) {
 
 
 
-module.exports = router;
+export default router;

@@ -1,11 +1,9 @@
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
-const AuthService = require('./authService');
-const LogService = require("./logService");
-const aclService = require("./aclService");
-const Log = require('../utils/log');
-
-
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
+import AuthService from './authService.js';
+import LogService from "./logService.js";
+import aclService from "./aclService.js";
+import Log from '../utils/log.js';
 
 const User = db.User;
 const Event = db.Event;
@@ -14,9 +12,9 @@ const Qualifications = db.Qualifications;
 const UserACL = db.UserACL;
 const DbLog = db.Log;
 
-var fs = require('fs-extra');
+import fs from 'fs-extra';
 
-module.exports = {
+export default {
     getAll,
     getManyById,
     getAllFiltered,

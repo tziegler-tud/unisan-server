@@ -1,10 +1,8 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const protocolService = require('../../services/apps/protocolService');
-const AuthService = require('../../services/authService');
+import bodyParser from "body-parser";
+import protocolService from "../../services/apps/protocolService.js";
+import AuthService from "../../services/authService.js";
 
 
 var app = express();
@@ -29,6 +27,6 @@ function editDoc(req, res, next) {
 
 
 
-module.exports = router;
+export default router;
 
 

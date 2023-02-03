@@ -1,7 +1,6 @@
-const bcrypt = require('bcrypt');
-const db = require('../schemes/mongo');
-
-const aclService = require("./aclService");
+import bcrypt from 'bcrypt';
+import db from '../schemes/mongo.js';
+import aclService from "./aclService.js";
 
 const UserGroup = db.UserGroup;
 const User = db.User;
@@ -491,5 +490,5 @@ let authService = new AuthService()
 authService.roles = roles;
 authService.rolesEnum = rolesEnum;
 authService.rolesMap = rolesMap;
-module.exports = authService;
+export default authService;
 

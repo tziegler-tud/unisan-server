@@ -1,7 +1,6 @@
-const express = require('express');
-const path = require('path');
-
-var i18n = require('i18n');
+import express from "express";
+import path from "path";
+import i18n from "i18n";
 var app = express();
 
 i18n.configure({

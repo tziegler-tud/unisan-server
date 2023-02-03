@@ -1,11 +1,10 @@
-var express = require('express');
-const router = express.Router();
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const userService = require('../../services/userService');
-const AuthService = require('../../services/authService');
-const aclService = require('../../services/aclService');
+import express from 'express';
+var router = express.Router();
+import bodyParser from "body-parser";
+import userService from "../../services/userService.js";
+import AuthService from "../../services/authService.js";
+import aclService from "../../services/aclService.js";
+
 
 var app = express();
 
@@ -52,7 +51,7 @@ router.get('/:username/events', userEvents);
 //
 
 
-module.exports = router;
+export default router;
 
 function legacyRedirect(req, res, next) {
     var newPath = baseUrl + "/" + req.params.username;

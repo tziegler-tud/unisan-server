@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-plugin-autoinc-fix');
-
+import mongoose from "mongoose";
+import autoIncrement from "mongoose-plugin-autoinc-fix";
 
 
 /** @typedef {{ name: string, qualType: string, acquiredDate: Date, expireDate: Date, trainingDate: Date, isValid: boolean, hasDocument: boolean, documentPath: string }} QualificationObject */
@@ -153,15 +152,12 @@ UserSchema.plugin(autoIncrement.plugin, { model: 'User', field: 'generalData.mem
 
 UserSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('User', UserSchema);
+
 
 UserSchema.virtual('name').get(function() {
     if (this.generalData.firstName === undefined || this.generalData.lastName === undefined) return "";
     return (this.generalData.firstName.value + " " + this.generalData.lastName.value);
 });
-
-
-
 
 UserSchema.virtual('contactDefault').get(function() {
     let obj;
@@ -194,3 +190,5 @@ UserSchema.virtual('contactDefault').get(function() {
 //
 // });
 // module.exports = user;
+
+export default mongoose.model('User', UserSchema);

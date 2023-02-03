@@ -1,10 +1,9 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var uuid = require('uuid');
-const passport = require('passport');
-const bodyParser = require("body-parser");
-const protocolService = require('../../services/apps/protocolService');
-const authService = require('../../services/authService');
+import uuid from 'uuid';
+import bodyParser from "body-parser";
+import protocolService from "../../services/apps/protocolService.js";
+import authService from "../../services/authService.js";
 
 
 var app = express();
@@ -86,6 +85,6 @@ function deleteDocument(req, res, next) {
         .catch(err=>next(err))
 }
 
-module.exports = router;
+export default router;
 
 
