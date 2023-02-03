@@ -1,3 +1,4 @@
+
 import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
@@ -8,6 +9,9 @@ import session from "express-session";
 import SessionFileStore from "session-file-store";
 const FileStore = SessionFileStore(session);
 import uuid from 'uuid';
+
+var errorHandler = require("./helpers/error-handler");
+
 
 import fs from 'fs';
 import {fileURLToPath} from "url";
@@ -116,6 +120,9 @@ let webAuth = function(req, res, next){
     next();
   }
 };
+
+
+const oidcService = require("./services/oicd/oicdService");
 
 // data folder requires authentication
 server.use('/data/*', apiAuth);
