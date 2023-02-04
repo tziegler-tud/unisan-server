@@ -67,7 +67,7 @@ class OidcService {
                 clients: [{
                     client_id: 'moodle_local',
                     client_secret: 'moodleSecret',
-                    redirect_uris: ['localhost:8000'],
+                    redirect_uris: ['127.0.0.1:8000'],
                     // + other client properties
                 },
                     {
