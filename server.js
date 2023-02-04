@@ -123,15 +123,15 @@ let webAuth = function(req, res, next){
   }
 };
 
-
-const oidcService = require("./services/oicd/oicdService");
-
 // data folder requires authentication
 server.use('/data/*', apiAuth);
 server.use(express.static(path.join(__dirname, 'src')));
 
 import oicdRouter from "./routes/oicd/index.js"
-server.use("/oicd", oicdRouter);
+oidcService.init.then((oicd)=>{
+  server.use(oicd.url, oicd.provider.callback());
+  server.use(oicd.url, oicdRouter);
+})
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
