@@ -78,7 +78,7 @@ class OidcService {
                     }],
                 interactions: {
                     url(ctx, interaction) { // eslint-disable-line no-unused-vars
-                        return "oidc/interaction/" + interaction.uid;
+                        return "oicd/interaction/" + interaction.uid;
                     },
                 },
                 features: {
@@ -93,10 +93,10 @@ class OidcService {
             };
 
             const provider = new Provider(self.issuer, configuration);
-
+            provider.proxy = true;
             let server = express();
             // routes(server, provider)
-            server.use(self.url, provider.callback());
+            // server.use(self.url, provider.callback());
 
             self.provider = provider;
             console.log("Oauth2 provider service running at " + self.issuer + self.url);
