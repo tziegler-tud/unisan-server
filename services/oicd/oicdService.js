@@ -13,9 +13,9 @@ import UserService from "../userService.js";
 class OidcService {
     constructor(){
 
-        const { PORT = 3000, ISSUER = "https://unisan-server.de"} = process.env;
-        this.port = PORT;
-        this.issuer = ISSUER;
+        // const { PORT = 3000, ISSUER = "https://unisan-server.de"} = process.env;
+        this.port = 3000;
+        this.issuer = "https://3185-95-91-4-57.eu.ngrok.io";
 
         this.config = {};
 
@@ -44,11 +44,11 @@ class OidcService {
             console.log("Initializing Oauth2 provider service...\n");
             function findAccount(ctx, id, token) {
                 return new Promise(function(resolve, reject){
-                    UserService.getById(id)
+                    UserService.getByUsername(id)
                         .then(user=> {
                             if(user){
                                 let result = {
-                                    accountId: user.id,
+                                    accountId: user.username,
                                     scope: undefined,
                                     rejected: undefined,
                                     async claims(use, scope, claims, rejected) { return { sub: id }; },
@@ -67,29 +67,34 @@ class OidcService {
                 clients: [{
                     client_id: 'moodle_local',
                     client_secret: 'moodleSecret',
-                    redirect_uris: ['127.0.0.1:8000'],
+                    redirect_uris: ['http://localhost:8000/admin/oauth2callback.php'],
                     // + other client properties
                 },
                     {
                         client_id: 'test_client',
                         client_secret: 'test_secret',
-                        redirect_uris: ['localhost:8000'],
+                        redirect_uris: ['https://oauthdebugger.com/debug'],
                         // + other client properties
                     }],
                 interactions: {
-                    url(ctx, interaction) { // eslint-disable-line no-unused-vars
-                        return "oicd/interaction/" + interaction.uid;
+                    url : function interActionsUrl(ctx, interaction) { // eslint-disable-line no-unused-vars
+                        return "/oicdIt/interaction/" + interaction.uid;
                     },
                 },
                 features: {
-                    devInteractions: { enabled: false }, // defaults to true
+                    devInteractions: { enabled: true }, // defaults to true
 
                     deviceFlow: { enabled: true }, // defaults to false
                     revocation: { enabled: true }, // defaults to false
                 },
-                claims: self.claims,
-                cookies: self.cookies,
-                findAccount: Account.findAccount,
+                claims: self.config.claims,
+                cookies: self.config.cookies,
+                findAccount: findAccount,
+                pkce: {
+                    required: function pkceRequired(ctx, client) {
+                        return false;
+                    }
+                }
             };
 
             const provider = new Provider(self.issuer, configuration);

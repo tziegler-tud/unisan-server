@@ -40,6 +40,7 @@ class MongooseAdapter {
      *
      */
     upsert(id, payload, expiresIn) {
+        let self =this;
 
         return new Promise(function(resolve, reject){
             let expiresAt;
@@ -48,20 +49,55 @@ class MongooseAdapter {
                 expiresAt = new Date(Date.now() + (expiresIn * 1000));
             }
 
-            let account = new OicdAccount({
-                accountId: id,
-                payload: payload,
-                expiresAfterSeconds: expiresIn,
-                expiresAt: expiresAt,
-            })
+            if(self.name === "Session") {
+                console.log("this is a session");
+            }
 
-            account.save()
-                .then(result => {
-                    resolve(result);
+            //check if exists
+            OicdAccount.findOne({model: self.name, accountId: id})
+                .then(account=> {
+                    if(account) {
+                        account.payload = payload;
+                        account.grantId = payload.grantId;
+                        account.userCode = payload.userCode;
+                        account.uid = payload.uid;
+                        account.session = payload.session;
+                        account.expiresAfterSeconds = expiresIn;
+                        account.expiresAt = expiresAt;
+
+                        account.save()
+                            .then(result=> {
+                                console.log("Element updated: " + result);
+                                resolve();
+                            })
+                            .catch(err => {
+                                reject(err);
+                            })
+                    }
+                    else {
+                        let account = new OicdAccount({
+                            accountId: id,
+                            model: self.name,
+                            payload: payload,
+                            grantId: payload.grantId,
+                            userCode: payload.userCode,
+                            session: payload.session,
+                            uid: payload.uid,
+                            expiresAfterSeconds: expiresIn,
+                            expiresAt: expiresAt,
+                        })
+
+                        account.save()
+                            .then(result => {
+                                console.log("Element created: " + result);
+                                resolve(result);
+                            })
+                            .catch(err => {
+                                reject(err);
+                            })
+                    }
                 })
-                .catch(err => {
-                    reject(err);
-                })
+
         })
 
 
@@ -199,9 +235,9 @@ class MongooseAdapter {
      *
      */
     async find(id) {
-        const account = await OicdAccount.find({accountId: id});
+        const account = await OicdAccount.findOne({model: this.name, accountId: id});
         if(account) {
-            return account;
+            return account.payload;
         }
         else return undefined;
     }
@@ -218,9 +254,9 @@ class MongooseAdapter {
      *
      */
     async findByUserCode(userCode) {
-        const account = await OicdAccount.find({"payload.userCode": userCode});
+        const account = await OicdAccount.findOne({model: this.name, "payload.userCode": userCode});
         if(account) {
-            return account;
+            return account.payload;
         }
         else return undefined;
     }
@@ -236,9 +272,9 @@ class MongooseAdapter {
      *
      */
     async findByUid(uid) {
-        const account = await OicdAccount.find({"payload.uid": uid});
+        const account = await OicdAccount.findOne({model: this.name, "payload.uid": uid});
         if(account) {
-            return account;
+            return account.payload;
         }
         else return undefined;
     }
@@ -255,9 +291,9 @@ class MongooseAdapter {
      *
      */
     async consume(id) {
-        let account = await OicdAccount.find({accountId: id})
+        let account = await OicdAccount.findOne({model: this.name, accountId: id})
         if (account){
-            account.consumed = true;
+            account.payload.consumed = true;
             account.save();
         }
         else {
@@ -276,8 +312,9 @@ class MongooseAdapter {
      *
      */
     destroy(id) {
+        let self = this;
         return new Promise(function(resolve, reject){
-            OicdAccount.findOneAndRemove({accountId: id})
+            OicdAccount.findOneAndRemove({model: self.name, accountId: id})
                 .then(result => {
                     resolve()
                 })
@@ -298,8 +335,9 @@ class MongooseAdapter {
      *
      */
     revokeByGrantId(grantId) {
+        let self = this;
         return new Promise(function(resolve, reject){
-            OicdAccount.findOneAndRemove({"payload.grantId": grantId})
+            OicdAccount.findOneAndRemove({model: self.name, "payload.grantId": grantId})
                 .then(result => {
                     resolve()
                 })

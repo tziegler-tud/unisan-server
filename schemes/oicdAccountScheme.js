@@ -10,16 +10,23 @@ var OicdAccountScheme = new Schema({
         required: true,
         type: String,
     },
+    model: {
+
+    },
     payload: {
-        userCode: {
 
-        },
-        uid: {
+    },
+    grantId: {
 
-        },
-        grantId: {
+    },
+    userCode: {
 
-        }
+    },
+    session: {
+
+    },
+    uid: {
+
     },
     consumed: {
 

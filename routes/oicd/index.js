@@ -12,6 +12,7 @@ import bodyParser from "body-parser";
 var app = express();
 
 import oicdService from "../../services/oicd/oicdService.js";
+import passport from "passport";
 
 
 const body = urlencoded({ extended: false });
@@ -37,9 +38,9 @@ router.get('/interaction/:uid', setNoCache, async (req, res, next) => {
 
         const client = await oicdService.provider.Client.find(itDetails.params.client_id);
 
-        switch (prompt.name) {
+        switch (itDetails.prompt.name) {
             case 'login': {
-                return res.render('login', {
+                return res.render('oicd/login', {
                     client,
                     uid: itDetails.uid,
                     details: itDetails.prompt.details,
@@ -68,17 +69,27 @@ router.get('/interaction/:uid', setNoCache, async (req, res, next) => {
 router.post('/interaction/:uid/login', setNoCache, body, async (req, res, next) => {
     try {
         const details = await oicdService.provider.interactionDetails(req, res);
-        const name = details.name;
-        assert.equal(name, 'login');
-        const account = await oicdService.Account.findByLogin(req.body.login);
 
-        const result = {
-            login: {
-                accountId: account.accountId,
-            },
-        };
+        passport.authenticate('local', {}, (err, user, info) => {
+            let result = {};
+            if (!user) {
+                console.warn("login failed");
+                result = {
+                    error: "access_denied",
+                }
 
-        await oicdService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+            }
+            else {
+                result = {
+                    login: {
+                        accountId: user._id.toString(),
+                    },
+                };
+            }
+
+            return oicdService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+        })(req, res, next);
+
     } catch (err) {
         next(err);
     }

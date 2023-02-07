@@ -130,7 +130,7 @@ server.use(express.static(path.join(__dirname, 'src')));
 import oicdRouter from "./routes/oicd/index.js"
 oidcService.init.then((oicd)=>{
   server.use(oicd.url, oicd.provider.callback());
-  server.use(oicd.url, oicdRouter);
+  server.use("/oicdIt", oicdRouter);
 })
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
