@@ -3,9 +3,9 @@ import "./eventSettings.scss";
 
 var lidlRTO = window.lidlRTO;
 
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
-import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {EditableInputField} from "../helpers/editableInputField";

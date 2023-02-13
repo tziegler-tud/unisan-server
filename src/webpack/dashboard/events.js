@@ -6,7 +6,7 @@ import {dateFromNow} from "../helpers/helpers";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
-import "/src/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
+import "/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
 
 let events = {
     data: {},

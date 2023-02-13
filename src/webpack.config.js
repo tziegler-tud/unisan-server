@@ -1,66 +1,63 @@
-import path from "path";
-import webpack from "webpack";
-import autoprefixer from 'autoprefixer';
-import sass from "sass";
-import {fileURLToPath} from "url";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const path = require("path");
+const webpack = require("webpack");
+const autoprefixer = require('autoprefixer');
 
-export default {
+module.exports = {
     watch: true,
     mode: 'development',
     entry: {
-        login: "./src/webpack/login.js",
-        login_style: "./src/webpack/login.scss",
+        login: "./webpack/login.js",
+        login_style: "./webpack/login.scss",
 
-        init: "./src/webpack/init.js",
-        init_style: "./src/webpack/init.scss",
+        init: "./webpack/init.js",
+        init_style: "./webpack/init.scss",
 
-        index: "./src/webpack/index.js",
-        index_style: "./src/webpack/index.scss",
+        index: "./webpack/index.js",
+        index_style: "./webpack/index.scss",
 
-        dashboard: "./src/webpack/dashboard/dashboard.js",
-        dashboard_style: "./src/webpack/dashboard/dashboard.scss",
+        dashboard: "./webpack/dashboard/dashboard.js",
+        dashboard_style: "./webpack/dashboard/dashboard.scss",
 
-        addUser: "./src/webpack/user/addUser.js",
-        addUser_style: "./src/webpack/user/addUser.scss",
-        editUser: "./src/webpack/user/editUser.js",
-        editUser_style: "./src/webpack/user/editUser.scss",
+        addUser: "./webpack/user/addUser.js",
+        addUser_style: "./webpack/user/addUser.scss",
+        editUser: "./webpack/user/editUser.js",
+        editUser_style: "./webpack/user/editUser.scss",
 
-        viewUser: "./src/webpack/user/viewUser.js",
-        viewUser_style: "./src/webpack/user/viewUser.scss",
+        viewUser: "./webpack/user/viewUser.js",
+        viewUser_style: "./webpack/user/viewUser.scss",
 
-        userEvents: "./src/webpack/user/userEvents.js",
-        userEvents_style: "./src/webpack/user/userEvents.scss",
+        userEvents: "./webpack/user/userEvents.js",
+        userEvents_style: "./webpack/user/userEvents.scss",
 
-        userLogs: "./src/webpack/user/userLogs.js",
-        userLogs_style: "./src/webpack/user/userLogs.scss",
+        userLogs: "./webpack/user/userLogs.js",
+        userLogs_style: "./webpack/user/userLogs.scss",
 
-        userlist: "./src/webpack/user/userlist.js",
-        userlist_style: "./src/webpack/user/userlist.scss",
+        userlist: "./webpack/user/userlist.js",
+        userlist_style: "./webpack/user/userlist.scss",
 
-        addEvent: "./src/webpack/events/addEvent.js",
-        addEvent_style: "./src/webpack/events/addEvent.scss",
+        addEvent: "./webpack/events/addEvent.js",
+        addEvent_style: "./webpack/events/addEvent.scss",
 
-        eventlist: "./src/webpack/events/eventlist.js",
-        eventlist_style: "./src/webpack/events/eventlist.scss",
+        eventlist: "./webpack/events/eventlist.js",
+        eventlist_style: "./webpack/events/eventlist.scss",
 
-        event: "./src/webpack/events/event.js",
-        event_style: "./src/webpack/events/event.scss",
+        event: "./webpack/events/event.js",
+        event_style: "./webpack/events/event.scss",
 
-        settings: "./src/webpack/settings/settings.js",
+        settings: "./webpack/settings/settings.js",
 
-        editRole: "./src/webpack/roles/editRole.js",
+        editRole: "./webpack/roles/editRole.js",
 
-        protocol: "./src/webpack/apps/protocol/protocol.js",
-        protocol_style: "./src/webpack/apps/protocol/protocol.scss",
+        protocol: "./webpack/apps/protocol/protocol.js",
+        protocol_style: "./webpack/apps/protocol/protocol.scss",
 
-        protocolEditor: "./src/webpack/apps/protocol/protocol-editor.js",
-        protocolEditor_style: "./src/webpack/apps/protocol/protocol-editor.scss",
+        protocolEditor: "./webpack/apps/protocol/protocol-editor.js",
+        protocolEditor_style: "./webpack/apps/protocol/protocol-editor.scss",
 
-        user: "./src/webpack/userpage/user.js",
+        user: "./webpack/userpage/user.js",
     },
     output: {
-        path: path.join(__dirname, "./src/dist"),
+        path: path.join(__dirname, "./dist"),
         filename: "[name].js"
     },
     plugins: [
@@ -90,7 +87,7 @@ export default {
                         loader: 'sass-loader',
                         options: {
                             // Prefer Dart Sass
-                            implementation: sass,
+                            implementation: require('sass'),
 
                             // See https://github.com/webpack-contrib/sass-loader/issues/804
                             webpackImporter: false,

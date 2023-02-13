@@ -23,9 +23,9 @@ import {escapeSelector, refJSON} from "../helpers/helpers";
 
 import {userActions} from "../actions/userActions";
 
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
-import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 $(document).ready (function () {
 

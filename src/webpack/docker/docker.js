@@ -1,7 +1,7 @@
 import {Drawer} from "./drawer"
 import "./docker.scss";
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
-import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
+import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 const Handlebars = require("handlebars");
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");

@@ -8,8 +8,8 @@ import {escapeSelector} from "../helpers/helpers";
 import {Preloader} from "../helpers/preloader"
 
 import {actions, qualificationActions} from "../actions/actions";
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
-import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
+import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 
 let qualifications = {
