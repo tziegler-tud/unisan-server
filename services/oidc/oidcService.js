@@ -5,8 +5,6 @@ import bodyParser from "body-parser";
 import passport from 'passport';
 import Provider from "oidc-provider";
 import MongooseAdapter from "./mongooseAdapter.js";
-import routes from "./routes.js";
-import Account from "./account.js";
 import UserService from "../userService.js";
 
 
@@ -14,18 +12,21 @@ class OidcService {
     constructor(){
 
         // const { PORT = 3000, ISSUER = "https://unisan-server.de"} = process.env;
+        // this.port = 80;
+        // this.issuer = "https://3c99-95-91-4-57.eu.ngrok.io";
+
+
+        this.issuer = "http://127.0.0.1";
         this.port = 3000;
-        this.issuer = "https://3185-95-91-4-57.eu.ngrok.io";
 
         this.config = {};
 
-        //oicd provider
+        //oidc provider
         this.config.claims = {
-            address: ['address'],
-            email: ['email', 'email_verified'],
-            phone: ['phone_number', 'phone_number_verified'],
-            profile: ['birthdate', 'family_name', 'gender', 'given_name', 'locale', 'middle_name', 'name',
-                'nickname', 'picture', 'preferred_username', 'profile', 'updated_at', 'website', 'zoneinfo'],
+            username: ["id", "username"],
+            email: ['email'],
+            profile: ['username', 'family_name', 'given_name', 'locale', 'name', 'updated_at'],
+            picture: ['picture'],
         }
         this.config.cookies = {
             cookies: {
@@ -33,7 +34,8 @@ class OidcService {
             },
         }
 
-        this.url = "/oicd";
+        this.url = "/oidc";
+        this.serverUrl = this.issuer + ":" + this.port;
         this.init = this.init();
 
     }
@@ -44,14 +46,24 @@ class OidcService {
             console.log("Initializing Oauth2 provider service...\n");
             function findAccount(ctx, id, token) {
                 return new Promise(function(resolve, reject){
-                    UserService.getByUsername(id)
+                    UserService.getById(id)
                         .then(user=> {
                             if(user){
                                 let result = {
-                                    accountId: user.username,
+                                    accountId: user.id,
                                     scope: undefined,
                                     rejected: undefined,
-                                    async claims(use, scope, claims, rejected) { return { sub: id }; },
+                                    async claims(use, scope, claims, rejected) { return {
+                                        sub: id,
+                                        email: user.internalEmail,
+                                        username: user.username,
+                                        given_name: user.generalData.firstName.value,
+                                        family_name: user.generalData.lastName.value,
+                                        // picture: self.issuer + "/data/uploads/user_images/" + user.id + "/" + user.id + ".jpg",
+                                        picture: self.issuer + "/data/uploads/user_images/" + user.id + "/" + user.id + ".jpg",
+                                        // picture: "https://static.wikia.nocookie.net/lotr/images/8/8d/Gandalf-2.jpg/revision/latest?cb=20130209172436",
+                                        };
+                                    },
                                 };
                                 resolve( result);
                             }
@@ -59,6 +71,23 @@ class OidcService {
 
 
                 })
+            }
+
+            async function renderError(ctx, out, error) {
+                ctx.type = 'html';
+                ctx.body = `<!DOCTYPE html>
+                    <head>
+                      <title>oops! something went wrong</title>
+                    </head>
+                    <body>
+                      <div>
+                        <h1>oops! something went wrong</h1>
+                        
+                      </div>
+                      <h1>Stack:</h1>        
+                      <span>${error.stack}</span>               
+                     </body>
+                    </html>`;
             }
 
             const configuration = {
@@ -71,6 +100,12 @@ class OidcService {
                     // + other client properties
                 },
                     {
+                        client_id: 'moodle_local_https',
+                        client_secret: 'moodleSecret',
+                        redirect_uris: ['http://localhost:8000/admin/oauth2callback.php'],
+                        // + other client properties
+                    },
+                    {
                         client_id: 'test_client',
                         client_secret: 'test_secret',
                         redirect_uris: ['https://oauthdebugger.com/debug'],
@@ -78,15 +113,16 @@ class OidcService {
                     }],
                 interactions: {
                     url : function interActionsUrl(ctx, interaction) { // eslint-disable-line no-unused-vars
-                        return "/oicdIt/interaction/" + interaction.uid;
+                        return "/oidcIt/interaction/" + interaction.uid;
                     },
                 },
                 features: {
-                    devInteractions: { enabled: true }, // defaults to true
+                    devInteractions: { enabled: false }, // defaults to true
 
                     deviceFlow: { enabled: true }, // defaults to false
                     revocation: { enabled: true }, // defaults to false
                 },
+                renderError: renderError,
                 claims: self.config.claims,
                 cookies: self.config.cookies,
                 findAccount: findAccount,

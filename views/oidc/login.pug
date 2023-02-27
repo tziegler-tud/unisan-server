@@ -40,20 +40,12 @@ html
               .login-form-container
                 .login-form-greeter
                   .greeter-label
-                    | OpenId Test Suite
+                    | OpenID Login
                   .greeter-content
-                    | Interaction page
+                    | Melde dich an, um fortzufahren.
                 .login-form-content
-                  //form#login-form01.login-form(action='login' method='POST')
-                  //  .login-form-inp
-                  //    input#login-inp01.floating-label-field.floating-label-field--s3(name="username" type="text" placeholder="username")
-                  //    label.floating-label(for='login-inp01') username
-                  //  .login-form-inp
-                  //    input#login-inp02.login-form-inp.floating-label-field.floating-label-field--s3(name="password" type="password" placeholder="password")
-                  //    label.floating-label(for='login-inp02') password
-                  //  input#login-submit.login-form-submit(type="submit" value="login")
 
-                  form#login-form01.login-form(action='login' method='POST')
+                  form#login-form01.login-form(action= uid + '/login' method='POST')
                     label#mdcTextField1.mdc-text-field.mdc-text-field--outlined
                       span.mdc-notched-outline
                         span.mdc-notched-outline__leading

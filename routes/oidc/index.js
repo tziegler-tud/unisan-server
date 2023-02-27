@@ -11,7 +11,7 @@ import bodyParser from "body-parser";
 
 var app = express();
 
-import oicdService from "../../services/oicd/oicdService.js";
+import oidcService from "../../services/oidc/oidcService.js";
 import passport from "passport";
 
 
@@ -23,7 +23,7 @@ function setNoCache(req, res, next) {
 }
 
 /**
- * hooked at /oicd
+ * hooked at /oidc
  */
 
 router.get("/test", function(req, res, next){
@@ -34,13 +34,13 @@ router.get("/test", function(req, res, next){
 
 router.get('/interaction/:uid', setNoCache, async (req, res, next) => {
     try {
-        const itDetails = await oicdService.provider.interactionDetails(req, res);
+        const itDetails = await oidcService.provider.interactionDetails(req, res);
 
-        const client = await oicdService.provider.Client.find(itDetails.params.client_id);
+        const client = await oidcService.provider.Client.find(itDetails.params.client_id);
 
         switch (itDetails.prompt.name) {
             case 'login': {
-                return res.render('oicd/login', {
+                return res.render('oidc/login', {
                     client,
                     uid: itDetails.uid,
                     details: itDetails.prompt.details,
@@ -50,7 +50,7 @@ router.get('/interaction/:uid', setNoCache, async (req, res, next) => {
                 });
             }
             case 'consent': {
-                return res.render('oicd/interaction', {
+                return res.render('oidc/interaction', {
                     client,
                     uid: itDetails.uid,
                     details: itDetails.prompt.details,
@@ -68,7 +68,7 @@ router.get('/interaction/:uid', setNoCache, async (req, res, next) => {
 
 router.post('/interaction/:uid/login', setNoCache, body, async (req, res, next) => {
     try {
-        const details = await oicdService.provider.interactionDetails(req, res);
+        const details = await oidcService.provider.interactionDetails(req, res);
 
         passport.authenticate('local', {}, (err, user, info) => {
             let result = {};
@@ -77,7 +77,6 @@ router.post('/interaction/:uid/login', setNoCache, body, async (req, res, next) 
                 result = {
                     error: "access_denied",
                 }
-
             }
             else {
                 result = {
@@ -87,7 +86,7 @@ router.post('/interaction/:uid/login', setNoCache, body, async (req, res, next) 
                 };
             }
 
-            return oicdService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+            return oidcService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
         })(req, res, next);
 
     } catch (err) {
@@ -97,7 +96,7 @@ router.post('/interaction/:uid/login', setNoCache, body, async (req, res, next) 
 
 router.post('/interaction/:uid/confirm', setNoCache, body, async (req, res, next) => {
     try {
-        const interactionDetails = await oicdService.provider.interactionDetails(req, res);
+        const interactionDetails = await oidcService.provider.interactionDetails(req, res);
         const { prompt: { name, details }, params, session: { accountId } } = interactionDetails;
         assert.equal(name, 'consent');
 
@@ -106,10 +105,10 @@ router.post('/interaction/:uid/confirm', setNoCache, body, async (req, res, next
 
         if (grantId) {
             // we'll be modifying existing grant in existing session
-            grant = await oicdService.provider.Grant.find(grantId);
+            grant = await oidcService.provider.Grant.find(grantId);
         } else {
             // we're establishing a new grant
-            grant = new oicdService.provider.Grant({
+            grant = new oidcService.provider.Grant({
                 accountId,
                 clientId: params.client_id,
             });
@@ -136,7 +135,7 @@ router.post('/interaction/:uid/confirm', setNoCache, body, async (req, res, next
         }
 
         const result = { consent };
-        await oicdService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
+        await oidcService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
     } catch (err) {
         next(err);
     }
@@ -148,7 +147,7 @@ router.get('/interaction/:uid/abort', setNoCache, async (req, res, next) => {
             error: 'access_denied',
             error_description: 'End-User aborted interaction',
         };
-        await oicdService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+        await oidcService.provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
     } catch (err) {
         next(err);
     }

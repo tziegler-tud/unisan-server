@@ -1,0 +1,65 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=")
+
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_login.css')
+
+    script(src='/static/unisams/js/preloader.js')
+    script(src='/dist/login.js')
+    script(src='/dist/login_style.js')
+
+    //
+      ***********************************
+      ** no js fallback
+      ***********************************
+    noscript
+      link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/no-js.css')
+
+
+
+
+  body.no-js
+    #wrapper.wrapper-full-height
+      .login-page
+        .login-page-container
+          .login-additional-box
+            .additonal-content-container.centered
+              .img-container
+                img(src="/static/images/logo/unisams-kompakt.jpg")
+              //.unisams-label
+              //  span.acc1 uni
+              //  span.acc2 Sams
+                .clear
+              .clear
+          .login-content
+            .login-content-inner.centered
+              .login-form-container
+                .login-form-greeter
+                  .greeter-label
+                    | OpenId Test Suite
+                  .greeter-content
+                    | Interaction page
+                .login-form-content
+
+
+                  .login-form-consent
+                    .login-fomr-consent-label
+                      span.login-form-consent-label--bold=client.clientId
+                      span
+                      |  erhält Zugriff auf folgende Daten:
+                    ul.login-form-consent-list
+                      each val in details.missingOIDCScope
+                        li.login-form-consent-entry=val
+
+                  form#login-form01.login-form(action=uid + '/confirm' method='POST')
+                    button.submit-button.mdc-button.mdc-button--raised.next
+                      .mdc-button__ripple
+                      span.mdc-button__label
+                        | Bestätigen
+
+
+

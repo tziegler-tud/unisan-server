@@ -12,8 +12,7 @@ import uuid from 'uuid';
 
 var errorHandler = require("./helpers/error-handler");
 
-import oidcService from "./services/oicd/oicdService.js";
-
+import oidcService from "./services/oidc/oidcService.js";
 
 import fs from 'fs';
 import {fileURLToPath} from "url";
@@ -127,10 +126,11 @@ let webAuth = function(req, res, next){
 server.use('/data/*', apiAuth);
 server.use(express.static(path.join(__dirname, 'src')));
 
-import oicdRouter from "./routes/oicd/index.js"
-oidcService.init.then((oicd)=>{
-  server.use(oicd.url, oicd.provider.callback());
-  server.use("/oicdIt", oicdRouter);
+import oidcRouter from "./routes/oidc/index.js"
+oidcService.init.then((oidc)=>{
+  server.use(oidc.url, oidc.provider.callback());
+  server.use("/oidcIt", oidcRouter);
+
 })
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
