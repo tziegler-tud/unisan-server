@@ -8,10 +8,10 @@ import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import {EditableTextField} from "../helpers/editableTextField";
 import {EditableInputField} from "../helpers/editableInputField";
 
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2"
-import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer"
-import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog"
-import {PageSlider as lidlPageSlider} from "/src/lib/lidl-modules/pageSlider/pageSlider";
+import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2"
+import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer"
+import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog"
+import {PageSlider as lidlPageSlider} from "/lib/lidl-modules/pageSlider/pageSlider";
 
 const Handlebars = require("handlebars");
 

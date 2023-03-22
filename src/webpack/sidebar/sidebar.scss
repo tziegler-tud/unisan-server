@@ -31,7 +31,7 @@ body{
 
     //overflow: auto;
     .page-container {
-      width: calc(#{"100% - ${sidebar-width} - 0.1em"});
+      width: calc(100% - #{$sidebar-width} - 0.1em);
       float: left;
 
     }
@@ -80,9 +80,9 @@ body{
 
   .sidebar-container {
     width:    100vw;
-    //min-height: 100vh;
+    min-height: 100%;
     //height: auto;
-    height: 100vh;
+    height: 100%;
     transform: translateX(100%);
     position: fixed;
     border-left: 1px solid $menu-border-color;

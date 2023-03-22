@@ -48,14 +48,24 @@
         }
 
         .docker-top-btn {
-          flex: 0 0 $topnav-height;
+          @media #{$desktop, $tablet-landscape} {
+            flex: 0 0 $topnav-height;
+            height: $topnav-height;
+          }
+          flex: 0 0 3em;
+          height: 3em;
           border-right: 1px solid $menu-border-color;
           float: left;
 
           svg {
             display: block;
-            height: 33%;
-            margin: 33% 33%;
+            height: 100%;
+            width: 50%;
+            margin: auto;
+
+            @media #{$desktop, $tablet-landscape} {
+              width: 33%;
+            }
           }
         }
 

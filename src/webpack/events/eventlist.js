@@ -6,7 +6,7 @@ const {Sidebar} = require("../sidebar/sidebar");
 import {Searchbar} from "../searchbar/searchbar";
 import {Corner, DropdownMenu} from "../helpers/dropdownMenu";
 import {eventActions} from "../actions/eventActions";
-import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
+import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");

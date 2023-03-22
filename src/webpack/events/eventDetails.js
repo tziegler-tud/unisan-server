@@ -6,9 +6,9 @@ import {UserProfile} from "../userprofile/userprofile";
 
 import {Snackbar} from "../helpers/snackbar";
 import {DropdownMenu} from "../helpers/dropdownMenu";
-import {lidl} from "/src/lib/lidl-modules/core/lidlModular-0.2";
-import {Observer as lidlObserver} from "/src/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/src/lib/lidl-modules/dialog/lidl-dialog";
+import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
