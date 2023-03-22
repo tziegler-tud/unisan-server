@@ -22,7 +22,7 @@ block content
             #page-container-inner.page-container-inner.full-width.full-height
                 section#sec1
                     #sec-content.subpage-container
-                        #content1-heading.sec-heading.subpage-heading
+                        #content1-heading.sec-heading.subpage-heading.userinfo-heading-container.mobile-avatar
                             .userimg-container.sec-heading-img
                                 .userimg.hover
                                     .userimg-overlay.changeProfilePicture
@@ -33,7 +33,8 @@ block content
 
                             .sec-heading-label.userprofile-heading
                                 .userprofile-heading-container
-                                    h3#userProfileName.limitCharacters=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
+                                    .userprofile-heading-text
+                                        h3#userProfileName.limitCharacters=exploreUser.generalData.firstName.value + " " + exploreUser.generalData.lastName.value
                                     #mdc-dropdown.userprofile-dropdown.dropdown-menu.mdc-menu-surface--anchor
                                         dropdown-btn
                                             button.material-icons.mdc-icon-button(id="mdc-dropdown-trigger" aria-label="Options") more_vert

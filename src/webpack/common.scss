@@ -276,9 +276,12 @@ a {
     .subpage-heading {
       font-size: 100%;
       color: #333;
-
       display: flex;
       flex-flow: row wrap;
+
+      @media #{$desktop, $tablet-landscape} {
+
+      }
 
       &.padding {
         padding-left: 1em;
