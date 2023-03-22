@@ -12,7 +12,7 @@ let user = {
         $(document).ready(function () {
 
             //debug line, remove before flight
-            console.log("loading js module: settings.user");
+            console.log("loading js module: system.user");
 
         })
     }

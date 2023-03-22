@@ -40,7 +40,7 @@ function getDockerArguments (req, res, next) {
     // next();
 }
 
-//hooked at /unisams/settings
+//hooked at /unisams/system
 
 /* GET home page. */
 // router.get("/*", auth);
@@ -60,7 +60,7 @@ function database (req, res, next) {
     qualificationService.getAll()
         .then(quals => {
             qualList = quals;
-            res.render("unisams/settings/settingsDatabase", {title: "settings - uniSams",
+            res.render("unisams/system/settingsDatabase", {title: "System - uniSams",
                 user: req.user._doc,
                 acl: req.acl,
                 qualificationList: qualList
@@ -76,7 +76,7 @@ function qualifications (req, res, next) {
     qualificationService.getAll()
         .then(quals => {
             qualList = quals;
-            res.render("unisams/settings/qualifications", {title: "qualifications - uniSams",
+            res.render("unisams/system/qualifications", {title: "qualifications - uniSams",
                 user: req.user._doc,
                 acl: req.acl,
                 qualificationList: qualList
@@ -88,7 +88,7 @@ function qualifications (req, res, next) {
 }
 
 function user (req, res, next) {
-    res.render("unisams/settings/user", {title: "settings - uniSams",
+    res.render("unisams/system/user", {title: "system settings - uniSams",
         user: req.user._doc,
         acl: req.acl,
     })
@@ -96,7 +96,7 @@ function user (req, res, next) {
 
 
 function events (req, res, next) {
-    res.render("unisams/settings/events", {title: "settings - uniSams",
+    res.render("unisams/system/events", {title: "system settings - uniSams",
         user: req.user._doc,
         acl: req.acl,
     })
@@ -106,7 +106,7 @@ function events (req, res, next) {
 function roles (req, res, next) {
     userGroupService.getAll()
         .then(groups => {
-            res.render("unisams/settings/roles", {title: "Rechte und Rollen - uniSams",
+            res.render("unisams/system/roles", {title: "Rechte und Rollen - uniSams",
                 user: req.user._doc,
                 acl: req.acl,
                 groups: groups
@@ -119,7 +119,7 @@ function roles (req, res, next) {
 
 
 function logs (req, res, next) {
-    res.render("unisams/settings/logs", {title: "logs - uniSams",
+    res.render("unisams/system/logs", {title: "logs - uniSams",
         user: req.user._doc,
         acl: req.acl,
     })

@@ -4,21 +4,17 @@ block page_includes
 
     script.
         window.groupId = "#{group._id}";
-         window.group = !{JSON.stringify(group)}
-         window.assignedUser = !{JSON.stringify(assignedUser)};
+        window.group = !{JSON.stringify(group)}
+        window.assignedUser = !{JSON.stringify(assignedUser)};
         window.dockerArgs.activeContainer = "roleContainer";
         window.dockerArgs.activeElementId = "roleAdvanced";
 
         window.jsmodule = {
-            module: "role",
+            module: "roles",
             loaders: ["advanced"],
         };
 
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
-    //script(src="/static/unisams/js/settings/role.js")
-    //script(src="/static/unisams/js/actions.js")
-    script(src="/dist/editRole.js")
+    script(src="/dist/roles.js")
 
 block content
     #wrapper
@@ -34,14 +30,14 @@ block content
                                 .clear
                         #content1-text.sec-content.border-top.userlogs-container.logs-container
                             .subpage-content
-                                .userinfo-container
-                                    #tab-userinfo-general.userinfo-inner
-                                        .userinfo-section.userinfo-card.card-full.userwidget-description
-                                            .userinfo-section-inner
-                                                .userinfo-sectionheader
+                                .info-container
+                                    #tab-info-general.info-inner
+                                        .info-section.info-card.card-full.userwidget-description
+                                            .info-section-inner
+                                                .info-sectionheader
                                                     span http allowed operations
                                                 div
-                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                    ul.userlist.itemlist.itemlist-style-clean.info-itemList
                                                         if group.allowedOperations
                                                             - var secKey = "allowedOperations"
                                                             - var secVal = group.allowedOperations
@@ -57,17 +53,17 @@ block content
                                                 if group.default === true
 
                                                 else
-                                                    .userinfo-item.useredit-item.useredit-addItem
+                                                    .info-item.useredit-item.useredit-addItem
                                                         .addPathButton.btn-addItem.btn-listExt(data-catkey=secKey)
                                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                             span Hinzufügen
                                                             .clear
 
-                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                        .info-section.info-card.card-full.userwidget-description
                                             a#addToAllButton.content-link.style2.addToAllButton Gruppe allen Nutzern zuweisen
 
-                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                        .info-section.info-card.card-full.userwidget-description
                                             a#removeFromAllButton.content-link.style2.removeFromAllButton Alle Nutzer aus Gruppe entfernen
 
-                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                        .info-section.info-card.card-full.userwidget-description
                                             a#deleteGroupButton.content-link.deleteGroupButton Gruppe löschen

@@ -1,5 +1,7 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
 
+import "../sidebar-addParticipant.scss";
+
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {Searchbar} from "../../searchbar/searchbar";

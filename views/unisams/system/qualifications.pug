@@ -3,18 +3,18 @@ extends ../layout
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
     link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    script(src="/dist/settings.js")
+    script(src="/dist/system.js")
 
 
 
     script.
         //used to tell the bundled js which modules to load.
         window.jsmodule = {
-            module: "settings",
+            module: "system",
             loaders: ["qualifications"],
         };
-        window.dockerArgs.activeContainer = "settingsContainer";
-        window.dockerArgs.activeElementId = "settingsQualifications";
+        window.dockerArgs.activeContainer = "systemContainer";
+        window.dockerArgs.activeElementId = "systemQualifications";
 
 
 block content

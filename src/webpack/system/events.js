@@ -10,7 +10,7 @@ let events = {
         $(document).ready(function () {
 
             //debug line, remove before flight
-            console.log("loading js module: settings.events");
+            console.log("loading js module: system.events");
 
         })
     }

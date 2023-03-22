@@ -1,4 +1,4 @@
-//load settings modules
+//load system modules
 import {logs} from "./logs.js";
 import {groups} from "./groups.js";
 import {user} from "./user.js";
@@ -9,6 +9,8 @@ var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
 
 $(document).ready(function () {
+
+    const moduleName = "system";
 
     //setup module specific loaders
     let loaders = [];
@@ -41,8 +43,8 @@ $(document).ready(function () {
     let jsmodule = window.jsmodule;
     if (jsmodule === undefined) jsmodule = {};
 
-    if(!jsmodule.module === "settings") {
-        console.error("invalid jsmodule information: Expected 'settings', but found " + jsmodule.module)
+    if(!jsmodule.module === moduleName) {
+        console.error("invalid jsmodule information: Expected " + moduleName + ", but found " + jsmodule.module)
         return false;
     }
 

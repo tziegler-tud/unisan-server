@@ -4,18 +4,18 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
     script(src="/static/unisams/js/qualificationActions.js")
     //script(src="/static/unisams/js/settings.js")
-    script(src="/dist/settings.js")
+    script(src="/dist/system.js")
 
 
 
     script.
         //used to tell the bundled js which modules to load.
         window.jsmodule = {
-            module: "settings",
+            module: "system",
             loaders: ["events"],
         };
-        window.dockerArgs.activeContainer = "settingsContainer";
-        window.dockerArgs.activeElementId = "settingsEvents";
+        window.dockerArgs.activeContainer = "systemContainer";
+        window.dockerArgs.activeElementId = "systemEvents";
 
 
 block content

@@ -265,7 +265,7 @@ var userActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+data.userGroupId)
+                location.replace("/unisams/system/roles/"+data.userGroupId)
             }
         });
     },
@@ -285,7 +285,7 @@ var userActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+data.userGroupId)
+                location.replace("/unisams/system/roles/"+data.userGroupId)
             }
         });
     },

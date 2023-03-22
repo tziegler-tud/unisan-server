@@ -1,5 +1,4 @@
 import "./sidebar.scss";
-
 import "./sidebar-logs.scss";
 
 import {phone, tablet} from "../helpers/variables";

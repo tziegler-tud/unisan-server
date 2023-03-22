@@ -10,15 +10,11 @@ block page_includes
         window.dockerArgs.activeElementId = "roleGeneral";
 
         window.jsmodule = {
-            module: "role",
+            module: "roles",
             loaders: ["view"],
         };
 
-    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    //script(src="/static/unisams/js/settings/role.js")
-    //script(src="/static/unisams/js/actions.js")
-    script(src="/dist/editRole.js")
+    script(src="/dist/roles.js")
 
 
 
@@ -36,14 +32,14 @@ block content
                                 .clear
                         #content1-text.sec-content.border-top.userlogs-container.logs-container
                             .subpage-content
-                                .userinfo-container
-                                    #tab-userinfo-general.userinfo-inner
-                                        .userinfo-section.userinfo-card.card-full.userwidget-description
-                                            .userinfo-section-inner
-                                                .userinfo-sectionheader
+                                .info-container
+                                    #tab-info-general.info-inner
+                                        .info-section.info-card.card-full.userwidget-description
+                                            .info-section-inner
+                                                .info-sectionheader
                                                     span Allgemeines
                                                 div
-                                                    ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                    ul.userlist.itemlist.itemlist-style-clean.info-itemList
                                                         - var combinedKey = "title"
                                                         - var keyTitle = "Titel"
                                                         - var value = group.title
@@ -77,9 +73,9 @@ block content
                                                                 .clear
 
 
-                                            .userinfo-section.userinfo-card.card-full.userwidget-description
-                                                .userinfo-section-inner
-                                                    .userinfo-sectionheader
+                                            .info-section.info-card.card-full.userwidget-description
+                                                .info-section-inner
+                                                    .info-sectionheader
                                                         span assigned user
                                                     div.itemlist-header-container.userlist-header-container
                                                         ul#userlist-top.userlist-header.userlistModule.itemlist.common-list.list-view.border
@@ -89,7 +85,7 @@ block content
                                                     .itemlist-content-container.userlist-content-container
                                                         #userlist-container
 
-                                                    .userinfo-item.useredit-item.useredit-addItem
+                                                    .info-item.useredit-item.useredit-addItem
                                                         .useredit-addGeneralItemBtn.btn-addItem.btn-listExt.addUserButton
                                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                             span Hinzufügen

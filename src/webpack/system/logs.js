@@ -14,7 +14,7 @@ let logs = {
             plr.show();
 
             //debug line, remove before flight
-            console.log("loading js module: settings.logs");
+            console.log("loading js module: system.logs");
 
             // window.DockerElement = new docker.Docker(window.dockerArgs);
             var sidebar = new Sidebar('wrapper', {title: "Test"});

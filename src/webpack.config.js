@@ -46,9 +46,9 @@ module.exports = {
         event: "./webpack/events/event.js",
         event_style: "./webpack/events/event.scss",
 
-        settings: "./webpack/settings/settings.js",
+        system: "./webpack/system/system.js",
 
-        editRole: "./webpack/roles/editRole.js",
+        roles: "./webpack/roles/roles.js",
 
         protocol: "./webpack/apps/protocol/protocol.js",
         protocol_style: "./webpack/apps/protocol/protocol.scss",
