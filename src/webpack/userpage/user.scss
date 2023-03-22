@@ -12,22 +12,6 @@
     display: flex;
     flex-flow: row wrap;
 
-    &.mobile-avatar {
-      padding: 0;
-      @media #{$mobile-} {
-        padding: 3em 1em 1em 0;
-
-        .userimg-container {
-          .userimg {
-            img {
-              border-radius: 0;
-            }
-          }
-        }
-
-      }
-    }
-
     .sec-heading-label.userprofile-heading {
 
       flex: 1 1 auto;

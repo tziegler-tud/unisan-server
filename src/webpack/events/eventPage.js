@@ -169,7 +169,7 @@ var Component = function(componentId, componentType, data, args){
                                 $(listItemEl).click(function(e){
                                     this.menu.open = true;
                                 })
-                                $(menu.items).closest(".menu-entry-delete").on("click", function(e) {
+                                $(menu.items).closest(".menu-entry__delete").on("click", function(e) {
 
                                     let uniqueId = this.dataset.id;
                                     eventActions.deleteFileFromStorage(event.id, uniqueId, {
