@@ -3,6 +3,7 @@ node_modules/
 bin/sessions/*
 sessions/
 src/**/build/
+src/dist
 src/node_modules
 src/data/uploads/
 src/data/event_files
