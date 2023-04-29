@@ -115,9 +115,11 @@ var Docker = function(dockerArgs){
                         self.ready = true;
                         self.resolveObserver(true);
 
-                        //add settings subpage to all users for now
+                        //add system settings subpage to all users for now
                         //TODO: settings subpage should only be visible for users with appropriate access rights
-                        self.addDockerSubPage("system", {id: "DockerSystemContainer"}, {position: {place: "first"}}, undefined, userACL.docker)
+                        if(self.dockerAcl.system.enabled) {
+                            self.addDockerSubPage("system", {id: "DockerSystemContainer"}, {position: {place: "first"}}, undefined, userACL.docker)
+                        }
                     })
             })
                 .catch(function(){

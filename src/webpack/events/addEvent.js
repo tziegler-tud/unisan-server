@@ -28,7 +28,7 @@ $(document).ready (function () {
     // window.addEventListener("resize", setupTimePickerWidget);
 
     let pagesliderContainer = document.getElementById("pageslider-container-01");
-    $.get('/static/unisams/js/events/templates/addEvent-container.hbs', function (data) {
+    $.get('/webpack/events/templates/addEvent-container.hbs', function (data) {
         var template = Handlebars.compile(data);
         pagesliderContainer.innerHTML = template();
         buildPageSlider(pagesliderContainer);

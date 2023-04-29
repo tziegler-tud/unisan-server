@@ -25,10 +25,10 @@ $(document).ready (function () {
     let url;
     switch(template){
         case "divi":
-            url="/static/unisams/js/apps/protocol/templates/divi.hbs";
+            url="/webpack/apps/protocol/templates/divi.hbs";
             break;
         default:
-            url="/static/unisams/js/apps/protocol/templates/divi.hbs";
+            url="/webpack/apps/protocol/templates/divi.hbs";
             break;
     }
 

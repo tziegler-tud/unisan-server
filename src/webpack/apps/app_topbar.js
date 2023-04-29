@@ -8,7 +8,7 @@ import {MDCTopAppBar} from '@material/top-app-bar';
         if (callback === undefined) callback = {}
         this.callback = callback;
         //load drawer template and attach to body
-        this.initialize = $.get('/static/unisams/js/apps/templates/topbar.hbs', function (data) {
+        this.initialize = $.get('/webpack/apps/templates/topbar.hbs', function (data) {
             var template = Handlebars.compile(data);
             $("body").prepend(template(context));
             const topAppBarElement = document.querySelector('.mdc-top-app-bar');
