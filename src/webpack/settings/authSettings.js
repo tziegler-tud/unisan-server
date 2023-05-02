@@ -1,8 +1,5 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
-import {UserProfile} from "../userprofile/userprofile";
-import {UserPage} from "./userPage";
-
 import {userActions, eventActions, groupActions} from "../actions/actions"
 
 import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
@@ -17,15 +14,12 @@ import {dateFromNow} from "../helpers/helpers";
 import {phone, tablet} from "../helpers/variables";
 import {Snackbar} from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
-import {EventPage} from "../events/eventPage";
-import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import ComponentPage from "../components/ComponentPage";
+import {UserProfile} from "../userprofile/userprofile";
+import {EventRequest} from "../events/eventRequest";
 
-var actions = window.actions;
-
-
-let settings = {
-    title: "settings",
+let authSettings = {
+    title: "authSettings",
     pageData: {},
     init: function (args) {
         let self  = this;
@@ -33,42 +27,36 @@ let settings = {
             $(document).ready(function () {
 
                 //debug line, remove before flight
-                console.log("loading js module: user."+self.title);
+                console.log("loading js module: settings." + self.title);
 
                 self.pageData = {};
                 var lidlRTO = window.lidlRTO;
-                var currentExploredUser;
-                var profile = new UserProfile(window.exploreUserId);
+
+                window.snackbar = new Snackbar();
+
+                var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
                 // create new observer
                 var ob1 = new lidlObserver(function (u) {
-                    currentExploredUser = u;
-                    self.pageData.exploredUser = currentExploredUser;
-                    self.updatePage(self.pageData.exploredUser, args)
+                    self.pageData.user = u;
+                    self.updatePage(self.pageData.user, args)
                 });
                 window.snackbar = new Snackbar();
-
-                const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
-
-
                 // get user data from user service
                 //subscribe as observer to get notification if user changes on server
-                let userPromise = profile.getUserAndSubscribe(ob1);
+                let userPromise = userProfile.getUserAndSubscribe(ob1)
+                window.userProfile = userProfile;
 
-                userPromise.then(user=> {
-                    self.pageData.exploredUser = user;
-                    self.buildPage(self.pageData.exploredUser, args)
+                userPromise.then(user => {
+                    self.pageData.user = user;
+                    self.buildPage(self.pageData.user, args)
                         .then(result => {
                             resolve();
                         })
-                        .catch(err=> {
+                        .catch(err => {
                             reject(err)
                         })
                 })
-                    .catch(function (reason) {
-                        console.error("Failed to retrieve data:" + reason)
-
-                    })
             })
         })
     },
@@ -81,31 +69,23 @@ let settings = {
         // init event sidebar
         // if(!(phone.matches || tablet.matches)) sidebar.show();
 
-
         return new Promise(function(resolve, reject){
-
-            if (window.allowedit) {
-                window.DockerElement.addDockerSubPage("userEdit", self.pageData.exploredUser, {}, undefined, {currentUser: {edit: window.allowedit}});
-            }
-            else {
-                window.DockerElement.addDockerSubPage("user", self.pageData.exploredUser, {}, undefined, {currentUser: {edit: window.allowedit}});
-            }
-
-            let pageContainer = document.getElementById("userPage-component-container");
-            var userPage = new ComponentPage({
+            let pageContainer = document.getElementById("componentPage-component-container");
+            var componentPage = new ComponentPage({
                 container: pageContainer,
                 sidebar: sidebar,
                 data: {user: user},
                 args: {},
             });
-            window.userPage = userPage;
-            userPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id});
+            window.componentPage = componentPage;
+            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full"});
+            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full"});
+            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.LOGINS, {allowEdit: true, size: "full"});
         })
-
     },
     updatePage: function(user, args){
-        this.buildPage(user, args)
+        return this.buildPage(user, args)
     },
 };
 
-export {settings}
+export {authSettings}

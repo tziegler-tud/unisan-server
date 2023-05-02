@@ -1,13 +1,15 @@
 var userActions = {
 
     addUser: function (data, args) {
+        let self = this;
         let defaults = {
             memberId: {
                 setCustom: false,
             },
             userImg: {
                 tmp: false,
-            }
+            },
+            groups: [],
         }
         args = (args === undefined) ? {} : args;
         args = Object.assign(defaults, args);
@@ -41,9 +43,33 @@ var userActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/user/edit/" + data.username)
+                let groupsPromises = [];
+                //assign groups
+                let jsonData = {
+                    userId: data.userId,
+                    args: args,
+                }
+                args.groups.forEach(groupId => {
+                    jsonData.userGroupId = groupId;
+                    let action = $.ajax({
+                        url: "/api/v1/usermod/addUserGroup/"+data.userId,
+                        type: 'POST',
+                        contentType: "application/json; charset=UTF-8",
+                        dataType: 'json',
+                        data: JSON.stringify(jsonData)
+                    });
+                    groupsPromises.push(action)
+                })
+                Promise.all(groupsPromises)
+                    .then()
+                    .catch()
+
+
             }
         });
+
+
+        location.replace("/unisams/user/edit/" + data.username)
     },
 
     deleteUser: function (userid) {
@@ -120,7 +146,29 @@ var userActions = {
         });
     },
 
-    updateCurrentUserPassword: function (userid, currentPassword, newPassword, args, callback) {
+    updateUserPassword: function (userid, currentPassword, newPassword, args, callback) {
+        callback = (callback == null) ? function () {
+        } : callback;
+        var data = {
+            userid: userid,
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+            args: args,
+        };
+        return $.ajax({
+            url: "/api/v1/usermod/updateUserPassword/",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                callback(result)
+            }
+        });
+    },
+
+    updateCurrentUserPassword: function (currentPassword, newPassword, args, callback) {
         callback = (callback == null) ? function () {
         } : callback;
         var data = {

@@ -70,7 +70,7 @@ let operations = {
         GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
     },
-    settings: {
+    system: {
         QUALIFICATIONS: "manageQualificationSettings",
         LOGS: "manageSystemLogs",
         EVENTS: "manageEventSettings",

@@ -48,6 +48,8 @@ module.exports = {
 
         system: "./webpack/system/system.js",
 
+        settings: "./webpack/settings/settings.js",
+
         roles: "./webpack/roles/roles.js",
 
         protocol: "./webpack/apps/protocol/protocol.js",

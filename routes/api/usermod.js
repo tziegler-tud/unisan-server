@@ -125,7 +125,9 @@ function create(req, res, next) {
             let args = (req.body.args === undefined ? {} : req.body.args);
             req.body.args = {};
             userService.create(req, req.body, args)
-                .then(() => res.json(req.body))
+                .then((user) => {
+                    res.json(req.body)
+                })
                 .catch(err => {
                     next(err);
                 })
@@ -232,11 +234,6 @@ function updateCurrentUserPassword(req, res, next) {
                             next(err);
                         })
                 })
-
-
-            // userService.update(req, req.params.id, req.body)
-            //     .then(() => res.json({}))
-            //     .catch(err => next(err));
         })
         .catch(err =>{
             next(err);
@@ -244,6 +241,50 @@ function updateCurrentUserPassword(req, res, next) {
 }
 
 function updateUserPassword(req, res, next) {
+    //routine for the current user updating its own password. requires the current password to be correct.
+    //auth
+    if (!req.body.currentPassword || !req.body.newPassword) {
+        return false;
+    }
+    let password = req.body.currentPassword;
+    let newPassword = req.body.newPassword;
+    let targetUserId = req.body.userid;
+
+    //get target user
+    userService.getById(targetUserId)
+        .then(targetUser => {
+            AuthService.checkUserWriteAccess(req.user, targetUser, true)
+                .then(result => {
+                    userService.getUserHash(targetUser)
+                        .then(targetWithHash=> {
+                            //verify password is correct
+                            bcrypt.compare(password, targetWithHash.hash)
+                                .then(result => {
+                                    if(result) {
+                                        //password matches. set new Password
+                                        userService.updatePassword(req, targetUser.id, newPassword)
+                                            .then(result => {
+                                                res.json({})
+                                            })
+                                            .catch(err => {
+                                                next(err)
+                                            });
+                                    }
+                                    else {
+                                        let err = {name: "ValidationError", message: "Validation failed."}
+                                        next(err);
+                                    }
+                                })
+                                .catch(err => {
+                                    next(err);
+                                })
+                        })
+                })
+                .catch(err =>{
+                    next(err);
+                })
+        })
+        .catch(err => next(err));
 }
 
 

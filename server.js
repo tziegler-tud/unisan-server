@@ -29,6 +29,7 @@ import dashboardRouter from './routes/unisams/dashboard.js';
 import userManagementRouter from './routes/unisams/user.js';
 import eventManagementRouter from './routes/unisams/events.js';
 import systemRouter from './routes/unisams/system.js';
+import settingsRouter from './routes/unisams/settings.js';
 import protocolRouter from './routes/unisams/protocol.js';
 
 import publicProtocolRouter from './routes/unisams/protocol_public.js';
@@ -133,6 +134,7 @@ server.use('/unisams/dashboard', dashboardRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
 server.use('/unisams/system', systemRouter);
+server.use('/unisams/settings', settingsRouter);
 
 // catch 404 and forward to error handler
 server.use("/unisams/*", function(req, res, next) {

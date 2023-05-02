@@ -29,7 +29,7 @@ function getDockerArguments (req, res, next) {
     // next();
 }
 
-//hooked at /unisams/system
+//hooked at /unisams/settings
 
 /* GET home page. */
 // router.get("/*", auth);
@@ -39,7 +39,17 @@ router.get('/', userSettings);
 
 
 function userSettings(req, res, next) {
-
+    userService.getByUsername(req.user.username)
+        .then(user => {
+            res.render("unisams/settings/settings", {
+                user: req.user._doc,
+                acl: req.acl,
+                title: user.username + " | Einstellungen",
+                refurl: req.params.username,
+                allowedit: true
+            })
+        })
+        .catch(err => next(err));
 }
 
 

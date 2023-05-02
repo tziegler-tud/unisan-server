@@ -436,6 +436,7 @@ class AuthService {
                         let group = results[0];
                         let accessLevel = results[1];
                         console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
+                        resolve(results)
                     })
                     .catch(err =>{
                         reject(err)

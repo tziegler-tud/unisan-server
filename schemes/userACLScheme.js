@@ -75,12 +75,12 @@ UserACLSchema.methods.updateDockerObject = function(){
                     protocol: true,
                 },
                 system: {
-                    qualifications: opArray.includes(authEnums.operations.settings.QUALIFICATIONS),
-                    logs: opArray.includes(authEnums.operations.settings.LOGS),
-                    events: opArray.includes(authEnums.operations.settings.EVENTS),
-                    user: opArray.includes(authEnums.operations.settings.USER),
-                    groups: opArray.includes(authEnums.operations.settings.GOUPS),
-                    system: opArray.includes(authEnums.operations.settings.SYSTEM),
+                    qualifications: opArray.includes(authEnums.operations.system.QUALIFICATIONS),
+                    logs: opArray.includes(authEnums.operations.system.LOGS),
+                    events: opArray.includes(authEnums.operations.system.EVENTS),
+                    user: opArray.includes(authEnums.operations.system.USER),
+                    groups: opArray.includes(authEnums.operations.system.GOUPS),
+                    system: opArray.includes(authEnums.operations.system.SYSTEM),
                 }
             }
 

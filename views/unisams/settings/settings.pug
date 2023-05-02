@@ -1,0 +1,35 @@
+extends ../layout
+
+block page_includes
+
+    script.
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["authSettings"],
+        };
+        window.dockerArgs.activeContainer = "userprofileContainer";
+        window.dockerArgs.activeElementId = "userprofileSettings";
+        window.allowedit = #{allowedit};
+
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
+
+    script(src="/dist/settings.js")
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            | Einstellungen
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .userinfo-container
+                                    #componentPage-component-container.componentPage-component-container
+
+
+
+
+
