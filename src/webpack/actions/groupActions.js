@@ -14,7 +14,7 @@ var groupActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+result.id)
+                location.replace("/unisams/system/roles/"+result.id)
             }
         });
     },
@@ -28,7 +28,7 @@ var groupActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+result.id)
+                location.replace("/unisams/system/roles/"+result.id)
             }
         });
     },
@@ -39,7 +39,7 @@ var groupActions = {
             type: 'DELETE',
             contentType: "application/json; charset=UTF-8",
             success: function (result) {
-                location.replace("/unisams/settings/roles")
+                location.replace("/unisams/system/roles")
             }
         });
     },
@@ -57,7 +57,7 @@ var groupActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+data.userGroupId)
+                location.replace("/unisams/system/roles/"+data.userGroupId)
             }
         });
     },
@@ -76,7 +76,7 @@ var groupActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+userGroupId)
+                location.replace("/unisams/system/roles/"+userGroupId)
             }
         });
     },
@@ -93,7 +93,7 @@ var groupActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/settings/roles/"+userGroupId)
+                location.replace("/unisams/system/roles/"+userGroupId)
             }
         });
     },
@@ -113,7 +113,7 @@ var groupActions = {
         //     dataType: 'json',
         //     data: JSON.stringify(jsonData),
         //     success: function (result) {
-        //         location.replace("/unisams/settings/roles/"+userGroupId+"/advanced");
+        //         location.replace("/unisams/system/roles/"+userGroupId+"/advanced");
         //     }
         // });
     },
@@ -133,7 +133,7 @@ var groupActions = {
         //     dataType: 'json',
         //     data: JSON.stringify(jsonData),
         //     success: function (result) {
-        //         location.replace("/unisams/settings/roles/"+userGroupId+"/advanced");
+        //         location.replace("/unisams/system/roles/"+userGroupId+"/advanced");
         //     }
         // });
     }

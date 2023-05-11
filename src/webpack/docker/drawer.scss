@@ -1,5 +1,6 @@
 @use "@material/drawer";
 @use "@material/list";
+@use "@material/icon-button";
 
 @import "../variables";
 @import "../color-rules";
@@ -9,6 +10,7 @@
 @include drawer.dismissible-core-styles;
 @include drawer.modal-core-styles;
 @include list.core-styles;
+@include icon-button.core-styles;
 
 .mdc-drawer {
   width: 300px;
@@ -76,3 +78,24 @@
 .mdc-drawer-scrim {
   z-index: 998;
 }
+
+
+.drawer {
+  display: flex;
+  flex-flow: column nowrap;
+  margin-bottom: 1em;
+  .drawer-nav {
+    flex: 1 1 auto;
+  }
+  .drawer-bottom {
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: row wrap;
+
+    .drawer-bottom-element {
+      flex: 1 1 auto;
+
+    }
+  }
+}
+

@@ -78,7 +78,7 @@ let view = {
                 group: group,
                 user: window.assignedUser,
             }
-            let userlist = new Userlist("userlist-container", listData, "/webpack/roles/templates/userlist.hbs", true);
+            let userlist = new Userlist("userlist-container", listData, "/webpack/roles/templates/userlist.hbs", {overflow: "unset"});
             userlist.templatePromise
                 .then(function(){
                     userlist.addEventHandler(function(){

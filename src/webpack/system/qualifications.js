@@ -19,7 +19,7 @@ let qualifications = {
             plr.show();
 
             //debug line, remove before flight
-            console.log("loading js module: settings.qualifications");
+            console.log("loading js module: system.qualifications");
 
             var lidlRTO = window.lidlRTO;
 

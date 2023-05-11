@@ -4,18 +4,18 @@ block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
     script(src="/static/unisams/js/qualificationActions.js")
     //script(src="/static/unisams/js/settings.js")
-    script(src="/dist/settings.js")
+    script(src="/dist/system.js")
 
 
 
     script.
         //used to tell the bundled js which modules to load.
         window.jsmodule = {
-            module: "settings",
+            module: "system",
             loaders: ["groups"],
         };
-        window.dockerArgs.activeContainer = "settingsContainer";
-        window.dockerArgs.activeElementId = "settingsRoles";
+        window.dockerArgs.activeContainer = "systemContainer";
+        window.dockerArgs.activeElementId = "systemRoles";
 
 
 block content
@@ -39,7 +39,7 @@ block content
 
                                     each group in groups
                                         li.user-entry.grouplist-entry(id= "groupId"+ group.id data-groupId= group.id)
-                                            a.inner(href="/unisams/settings/roles/" + group.id)
+                                            a.inner(href="/unisams/system/roles/" + group.id)
                                                 .item-property= group.title
                                                 if group.default
                                                     div

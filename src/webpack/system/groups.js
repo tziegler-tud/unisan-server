@@ -10,7 +10,7 @@ let groups = {
         $(document).ready(function () {
 
             //debug line, remove before flight
-            console.log("loading js module: settings.roles");
+            console.log("loading js module: system.roles");
 
             //init sidebar
             let addDBKey_sidebar = new Sidebar('wrapper', "test");

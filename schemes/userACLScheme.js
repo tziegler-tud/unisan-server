@@ -74,15 +74,25 @@ UserACLSchema.methods.updateDockerObject = function(){
                 apps: {
                     protocol: true,
                 },
-                settings: {
-                    qualifications: opArray.includes(authEnums.operations.settings.QUALIFICATIONS),
-                    logs: opArray.includes(authEnums.operations.settings.LOGS),
-                    events: opArray.includes(authEnums.operations.settings.EVENTS),
-                    user: opArray.includes(authEnums.operations.settings.USER),
-                    groups: opArray.includes(authEnums.operations.settings.GOUPS),
-                    system: opArray.includes(authEnums.operations.settings.SYSTEM),
+                system: {
+                    qualifications: opArray.includes(authEnums.operations.system.QUALIFICATIONS),
+                    logs: opArray.includes(authEnums.operations.system.LOGS),
+                    events: opArray.includes(authEnums.operations.system.EVENTS),
+                    user: opArray.includes(authEnums.operations.system.USER),
+                    groups: opArray.includes(authEnums.operations.system.GOUPS),
+                    system: opArray.includes(authEnums.operations.system.SYSTEM),
                 }
             }
+
+            //show menu groups if any is allowed
+            for (const [key, value] of Object.entries(docker)) {
+                let groupEnabled = false;
+                for (const [key, boolValue] of Object.entries(value)) {
+                    groupEnabled = (groupEnabled || boolValue);
+                }
+                docker[key].enabled = groupEnabled;
+            }
+
             self.docker = docker;
             self.updateOne({$set: {"docker": docker}})
                 .then(result => {

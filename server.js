@@ -28,6 +28,7 @@ import mainRouter from './routes/unisams/index.js';
 import dashboardRouter from './routes/unisams/dashboard.js';
 import userManagementRouter from './routes/unisams/user.js';
 import eventManagementRouter from './routes/unisams/events.js';
+import systemRouter from './routes/unisams/system.js';
 import settingsRouter from './routes/unisams/settings.js';
 import protocolRouter from './routes/unisams/protocol.js';
 
@@ -132,6 +133,7 @@ server.use('/unisams', mainRouter);
 server.use('/unisams/dashboard', dashboardRouter);
 server.use('/unisams/user', userManagementRouter);
 server.use('/unisams/events', eventManagementRouter);
+server.use('/unisams/system', systemRouter);
 server.use('/unisams/settings', settingsRouter);
 
 // catch 404 and forward to error handler

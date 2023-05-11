@@ -9,6 +9,7 @@ import logService from '../../services/logService.js';
 import userGroupService from "../../services/userGroupService.js";
 import qualificationService from "../../services/qualificationService.js";
 import Log from '../../utils/log.js';
+import aclService from "../../services/aclService.js";
 
 
 var app = express();
@@ -17,18 +18,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-
-
-
-let auth = function(req, res, next){
-    if (!req.isAuthenticated()) {
-        req.session.redirectTo = '/unisams';
-        console.log("");
-        res.redirect('/unisams/login');
-    } else {
-        next();
-    }
-};
 
 function getDockerArguments (req, res, next) {
     AclService.getCurrentDocker(req.user._id)
@@ -45,136 +34,22 @@ function getDockerArguments (req, res, next) {
 /* GET home page. */
 // router.get("/*", auth);
 router.get("/*", getDockerArguments);
-router.get('/', database);
-router.get('/qualifications', qualifications);
-router.get('/user', user);
-router.get('/events', events);
-router.get('/roles', roles);
-router.get('/logs', logs);
+router.get('/', userSettings);
 
-router.get("/roles/:id/advanced", editRoleAdvanced);
-router.get("/roles/:id", editRole);
 
-function database (req, res, next) {
-    var qualList = {};
-    qualificationService.getAll()
-        .then(quals => {
-            qualList = quals;
-            res.render("unisams/settings/settingsDatabase", {title: "settings - uniSams",
+
+function userSettings(req, res, next) {
+    userService.getByUsername(req.user.username)
+        .then(user => {
+            res.render("unisams/settings/settings", {
                 user: req.user._doc,
                 acl: req.acl,
-                qualificationList: qualList
+                title: user.username + " | Einstellungen",
+                refurl: req.params.username,
+                allowedit: true
             })
         })
-        .catch(err => {
-            next(err);
-        })
-}
-
-function qualifications (req, res, next) {
-    var qualList = {};
-    qualificationService.getAll()
-        .then(quals => {
-            qualList = quals;
-            res.render("unisams/settings/qualifications", {title: "qualifications - uniSams",
-                user: req.user._doc,
-                acl: req.acl,
-                qualificationList: qualList
-            })
-        })
-        .catch(err => {
-            next(err);
-        })
-}
-
-function user (req, res, next) {
-    res.render("unisams/settings/user", {title: "settings - uniSams",
-        user: req.user._doc,
-        acl: req.acl,
-    })
-}
-
-
-function events (req, res, next) {
-    res.render("unisams/settings/events", {title: "settings - uniSams",
-        user: req.user._doc,
-        acl: req.acl,
-    })
-}
-
-
-function roles (req, res, next) {
-    userGroupService.getAll()
-        .then(groups => {
-            res.render("unisams/settings/roles", {title: "Rechte und Rollen - uniSams",
-                user: req.user._doc,
-                acl: req.acl,
-                groups: groups
-            })
-        })
-        .catch(err => {
-            next(err);
-        })
-}
-
-
-function logs (req, res, next) {
-    res.render("unisams/settings/logs", {title: "logs - uniSams",
-        user: req.user._doc,
-        acl: req.acl,
-    })
-}
-
-function editRole(req, res, next) {
-    userGroupService.getById(req.params.id)
-        .then(function(group){
-
-            //get assigned user
-            userGroupService.getAssignedUser(req.params.id)
-                .then(function(user){
-                    res.render("unisams/roles/role",
-                        {
-                            title: "Rolle: " + group.title,
-                            user: req.user._doc,
-                            acl: req.acl,
-                            group: group._doc,
-                            groupId: group._id,
-                            assignedUser: user,
-                        })
-                })
-                .catch(function(err){
-                    next(next({status:404, message: err}));
-                })
-
-        })
-        .catch(err => next(err))
-
-}
-
-function editRoleAdvanced(req, res, next) {
-    userGroupService.getById(req.params.id)
-        .then(function(group){
-
-            //get assigned user
-            userGroupService.getAssignedUser(req.params.id)
-                .then(function(user){
-                    res.render("unisams/roles/advanced",
-                        {
-                            title: "Rolle: " + group.title,
-                            user: req.user._doc,
-                            acl: req.acl,
-                            group: group._doc,
-                            groupId: group._id,
-                            assignedUser: user,
-                        })
-                })
-                .catch(function(err){
-                    next(next({status:404, message: err}));
-                })
-
-        })
-        .catch(err => next(err))
-
+        .catch(err => next(err));
 }
 
 

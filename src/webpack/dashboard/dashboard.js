@@ -39,7 +39,7 @@ $(document).ready (function () {
 
 
     if(!jsmodule.module === "dashboard") {
-        console.error("invalid jsmodule information: Expected 'settings', but found " + jsmodule.module)
+        console.error("invalid jsmodule information: Expected 'system', but found " + jsmodule.module)
         return false;
     }
 

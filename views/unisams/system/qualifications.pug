@@ -1,20 +1,16 @@
 extends ../layout
 
 block page_includes
-    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    script(src="/dist/settings.js")
-
-
+    script(src="/dist/system.js")
 
     script.
         //used to tell the bundled js which modules to load.
         window.jsmodule = {
-            module: "settings",
+            module: "system",
             loaders: ["qualifications"],
         };
-        window.dockerArgs.activeContainer = "settingsContainer";
-        window.dockerArgs.activeElementId = "settingsQualifications";
+        window.dockerArgs.activeContainer = "systemContainer";
+        window.dockerArgs.activeElementId = "systemQualifications";
 
 
 block content
@@ -32,22 +28,22 @@ block content
                                 .clear
                         #content1-text.sec-content.border-top.userlogs-container.logs-container
                             .subpage-content
-                                .userinfo-container
-                                    #tab-userinfo-general.userinfo-inner
-                                        .userinfo-section.userinfo-card.card-full.userwidget-description
+                                .info-container
+                                    #tab-info-general.info-inner
+                                        .info-section.info-card.card-full.userwidget-description
 
-                                            .userinfo-section.userinfo-card.card-full.userwidget-description
-                                                .userinfo-section-inner
-                                                    .userinfo-sectionheader
+                                            .info-section.info-card.card-full.userwidget-description
+                                                .info-section-inner
+                                                    .info-sectionheader
                                                     .itemlist-content-container.userlist-content-container
                                                         #quallist-container
-                                                        .userinfo-item.useredit-item.useredit-addItem
+                                                        .info-item.useredit-item.useredit-addItem
                                                             #addQualButton.useredit-addGeneralItemBtn.btn-addItem.btn-listExt.addQualificationButton
                                                                 svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                                                 span Hinzufügen
                                                                 .clear
                                 .add-smt-button.addQualificationButton
-                                    if acl.settings.qualifications
+                                    if acl.system.qualifications
                                         a.add-smt-button-inner()
                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
 

@@ -19,6 +19,7 @@ import {Snackbar} from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import {EventPage} from "../events/eventPage";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
+import ComponentPage from "../components/ComponentPage";
 
 var actions = window.actions;
 
@@ -91,14 +92,14 @@ let settings = {
             }
 
             let pageContainer = document.getElementById("userPage-component-container");
-            var userPage = new UserPage({
+            var userPage = new ComponentPage({
                 container: pageContainer,
                 sidebar: sidebar,
                 data: {user: user},
                 args: {},
             });
             window.userPage = userPage;
-            userPage.addComponent(UserPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full"});
+            userPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id});
         })
 
     },

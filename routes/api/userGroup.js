@@ -95,7 +95,9 @@ function getUserGroups(req, res, next){
 
 function createGroup(req, res, next){
     userGroupService.create(req, req.body.data, req.body.args)
-        .then(result => res.json(result))
+        .then(result => {
+            res.json(result)
+        })
         .catch(err => next(err));
 }
 

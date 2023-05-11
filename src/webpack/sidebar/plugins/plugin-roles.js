@@ -1,5 +1,7 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
 
+import "../sidebar-addParticipant.scss";
+
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {Searchbar} from "../../searchbar/searchbar";
@@ -32,6 +34,7 @@ let addGroup = new ContentHandler("addGroup",
                     let data = {
                         title: $("#addRoleForm-title").val(),
                         description: $("#addRoleForm-description").val(),
+                        type: $("#addRoleForm-type").val(),
                     };
                     onConfirm(data);
                 }.bind(args),
@@ -148,7 +151,7 @@ var addUser  = new ContentHandler("addUserToGroup",
                         success: function (result) {
                             handleData.userlist = result;
                             // render userlist template
-                            $.get('/static/unisams/js/sidebar/plugins/userselect-plugin.hbs', function (data) {
+                            $.get('/webpack/sidebar/plugins/userselect-plugin.hbs', function (data) {
                                 var template = Handlebars.compile(data);
                                 appendContent(template(handleData))
                             });

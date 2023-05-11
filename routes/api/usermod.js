@@ -19,6 +19,8 @@ import upload from "../../config/multer.js";
 
 
 function postUpload (req, res, next) {
+    const srcPath = appRoot + '/src/data/uploads/tmp/' + req.file.filename;
+
     //check if tmp
     if (req.params.id === "tmp") {
         //generate tmp access key with 5 digits
@@ -28,7 +30,10 @@ function postUpload (req, res, next) {
         }
 
         //upload to tmp
-        fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename, appRoot + `/src/data/uploads/tmp/${tmpkey}.jpg`, {overwrite: true}, function (err) {
+        const targetPathRelative = `/data/uploads/tmp/${tmpkey}.jpg`
+        const targetPath = appRoot + "/src" + targetPathRelative;
+
+        fs.move(srcPath, targetPath, {overwrite: true}, function (err) {
             if (err) return console.error(err);
             console.log("moved file to tmp dir with filename " + tmpkey + ".jpg");
         });
@@ -36,16 +41,20 @@ function postUpload (req, res, next) {
         //return tmpkey
         res.json({
             success: true,
+            url: targetPathRelative,
             tmpkey: tmpkey,
         });
     } else {
         userService.getById(req.params.id)
             .then(user => {
-                fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename, appRoot + `/src/data/uploads/user_images/${user.id}/${user.id}.jpg`, {overwrite: true}, function (err) {
+                //upload to tmp
+                const targetPathRelative = `/data/uploads/user_images/${user.id}/${user.id}.jpg`;
+                const targetPath = appRoot + '/src' + targetPathRelative;
+
+                fs.move(srcPath, targetPath, {overwrite: true}, function (err) {
                     if (err) return console.error(err);
                     console.log("moved file to user dir: " + user.id);
                 });
-                //log
                 //create log
                 let log = new Log({
                     type: "modification",
@@ -67,7 +76,10 @@ function postUpload (req, res, next) {
                 })
 
                 LogService.create(log).then().catch();
-                res.json({success: true});
+                res.json({
+                    success: true,
+                    url: targetPathRelative,
+                });
             })
             .catch(err => next(err));
     }
@@ -125,7 +137,9 @@ function create(req, res, next) {
             let args = (req.body.args === undefined ? {} : req.body.args);
             req.body.args = {};
             userService.create(req, req.body, args)
-                .then(() => res.json(req.body))
+                .then((user) => {
+                    res.json(user)
+                })
                 .catch(err => {
                     next(err);
                 })
@@ -232,11 +246,6 @@ function updateCurrentUserPassword(req, res, next) {
                             next(err);
                         })
                 })
-
-
-            // userService.update(req, req.params.id, req.body)
-            //     .then(() => res.json({}))
-            //     .catch(err => next(err));
         })
         .catch(err =>{
             next(err);
@@ -244,6 +253,50 @@ function updateCurrentUserPassword(req, res, next) {
 }
 
 function updateUserPassword(req, res, next) {
+    //routine for the current user updating its own password. requires the current password to be correct.
+    //auth
+    if (!req.body.currentPassword || !req.body.newPassword) {
+        return false;
+    }
+    let password = req.body.currentPassword;
+    let newPassword = req.body.newPassword;
+    let targetUserId = req.body.userid;
+
+    //get target user
+    userService.getById(targetUserId)
+        .then(targetUser => {
+            AuthService.checkUserWriteAccess(req.user, targetUser, true)
+                .then(result => {
+                    userService.getUserHash(targetUser)
+                        .then(targetWithHash=> {
+                            //verify password is correct
+                            bcrypt.compare(password, targetWithHash.hash)
+                                .then(result => {
+                                    if(result) {
+                                        //password matches. set new Password
+                                        userService.updatePassword(req, targetUser.id, newPassword)
+                                            .then(result => {
+                                                res.json({})
+                                            })
+                                            .catch(err => {
+                                                next(err)
+                                            });
+                                    }
+                                    else {
+                                        let err = {name: "ValidationError", message: "Validation failed."}
+                                        next(err);
+                                    }
+                                })
+                                .catch(err => {
+                                    next(err);
+                                })
+                        })
+                })
+                .catch(err =>{
+                    next(err);
+                })
+        })
+        .catch(err => next(err));
 }
 
 

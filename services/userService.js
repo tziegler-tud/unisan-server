@@ -163,6 +163,9 @@ async function create(req, userParam, args) {
         user.hash = await bcrypt.hash(userParam.password, salt);
     }
 
+    //assign roles
+
+
     //create log
     let log = new Log({
         type: "modification",
@@ -251,6 +254,9 @@ async function create(req, userParam, args) {
                 }
             }
         });
+        let {hash: _, ...userNoHash} = user._doc;
+        userNoHash.id = userNoHash._id;
+        return userNoHash;
     }
 }
 

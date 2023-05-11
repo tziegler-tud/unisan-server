@@ -1,16 +1,20 @@
 import "./userprofile.scss";
+import "./addUser.scss";
 
 import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
+import {MDCList} from '@material/list';
+import {MDCRipple} from '@material/ripple';
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
-import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
-import {PageSlider as lidlPageSlider} from "/lib/lidl-modules/pageSlider/pageSlider";
+import {lidl} from "../../lib/lidl-modules/core/lidlModular-0.2";
+import {Observer as lidlObserver} from "../../lib/lidl-modules/observer/lidl-observer";
+import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
+import PageSlider from "../../lib/lidl-modules/pageSlider/pageSlider";
+
 
 
 import {userActions} from "../actions/userActions";
@@ -29,23 +33,23 @@ import {
 
 
 $(document).ready (function () {
-    //setupTimePickerWidget()
     var lidlRTO = window.lidlRTO;
 
     let pagesliderContainer = document.getElementById("pageslider-container-01");
     $.get('/webpack/user/templates/addUser/addUser-container.hbs', function (data) {
         var template = Handlebars.compile(data);
         pagesliderContainer.innerHTML = template();
-        buildPageSlider(pagesliderContainer);
+        const groups = window.pageData.groups;
+        buildPageSlider(pagesliderContainer, groups);
     });
 
 
 });
 
 
-function buildPageSlider(container) {
+function buildPageSlider(container, groups) {
     let token = lidlRTO.objectManager.createNewObjectToken();
-    let pageslider = new lidlPageSlider(container, token);
+    let pageslider = new PageSlider(container, token);
     pageslider.setCallback({
         onComplete: function(data){
 
@@ -61,9 +65,11 @@ function buildPageSlider(container) {
             let args = {
                 memberId: {setCustom: false},
                 userImg: {
-                    tmp: true,
+                    tmp: data[4].tmp ?? false,
                     tmpkey: data[4].userimg_tmpkey,
-                }
+                },
+                groups: data[3].groups,
+                redirect: true,
             };
             userActions.addUser(apiData, args);
         },
@@ -133,28 +139,36 @@ function buildPageSlider(container) {
                 });
 
             //get third page
-            $.get('/webpack/user/templates/addUser/addUser-details.hbs', function (data) {
+            $.get('/webpack/user/templates/addUser/addUser-groups.hbs', function (data) {
                 var template = Handlebars.compile(data);
-                let page3 = pageslider.addPage(template());
+                let p3Data = {
+                    groups: groups,
+                }
+                let page3 = pageslider.addPage(template(p3Data));
+                let listElement = document.getElementById("userGroupSelect-list");
+                let list = {selectedIndex: []};
+                if(listElement){
+                    list = new MDCList(listElement);
+                    const listItemRipples = list.listElements.map((listItemEl) => new MDCRipple(listItemEl));
+                }
+
+                page3.setOnSaveCallback(function(){
+                    let groups = [];
+                    list.selectedIndex.forEach(index => {
+                        let groupId = list.listElements[index].dataset.groupid;
+                        groups.push(groupId)
+                    })
+                    page3.addObject("groups", groups);
+                })
 
                 //get 4th page
                 $.get('/webpack/user/templates/addUser/addUser-img.hbs', function (data) {
                     var template = Handlebars.compile(data);
+                    /**
+                     * @param page4 {PageSlider.Page}
+                     */
                     let page4 = pageslider.addPage(template());
 
-                    var args2 = {
-                        userid: "",
-                        callback: {
-                            onConfirm: function () {
-                            }
-                        }
-                    };
-                    const content2 = {
-                        title: "Bild hochladen",
-                    };
-
-                    //input elements
-                    pageslider.addClassToLabel("test");
                     // pageslider.addClassToInputs("mdc-input");
                     // const textFields = [].map.call(document.querySelectorAll('.mdc-input'), function(el) {
 
@@ -170,12 +184,20 @@ function buildPageSlider(container) {
                     });
                     // const icon = new MDCTextFieldIcon(document.querySelector('.mdc-text-field-icon'));
 
+                    //input elements
+                    pageslider.addClassToLabel("test");
+
                     const uploader = new Uppload({
                         lang: en,
                         call: ".changeProfilePicture",
                         defaultService: "local",
                         uploader: xhrUploader({
                             endpoint: '/api/v1/usermod/tmp/uploadUserImage',
+                            responseFunction: response => {
+                                // Return the URL from the response text yourself
+                                const json = JSON.parse(response);
+                                return json; // Use your JSON response
+                            },
                             fileKeyName: "image",
                             method: "POST"
                         })
@@ -186,57 +208,16 @@ function buildPageSlider(container) {
                             aspectRatio: 1
                         }),
                     ]);
-                    uploader.on("upload", function(){
+                    uploader.on("upload", function(response){
                         const items = $(".userProfileImage");
-                        let src;
+                        let src = response.url;
+                        let tmpkey = response.tmpkey;
                         $(items).each(function (img) {
-                            src = $(this).attr("src");
                             $(this).attr("src", src + "?t=" + new Date().getTime());
                         });
+                        page4.addObject('tmp', true);
+                        page4.addObject('userimg_tmpkey', tmpkey);
                     });
-
-
-                    // var token2 = lidlRTO.objectManager.createNewObjectToken();
-                    // const dialog02 = new lidlDialog(token2, ".imgUpload", 'imageUpload', content2, args2);
-                    // lidlRTO.objectManager.addObject(dialog02, token2);
-                    //
-                    //
-                    // var manualUploader = new qq.FineUploader({
-                    //     element: document.getElementById('imgUpload-' + token2),
-                    //     template: 'qq-template-manual-trigger',
-                    //     request: {
-                    //         method: 'POST',
-                    //         endpoint: '/api/v1/usermod/tmp/uploadUserImage',
-                    //         inputName: 'image'
-                    //
-                    //     },
-                    //     thumbnails: {
-                    //         placeholders: {
-                    //             waitingPath: '/lib/fineUploader/placeholders/waiting-generic.png',
-                    //             notAvailablePath: '/lib/fineUploader/placeholders/not_available-generic.png'
-                    //         }
-                    //     },
-                    //     autoUpload: false,
-                    //     debug: true,
-                    //     multiple: false,
-                    //
-                    //     callbacks: {
-                    //         onComplete: function (id, name, responseJSON) {
-                    //             let tmpkey = responseJSON.tmpkey;
-                    //             alert(tmpkey);
-                    //             const items = $(".userProfileImage");
-                    //             $(items).each(function () {
-                    //                 const src = '/data/uploads/tmp/' + tmpkey + '.jpg';
-                    //                 $(this).attr("src", src + "?t=" + new Date().getTime());
-                    //             });
-                    //             $("#userimg_tmpkey").val(tmpkey);
-                    //             dialog02.confirmAndClose();
-                    //         }
-                    //     }
-                    // });
-                    // qq(document.getElementById("confirmBtn" + token2)).attach("click", function () {
-                    //     manualUploader.uploadStoredFiles();
-                    // });
                 });
             });
 

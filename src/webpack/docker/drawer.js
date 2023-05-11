@@ -1,4 +1,5 @@
 import {MDCDrawer} from "@material/drawer";
+
 import "./drawer.scss";
 const Handlebars = require("handlebars");
 
@@ -14,6 +15,11 @@ var Drawer = function(context){
 
         listEl.addEventListener('click', (event) => {
             drawer.open = false;
+        });
+
+        const settingsButton = document.getElementById("drawer-settings-button");
+        settingsButton.addEventListener('click', (event) => {
+            window.location = "/unisams/settings";
         });
 
         document.body.addEventListener('MDCDrawer:closed', () => {

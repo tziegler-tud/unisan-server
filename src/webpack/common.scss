@@ -322,13 +322,23 @@ a {
         display: flex;
         flex-flow: column wrap;
         justify-content: flex-end;
+        font-size: 150%;
 
         .propertypage-heading-container {
 
           max-width: 100%;
           display: flex;
           flex-flow: row wrap;
-          margin-left: 2em;
+          margin-left: 0.5em;
+
+
+          @media #{$tablet-landscape} {
+            margin-left: 1em;
+          }
+
+          @media #{$desktop} {
+            margin-left: 2em;
+          }
 
           h3 {
             margin: 0;
@@ -892,6 +902,22 @@ dropdown menu
 }
 
 
+/**
+mdc dropdown wrapper to make menu escape container
+ */
+
+
+.mdc-list-item-wrapper {
+  position: relative;
+  overflow: initial;
+
+  .mdc-dropdown-menu {
+    position: absolute;
+    top: 1em !important;
+    left: unset !important;
+    right: 3em !important;
+  }
+}
 /*
     icons
  */
@@ -1808,6 +1834,103 @@ ul.itemlist {
         height: 4em;
         width: 4em;
         color: #c31d34;
+      }
+    }
+  }
+}
+
+
+/**
+generic info container
+ */
+
+
+.info-container {
+
+  width: 100%;
+  background-color: $page-bg-color-v2;
+  .info-inner {
+
+    padding: 1em 0;
+    display: flex;
+    flex-flow: row wrap;
+
+    @media #{$desktop, $tablet-landscape} {
+      padding: 1em;
+    }
+
+    .info-section {
+      .info-section-inner {
+        display: flex;
+        flex-flow: column wrap;
+
+        margin-bottom: 2em;
+      }
+
+      &.info-card {
+        flex: 1 1 auto;
+        margin-bottom: 0;
+
+
+        .info-section-inner {
+          margin: 20px 0;
+          padding: 15px;
+          background-color: $page-bg-color;
+          box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+
+          @media #{$desktop, $tablet-landscape} {
+            margin: 20px;
+          }
+        }
+
+        &.card-full {
+          flex: 0 0 100%;
+        }
+        &.card-half {
+
+          @media #{$desktop, $tablet-landscape} {
+            flex: 1 0 50%;
+            min-width: 30em;
+          }
+        }
+      }
+      .info-sectionheader {
+        font-size: 120%;
+        margin-bottom: .5em;
+        color: #666;
+        padding: 12px 12px 0 12px;
+
+        font-variant: small-caps;
+        letter-spacing: .15em;
+      }
+
+      .info-item {
+
+        flex: 1 1 auto;
+
+        span.info-item-label, label.info-item-label {
+          width: 100%;
+          float: left;
+          display: block;
+          margin-bottom: .5em;
+
+          @media #{$desktop, $tablet-landscape} {
+            width: auto;
+          }
+
+          &.info-attribute-name {
+
+            width: 100%;
+            margin-right: 2em;
+            margin-bottom: 0;
+
+            color: #555;
+
+            @media #{$desktop, $tablet-landscape} {
+              width: 8em;
+            }
+          }
+        }
       }
     }
   }

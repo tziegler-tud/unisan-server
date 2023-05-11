@@ -1,47 +1,39 @@
 extends ../layout
 
 block page_includes
-    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
-    script(src="/static/unisams/js/qualificationActions.js")
-    script(src="/static/unisams/js/settings.js")
-
-
 
     script.
-        window.dockerArgs.activeContainer = "settingsContainer";
-        window.dockerArgs.activeElementId = "settings";
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["authSettings"],
+        };
+        window.dockerArgs.activeContainer = "userprofileContainer";
+        window.dockerArgs.activeElementId = "userprofileSettings";
+        window.allowedit = #{allowedit};
 
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
+
+    script(src="/dist/settings.js")
 
 block content
     #wrapper
         #page-container.page-container
-            #page-container-inner.page-container-inner
+            #page-container-inner.page-container-inner.full-width.full-height
                 section#sec1
                     #sec-content.subpage-container
                         #content1-heading.sec-heading.subpage-heading
-                            h3 database: qualifications
-                        #content1-text.sec-content
-                            .subpage-options
+                            .sec-heading-label.propertypage-heading
+                                .propertypage-heading-container
+                                    h3
+                                        | Meine Einstellungen
+                                    .clear
+                                .clear
+                        #content1-text.sec-content.border-top
                             .subpage-content
-                                ul.userlist.itemlist
-                                    li.user-entry.noSelect.borderBottom
-                                        .inner
-                                            .item-property type
-                                            .item-property title
+                                .userinfo-container
+                                    #componentPage-component-container.componentPage-component-container
 
-                                    each qual in qualificationList
-                                        li.user-entry.quallist-entry(id= "qualId"+ qual.id data-qualid= qual.id)
-                                            a.inner()
-                                                .item-property= qual.qualType
-                                                .item-property= qual.name
-                                                .clear
-
-                                    #addQualButton.btn-addItem.btn-listExt
-                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        span Hinzufügen
-                                        .clear
-                            #usermanagment-menu.subpage-menu
-                                #btn01.subpage-menu-btn
 
 
 

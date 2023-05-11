@@ -107,6 +107,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     navDrop.addHandler(".navTop-dropdown--user", function(){
         window.location = "/unisams/user/current";
     }, {});
+    navDrop.addHandler(".navTop-dropdown--settings", function(){
+        window.location = "/unisams/settings";
+    }, {});
     navDrop.addHandler(".navTop-dropdown--logout", function(){
         window.location = "/unisams/logout";
     }, {});

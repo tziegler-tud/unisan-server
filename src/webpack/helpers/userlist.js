@@ -23,6 +23,7 @@ var Userlist = function(containerId, data, template, args) {
             show: false,
             height: "fill",
             fixedHeight: "unset",
+            overflow: "auto"
         }
     }
     template = template === undefined ? defaults.template : template;
@@ -127,7 +128,7 @@ function adjustList(c, args) {
     //set element height
     $(container).css({
         "height": cssHeightProperty,
-        "overflow": "auto",
+        "overflow": args.overflow,
     });
 
     //get scollbar width
