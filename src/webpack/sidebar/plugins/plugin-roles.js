@@ -34,6 +34,7 @@ let addGroup = new ContentHandler("addGroup",
                     let data = {
                         title: $("#addRoleForm-title").val(),
                         description: $("#addRoleForm-description").val(),
+                        type: $("#addRoleForm-type").val(),
                     };
                     onConfirm(data);
                 }.bind(args),

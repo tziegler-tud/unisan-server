@@ -254,6 +254,9 @@ async function create(req, userParam, args) {
                 }
             }
         });
+        let {hash: _, ...userNoHash} = user._doc;
+        userNoHash.id = userNoHash._id;
+        return userNoHash;
     }
 }
 

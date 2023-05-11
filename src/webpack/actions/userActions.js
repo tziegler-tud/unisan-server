@@ -1,5 +1,19 @@
 var userActions = {
 
+    /**
+     * api call to create new user.
+     * @param data {Object}
+     * @param args {Object}
+     * @param {Object} args.memberId
+     * @param {Boolean} args.memberId.setCustom true to set a custom memberId
+     * @param {Integer} args.memberId.value custom memberId
+     * @param {Object} args.userImg
+     * @param {Boolean} args.userImg.tmp true to use an image from tmp storage as user image
+     * @param {String} args.userImg.tmpkey tmpkey for the uploaded image, obtained from api response
+     * @param {String[]} args.groups Array of group ids to add to the user
+     * @param {Boolean} args.redirect true to redirect browser window to the profile of the newly added user
+     * @returns {Promise<unknown>}
+     */
     addUser: function (data, args) {
         let self = this;
         let defaults = {
@@ -10,66 +24,79 @@ var userActions = {
                 tmp: false,
             },
             groups: [],
+            redirect: true,
         }
         args = (args === undefined) ? {} : args;
         args = Object.assign(defaults, args);
 
-        var memberId = {
-            title: "Mitgliedsnummer",
-        }
-        if (args.memberId.setCustom) {
-            memberId.value = data.memberId;
-        }
-        //user image has already been uploaded. Pass path to server
-        if (args.userImg.tmp) {
+        return new Promise(function(resolve, reject){
 
-        }
-        var jsonData = {
-            username: data.username,
-            password: data.password,
-            generalData: {
-                firstName: {title: "Vorname", value: data.generalData.firstName},
-                lastName: {title: "Nachname", value: data.generalData.lastName},
-                memberId: memberId,
-            },
-            args: args,
-        };
-
-        $.ajax({
-            url: "/api/v1/usermod/create",
-            // make put for safety reasons :-)
-            type: 'POST',
-            contentType: "application/json; charset=UTF-8",
-            dataType: 'json',
-            data: JSON.stringify(jsonData),
-            success: function (result) {
-                let groupsPromises = [];
-                //assign groups
-                let jsonData = {
-                    userId: data.userId,
-                    args: args,
-                }
-                args.groups.forEach(groupId => {
-                    jsonData.userGroupId = groupId;
-                    let action = $.ajax({
-                        url: "/api/v1/usermod/addUserGroup/"+data.userId,
-                        type: 'POST',
-                        contentType: "application/json; charset=UTF-8",
-                        dataType: 'json',
-                        data: JSON.stringify(jsonData)
-                    });
-                    groupsPromises.push(action)
-                })
-                Promise.all(groupsPromises)
-                    .then()
-                    .catch()
-
+            var memberId = {
+                title: "Mitgliedsnummer",
+            }
+            if (args.memberId.setCustom) {
+                memberId.value = data.memberId;
+            }
+            //user image has already been uploaded. Pass path to server
+            if (args.userImg.tmp) {
 
             }
-        });
+            var jsonData = {
+                username: data.username,
+                password: data.password,
+                generalData: {
+                    firstName: {title: "Vorname", value: data.generalData.firstName},
+                    lastName: {title: "Nachname", value: data.generalData.lastName},
+                    memberId: memberId,
+                },
+                args: args,
+            };
 
+            let action = $.ajax({
+                url: "/api/v1/usermod/create",
+                // make put for safety reasons :-)
+                type: 'POST',
+                contentType: "application/json; charset=UTF-8",
+                dataType: 'json',
+                data: JSON.stringify(jsonData),
 
-        location.replace("/unisams/user/edit/" + data.username)
+            });
+
+            action.then(result => {
+                if(Array.isArray(args.groups) && args.groups.length > 0) {
+                    let groupsPromises = [];
+                    //assign groups
+                    let jsonData = {
+                        userId: result.id,
+                        args: args,
+                    }
+                    args.groups.forEach(groupId => {
+                        jsonData.userGroupId = groupId;
+                        let action = $.ajax({
+                            url: "/api/v1/usermod/addUserGroup/" + jsonData.userId,
+                            type: 'POST',
+                            contentType: "application/json; charset=UTF-8",
+                            dataType: 'json',
+                            data: JSON.stringify(jsonData)
+                        });
+                        groupsPromises.push(action)
+                    })
+                    Promise.all(groupsPromises)
+                        .then(results => {
+                            onSuccess();
+                        })
+                        .catch()
+                }
+                else {
+                    onSuccess();
+                }
+            })
+
+            function onSuccess(){
+                if (args.redirect) location.replace("/unisams/user/edit/" + data.username)
+                resolve();
+            }
+        })
     },
 
     deleteUser: function (userid) {

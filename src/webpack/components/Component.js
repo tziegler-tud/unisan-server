@@ -9,6 +9,7 @@ import {ComponentPage} from "./ComponentPage";
  * @param componentType {ComponentPage.componentTypes} type of the component
  * @param data {Object}
  * @param args {Object}
+ * @param args.order {Integer} order inside componentContainer
  * @returns {Component}
  * @constructor
  */
@@ -20,7 +21,6 @@ export default class Component {
             classes: "",
             order: componentId,
             handlers: [],
-
         }
         args = (args === undefined) ? {} : args;
         this.args = Object.assign(defaults, args);
@@ -68,6 +68,7 @@ export default class Component {
             self.container.innerHTML = template(self.handleData);
             self.page.renderComponentHtml(self.container)
                 .then((resolve, reject)=>{
+                    self.postRenderInternal();
                     if(post) self.postRender()
                         .then(()=>{
                             return result;
@@ -91,6 +92,10 @@ export default class Component {
 
     async postRender(){
 
+    }
+
+    postRenderInternal(){
+        this.container.style.order = this.args.order;
     }
 
     fail(error){

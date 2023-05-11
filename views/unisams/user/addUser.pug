@@ -12,6 +12,7 @@ block page_includes
     script.
         window.dockerArgs.activeContainer =  "userContainer";
         window.dockerArgs.activeElementId =  "useradd";
+        window.pageData = {groups: !{JSON.stringify(groups)}}
 block content
     #wrapper
         #page-container.page-container

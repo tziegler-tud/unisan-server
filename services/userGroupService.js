@@ -22,8 +22,14 @@ export default {
     getAssignedUser,
 };
 
-
-async function getAll(){
+/**
+ *
+ * @param {String[]} select
+ */
+async function getAll(select= []){
+    if(Array.isArray && select.length > 0){
+        return UserGroup.find().select(select);
+    }
     return UserGroup.find();
 }
 
@@ -31,8 +37,12 @@ async function getAll(){
 /**
  * Gets an event by its id
  * @param {number} id id of the event
+ * @param {String[]} select
  */
-async function getById(id) {
+async function getById(id, select= []) {
+    if(Array.isArray && select.length > 0){
+        return UserGroup.findById(id).select(select);
+    }
     return UserGroup.findById(id);
 }
 
@@ -48,39 +58,46 @@ async function getByTitle(title) {
  * Creates a new group from qualified JSON object
  * @param {Object} req request object
  * @param {UserGroup} groupObject
- * @þaram {Object} args
+ * @param {Object} args
  */
-async function create(req, groupObject, args) {
-    // create group document
-    let data = groupObject;
-    groupObject.default = false;
-    const group = new UserGroup(groupObject);
-    // save in database
-    return group.save()
-        .then(result => {
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "userGroup",
-                    actionType: "add",
-                    actionDetail: "groupAdd",
-                    key: group.title,
-                    value: "",
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "userGroup",
-                    targetObject: group._id,
-                    targetObjectId: group._id,
-                    targetModel: "UserGroup",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
+function create(req, groupObject, args) {
+    return new Promise(function(resolve, reject){
+        // create group document
+        let data = groupObject;
+        groupObject.default = false;
+        const group = new UserGroup(groupObject);
+        // save in database
+        group.save()
+            .then(result => {
+                resolve(result);
+                let log = new Log({
+                    type: "modification",
+                    action: {
+                        objectType: "userGroup",
+                        actionType: "add",
+                        actionDetail: "groupAdd",
+                        key: group.title,
+                        value: "",
+                    },
+                    authorizedUser: req.user,
+                    target: {
+                        targetType: "userGroup",
+                        targetObject: group._id,
+                        targetObjectId: group._id,
+                        targetModel: "UserGroup",
+                    },
+                    httpRequest: {
+                        method: req.method,
+                        url: req.originalUrl,
+                    }
+                })
+                LogService.create(log).then().catch();
             })
-            LogService.create(log).then().catch();
-        })
+            .catch(err => {
+                reject(err);
+            })
+    })
+
 }
 
 

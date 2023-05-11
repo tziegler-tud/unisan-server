@@ -11,7 +11,7 @@ import {EditableInputField} from "../helpers/editableInputField";
 import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2"
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer"
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog"
-import {PageSlider as lidlPageSlider} from "/lib/lidl-modules/pageSlider/pageSlider";
+import PageSlider from "../../lib/lidl-modules/pageSlider/pageSlider";
 
 const Handlebars = require("handlebars");
 
@@ -39,7 +39,7 @@ $(document).ready (function () {
 
 function buildPageSlider(container) {
     let token = lidlRTO.objectManager.createNewObjectToken();
-    let pageslider = new lidlPageSlider(container, token);
+    let pageslider = new PageSlider(container, token);
     pageslider.setCallback({
         onComplete: function(data){
             const regex = / Uhr/g;

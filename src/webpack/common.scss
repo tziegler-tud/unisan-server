@@ -322,13 +322,23 @@ a {
         display: flex;
         flex-flow: column wrap;
         justify-content: flex-end;
+        font-size: 150%;
 
         .propertypage-heading-container {
 
           max-width: 100%;
           display: flex;
           flex-flow: row wrap;
-          margin-left: 2em;
+          margin-left: 0.5em;
+
+
+          @media #{$tablet-landscape} {
+            margin-left: 1em;
+          }
+
+          @media #{$desktop} {
+            margin-left: 2em;
+          }
 
           h3 {
             margin: 0;

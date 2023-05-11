@@ -8,7 +8,7 @@ const UserACL = db.UserACL;
 const User = db.User;
 
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
-/** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
+/** @typedef {import("../schemes/userScheme.js").UserScheme} User */
 
 let rolesMap = {
     "protected": -1,
@@ -277,7 +277,7 @@ class AuthService {
 
     /**
      *
-     * @param requestingUser {UserScheme} object or id of the requesting user
+     * @param requestingUser {User} object or id of the requesting user
      * @param operation {String} String representation of requested operation. Use static enum AuthService.operations to obtain string.
      * @returns {Promise<Object|Error>}
      */
@@ -361,8 +361,8 @@ class AuthService {
     /**
      * authorizes basic write access on user documents. dont use this for critical properties, e.g. passwords or username
      *
-     * @param user {UserScheme} requesting user
-     * @param target {UserScheme} target user
+     * @param user {User} requesting user
+     * @param target {User} target user
      * @param critical {Boolean} forwards to critical security check
      * @returns {Promise<unknown>}
      */
@@ -495,50 +495,63 @@ class AuthService {
     /**
      *
      * @param user {User} requesting user
-     * @param target {ObjectId | User} target user
+     * @param target {ObjectId | User | String} target user
      * @param group {UserGroup} group to be added or revoked
      * @param grant {Boolean} grant = true, revoke = false
      * @returns {Promise<unknown>}
      */
-    async checkUserGroupWriteAccess(user, target, group, grant) {
+    checkUserGroupWriteAccess(user, target, group, grant) {
         let self = this;
-        //validate
-        if (user === undefined || target === undefined || group === undefined || group.type === undefined) throw new Error("AuthService fail: invalid parameters given");
-        let targetId = target;
-        if (target.id !== undefined) targetId = target.id;
+        return new Promise(function(resolve, reject){
+            //validate
+            if (user === undefined || target === undefined || group === undefined || group.type === undefined) throw new Error("AuthService fail: invalid parameters given");
+            let targetId = target;
+            if (target.id !== undefined) targetId = target.id;
 
-        let granting = (grant === undefined || grant) ? groupActionsEnum.GRANT : groupActionsEnum.REVOKE;
-        let groupOperation = self.getRequiredGroupOperation(group.type, granting);
+            let granting = (grant === undefined || grant) ? groupActionsEnum.GRANT : groupActionsEnum.REVOKE;
+            let groupOperation = self.getRequiredGroupOperation(group.type, granting);
 
 
-        if(target === "self" || user.id.toString() === targetId.toString()) {
-            //trying to write self
-            let writeSelf = self.checkAllowedGroupOperation(user, operations.user.WRITESELF);
+            if(target === "self" || user.id.toString() === targetId.toString()) {
+                //trying to write self
+                let writeSelf = self.checkAllowedGroupOperation(user, operations.user.WRITESELF);
 
-            let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
+                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
 
                 Promise.all([writeSelf, addGroup])
                     .then(result => {
-                        return(result)
-                })
+                        resolve(result)
+                    })
                     .catch(err => {
-                        throw err
-                })
-        }
-        else {
+                        reject(err)
+                    })
+            }
+            if(target === "new") {
+                //trying to create new user with groups
+                let writeSelf = self.checkAllowedGroupOperation(user, operations.user.CREATE);
+                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
+
+                Promise.all([writeSelf, addGroup])
+                    .then(result => {
+                        resolve(result)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            }
             //general user write access is required
             let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
             let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
 
             Promise.all([writeAccess, addGroup])
                 .then(result => {
-                    return(result)
+                    resolve(result)
                 })
                 .catch(err => {
-                    throw err
+                    reject(err)
                 })
+        })
 
-        }
     }
 
     /**

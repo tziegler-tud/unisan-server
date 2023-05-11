@@ -78,9 +78,9 @@ let authSettings = {
                 args: {},
             });
             window.componentPage = componentPage;
-            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full"});
-            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full"});
-            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.LOGINS, {allowEdit: true, size: "full"});
+            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full", order: 1});
+            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", order: 2});
+            componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.LOGINS, {allowEdit: true, size: "full", order: 3});
         })
     },
     updatePage: function(user, args){

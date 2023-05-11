@@ -19,6 +19,8 @@ import upload from "../../config/multer.js";
 
 
 function postUpload (req, res, next) {
+    const srcPath = appRoot + '/src/data/uploads/tmp/' + req.file.filename;
+
     //check if tmp
     if (req.params.id === "tmp") {
         //generate tmp access key with 5 digits
@@ -28,7 +30,10 @@ function postUpload (req, res, next) {
         }
 
         //upload to tmp
-        fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename, appRoot + `/src/data/uploads/tmp/${tmpkey}.jpg`, {overwrite: true}, function (err) {
+        const targetPathRelative = `/data/uploads/tmp/${tmpkey}.jpg`
+        const targetPath = appRoot + "/src" + targetPathRelative;
+
+        fs.move(srcPath, targetPath, {overwrite: true}, function (err) {
             if (err) return console.error(err);
             console.log("moved file to tmp dir with filename " + tmpkey + ".jpg");
         });
@@ -36,16 +41,20 @@ function postUpload (req, res, next) {
         //return tmpkey
         res.json({
             success: true,
+            url: targetPathRelative,
             tmpkey: tmpkey,
         });
     } else {
         userService.getById(req.params.id)
             .then(user => {
-                fs.move(appRoot + '/src/data/uploads/tmp/' + req.file.filename, appRoot + `/src/data/uploads/user_images/${user.id}/${user.id}.jpg`, {overwrite: true}, function (err) {
+                //upload to tmp
+                const targetPathRelative = `/data/uploads/user_images/${user.id}/${user.id}.jpg`;
+                const targetPath = appRoot + '/src' + targetPathRelative;
+
+                fs.move(srcPath, targetPath, {overwrite: true}, function (err) {
                     if (err) return console.error(err);
                     console.log("moved file to user dir: " + user.id);
                 });
-                //log
                 //create log
                 let log = new Log({
                     type: "modification",
@@ -67,7 +76,10 @@ function postUpload (req, res, next) {
                 })
 
                 LogService.create(log).then().catch();
-                res.json({success: true});
+                res.json({
+                    success: true,
+                    url: targetPathRelative,
+                });
             })
             .catch(err => next(err));
     }
@@ -126,7 +138,7 @@ function create(req, res, next) {
             req.body.args = {};
             userService.create(req, req.body, args)
                 .then((user) => {
-                    res.json(req.body)
+                    res.json(user)
                 })
                 .catch(err => {
                     next(err);

@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import userService from "../../services/userService.js";
 import AuthService from "../../services/authService.js";
 import aclService from "../../services/aclService.js";
+import UserGroupService from "../../services/userGroupService.js";
 
 
 var app = express();
@@ -105,11 +106,39 @@ function getAll(req, res, next) {
 function addUser(req, res, next) {
     AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.CREATE)
         .then(result => {
-            res.render("unisams/user/addUser", {
-                title: "create user - uniSams",
-                acl: req.acl,
-                user: req.user._doc
-            })
+
+            //get groups and check permission
+            UserGroupService.getAll(["title", "description", "default", "type"])
+                .then(groups => {
+
+                    const allowed = []
+                    const notAllowed = []
+                    let promises = [];
+
+                    groups.forEach(group => {
+                        const promise  = AuthService.checkUserGroupWriteAccess(req.user, "new", group, true)
+                            .then(result => {
+                                allowed.push(group)
+                            })
+                            .catch(err => {
+                                notAllowed.push(group)
+                            })
+                        promises.push(promise)
+                    })
+
+                    Promise.allSettled(promises)
+                        .then(groups => {
+                            res.render("unisams/user/addUser", {
+                                title: "create user - uniSams",
+                                acl: req.acl,
+                                user: req.user._doc,
+                                groups: {
+                                    allowed: allowed,
+                                    notAllowed: notAllowed,
+                                }
+                            })
+                        })
+                })
         })
         .catch(err =>  next(err))
 

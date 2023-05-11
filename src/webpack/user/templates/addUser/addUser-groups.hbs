@@ -1,0 +1,67 @@
+<form class="form form-paged">
+    <div class="form-page">
+        <div class="form-section">
+            <div class="form-sectionheader has-icon">
+                <span>Rechte und Rollen</span>
+            </div>
+        </div>
+        <div class="form-item useredit-item" id="eventitem-roles">
+            <div class="userGroupSelect-container">
+                <div class="userGroupSelect-container--inner">
+                    <ul id="userGroupSelect-list" class="userGroupSelect-list mdc-list mdc-list--two-line" role="group" aria-label="List with checkbox items">
+                        {{#each groups.allowed}}
+                            <li class="mdc-list-item" role="checkbox" aria-checked="false" data-groupid="{{this.id}}">
+                                <span class="mdc-list-item__ripple"></span>
+                                <span class="mdc-list-item__graphic">
+                                  <div class="mdc-checkbox">
+                                    <input type="checkbox" class="mdc-checkbox__native-control userGroupSelect-checkbox" id="checkbox-{{this.id}}" data-groupid="{{this.id}}"/>
+                                    <div class="mdc-checkbox__background">
+                                      <svg class="mdc-checkbox__checkmark"
+                                           viewBox="0 0 24 24">
+                                        <path class="mdc-checkbox__checkmark-path"
+                                              fill="none"
+                                              d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                                      </svg>
+                                      <div class="mdc-checkbox__mixedmark"></div>
+                                    </div>
+                                  </div>
+                                </span>
+                                <label class="mdc-list-item__text" for="demo-list-checkbox-item-1">
+                                    <span class="mdc-list-item__primary-text">{{this.title}}</span>
+                                    <span class="mdc-list-item__secondary-text">{{this.description}}</span>
+                                </label>
+                            </li>
+                        {{/each}}
+                        <li role="separator" class="mdc-list-divider"></li>
+                        {{#each groups.notAllowed}}
+                            <li class="mdc-list-item" role="checkbox" aria-checked="false">
+                                <span class="mdc-list-item__ripple"></span>
+                                <span class="mdc-list-item__graphic">
+                                  <div class="mdc-checkbox">
+                                    <input type="checkbox"
+                                           class="mdc-checkbox__native-control"
+                                           id="demo-list-checkbox-item-1"  />
+                                    <div class="mdc-checkbox__background">
+                                      <svg class="mdc-checkbox__checkmark"
+                                           viewBox="0 0 24 24">
+                                        <path class="mdc-checkbox__checkmark-path"
+                                              fill="none"
+                                              d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                                      </svg>
+                                      <div class="mdc-checkbox__mixedmark"></div>
+                                    </div>
+                                  </div>
+                                </span>
+                                <label class="mdc-list-item__text" for="demo-list-checkbox-item-1">
+                                    <span class="mdc-list-item__primary-text">{{this.title}}</span>
+                                    <span class="mdc-list-item__secondary-text">{{this.description}}</span>
+                                </label>
+                            </li>
+                        {{/each}}
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
