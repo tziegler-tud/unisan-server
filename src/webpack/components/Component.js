@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import {userActions} from "../actions/userActions";
-import {ComponentPage} from "./ComponentPage";
+import ComponentPage from "./ComponentPage";
 
 /**
  *
@@ -51,6 +51,8 @@ export default class Component {
         };
 
         this.errorMessage = "Component " + this.componentId + " failed to render:"
+
+        this.observers = [];
     }
 
     async renderComponent({pre = true, post = true}={}){
@@ -61,29 +63,26 @@ export default class Component {
             component: this,
         }
 
-        if (pre) await self.preRender();
+        try {
+            if (pre) await self.preRender();
 
-        $.get(self.templateUrl, function (templateData) {
+            let templateData = await $.get(self.templateUrl)
             let template = Handlebars.compile(templateData);
             self.container.innerHTML = template(self.handleData);
-            self.page.renderComponentHtml(self.container)
-                .then((resolve, reject)=>{
-                    self.postRenderInternal();
-                    if(post) self.postRender()
-                        .then(()=>{
-                            return result;
-                        })
-                        .catch(err => {
-                            self.fail(err);
-                        })
-                    else return result;
-                })
-                .catch(err => {
-                    self.fail(err);
-                })
-
-
-        })
+            let pageRenderResult = await self.page.renderComponentHtml(self.container);
+            if(pageRenderResult.error) self.fail(pageRenderResult.error);
+            else {
+                self.postRenderInternal();
+                if(post) {
+                    await self.postRender();
+                    return result;
+                }
+                else return result;
+            }
+        }
+        catch(err) {
+            self.fail(err);
+        }
     }
 
     async preRender(){
@@ -104,5 +103,15 @@ export default class Component {
 
     getHtml(){
         return this.html;
+    }
+
+    addObserver(observer){
+        this.observers.push(observer);
+    }
+
+    emitEvent({event, data}){
+        this.observers.forEach(observer=>{
+            observer.inform({event: event, data: data})
+        })
     }
 }

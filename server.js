@@ -9,8 +9,6 @@ import SessionFileStore from "session-file-store";
 const FileStore = SessionFileStore(session);
 import uuid from 'uuid';
 
-var errorHandler = require("./helpers/error-handler");
-
 import oidcService from "./services/oidc/oidcService.js";
 
 import fs from 'fs';

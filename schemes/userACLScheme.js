@@ -81,6 +81,8 @@ UserACLSchema.methods.updateDockerObject = function(){
                     user: opArray.includes(authEnums.operations.system.USER),
                     groups: opArray.includes(authEnums.operations.system.GOUPS),
                     system: opArray.includes(authEnums.operations.system.SYSTEM),
+                    auth: opArray.includes(authEnums.operations.system.AUTH),
+                    development: opArray.includes(authEnums.operations.system.DEVELOPMENT),
                 }
             }
 

@@ -70,7 +70,10 @@ export default class ComponentPage {
         let self = this;
         return new Promise(function(resolve, reject){
             self.componentContainer.append(html);
-            resolve();
+            let result = {
+                error: false,
+            }
+            resolve(result);
         })
     }
 

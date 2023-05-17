@@ -337,8 +337,18 @@ async function rebuildFromUserData(req){
 
 async function updateAllUser(req){
     let userAclArray = await UserACL.find();
+    let promises = [];
     userAclArray.forEach(user => {
-        user.save();
+        promises.push(user.save());
+    })
+    return await new Promise(function(resolve, reject){
+        Promise.all(promises)
+            .then(result => {
+                resolve({successful: true})
+            })
+            .catch(err => {
+                reject(err);
+            })
     })
 }
 

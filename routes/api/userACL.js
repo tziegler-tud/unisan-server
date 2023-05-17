@@ -163,8 +163,12 @@ function rebuildUserAcls(req, res, next){
 
 function updateAllUser(req, res, next){
     aclService.updateAllUser(req)
-        .then(result => res.json(result))
-        .catch(err => next(err))
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => {
+            next(err)
+        })
 }
 
 export default router;

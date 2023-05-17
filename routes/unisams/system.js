@@ -51,6 +51,8 @@ router.get('/user', user);
 router.get('/events', events);
 router.get('/roles', roles);
 router.get('/logs', logs);
+router.get('/auth', authSettings);
+router.get('/dev', devSettings);
 
 router.get("/roles/:id/advanced", editRoleAdvanced);
 router.get("/roles/:id", editRole);
@@ -115,6 +117,22 @@ function roles (req, res, next) {
         .catch(err => {
             next(err);
         })
+}
+
+function authSettings (req, res, next) {
+    res.render("unisams/system/authentication", {
+        title: "Authentifizierung - uniSams",
+        user: req.user._doc,
+        acl: req.acl,
+    })
+}
+
+function devSettings (req, res, next) {
+    res.render("unisams/system/development", {
+        title: "Entwicklung - uniSams",
+        user: req.user._doc,
+        acl: req.acl,
+    })
 }
 
 

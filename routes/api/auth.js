@@ -14,6 +14,10 @@ app.use(bodyParser.json());
 
 /* POST users listing. */
 
+/**
+ * hooked at /api/v1/auth
+ */
+
 router.post('/auth', function(req, res, next) {
     console.log('Inside POST /login callback');
     passport.authenticate('local', {}, (err, user, info) => {
