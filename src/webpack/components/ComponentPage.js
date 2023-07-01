@@ -12,7 +12,7 @@ import {MDCMenu} from "@material/menu";
 import {MDCTextField} from "@material/textfield";
 import {MDCTextFieldHelperText} from "@material/textfield/helper-text";
 
-import "./componentPage.scss";
+import "./scss/componentPage.scss";
 import PasswordComponent from "./PasswordComponent";
 import GeneralSettingsComponent from "./GeneralSettingsComponent";
 import ConnectedServicesComponent from "./ConnectedServicesComponent";
