@@ -1498,6 +1498,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
         let assigned = {
             user: userId,
             isAssigned: true,
+            date: Date.now(),
         }
 
 

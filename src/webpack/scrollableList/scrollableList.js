@@ -41,9 +41,8 @@ let ScrollableListCounter = {
  * @returns {ScrollableList}
  * @constructor
  */
-var ScrollableList = function(container,type, data,  args, callback){
+var ScrollableList = function(container,type="qualification", data,  args, callback){
     if (container === undefined) throw new Error("cannot instantiate list without container");
-    if (type === undefined) type = "qualification";
     this.id = ScrollableListCounter.next();
 
     args = applyArgs(args);
@@ -130,6 +129,12 @@ var applyType = function(type, self) {
         case "logDetails":
             url.list = '/webpack/scrollableList/templates/logdetailsList.hbs'
             break;
+        case "generic":
+        default:
+            url.mobile = "/webpack/scrollableList/templates/genericList.hbs";
+            url.list = "/webpack/scrollableList/templates/genericList.hbs";
+            url.cards = "/webpack/scrollableList/templates/genericCards.hbs";
+
     }
     return url;
 }

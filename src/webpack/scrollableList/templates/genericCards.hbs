@@ -1,0 +1,60 @@
+{{#arrayNotEmpty listdata}}
+<div class="generic-list-container">
+    <ul class="common-list generic-list gallery-view" id="genericlist-top">
+        {{#each listdata}}
+            <li class="gallery-item viewKey-item cards-item" data-viewkey={{this.id}}>
+                <div class="inner">
+                    <!--                    <div class="image"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                    <div class="image-overlay"></div>
+                    <div class="item-property title gallery-heading eventcard-heading">
+                        {{{this.title.html}}}
+                        <div class="gallery-heading-inner date">{{{this.type.value}}}</div>
+                        <div class="gallery-heading-inner date">{{{this.dateRangeString}}}</div>
+                    </div>
+                    {{#if this.dropdown.enabled}}
+                        <div class="gallery-item-actions">
+                            <div class="eventcard-menu-container card-menu-container mdc-menu-surface--anchor">
+                                <button class="eventcard-menu-button card-menu-button mdc-icon-button material-icons">
+                                    <div class="mdc-icon-button__ripple"></div>
+                                    more_vert
+                                </button>
+                                <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
+                                    <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                        {{#each this.dropdown.options}}
+                                            {{#if this.enabled}}
+                                                <li class="mdc-list-item event-show" role="menuitem">
+                                                    {{#if this.icon}}
+                                                        <span class="mdc-list-item__graphic material-icons">
+                                                            {{this.icon}}
+                                                        </span>
+                                                    {{/if}}
+                                                    <a class="mdc-list-item__text" href="{{this.href}}">{{this.label}}</a>
+                                                </li>
+                                            {{/if}}
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {{/if}}
+                </div>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+{{else}}
+    <div class="itemlist-content-container scrollableList-content">
+        <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+            <li class="event-entry noSelect" id=''>
+                <a class="inner">
+                    <div class="item-property item-container noEntries-container">
+                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                        <span class=" item-container-element">Keine Einträge vorhanden</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+{{/arrayNotEmpty}}
+
+

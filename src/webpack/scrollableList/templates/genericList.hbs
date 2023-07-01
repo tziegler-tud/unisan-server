@@ -1,0 +1,43 @@
+<div class="itemlist-header-container postingslist-top borderBottom">
+    <ul class="common-list postingslist scrollableItemList list-view border scrollableList-top">
+        <li class="noSelect rowHeading">
+            <div class="inner">
+                {{#each listcolumns}}
+                    <div class="item-property scrollableList-header-column userlist-ch" data-property="{{this.property}}">{{this.name}}</div>
+                {{/each}}
+            </div>
+        </li>
+    </ul>
+</div>
+{{#arrayNotEmpty listdata}}
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list postingslist scrollableItemList scrollableList-body noSelect list-view border">
+    {{#each listdata}}
+        <li class="user-entry noSelect scrollableList-item" id='listEntry--{{this._id}}' data-dataId="{{this._id}}" data-key="{{this.key}}" data-value="{{this.value}}">
+            <a class="inner noSelect">
+                {{#each this.columns}}
+                    <div class="scrollableList-body-column center item-property">
+                        <span class="item-container-element">{{this.data}}</span>
+                    </div>
+                {{/each}}
+            </a>
+        </li>
+    {{/each}}
+    </ul>
+</div>
+{{else}}
+    <div class="itemlist-content-container scrollableList-content">
+        <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+            <li class="event-entry noSelect" id=''>
+                <a class="inner">
+                    <div class="item-property item-container noEntries-container">
+                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                        <span class=" item-container-element">Keine Einträge vorhanden</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+{{/arrayNotEmpty}}
+
+
