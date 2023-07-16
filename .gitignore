@@ -13,5 +13,6 @@ src/data/tmp
 dataBackup/
 logs/*
 config/config.json
+config/db.json
 config/keys.json
 .env
