@@ -13,6 +13,7 @@ const UserGroup = db.UserGroup;
 
 export default {
     getAll,
+    getDefaultGroups,
     getById,
     update,
     create,
@@ -33,6 +34,9 @@ async function getAll(select= []){
     return UserGroup.find();
 }
 
+async function getDefaultGroups(){
+    return UserGroup.find({default: true});
+}
 
 /**
  * Gets an event by its id

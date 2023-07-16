@@ -39,7 +39,7 @@
     "jose": "^4.14.4",
     "material-icons-font": "^2.1.0",
     "moment": "^2.29.3",
-    "mongodb": "4.1.2",
+    "mongodb": "^5.7.0",
     "mongoose": "6.9.0",
     "mongoose-plugin-autoinc-fix": "^1.2.1",
     "morgan": "~1.9.1",

@@ -61,6 +61,7 @@ import passport from './config/passport.js';
 import upload from "./config/multer.js";
 import oidcRouter from "./routes/oidc/index.js";
 import oidcInteractionsRouter from "./routes/oidc/interactions.js";
+import UserService from "./services/userService.js";
 
 
 
@@ -192,6 +193,7 @@ SystemService.start({config: config})
             version: system.version,
             build: system.build
         }
+        UserService.ensureAdminUser();
         /* load OidcService */
         oidcService.init()
             .then(() => {

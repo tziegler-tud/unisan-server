@@ -13,6 +13,7 @@ const UserACL = db.UserACL;
 const DbLog = db.Log;
 
 import fs from 'fs-extra';
+import UserGroupService from "./userGroupService.js";
 
 export default {
     getAll,
@@ -40,6 +41,7 @@ export default {
     addIndividualEventAccess,
     removeIndividualEventAccess,
     clearDocuments,
+    ensureAdminUser,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -1010,13 +1012,14 @@ async function matchAny(matchString, args){
         if (matchString.length === 0) {
             userlist = User.find();
         }
-        userlist = User.find().or([{username: { $regex: matchString, $options: "-i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "-i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "-i" }}])
-
+        else {
+            userlist = User.find().or([{username: { $regex: matchString, $options: "i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "i" }}])
+        }
     }
     else {
         let filterObj = {};
         filterObj[filter.filter] = filter.value;
-        userlist = User.find(filterObj).or([{username: { $regex: matchString, $options: "-i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "-i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "-i" }}]).select("-hash");
+        userlist = User.find(filterObj).or([{username: { $regex: matchString, $options: "i" }}, {'generalData.firstName.value': { $regex: matchString, $options: "i" }}, {'generalData.lastName.value': { $regex: matchString, $options: "i" }}]).select("-hash");
     }
     //filter user by given string, using username, firstname and lastname attribute
 
@@ -1596,5 +1599,36 @@ function clearDocuments(){
             })
             .catch(err => reject(err))
     })
+}
+
+async function ensureAdminUser(){
+    const defaultUsername = "admin";
+    const defaultPassword = "admin";
+    //check if at least one user is present
+    const users = await User.find();
+    if(!Array.isArray(users) || users.length === 0) {
+        //create default user
+        console.log("Empty user database found. Creating default user with username/password: " + defaultUsername + "/" + defaultPassword);
+        const defaultAdmin = new User({
+            username: defaultUsername,
+            generalData: {
+                firstName: {
+                    value: "default"
+                },
+                lastName: {
+                    value: "Admin"
+                },
+                memberId: {
+                    value: 0,
+                },
+            }
+        })
+        const salt = await bcrypt.genSalt(10);
+        defaultAdmin.hash = await bcrypt.hash(defaultPassword, salt);
+        const user = await defaultAdmin.save()
+        const defaultGroups = await UserGroupService.getDefaultGroups();
+        const userACL = new UserACL({user: user.id, userRole: "superadmin", userGroups: defaultGroups})
+        return userACL.save()
+    }
 }
 
