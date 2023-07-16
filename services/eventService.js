@@ -311,7 +311,7 @@ async function create(req, eventParam) {
                     .catch(
 
                     );
-                fs.mkdir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
+                fs.ensureDir(appRoot + '/src/data/uploads/event_images/' + event._id.toString(), { recursive: true }, (err) => {
                     if (err) {
                         console.warn("Failed to create directory: " + '/src/data/uploads/event_images/' + event._id.toString());
                     }
@@ -326,7 +326,7 @@ async function create(req, eventParam) {
                         });
                     }
                 });
-                fs.mkdir(appRoot + '/src/data/uploads/event_files/' + event._id.toString(), { recursive: true }, (err) => {
+                fs.ensureDir(appRoot + '/src/data/uploads/event_files/' + event._id.toString(), { recursive: true }, (err) => {
                     if (err) {
                         throw err;
                     } else {
