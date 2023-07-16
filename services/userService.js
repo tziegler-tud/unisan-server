@@ -202,10 +202,9 @@ async function create(req, userParam, args) {
 
             );
         //create user dir
-        fs.mkdir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
+        fs.ensureDir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
             if (err) {
                 console.error("Failed to create directory: " + '/src/data/uploads/user_images/' + user._id.toString());
-
             }
             else {
                 //check if tmp image exists

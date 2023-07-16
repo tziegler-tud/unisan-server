@@ -15,7 +15,6 @@ import config from "./config/config.json" assert {type: "json"};
 import oidcService from "./services/oidc/oidcService.js";
 import SystemService from "./services/SystemService.js";
 
-import fs from 'fs';
 import {fileURLToPath} from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -75,12 +74,6 @@ server.use(bodyParser.urlencoded({
 }));
 server.use(bodyParser.json());
 server.use(bodyParser.text());
-
-// // create a write stream (in append mode)
-// var accessLogStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' })
-//
-// // setup the logger
-// server.use(logger('combined', { stream: accessLogStream }))
 
 server.use(logger('dev')); //logging to console
 server.use(express.json());

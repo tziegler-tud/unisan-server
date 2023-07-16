@@ -6,9 +6,7 @@ import {fileURLToPath} from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dir = path.resolve(__dirname, "../src/data/uploads/tmp");
 //create directories if not exists
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-}
+fs.ensureDirSync(dir)
 
 // upload new files to tmp directory
 var storage = multer.diskStorage({
