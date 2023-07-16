@@ -160,7 +160,7 @@ var Component = function(componentId, componentType, data, args){
                     }
                     else {
                         fileList.listElements.forEach(function(listItemEl){
-                            var it = $(listItemEl).parent(".mdc-list-item-wrapper").find('.mdc-menu');
+                            var it = $(listItemEl).parent(".mdc-deprecated-list-item-wrapper").find('.mdc-menu');
                             var menu;
                             $(it).each(function(index){
                                 menu = new MDCMenu(this);
@@ -174,7 +174,7 @@ var Component = function(componentId, componentType, data, args){
                                     let uniqueId = this.dataset.id;
                                     eventActions.deleteFileFromStorage(event.id, uniqueId, {
                                         onSuccess: function(){
-                                            $(listItemEl).parent(".mdc-list-item-wrapper").next(".mdc-list-divider").remove();
+                                            $(listItemEl).parent(".mdc-deprecated-list-item-wrapper").next(".mdc-deprecated-list-divider").remove();
                                             listItemEl.remove();
                                         },
                                     })

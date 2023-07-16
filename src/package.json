@@ -12,7 +12,7 @@
     "@material/drawer": "14.0.0",
     "@material/fab": "14.0.0",
     "@material/icon-button": "14.0.0",
-    "@material/list": "14.0.0",
+    "@material/list": "12.0.0",
     "@material/menu": "14.0.0",
     "@material/ripple": "14.0.0",
     "@material/snackbar": "14.0.0",
