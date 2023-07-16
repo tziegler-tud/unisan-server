@@ -1,5 +1,6 @@
 import db from '../../schemes/mongo.js';
-const OicdAccount = db.OicdAccount;
+const OidcAccount = db.OidcAccount;
+const OidcClient = db.OidcClient;
 
 const grantable = new Set([
     'access_token',
@@ -54,7 +55,7 @@ class MongooseAdapter {
             }
 
             //check if exists
-            OicdAccount.findOne({model: self.name, accountId: id})
+            OidcAccount.findOne({model: self.name, accountId: id})
                 .then(account=> {
                     if(account) {
                         account.payload = payload;
@@ -75,7 +76,7 @@ class MongooseAdapter {
                             })
                     }
                     else {
-                        let account = new OicdAccount({
+                        let account = new OidcAccount({
                             accountId: id,
                             model: self.name,
                             payload: payload,
@@ -235,7 +236,14 @@ class MongooseAdapter {
      *
      */
     async find(id) {
-        const account = await OicdAccount.findOne({model: this.name, accountId: id});
+        if(this.name === "Client") {
+            const client = await OidcClient.findOne({client_id: id}).lean();
+            if(client) {
+                if(client.enabled) return client;
+            }
+            else return undefined;
+        }
+        const account = await OidcAccount.findOne({model: this.name, accountId: id});
         if(account) {
             return account.payload;
         }
@@ -254,7 +262,7 @@ class MongooseAdapter {
      *
      */
     async findByUserCode(userCode) {
-        const account = await OicdAccount.findOne({model: this.name, "payload.userCode": userCode});
+        const account = await OidcAccount.findOne({model: this.name, "payload.userCode": userCode});
         if(account) {
             return account.payload;
         }
@@ -272,7 +280,7 @@ class MongooseAdapter {
      *
      */
     async findByUid(uid) {
-        const account = await OicdAccount.findOne({model: this.name, "payload.uid": uid});
+        const account = await OidcAccount.findOne({model: this.name, "payload.uid": uid});
         if(account) {
             return account.payload;
         }
@@ -291,7 +299,7 @@ class MongooseAdapter {
      *
      */
     async consume(id) {
-        let account = await OicdAccount.findOne({model: this.name, accountId: id})
+        let account = await OidcAccount.findOne({model: this.name, accountId: id})
         if (account){
             account.payload.consumed = true;
             account.save();
@@ -314,7 +322,7 @@ class MongooseAdapter {
     destroy(id) {
         let self = this;
         return new Promise(function(resolve, reject){
-            OicdAccount.findOneAndRemove({model: self.name, accountId: id})
+            OidcAccount.findOneAndRemove({model: self.name, accountId: id})
                 .then(result => {
                     resolve()
                 })
@@ -337,7 +345,7 @@ class MongooseAdapter {
     revokeByGrantId(grantId) {
         let self = this;
         return new Promise(function(resolve, reject){
-            OicdAccount.findOneAndRemove({model: self.name, "payload.grantId": grantId})
+            OidcAccount.findOneAndRemove({model: self.name, "payload.grantId": grantId})
                 .then(result => {
                     resolve()
                 })

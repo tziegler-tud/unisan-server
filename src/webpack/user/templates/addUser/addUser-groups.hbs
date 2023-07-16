@@ -8,11 +8,11 @@
         <div class="form-item useredit-item" id="eventitem-roles">
             <div class="userGroupSelect-container">
                 <div class="userGroupSelect-container--inner">
-                    <ul id="userGroupSelect-list" class="userGroupSelect-list mdc-list mdc-list--two-line" role="group" aria-label="List with checkbox items">
+                    <ul id="userGroupSelect-list" class="userGroupSelect-list mdc-deprecated-list mdc-deprecated-list--two-line" role="group" aria-label="List with checkbox items">
                         {{#each groups.allowed}}
-                            <li class="mdc-list-item" role="checkbox" aria-checked="false" data-groupid="{{this.id}}">
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__graphic">
+                            <li class="mdc-deprecated-list-item" role="checkbox" aria-checked="false" data-groupid="{{this.id}}">
+                                <span class="mdc-deprecated-list-item__ripple"></span>
+                                <span class="mdc-deprecated-list-item__graphic">
                                   <div class="mdc-checkbox">
                                     <input type="checkbox" class="mdc-checkbox__native-control userGroupSelect-checkbox" id="checkbox-{{this.id}}" data-groupid="{{this.id}}"/>
                                     <div class="mdc-checkbox__background">
@@ -26,17 +26,17 @@
                                     </div>
                                   </div>
                                 </span>
-                                <label class="mdc-list-item__text" for="demo-list-checkbox-item-1">
-                                    <span class="mdc-list-item__primary-text">{{this.title}}</span>
-                                    <span class="mdc-list-item__secondary-text">{{this.description}}</span>
+                                <label class="mdc-deprecated-list-item__text" for="demo-list-checkbox-item-1">
+                                    <span class="mdc-deprecated-list-item__primary-text">{{this.title}}</span>
+                                    <span class="mdc-deprecated-list-item__secondary-text">{{this.description}}</span>
                                 </label>
                             </li>
                         {{/each}}
-                        <li role="separator" class="mdc-list-divider"></li>
+                        <li role="separator" class="mdc-deprecated-list-divider"></li>
                         {{#each groups.notAllowed}}
-                            <li class="mdc-list-item" role="checkbox" aria-checked="false">
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__graphic">
+                            <li class="mdc-deprecated-list-item" role="checkbox" aria-checked="false">
+                                <span class="mdc-deprecated-list-item__ripple"></span>
+                                <span class="mdc-deprecated-list-item__graphic">
                                   <div class="mdc-checkbox">
                                     <input type="checkbox"
                                            class="mdc-checkbox__native-control"
@@ -52,9 +52,9 @@
                                     </div>
                                   </div>
                                 </span>
-                                <label class="mdc-list-item__text" for="demo-list-checkbox-item-1">
-                                    <span class="mdc-list-item__primary-text">{{this.title}}</span>
-                                    <span class="mdc-list-item__secondary-text">{{this.description}}</span>
+                                <label class="mdc-deprecated-list-item__text" for="demo-list-checkbox-item-1">
+                                    <span class="mdc-deprecated-list-item__primary-text">{{this.title}}</span>
+                                    <span class="mdc-deprecated-list-item__secondary-text">{{this.description}}</span>
                                 </label>
                             </li>
                         {{/each}}

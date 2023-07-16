@@ -5,12 +5,16 @@ var Preloader = function(){
     var self = document.getElementById("preloader");
 
     plr.hide = function(){
-        self.classList.remove("preloader-active");
-        self.classList.add("preloader-hidden");
+        if(self) {
+            self.classList.remove("preloader-active");
+            self.classList.add("preloader-hidden");
+        }
     };
     plr.show = function(){
-        self.classList.add("preloader-active");
-        self.classList.remove("preloader-hidden");
+        if(self) {
+            self.classList.add("preloader-active");
+            self.classList.remove("preloader-hidden");
+        }
     };
     return plr;
 };

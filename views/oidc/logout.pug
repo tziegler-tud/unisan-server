@@ -1,0 +1,53 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=")
+
+    script(src='/static/unisams/js/preloader.js')
+    script(src='/dist/login.js')
+    script(src='/dist/login_style.js')
+
+    //
+      ***********************************
+      ** no js fallback
+      ***********************************
+    noscript
+      link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/no-js.css')
+
+
+
+
+  body.no-js
+    #wrapper.wrapper-full-height
+      .login-page
+        .login-page-container
+          .login-additional-box
+            .additonal-content-container.centered
+              .img-container
+                img(src="/static/images/logo/unisams-kompakt.jpg")
+              //.unisams-label
+              //  span.acc1 uni
+              //  span.acc2 Sams
+                .clear
+              .clear
+          .login-content
+            .login-content-inner.centered
+              .login-form-container
+                .login-form-greeter
+                  .greeter-label
+                    | OpenID Logout
+                  .greeter-content
+                    | Bestätige, dass du dich abmelden möchtest.
+                .logout-form-hidden!=form
+                .login-form-content
+                    button.submit-button.mdc-button.mdc-button--raised.next(autofocus type="submit" form="op.logoutForm" value="yes" name="logout")
+                      .mdc-button__ripple
+                      span.mdc-button__label
+                        | logout
+
+
+
+

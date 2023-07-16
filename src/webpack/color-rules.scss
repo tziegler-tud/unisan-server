@@ -5,6 +5,7 @@ $publicroute: "../static/public/stylesheets";
 $page-font-color: #333;
 $page-bg-color: #fff;
 $page-bg-color-v2: #f9f9f9;
+$page-bg-color-v3: #f6f6f6;
 
 
 
@@ -35,6 +36,11 @@ $text-color-body: #000;
 $text-color-secondary: #333;
 $text-color-heading--light: #fff;
 $text-color-secondary--light: #fafafa;
+$text-color-tertiary: #666;
+
+$item-container-background: $page-bg-color-v3;
+$item-container-secondary: $text-color-tertiary;
+$item-container-primary: $text-color-secondary;
 
 $disabled-color: #858585;
 $allowed-color: #3b8d23;

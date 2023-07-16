@@ -1,8 +1,10 @@
 @use "@material/list";
+@use "@material/list/mdc-list";
+@use "@material/switch";
 @use '@material/switch/styles';
-@import "./../../variables.scss";
+@import "../../variables.scss";
 
-@include list.core-styles;
+@include list.deprecated-core-styles;
 
 .interactiveList {
 

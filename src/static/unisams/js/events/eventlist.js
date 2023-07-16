@@ -62,7 +62,7 @@ $(document).ready (function () {
                 $('.event-entry').each(function(){
                     $(this).on("click", function(e){
                         e.preventDefault();
-                        window.location = "/unisams/events/view/" + this.dataset.eventid;
+                        window.location = "/events/view/" + this.dataset.eventid;
                     })
                 });
 

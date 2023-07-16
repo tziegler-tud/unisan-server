@@ -2,7 +2,7 @@
 @import "../color-rules";
 @import "../variables";
 
-@include list.core-styles;
+@include list.deprecated-core-styles;
 
 .sidebar-event {
   .sidebar-content {

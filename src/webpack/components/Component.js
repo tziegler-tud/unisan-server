@@ -14,7 +14,7 @@ import ComponentPage from "./ComponentPage";
  * @constructor
  */
 export default class Component {
-    constructor({page, componentId=Date.now(), componentType, data, args}={}) {
+    constructor({page, componentId=Date.now(), componentType, pageData, data={}, args}={}) {
         let defaults = {
             allowEdit: true,
             size: "full",
@@ -26,6 +26,7 @@ export default class Component {
         this.args = Object.assign(defaults, args);
         this.page = page;
         this.data = data;
+        this.pageData = pageData;
         this.user = data.user;
 
         this.componentId = componentId;
@@ -45,7 +46,9 @@ export default class Component {
         this.html = this.container;
 
         this.templateUrl = "";
-        this.handleData = data;
+        this.handleData = {
+            data: data
+        };
         this.handleData.args = {
             allowEdit: this.args.allowEdit,
         };
@@ -62,6 +65,8 @@ export default class Component {
             error: undefined,
             component: this,
         }
+
+        self.handleData.data = self.data;
 
         try {
             if (pre) await self.preRender();

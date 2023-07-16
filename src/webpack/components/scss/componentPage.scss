@@ -49,7 +49,11 @@
           letter-spacing: .15em;
         }
         .componentPage-component-item {
-          flex: 1 1 auto
+          flex: 1 1 auto;
+          padding: 12px 12px 0 12px;
+          &__full {
+            padding: 0;
+          }
         }
       }
     }

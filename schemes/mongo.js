@@ -1,4 +1,4 @@
-import config from '../config/config.json' assert {type: "json"};
+import config from '../config/db.json' assert {type: "json"};
 import mongoose from "mongoose";
 import autoIncrement from "mongoose-plugin-autoinc-fix";
 
@@ -10,7 +10,9 @@ import UserGroup from './userGroupScheme.js';
 import UserACL from './userACLScheme.js';
 import Log from './logScheme.js';
 import Protocol from './protocolScheme.js'
-import OicdAccount from './oicdAccountScheme.js'
+import OidcAccount from './oidcAccountScheme.js'
+import OidcClient from './oidcClientScheme.js'
+import SystemSettings from './systemSettingsScheme.js'
 
 mongoose.set('debug', false);
 
@@ -41,5 +43,7 @@ export default {
     UserACL: UserACL,
     Log: Log,
     Protocol: Protocol,
-    OicdAccount: OicdAccount,
+    OidcAccount: OidcAccount,
+    OidcClient: OidcClient,
+    SystemSettings: SystemSettings,
 };

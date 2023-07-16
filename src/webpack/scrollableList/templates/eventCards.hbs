@@ -17,28 +17,28 @@
                                 more_vert
                             </button>
                             <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
-                                <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                <ul class="mdc-deprecated-list mdc-deprecated-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
                                     {{#if ../acl.events.write}}
-                                    <li class="mdc-list-item event-show" role="menuitem" data-eventid="{{this._id}}">
-                                            <span class="mdc-list-item__graphic material-icons">
+                                    <li class="mdc-deprecated-list-item event-show" role="menuitem" data-eventid="{{this._id}}">
+                                            <span class="mdc-deprecated-list-item__graphic material-icons">
                                                 edit
                                             </span>
-                                        <span class="mdc-list-item__text">Event bearbeiten</span>
+                                        <span class="mdc-deprecated-list-item__text">Event bearbeiten</span>
                                     </li>
                                     {{else}}
-                                        <li class="mdc-list-item event-show" role="menuitem" data-eventid="{{this._id}}">
-                                            <span class="mdc-list-item__graphic material-icons">
+                                        <li class="mdc-deprecated-list-item event-show" role="menuitem" data-eventid="{{this._id}}">
+                                            <span class="mdc-deprecated-list-item__graphic material-icons">
                                                 info
                                             </span>
-                                            <span class="mdc-list-item__text">Event anzeigen</span>
+                                            <span class="mdc-deprecated-list-item__text">Event anzeigen</span>
                                         </li>
                                     {{/if}}
                                     {{#if ../acl.events.delete}}
-                                    <li class="mdc-list-item event-delete" role="menuitem" data-eventid="{{this._id}}">
-                                            <span class="mdc-list-item__graphic material-icons">
+                                    <li class="mdc-deprecated-list-item event-delete" role="menuitem" data-eventid="{{this._id}}">
+                                            <span class="mdc-deprecated-list-item__graphic material-icons">
                                                 delete
                                             </span>
-                                        <span class="mdc-list-item__text">Event löschen</span>
+                                        <span class="mdc-deprecated-list-item__text">Event löschen</span>
                                     </li>
                                     {{/if}}
                                 </ul>

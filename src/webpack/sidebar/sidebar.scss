@@ -3,10 +3,12 @@
   $on-primary: #c31d34
 );
 @use "@material/button";
+@use "@material/button/styles" as button-styles;
 @use "@material/icon-button";
-@use "@material/tooltip/styles";
+@use "@material/icon-button/styles";
+@use "@material/tooltip/styles" as tooltip-styles;
 
-@include icon-button.core-styles;
+//@include icon-button.core-styles;
 
 @import "../color-rules";
 @import "../variables";
@@ -263,6 +265,9 @@ body{
 
     }
   }
+  .sidebar-label {
+    margin-right: 15px;
+  }
 
   .sidebar-errorMsg {
     display: block;
@@ -293,7 +298,7 @@ body{
   }
   &.sidebarButton--cancel {
     button {
-      @include icon-button.ink-color(#00293c)
+      @include icon-button.ink-color(#00293c);
     }
   }
   &.sidebarButton--back {

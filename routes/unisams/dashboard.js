@@ -18,9 +18,9 @@ app.use(bodyParser.json());
 
 let auth = function(req, res, next){
     if (!req.isAuthenticated()) {
-        req.session.redirectTo = '/unisams';
+        req.session.redirectTo = '/';
         console.log("");
-        res.redirect('/unisams/login');
+        res.redirect('/login');
     } else {
         next();
     }
@@ -36,7 +36,7 @@ function getDockerArguments (req, res, next) {
     // next();
 }
 
-//hooked at /unisams/dashboard
+//hooked at /dashboard
 
 /* GET home page. */
 // router.get("/*", auth);

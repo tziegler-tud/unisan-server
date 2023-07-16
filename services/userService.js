@@ -1111,7 +1111,7 @@ async function addUserGroup(req, id, userGroup){
 
     return new Promise(function(resolve, reject){
         //get user acl
-        aclService.getUserACL(id, false)
+        aclService.getUserACL(id, {populate: {userGroups: true}})
             .then(userACL=> {
                 //check if user already has userGroup assigned
                 if(userACL.userGroups.includes(userGroupId)){
@@ -1187,7 +1187,7 @@ async function removeUserGroup(req, id, userGroup){
 
     return new Promise(function(resolve, reject){
         //check if user has userGroup assigned
-        aclService.getUserACL(id, false)
+        aclService.getUserACL(id, {populate: {userGroups: false}})
             .then(userACL=> {
                 //check if user has userGroup assigned
                 let index = userACL.userGroups.findIndex(g => {
@@ -1277,7 +1277,7 @@ async function addIndividualEventAccess(req, userid, target, operationArray){
         AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.access.GRANTEVENTCONTROL)
             .then(result => {
                 //get user acl
-                aclService.getUserACL(userid, false)
+                aclService.getUserACL(userid, {populate: {userGroups: false}})
                     .then(userACL=> {
                         if (userACL.individual === undefined) {
                             userACL.individual = {};
@@ -1398,7 +1398,7 @@ async function removeIndividualEventAccess(req, userid, target){
         AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.access.REVOKEEVENTCONTROL)
             .then(result => {
                 //get user acl
-                aclService.getUserACL(userid, false)
+                aclService.getUserACL(userid, {populate: {userGroups: true}})
                     .then(userACL=> {
                         if (userACL.individual === undefined) {
                             reject("Failed to read individual access rights.")

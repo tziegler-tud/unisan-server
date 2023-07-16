@@ -1,12 +1,12 @@
 {{#arrayNotEmpty listdata}}
-    <div class="itemlist-content-container scrollableList-content mdc-list-group">
-        <ul class="mdc-list mdc-list--two-line">
+    <div class="itemlist-content-container scrollableList-content mdc-deprecated-list-group">
+        <ul class="mdc-deprecated-list mdc-deprecated-list--two-line">
         {{#each listdata}}
-            <li class="mdc-list-item event-entry" tabindex="0" id='eventId{{this.id}}' data-id= {{this.id}}>
-                <span class="mdc-list-item__ripple"></span>
-                <span class="mdc-list-item__text">
-                    <span class="mdc-list-item__primary-text">{{{this.title.value}}} <span class="mobileList-secondary">| {{this.type.value}}</span></span>
-                     <span class="mdc-list-item__secondary-text">{{this.dateRangeString}}</span>
+            <li class="mdc-deprecated-list-item event-entry" tabindex="0" id='eventId{{this.id}}' data-id= {{this.id}}>
+                <span class="mdc-deprecated-list-item__ripple"></span>
+                <span class="mdc-deprecated-list-item__text">
+                    <span class="mdc-deprecated-list-item__primary-text">{{{this.title.value}}} <span class="mobileList-secondary">| {{this.type.value}}</span></span>
+                     <span class="mdc-deprecated-list-item__secondary-text">{{this.dateRangeString}}</span>
                 </span>
             </li>
     {{/each}}

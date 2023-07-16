@@ -30,12 +30,12 @@ var Navigation = function(context, version){
         var template = Handlebars.compile(data);
         // $(".app-drawer-container").prepend(template(context));
         $(".app-page-wrapper").prepend(template(context));
-        // const list = MDCList.attachTo(document.querySelector('.mdc-list'));
+        // const list = MDCList.attachTo(document.querySelector('.mdc-deprecated-list'));
         // list.wrapFocus = true;
         const topAppBarElement = document.querySelector('.mdc-top-app-bar');
         const topAppBar =  new MDCTopAppBar(topAppBarElement);
         const drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'))
-        const listEl = document.querySelector('.mdc-drawer .mdc-list');
+        const listEl = document.querySelector('.mdc-drawer .mdc-deprecated-list');
         const mainContentEl = document.querySelector('.app-content-container');
         listEl.addEventListener('click', (event) => {
             // mainContentEl.querySelector('input, button').focus();

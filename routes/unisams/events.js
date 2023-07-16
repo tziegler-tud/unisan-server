@@ -16,9 +16,9 @@ app.use(bodyParser.json());
 
 let auth = function(req, res, next){
     if (!req.isAuthenticated()) {
-        req.session.redirectTo = '/unisams';
+        req.session.redirectTo = '/';
         console.log("");
-        res.redirect('/unisams/login');
+        res.redirect('/login');
     } else {
         next();
     }
@@ -144,8 +144,8 @@ function getDockerArguments (req, res, next) {
 
 
 // routes
-//hooked at /unisams/events
-const baseUrl = "/unisams/events";
+//hooked at /events
+const baseUrl = "/events";
 
 //check url access by user group
 // router.use('/*', auth);
@@ -340,7 +340,6 @@ function eventPostings(req, res, next) {
                 let url = "unisams/events/participants";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
-
                         res.render(url, {
                             user: req.user.toJSON(),
                             acl: req.acl,

@@ -6,8 +6,6 @@ html
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     link(rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=")
 
-    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_login.css')
-
     script(src='/static/unisams/js/preloader.js')
     script(src='/dist/login.js')
     script(src='/dist/login_style.js')
@@ -40,20 +38,22 @@ html
               .login-form-container
                 .login-form-greeter
                   .greeter-label
-                    | OpenId Test Suite
+                    | OpenID Login
                   .greeter-content
-                    | Interaction page
+                    | Authorisierung erforderlich
                 .login-form-content
 
 
                   .login-form-consent
-                    .login-fomr-consent-label
-                      span.login-form-consent-label--bold=client.clientId
+                    .login-form-consent-label
+                      span.login-form-consent-label--bold=client_name
                       span
                       |  erhält Zugriff auf folgende Daten:
                     ul.login-form-consent-list
-                      each val in details.missingOIDCScope
-                        li.login-form-consent-entry=val
+                      each claim in claims
+                        li.login-form-consent-entry
+                          span.login-form-consent-entry--title=claim.scope
+                          span.login-form-consent-entry--text=claim.description
 
                   form#login-form01.login-form(action=uid + '/confirm' method='POST')
                     button.submit-button.mdc-button.mdc-button--raised.next

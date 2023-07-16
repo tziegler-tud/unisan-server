@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import config from "../config/config.json" assert {type: "json"};
 
 /**
  * Module dependencies.
@@ -9,14 +10,12 @@ import app from '../server.js';
 import makeDebug from 'debug';
 const debug = makeDebug('unisan-server:server');
 import http from 'http';
-import https from "https";
-import fs from "fs";
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || config.port);
 app.set('port', port);
 
 /**
@@ -32,15 +31,6 @@ var server = http.createServer(app);
 server.listen(port, '0.0.0.0');
 server.on('error', onError);
 server.on('listening', onListening);
-
-const options = {
-  key: fs.readFileSync("./bin//ssl/127.0.0.1-key.pem"),
-  cert: fs.readFileSync('./bin/ssl/127.0.0.1.pem'),
-};
-var httpsServer = https.createServer(options, app);
-httpsServer.listen(4000, "0.0.0.0");
-httpsServer.on('error', onError);
-httpsServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.

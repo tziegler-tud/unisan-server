@@ -2,6 +2,9 @@ import Handlebars from "handlebars";
 import {userActions} from "../actions/userActions";
 import {ComponentPage} from "./ComponentPage";
 import Component from "./Component";
+import {systemActions} from "../actions/actions";
+import "./scss/connectedServices.scss";
+import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
 
 /**
  *
@@ -14,13 +17,52 @@ import Component from "./Component";
  * @constructor
  */
 export default class ConnectedServicesComponent extends Component {
-    constructor({page, componentId, componentType, data, args}={}) {
-        super({page, componentId, componentType, data, args});
-        this.templateUrl = "/webpack/components/pageModules/settings/connectedServices.hbs"
+    constructor({page, componentId, componentType, pageData, data, args}={}) {
+        super({page, componentId, componentType, pageData, data, args});
+        this.templateUrl = "/webpack/components/pageModules/settings/connectedServices.hbs";
+    }
+
+    async preRender(){
+        let self = this;
+
+        const sessionsContainer = this.container.querySelector(".openid-sessions");
+        //get user sessions
+        const sessions = await systemActions.getUserSessions();
+        this.data.sessions = sessions;
+
+
     }
 
     async postRender(){
         let self = this;
+        const deleteButtons = this.container.querySelectorAll(".openid-sessionCard--deleteButton");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function(e){
+                const dialog_content = {
+                    title: "OpenID Session beenden",
+                    message: "Folgender OpenID Session wird beendet: " + button.dataset.sessionid,
+                    titleArg: "",
+                    messageArg: ""
+                };
+                var dialog_token = lidlRTO.objectManager.createNewObjectToken();
+                const dialog_args = {
+
+                };
+                const cb = {
+                    onConfirm: function(res){
+                        systemActions.removeUserSession(button.dataset.sessionid)
+                            .then(result => {
+                                window.location.reload();
+                            })
+                        lidlRTO.objectManager.removeObject(dialog_token);
+                    }
+                }
+                const dialog = new lidlDialog(dialog_token, null, 'confirmDelete', dialog_content, dialog_args, cb);
+                lidlRTO.objectManager.addObject(dialog, dialog_token);
+                dialog.openDialog();
+            })
+        })
     }
 
     getHtml(){

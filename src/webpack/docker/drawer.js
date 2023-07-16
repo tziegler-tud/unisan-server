@@ -10,7 +10,7 @@ var Drawer = function(context){
         var template = Handlebars.compile(data);
         $("body").prepend(template(context));
         drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
-        const listEl = document.querySelector('.mdc-drawer .mdc-list');
+        const listEl = document.querySelector('.mdc-drawer .mdc-deprecated-list');
         const mainContentEl = document.querySelector('#outer-wrapper');
 
         listEl.addEventListener('click', (event) => {
@@ -19,7 +19,7 @@ var Drawer = function(context){
 
         const settingsButton = document.getElementById("drawer-settings-button");
         settingsButton.addEventListener('click', (event) => {
-            window.location = "/unisams/settings";
+            window.location = "/settings";
         });
 
         document.body.addEventListener('MDCDrawer:closed', () => {

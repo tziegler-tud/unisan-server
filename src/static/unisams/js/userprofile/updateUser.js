@@ -17,7 +17,7 @@ $(function() {
             data: data,
             success: function(result) {
                 alert("Updated user info.");
-                location.replace("/unisams/user/view/" + data.username)
+                location.replace("/user/view/" + data.username)
                 // do something when it was successful
             }
         });

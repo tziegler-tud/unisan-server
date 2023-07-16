@@ -74,7 +74,7 @@
 }
 
 #error-container {
-  text-align: center;
+  text-align: left;
   max-width: 40em;
 
   margin: 1em auto;
@@ -83,10 +83,17 @@
   #error-container-inner {
     width: 100%;
 
+    .errorbox-image {
+      width: 100%;
+      text-align: center;
+      img {
+        max-width: 300px;
+      }
+    }
 
     .errorbox-heading {
       color: @col1;
-      font-size: 400%;
+      font-size: 200%;
     }
 
     .errorbox-status {
@@ -94,7 +101,7 @@
       padding: 0 0 20px 0;
 
       color: @akzent-color;
-      font-size: 500%;
+      font-size: 400%;
 
     }
     .errorbox-body {
@@ -122,6 +129,9 @@
         width: 100%;
         padding: 0 0 5px 0;
       }
+    }
+    .errorbox-link {
+      margin-left: 0;
     }
   }
 }

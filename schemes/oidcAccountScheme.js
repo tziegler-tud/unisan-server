@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 // create instance of Schema
-var OicdAccountScheme = new Schema({
+var OidcAccountScheme = new Schema({
     accountId: {
         required: true,
         type: String,
@@ -39,10 +39,10 @@ var OicdAccountScheme = new Schema({
     }
 });
 
-OicdAccountScheme.post('save', function(error, doc, next) {
+OidcAccountScheme.post('save', function(error, doc, next) {
     throw new Error(error);
 });
 
-OicdAccountScheme.set('toJSON', { virtuals: true });
+OidcAccountScheme.set('toJSON', { virtuals: true });
 
-export default mongoose.model('OicdAccount', OicdAccountScheme);
+export default mongoose.model('OidcAccount', OidcAccountScheme);

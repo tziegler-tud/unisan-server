@@ -1,15 +1,16 @@
 {{#arrayNotEmpty listdata}}
-<div class="generic-list-container">
+<div class="generic-list-container gallery-container">
     <ul class="common-list generic-list gallery-view" id="genericlist-top">
         {{#each listdata}}
             <li class="gallery-item viewKey-item cards-item" data-viewkey={{this.id}}>
                 <div class="inner">
                     <!--                    <div class="image"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
                     <div class="image-overlay"></div>
-                    <div class="item-property title gallery-heading eventcard-heading">
-                        {{{this.title.html}}}
-                        <div class="gallery-heading-inner date">{{{this.type.value}}}</div>
-                        <div class="gallery-heading-inner date">{{{this.dateRangeString}}}</div>
+                    <div class="item-property title gallery-heading">
+                        {{this.value}}
+                        {{#each this.columns}}
+                            <div class="gallery-heading-inner">{{{this.data}}}</div>
+                        {{/each}}
                     </div>
                     {{#if this.dropdown.enabled}}
                         <div class="gallery-item-actions">
@@ -19,16 +20,16 @@
                                     more_vert
                                 </button>
                                 <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
-                                    <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                    <ul class="mdc-deprecated-list mdc-deprecated-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
                                         {{#each this.dropdown.options}}
                                             {{#if this.enabled}}
-                                                <li class="mdc-list-item event-show" role="menuitem">
+                                                <li class="mdc-deprecated-list-item event-show" role="menuitem">
                                                     {{#if this.icon}}
-                                                        <span class="mdc-list-item__graphic material-icons">
+                                                        <span class="mdc-deprecated-list-item__graphic material-icons">
                                                             {{this.icon}}
                                                         </span>
                                                     {{/if}}
-                                                    <a class="mdc-list-item__text" href="{{this.href}}">{{this.label}}</a>
+                                                    <a class="mdc-deprecated-list-item__text" href="{{this.href}}">{{this.label}}</a>
                                                 </li>
                                             {{/if}}
                                         {{/each}}

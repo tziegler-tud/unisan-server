@@ -51,21 +51,25 @@ function apiErrorHandler(err, req, res, next) {
 
     if (err.name === 'ValidationError') {
         // mongoose validation error
+        err.status = 400;
         return res.status(400).json({message: err.message});
     }
 
     if (err.name === 'UnauthorizedError') {
         // jwt authentication error
+        err.status = 401;
         return res.status(401).json({message: 'Invalid Token'});
     }
 
     if (err.name === 'ForbiddenError' || err.status === 403) {
         // trying to access protected resource
+        err.status = 403;
         return res.status(403).json({message: err.message});
     }
 
     if (err.name === 'NotFoundError' || err.status === 404) {
         // not found
+        err.status = 404;
         return res.status(404).json(err);
     }
 

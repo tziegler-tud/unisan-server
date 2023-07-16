@@ -46,6 +46,7 @@ var Sidebar = function(parentId, content, optionalId){
     };
     this.sidebarHTML = createHTML(this, content);
     this.parent.append(this.sidebarHTML);
+    this.container = document.querySelector(".sidebar-container");
 
     return this;
 };

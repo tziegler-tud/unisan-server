@@ -99,7 +99,7 @@ let settings = {
                 args: {},
             });
             window.userPage = userPage;
-            userPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id});
+            userPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id}, {user: user, targetUser: user.id});
         })
 
     },

@@ -20,6 +20,7 @@ export default {
     createUserACL,
     getUserACL,
     getCurrentDocker,
+    getUserGroups,
     getUserRole,
     setUserRole,
     addUserGroup,
@@ -84,22 +85,27 @@ async function getManyByUserId(idArray) {
     })
 }
 
+async function getUserGroups(userid, {populate=true, json=false}) {
+    const userAcl = await getUserACL(userid,{populate: {userGroups: populate}});
+    let groups = (json) ? userAcl.toJSON().userGroups : userAcl.userGroups;
+    return groups;
+}
 
-async function getUserACL (userid, populateGroups) {
-    if (populateGroups === undefined) populateGroups = true;
+async function getUserACL(userid, {populate={userGroups: true, events: false}}={}) {
     if (typeof(userid) !== "string") {
         //try if user object
         if(typeof(userid.id) === "string") userid = userid.id;
         else throw new Error("invalid parameter given");
     }
     let user = await User.findById(userid).select('-hash');
-    let userACL;
-    if (populateGroups) {
-        userACL = await UserACL.findOne({user: userid}).populate("userGroups");
+    let q = UserACL.findOne({user: userid});
+    if (populate.userGroups) {
+        q.populate("userGroups");
     }
-    else {
-        userACL = await UserACL.findOne({user: userid});
+    if (populate.events) {
+        q.populate("individual.events.target")
     }
+    let userACL = await q.exec()
 
 
     // validate

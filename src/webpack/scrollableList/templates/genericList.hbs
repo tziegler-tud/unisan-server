@@ -1,8 +1,8 @@
-<div class="itemlist-header-container postingslist-top borderBottom">
-    <ul class="common-list postingslist scrollableItemList list-view border scrollableList-top">
+<div class="itemlist-header-container generic-list-top borderBottom">
+    <ul class="common-list generic-list scrollableItemList list-view border scrollableList-top">
         <li class="noSelect rowHeading">
             <div class="inner">
-                {{#each listcolumns}}
+                {{#each args.listcolumns}}
                     <div class="item-property scrollableList-header-column userlist-ch" data-property="{{this.property}}">{{this.name}}</div>
                 {{/each}}
             </div>
@@ -11,9 +11,9 @@
 </div>
 {{#arrayNotEmpty listdata}}
 <div class="itemlist-content-container scrollableList-content">
-    <ul class="common-list postingslist scrollableItemList scrollableList-body noSelect list-view border">
+    <ul class="common-list generic-list scrollableItemList scrollableList-body list-view border">
     {{#each listdata}}
-        <li class="user-entry noSelect scrollableList-item" id='listEntry--{{this._id}}' data-dataId="{{this._id}}" data-key="{{this.key}}" data-value="{{this.value}}">
+        <li class="generic-entry scrollableList-item" id='listEntry--{{this.id}}' data-dataId="{{this.id}}" data-key="{{this.key}}" data-value="{{this.value}}">
             <a class="inner noSelect">
                 {{#each this.columns}}
                     <div class="scrollableList-body-column center item-property">
@@ -31,7 +31,6 @@
             <li class="event-entry noSelect" id=''>
                 <a class="inner">
                     <div class="item-property item-container noEntries-container">
-                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
                         <span class=" item-container-element">Keine Einträge vorhanden</span>
                     </div>
                 </a>

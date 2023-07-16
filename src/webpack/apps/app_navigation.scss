@@ -1,7 +1,9 @@
 @use "@material/drawer";
 @use "@material/list";
 @use "@material/button";
+@use "@material/button/styles" as button-styles;
 @use "@material/icon-button";
+@use "@material/icon-button/styles";
 @use "@material/top-app-bar";
 @use "@material/top-app-bar/mdc-top-app-bar";
 
@@ -10,9 +12,7 @@
 @include drawer.core-styles;
 @include drawer.dismissible-core-styles;
 @include drawer.modal-core-styles;
-@include list.core-styles;
-@include button.core-styles;
-@include icon-button.core-styles;
+@include list.deprecated-core-styles;
 
 .mdc-top-app-bar {
   @include top-app-bar.fill-color(#00293c)

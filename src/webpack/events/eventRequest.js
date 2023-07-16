@@ -198,20 +198,22 @@ EventRequest.prototype.update = function(keyIdentifier, value, args, callback){
         value: value,
         args: args,
     };
-    $.ajax({
-        url: "/unisams/event/update/" + self.currentViewedEvent.id,
-        // make put for safety reasons :-)
-        type: 'PUT',
-        contentType: "application/json; charset=UTF-8",
-        dataType: 'json',
-        data: JSON.stringify(data),
-        success: function(result) {
-            self.refreshEvent().then(function(){
-                self.notifyObservers();
-            }).catch(reason => console.error(reason));
-            callback();
-        }
-    });
+    // $.ajax({
+    //     url: "/unisams/event/update/" + self.currentViewedEvent.id,
+    //     // make put for safety reasons :-)
+    //     type: 'PUT',
+    //     contentType: "application/json; charset=UTF-8",
+    //     dataType: 'json',
+    //     data: JSON.stringify(data),
+    //     success: function(result) {
+    //         self.refreshEvent().then(function(){
+    //             self.notifyObservers();
+    //         }).catch(reason => console.error(reason));
+    //         callback();
+    //     }
+    // });
+    console.error("eventRequest.update: Not implemented")
+
 };
 
 EventRequest.prototype.checkIfUserIsRegistered = function(user, args){

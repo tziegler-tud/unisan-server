@@ -8,8 +8,12 @@ import session from "express-session";
 import SessionFileStore from "session-file-store";
 const FileStore = SessionFileStore(session);
 import uuid from 'uuid';
+import 'dotenv/config'
+
+import config from "./config/config.json" assert {type: "json"};
 
 import oidcService from "./services/oidc/oidcService.js";
+import SystemService from "./services/SystemService.js";
 
 import fs from 'fs';
 import {fileURLToPath} from "url";
@@ -46,6 +50,7 @@ import qualificationApiRouter from './routes/api/qualification.js';
 import userDatasetApiRouter from './routes/api/userDataset.js';
 import logsRouter from './routes/api/logs.js';
 import protocolApiRouter from './routes/api/protocol.js';
+import systemApiRouter from './routes/api/system.js';
 
 
 //initialize server
@@ -54,6 +59,8 @@ var server = express();
 
 import passport from './config/passport.js';
 import upload from "./config/multer.js";
+import oidcRouter from "./routes/oidc/index.js";
+import oidcInteractionsRouter from "./routes/oidc/interactions.js";
 
 
 
@@ -112,7 +119,7 @@ let webAuth = function(req, res, next){
   if (!req.isAuthenticated()) {
     req.session.redirectTo = req.originalUrl; //strange bug setting favicon as url, disable until fixed
     req.session.save(function(){
-      res.status(401).redirect('/unisams/login');
+      res.status(401).redirect('/login');
     })
   } else {
     next();
@@ -123,35 +130,20 @@ let webAuth = function(req, res, next){
 server.use('/data/*', apiAuth);
 server.use(express.static(path.join(__dirname, 'src')));
 
-import oidcRouter from "./routes/oidc/index.js"
-oidcService.init.then((oidc)=>{
-  server.use(oidc.url, oidc.provider.callback());
-  server.use("/oidcIt", oidcRouter);
-
-})
-
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
 //no auth required
-server.use('/unisams', loginRouter);
-server.use('/unisams/apps/protocol', protocolRouter);
+server.use('/', loginRouter);
+server.use('/apps/protocol', protocolRouter);
 
 //auth required
-server.use("/unisams", webAuth);
-server.use('/unisams', mainRouter);
-server.use('/unisams/dashboard', dashboardRouter);
-server.use('/unisams/user', userManagementRouter);
-server.use('/unisams/events', eventManagementRouter);
-server.use('/unisams/system', systemRouter);
-server.use('/unisams/settings', settingsRouter);
-
-// catch 404 and forward to error handler
-server.use("/unisams/*", function(req, res, next) {
-  next(createError(404));
-});
-
-// webpage error handler
-server.use("/unisams", errorHandler.webErrorHandler);
+server.use("/", webAuth);
+server.use('/', mainRouter);
+server.use('/dashboard', dashboardRouter);
+server.use('/user', userManagementRouter);
+server.use('/events', eventManagementRouter);
+server.use('/system', systemRouter);
+server.use('/settings', settingsRouter);
 
 //API calls
 server.use('/api/v1', authRouter);
@@ -164,6 +156,7 @@ server.use('/api/v1/eventmod', eventApiRouter);
 server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
 server.use('/api/v1/logs', logsRouter);
+server.use('/api/v1/system', systemApiRouter);
 server.use('/api/v1/apps/protocol', protocolApiRouter);
 // catch 404 and forward to error handler
 server.use("/api", function(req, res, next) {
@@ -172,20 +165,51 @@ server.use("/api", function(req, res, next) {
 // api error handler
 server.use("/api", errorHandler.apiErrorHandler);
 
+
 //forwarding
 server.use("/", indexRouter);
 
+// catch 404 and forward to error handler
+server.use("/", function(req, res, next) {
+    next(createError(404));
+});
+
+// webpage error handler
+server.use("/", errorHandler.webErrorHandler);
 
 
 
 
 
-  // // render the error page
-  // res.status(err.status || 500);
-  // res.render('error');
-// });
 
-// use(errorHandler());
+SystemService.start({config: config})
+    .then(() => {
+        //system service loaded succesfully
+        const settings = SystemService.getSettings()
+        const system = SystemService.getSystemInformation()
+        //set app.locals
+        server.locals.app = {
+            version: system.version,
+            build: system.build
+        }
+        /* load OidcService */
+        oidcService.init()
+            .then(() => {
+                server.use(oidcService.url, oidcRouter);
+                server.use(oidcService.interactionsUrl, oidcInteractionsRouter);
+                if (settings.auth.openid.enabled) {
+                    oidcService.start();
+                }
+            })
+
+    })
+    .catch(err => {
+      console.log("Failed to get SystemSettings. This is a critical error, shutting down...");
+      process.exit();
+    })
+
+
+
 
 
 export default server;

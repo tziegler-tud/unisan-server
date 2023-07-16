@@ -173,7 +173,7 @@ function displayEventList(events, list, container, sort){
             onClick: function(e){
                 let self = e.currentTarget;
                 e.preventDefault();
-                window.location = "/unisams/events/view/"+self.dataset.id;
+                window.location = "/events/view/"+self.dataset.id;
 
             }
         }
@@ -258,7 +258,7 @@ function displayCalendar(events, calendar, container){
                 // }
         });
         $(container).on('selectEvent', function(domEvent, activeEvent, b, c) {
-            window.location = "/unisams/events/view/"+activeEvent.id;
+            window.location = "/events/view/"+activeEvent.id;
         });
 
         // $(container).evoCalendar('addCalendarEvent', calendarEvents);

@@ -11,93 +11,6 @@ const User = db.User;
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
 /** @typedef {import("../schemes/userScheme.js").UserScheme} User */
 
-// let rolesMap = {
-//     "protected": -1,
-//     "member": 1,
-//     "admin": 2,
-//     "superadmin": 3,
-// }
-//
-// let rolesEnum = {
-//     PROTECTED: "protected",
-//     MEMBER: "member",
-//     ADMIN: "admin",
-//     SUPERADMIN: "superadmin",
-// }
-//
-// let groupsEnum = {
-//     MEMBER: "member",
-//     USERADMIN: "userAdmin",
-//     EVENTADMIN: "eventAdmin",
-//     ACLADMIN: "aclAdmin",
-//     SYSADMIN: "systemAdmin"
-// }
-//
-// let groupActionsEnum = {
-//     GRANT: "grantGroup",
-//     REVOKE: "revokeGroup",
-// }
-//
-// let roles = [
-//     "protected",
-//     "member",
-//     "admin",
-//     "superadmin",
-// ]
-//
-// let operations = {
-//     user: {
-//         READ: "readUser", //read all user documents
-//         WRITE: "writeUser", //write all user documents
-//         CREATE: "createUser", //create user
-//         DELETE: "deleteUser", //delete user
-//         READSELF: "readUserSelf", //read own user document
-//         WRITESELF: "writeUserSelf", //write non-critical properties on own user docuemnt
-//     },
-//     events: {
-//         READ: "readEvent",
-//         WRITE: "writeEvent",
-//         CREATE: "createEvent",
-//         DELETE: "deleteEvent",
-//     },
-//     access: {
-//         READACL: "readAcl",
-//         WRITEACL: "writeAcl",
-//
-//         READUSERROLE: "readUserRole",
-//         WRITEUSERROLE: "writeUserRole",
-//
-//         GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
-//         REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
-//
-//         GRANTEVENTCONTROL: "grantEventControl",
-//         REVOKEEVENTCONTROL: "revokeEventControl",
-//
-//         GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
-//         REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
-//
-//         GRANTEVENTADMINRIGHTS: "grantEventRights", //grant event admin rights to other users
-//         REVOKEEVENTADMINRIGHTS: "revokeEventRights", //revoke event admin rights from other users
-//
-//         GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
-//         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
-//     },
-//     groups: {
-//         READ: "readGroups",
-//         WRITE: "writeGroups",
-//         CREATE: "createGroups",
-//         DELETE: "deleteGroups",
-//     },
-//     settings: {
-//         QUALIFICATIONS: "manageQualificationSettings",
-//         LOGS: "manageSystemLogs",
-//         EVENTS: "manageEventSettings",
-//         USER: "manageUserSettings",
-//         GOUPS: "manageGroupSettings",
-//         SYSTEM: "manageSystemSettings",
-//         AUTH: "manageAuthenticationSettings",
-//     }
-// }
 
     const rolesMap = authEnums.rolesMap;
     const rolesEnum = authEnums.rolesEnum;
@@ -302,7 +215,7 @@ class AuthService {
             self.init
                 .then(result => {
                     let id = typeof(requestingUser) === "string" ? requestingUser : requestingUser.id;
-                    aclService.getUserACL(id, true)
+                    aclService.getUserACL(id, {populate: {userGroups: true}})
                         .then(function(userACL){
                             //check if superadmin
                             if (userACL.userRole === self.rolesEnum.SUPERADMIN) {
@@ -612,7 +525,7 @@ class AuthService {
         return new Promise(function(resolve, reject){
             if(target === "self" || user.id.toString() === targetId.toString()) {
                 //trying to write self
-                aclService.getUserACL(user.id, true)
+                aclService.getUserACL(user.id, {populate: {userGroups: true}})
                     .then(userACL => {
                         //role write access is required
                         let writeRoles = self.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE);
@@ -642,8 +555,8 @@ class AuthService {
 
             }
             else {
-                let userACL = aclService.getUserACL(user.id, true);
-                let targetACL = aclService.getUserACL(targetId, true);
+                let userACL = aclService.getUserACL(user.id, {populate: {userGroups: true}});
+                let targetACL = aclService.getUserACL(targetId, {populate: {userGroups: true}});
                 Promise.all([userACL, targetACL])
                     .then(results => {
                         userACL = results[0];

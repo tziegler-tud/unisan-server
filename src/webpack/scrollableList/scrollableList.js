@@ -41,7 +41,7 @@ let ScrollableListCounter = {
  * @returns {ScrollableList}
  * @constructor
  */
-var ScrollableList = function(container,type="qualification", data,  args, callback){
+var ScrollableList = function(container,type="generic", data,  args, callback){
     if (container === undefined) throw new Error("cannot instantiate list without container");
     this.id = ScrollableListCounter.next();
 
@@ -124,7 +124,7 @@ var applyType = function(type, self) {
             url.mobile = '/webpack/scrollableList/templates/eventListMobile.hbs'
             url.list = '/webpack/scrollableList/templates/eventList.hbs'
             url.cards = '/webpack/scrollableList/templates/eventCards.hbs'
-            self.viewUrl = "/unisams/events/view/:id"
+            self.viewUrl = "/events/view/:id"
             break;
         case "logDetails":
             url.list = '/webpack/scrollableList/templates/logdetailsList.hbs'
@@ -154,6 +154,8 @@ var applyArgs = function(args){
         acl: {},
         hasTitle: false,
         title: "test",
+        classes: "",
+        listcolumns: [],
     }
     if (args===undefined) {
         return defaultArgs;
@@ -291,6 +293,19 @@ ScrollableList.prototype.adjustList = function() {
         "height": height,
         "overflow": "auto",
     });
+
+    //apply auto-alignment for generic list
+    if(this.type === "generic") {
+        //count columns
+        const columnCount = this.args.listcolumns.length;
+        //find inner elements for grid styling
+        self.container.querySelectorAll(".inner").forEach(element => {
+            $(element).css({
+                "grid-template-columns": "repeat("+columnCount + ", 1fr)"
+            })
+        })
+
+    }
 
     //wait for changes to apply
     let p = new Promise(function(resolve, reject) {

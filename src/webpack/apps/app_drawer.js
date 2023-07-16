@@ -9,7 +9,7 @@ import {MDCList} from "@material/list";
             var template = Handlebars.compile(data);
             // $(".app-drawer-container").prepend(template(context));
             $(".app-drawer-container").prepend(template(context));
-            const list = MDCList.attachTo(document.querySelector('.mdc-list'));
+            const list = MDCList.attachTo(document.querySelector('.mdc-deprecated-list'));
             list.wrapFocus = true;
         });
         return self;

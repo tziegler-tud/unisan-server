@@ -6,7 +6,7 @@ export default class StandaloneComponent {
     constructor({name, element, config={}, data={}}){
         this.componentName = name
         this.container = element;
-        this.templateUrl = "./templates/default.hbs";
+        this.templateUrl = "./templates/standalone/default.hbs";
         this.data = data;
         this.id = name + "-"+ uuidv4();
 

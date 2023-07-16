@@ -9,14 +9,15 @@ import Component from "./Component";
  * @param componentId {String} component id number, assigend by page on creation
  * @param componentType {ComponentPage.componentTypes} type of the component
  * @param data {Object}
+ * @param data.targetUser {String} target user id or "current" (default)
  * @param args {Object}
  * @returns {PasswordComponent}
  * @constructor
  */
 export default class PasswordComponent extends Component {
-    constructor({page, componentId, componentType, data, args={}}={}) {
-        super({page, componentId, componentType, data, args});
-        this.args.targetUser = this.args.targetUser ?? "current";
+    constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
+        super({page, componentId, componentType, pageData, data, args});
+        this.data.targetUser = this.data.targetUser ?? "current";
         this.templateUrl = "/webpack/components/pageModules/settings/password.hbs"
     }
 
@@ -28,7 +29,7 @@ export default class PasswordComponent extends Component {
             for (let button of buttonList) {
                 button.addEventListener("click", function (event) {
                     if (self.page.sidebar) {
-                        let targetUserId = self.args.targetUser === "current" ? self.user.id : self.args.targetUser;
+                        let targetUserId = self.data.targetUser === "current" ? self.data.user.id : self.data.targetUser;
                         self.page.sidebar.addContent("UserChangePassword", {
                             userid: targetUserId,
                             callback: {
@@ -40,7 +41,7 @@ export default class PasswordComponent extends Component {
 
                                     let action;
 
-                                    if (self.args.targetUser === "current") {
+                                    if (self.data.targetUser === "current") {
                                         action = userActions.updateCurrentUserPassword(data.current, data.pw, {})
                                     }
                                     else {

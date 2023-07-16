@@ -29,8 +29,22 @@ function getDockerArguments (req, res, next) {
 //             docker: req.docker,
 //         })
 // });
+
+const baseUrl = "/";
+function legacyRedirect(req, res, next) {
+    let stripOriginalUrl = req.originalUrl.replace("/unisams/", "");
+    var newPath = baseUrl + stripOriginalUrl;
+    if (req.params.url) newPath = newPath + "/" + req.params.url;
+    res.redirect(newPath);
+}
+
+router.get('/unisams', function(req,res,next){
+    res.redirect(baseUrl);
+})
+router.get('/unisams/*', legacyRedirect);
+
 router.get('/', function(req, res, next) {
-    res.redirect("/unisams/dashboard");
+    res.redirect("/dashboard");
 });
 
 

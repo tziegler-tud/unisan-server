@@ -1,5 +1,6 @@
 import Component from "./Component.js"
-import "../../scss/components/interactiveList.scss";
+import ComponentObserver from "./ComponentObserver.js";
+import "./scss/interactiveList.scss";
 import Handlebars from "handlebars";
 import {MDCSwitch} from '@material/switch';
 import {MDCList} from "@material/list";
@@ -107,7 +108,7 @@ export default class InteractiveListComponent extends Component{
             const dom = interaction.connectDom();
             if(dom){
                 interaction.init();
-                let o = new Observer(function({event, data}){
+                let o = new ComponentObserver(function({event, data}){
                     self.emitEvent({event: event, data: data});
                 });
                 interaction.addObserver(o)
@@ -198,10 +199,4 @@ class Interaction {
     }
 
 
-}
-
-class Observer {
-    constructor(resolveFunc){
-        this.inform = resolveFunc;
-    }
 }
