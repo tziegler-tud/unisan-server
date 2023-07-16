@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import {userActions} from "../actions/userActions";
-import {ComponentPage} from "./ComponentPage";
+import ComponentPage from "./ComponentPage";
 
 /**
  *
@@ -14,7 +14,7 @@ import {ComponentPage} from "./ComponentPage";
  * @constructor
  */
 export default class Component {
-    constructor({page, componentId=Date.now(), componentType, data, args}={}) {
+    constructor({page, componentId=Date.now(), componentType, pageData, data={}, args}={}) {
         let defaults = {
             allowEdit: true,
             size: "full",
@@ -26,6 +26,7 @@ export default class Component {
         this.args = Object.assign(defaults, args);
         this.page = page;
         this.data = data;
+        this.pageData = pageData;
         this.user = data.user;
 
         this.componentId = componentId;
@@ -45,12 +46,16 @@ export default class Component {
         this.html = this.container;
 
         this.templateUrl = "";
-        this.handleData = data;
+        this.handleData = {
+            data: data
+        };
         this.handleData.args = {
             allowEdit: this.args.allowEdit,
         };
 
         this.errorMessage = "Component " + this.componentId + " failed to render:"
+
+        this.observers = [];
     }
 
     async renderComponent({pre = true, post = true}={}){
@@ -61,29 +66,28 @@ export default class Component {
             component: this,
         }
 
-        if (pre) await self.preRender();
+        self.handleData.data = self.data;
 
-        $.get(self.templateUrl, function (templateData) {
+        try {
+            if (pre) await self.preRender();
+
+            let templateData = await $.get(self.templateUrl)
             let template = Handlebars.compile(templateData);
             self.container.innerHTML = template(self.handleData);
-            self.page.renderComponentHtml(self.container)
-                .then((resolve, reject)=>{
-                    self.postRenderInternal();
-                    if(post) self.postRender()
-                        .then(()=>{
-                            return result;
-                        })
-                        .catch(err => {
-                            self.fail(err);
-                        })
-                    else return result;
-                })
-                .catch(err => {
-                    self.fail(err);
-                })
-
-
-        })
+            let pageRenderResult = await self.page.renderComponentHtml(self.container);
+            if(pageRenderResult.error) self.fail(pageRenderResult.error);
+            else {
+                self.postRenderInternal();
+                if(post) {
+                    await self.postRender();
+                    return result;
+                }
+                else return result;
+            }
+        }
+        catch(err) {
+            self.fail(err);
+        }
     }
 
     async preRender(){
@@ -104,5 +108,15 @@ export default class Component {
 
     getHtml(){
         return this.html;
+    }
+
+    addObserver(observer){
+        this.observers.push(observer);
+    }
+
+    emitEvent({event, data}){
+        this.observers.forEach(observer=>{
+            observer.inform({event: event, data: data})
+        })
     }
 }

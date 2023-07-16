@@ -97,7 +97,7 @@ function getUserACL(req, res, next){
 function getCurrentAcl(req, res, next){
     AuthService.auth(req.user, AuthService.operations.user.READSELF)
         .then(result => {
-            aclService.getUserACL(req.user.id, false)
+            aclService.getUserACL(req.user.id, {populate: {userGroups: false}})
                 .then(userACL => userACL ? res.json(userACL) : res.sendStatus(404))
                 .catch(err => next(err));
         })
@@ -109,7 +109,7 @@ function getCurrentAcl(req, res, next){
 function getCurrentDockerArgs(req, res, next){
     AuthService.auth(req.user, AuthService.operations.user.READSELF)
         .then(result => {
-            aclService.getUserACL(req.user.id, false)
+            aclService.getUserACL(req.user.id, {populate: {userGroups: false}})
                 .then(userACL => userACL ? res.json(userACL.docker) : res.sendStatus(404))
                 .catch(err => next(err));
         })
@@ -163,8 +163,12 @@ function rebuildUserAcls(req, res, next){
 
 function updateAllUser(req, res, next){
     aclService.updateAllUser(req)
-        .then(result => res.json(result))
-        .catch(err => next(err))
+        .then(result => {
+            res.json(result)
+        })
+        .catch(err => {
+            next(err)
+        })
 }
 
 export default router;

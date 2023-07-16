@@ -1,6 +1,8 @@
 @use "@material/card";
 @use "@material/button";
+@use "@material/button/styles" as button-styles;
 @use "@material/icon-button";
+@use "@material/icon-button/styles";
 
 
 @import "~material-icons-font/material-icons-font.css";
@@ -10,9 +12,8 @@
 @import "../variables";
 @import "../fonts";
 
-@include icon-button.core-styles;
 @include card.core-styles;
-@include button.core-styles;
+
 
 .scrollableList {
   .scrollableList-title {
@@ -656,7 +657,7 @@ ul.eventlist{
       }
     }
   }
-  .card-menu-container .mdc-menu .mdc-list li {
+  .card-menu-container .mdc-menu .mdc-deprecated-list li {
     font-size: 80%;
   }
 }
@@ -1144,5 +1145,50 @@ log list
 
   }
 }
+
+
+/*
+generic list
+ */
+
+.generic-list-top {
+  border-top: 1px solid #AAA;
+  width: 100%;
+  li {
+    background-color: #fAfAfA;
+  }
+}
+
+ul.generic-list {
+  margin-top: 0;
+  margin-bottom: 0;
+  position: static;
+
+  &.list-view {
+    font-size: 110%;
+
+    li {
+
+      .inner {
+        display: grid;
+        grid-template-columns: auto;
+        grid-template-rows: auto;
+
+        .item-container {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
+
+          .item-container-element {
+            flex: 1 1 auto;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}
+
 
 

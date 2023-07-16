@@ -93,7 +93,7 @@ var userActions = {
             })
 
             function onSuccess(){
-                if (args.redirect) location.replace("/unisams/user/edit/" + data.username)
+                if (args.redirect) location.replace("/user/edit/" + data.username)
                 resolve();
             }
         })
@@ -107,7 +107,7 @@ var userActions = {
             type: 'DELETE',
             success: function (result) {
                 alert("User " + userid + " deleted.");
-                window.location.replace("/unisams/user");
+                window.location.replace("/user");
             }
         });
 
@@ -119,7 +119,7 @@ var userActions = {
             type: 'POST',
             success: function (result) {
                 alert("User " + userid + " image updated");
-                window.location.replace("/unisams/user/view/" + userid);
+                window.location.replace("/user/view/" + userid);
             }
         });
     },
@@ -340,7 +340,7 @@ var userActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/system/roles/"+data.userGroupId)
+                location.replace("/system/roles/"+data.userGroupId)
             }
         });
     },
@@ -360,7 +360,7 @@ var userActions = {
             dataType: 'json',
             data: JSON.stringify(jsonData),
             success: function (result) {
-                location.replace("/unisams/system/roles/"+data.userGroupId)
+                location.replace("/system/roles/"+data.userGroupId)
             }
         });
     },

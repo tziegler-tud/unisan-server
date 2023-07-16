@@ -4,6 +4,8 @@ import {groups} from "./groups.js";
 import {user} from "./user.js";
 import {events} from "./events.js";
 import {qualifications} from "./qualifications.js";
+import {auth} from "./auth.js";
+import {dev} from "./dev.js";
 
 var phone = window.matchMedia("only screen and (max-width: 50em)");
 var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
@@ -37,7 +39,17 @@ $(document).ready(function () {
         title: "events",
         loader: events,
     };
-    loaders.push(logsLoader, groupsLoader, userLoader, eventsLoader, qualificationsLoader);
+
+    let authLoader = {
+        title: "auth",
+        loader: auth,
+    };
+
+    let devLoader = {
+        title: "development",
+        loader: dev,
+    };
+    loaders.push(logsLoader, groupsLoader, userLoader, eventsLoader, qualificationsLoader, authLoader, devLoader);
 
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;

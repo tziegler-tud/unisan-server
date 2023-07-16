@@ -128,7 +128,7 @@ $(document).ready (function () {
                         e.preventDefault();
                         e.stopPropagation();
                         let eventId = e.target.dataset.eventid;
-                        window.location.href= "/unisams/events/"+eventId;
+                        window.location.href= "/events/"+eventId;
                     })
                 });
             }
@@ -191,7 +191,7 @@ $(document).ready (function () {
                                 onClick: function(e){
                                     let self = e.currentTarget;
                                     e.preventDefault();
-                                    window.location = "/unisams/events/view/"+self.dataset.id;
+                                    window.location = "/events/view/"+self.dataset.id;
 
                                 }
                             },

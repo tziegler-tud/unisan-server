@@ -7,7 +7,7 @@ $(function() {
                 type: 'DELETE',
                 success: function(result) {
                     alert("User " + userid + " deleted.");
-                    window.location.replace("/unisams/user");
+                    window.location.replace("/user");
                 }
             });
 

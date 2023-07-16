@@ -1,6 +1,6 @@
 <ul class="common-list userlistModule itemlist list-view border">
     {{#each user}}
-        <div class="mdc-list-item-wrapper userlist-menu-container">
+        <div class="mdc-deprecated-list-item-wrapper userlist-menu-container">
             <li class="user-entry noSelect" id='userId{{this.id}}' data-userid= {{this.id}}>
                 <a class="inner single-column noSelect">
                     <div class="item-property item-container name">
@@ -18,14 +18,14 @@
                 </a>
             </li>
             <div class="mdc-menu mdc-menu-surface mdc-dropdown-menu">
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                    <li class="mdc-list-item userlist-delete menu-entry__delete" role="menuitem"  data-userid={{this.id}}>
-                        <span class="mdc-list-item__ripple"></span>
-                        <span class="mdc-list-item__text icon-delete before-icon">Aus Gruppe entfernen</span>
+                <ul class="mdc-deprecated-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                    <li class="mdc-deprecated-list-item userlist-delete menu-entry__delete" role="menuitem"  data-userid={{this.id}}>
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <span class="mdc-deprecated-list-item__text icon-delete before-icon">Aus Gruppe entfernen</span>
                     </li>
-                    <li class="mdc-list-item userlist-view" role="menuitem"  data-userid={{this.id}}>
-                        <span class="mdc-list-item__ripple"></span>
-                        <span class="mdc-list-item__text">Akte öffnen</span>
+                    <li class="mdc-deprecated-list-item userlist-view" role="menuitem"  data-userid={{this.id}}>
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <span class="mdc-deprecated-list-item__text">Akte öffnen</span>
                     </li>
                 </ul>
             </div>

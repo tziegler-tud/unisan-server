@@ -499,7 +499,7 @@ $(document).ready (function () {
                                 callback: {
                                     onConfirm: function () {
                                         userActions.updateDBKey(userid, key, value, args, function () {
-                                            location.replace("/unisams/user/edit/" + userid);
+                                            location.replace("/user/edit/" + userid);
                                         });
                                     }
                                 }

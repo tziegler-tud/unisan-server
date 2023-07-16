@@ -1,0 +1,123 @@
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>{{title}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="sidebar-title">
+                    <span>Client Information</span>
+                </div>
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item ak-key">
+                            <label class="" for="openIdClient-name">display name</label>
+                            <input class="common-input" id="sidebar-input-openIdClient--name" name="openIdClient-name" type="text" value="{{data.name}}"/>
+                        </div>
+                        <div class="ak-item ak-key">
+                            <label class="" for="openIdClient-clientId">client_id</label>
+                            <input class="common-input" id="sidebar-input-openIdClient--clientId" name="openIdClient-clientId" type="text" value="{{data.client_id}}"/>
+                        </div>
+                        <div class="ak-item ak-key">
+                            <label class="" for="addGroupForm-title">client secret</label>
+                            <input class="common-input" id="sidebar-input-openIdClient-clientSecret" name="openIdClient-clientSecret" type="text" value="{{data.client_secret}}" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="section-title">
+                        Redirect uris
+                    </div>
+                    <div class="ak-form">
+                        {{#arrayNotEmpty data.redirect_uris}}
+                            {{#each data.redirect_uris}}
+                                <div class="ak-item ak-key">
+                                    <input class="common-input openIdClient-redirectUris" id="openIdClient-redirectUris--{{@index}}" name="openIdClient-redirectUris--{{@index}}" type="text" value="{{this}}"/>
+                                </div>
+                            {{/each}}
+                        {{else}}
+                            <div class="ak-item ak-key">
+                                <input class="common-input openIdClient-redirectUris" id="openIdClient-redirectUris--0" name="openIdClient-redirectUris--0" type="text" value=""/>
+                            </div>
+                        {{/arrayNotEmpty}}
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="section-title">
+                        Post logout redirect uris
+                    </div>
+                    <div class="ak-form">
+                        {{#arrayNotEmpty data.post_logout_redirect_uris}}
+                            {{#each data.post_logout_redirect_uris}}
+                                <div class="ak-item ak-key">
+                                    <input class="common-input openIdClient-postLogoutRedirectUris" id="openIdClient-postLogoutRedirectUris--{{@index}}" name="openIdClient-postLogoutRedirectUris--{{@index}}" type="text" value="{{this}}"/>
+                                </div>
+                            {{/each}}
+                        {{else}}
+                            <div class="ak-item ak-key">
+                                <input class="common-input openIdClient-postLogoutRedirectUris" id="openIdClient-postLogoutRedirectUris--0" name="openIdClient-postLogoutRedirectUris--0" type="text" value=""/>
+                            </div>
+                        {{/arrayNotEmpty}}
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="section-title">
+                        state
+                    </div>
+                    <div class="ak-form">
+                        <label class="sidebar-label" for="addGroupForm-title">enabled</label>
+                        <button id="sidebar-input-openIdClient-enabled__switch" class="mdc-switch mdc-switch--unselected" type="button" role="switch" aria-checked="false">
+                            <div class="mdc-switch__track"></div>
+                            <div class="mdc-switch__handle-track">
+                                <div class="mdc-switch__handle">
+                                    <div class="mdc-switch__shadow">
+                                        <div class="mdc-elevation-overlay"></div>
+                                    </div>
+                                    <div class="mdc-switch__ripple"></div>
+                                    <div class="mdc-switch__icons">
+                                        <svg class="mdc-switch__icon mdc-switch__icon--on" viewBox="0 0 24 24">
+                                            <path d="M19.69,5.23L8.96,15.96l-4.23-4.23L2.96,13.5l6,6L21.46,7L19.69,5.23z" />
+                                        </svg>
+                                        <svg class="mdc-switch__icon mdc-switch__icon--off" viewBox="0 0 24 24">
+                                            <path d="M20 13H4v-2h16v2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
+            <a class="sidebar-delete sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    delete
+                </button>
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import config from "../config/config.json" assert {type: "json"};
 
 /**
  * Module dependencies.
@@ -14,7 +15,7 @@ import http from 'http';
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || config.port);
 app.set('port', port);
 
 /**

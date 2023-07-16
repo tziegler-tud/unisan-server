@@ -156,10 +156,10 @@ Handlebars.registerHelper('HtmlFromTemplate', function (template, vars, log, opt
         let refUrl = "";
         switch(type){
             case "USER":
-                refUrl = "/unisams/user/" + ref;
+                refUrl = "/user/" + ref;
                 break;
             case "EVENT":
-                refUrl = "/unisams/events/" + ref;
+                refUrl = "/events/" + ref;
                 break;
             case "GROUP":
             default:

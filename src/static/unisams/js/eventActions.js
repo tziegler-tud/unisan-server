@@ -38,7 +38,7 @@ common = window.common;
                 dataType: 'json',
                 data: JSON.stringify(data),
                 success: function(result) {
-                    location.replace("/unisams/events")
+                    location.replace("/events")
                 }
             });
         };
@@ -51,7 +51,7 @@ common = window.common;
                 type: 'DELETE',
                 success: function(result) {
                     alert("Event " + eventid + " deleted.");
-                    window.location.replace("/unisams/events");
+                    window.location.replace("/events");
                 }
             });
 
@@ -63,7 +63,7 @@ common = window.common;
                 type: 'POST',
                 success: function(result) {
                     alert("Event " + eventid + " image updated");
-                    window.location.replace("/unisams/events/view/" + eventid);
+                    window.location.replace("/events/view/" + eventid);
                 }
             });
         };

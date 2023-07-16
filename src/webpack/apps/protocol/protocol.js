@@ -14,7 +14,7 @@ $(document).ready (function () {
   //register item links
   $(".protocol-item").on("click", function(){
     const viewkey = this.dataset.viewkey;
-    let url ="/unisams/apps/protocol/protocol-editor?viewkey="+viewkey;
+    let url ="/apps/protocol/protocol-editor?viewkey="+viewkey;
     window.open(url, '_blank').focus();
   })
 
@@ -51,7 +51,7 @@ $(document).ready (function () {
           url: "/api/v1/apps/protocol/" + id,
           type: 'DELETE',
           success: function(result) {
-            window.location.replace("/unisams/apps/protocol");
+            window.location.replace("/apps/protocol");
           }
         });
       }

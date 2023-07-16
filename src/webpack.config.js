@@ -11,6 +11,9 @@ module.exports = {
         login: "./webpack/login.js",
         login_style: "./webpack/login.scss",
 
+        error: "./webpack/error.js",
+        error_style: "./webpack/error.scss",
+
         init: "./webpack/init.js",
         init_style: "./webpack/init.scss",
 

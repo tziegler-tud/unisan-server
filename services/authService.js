@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import Mongoose from "mongoose";
 import db from '../schemes/mongo.js';
 import aclService from "./aclService.js";
+import authEnums from '../services/authEnums.js';
 
 const UserGroup = db.UserGroup;
 const UserACL = db.UserACL;
@@ -10,92 +11,13 @@ const User = db.User;
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
 /** @typedef {import("../schemes/userScheme.js").UserScheme} User */
 
-let rolesMap = {
-    "protected": -1,
-    "member": 1,
-    "admin": 2,
-    "superadmin": 3,
-}
 
-let rolesEnum = {
-    PROTECTED: "protected",
-    MEMBER: "member",
-    ADMIN: "admin",
-    SUPERADMIN: "superadmin",
-}
-
-let groupsEnum = {
-    MEMBER: "member",
-    USERADMIN: "userAdmin",
-    EVENTADMIN: "eventAdmin",
-    ACLADMIN: "aclAdmin",
-    SYSADMIN: "systemAdmin"
-}
-
-let groupActionsEnum = {
-    GRANT: "grantGroup",
-    REVOKE: "revokeGroup",
-}
-
-let roles = [
-    "protected",
-    "member",
-    "admin",
-    "superadmin",
-]
-
-let operations = {
-    user: {
-        READ: "readUser", //read all user documents
-        WRITE: "writeUser", //write all user documents
-        CREATE: "createUser", //create user
-        DELETE: "deleteUser", //delete user
-        READSELF: "readUserSelf", //read own user document
-        WRITESELF: "writeUserSelf", //write non-critical properties on own user docuemnt
-    },
-    events: {
-        READ: "readEvent",
-        WRITE: "writeEvent",
-        CREATE: "createEvent",
-        DELETE: "deleteEvent",
-    },
-    access: {
-        READACL: "readAcl",
-        WRITEACL: "writeAcl",
-
-        READUSERROLE: "readUserRole",
-        WRITEUSERROLE: "writeUserRole",
-
-        GRANTUSERGROUPS: "grantUserGroups", //grant non-admin user groups
-        REVOKEUSERGROUPS: "revokeUserGroups", //revoke non-admin user groups
-
-        GRANTEVENTCONTROL: "grantEventControl",
-        REVOKEEVENTCONTROL: "revokeEventControl",
-
-        GRANTUSERADMINRIGHTS: "grantUserRights", //grant user admin rights to other users
-        REVOKEUSERADMINRIGHTS: "revokeUserRights", //revoke user admin rights from other users
-
-        GRANTEVENTADMINRIGHTS: "grantEventRights", //grant event admin rights to other users
-        REVOKEEVENTADMINRIGHTS: "revokeEventRights", //revoke event admin rights from other users
-
-        GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
-        REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
-    },
-    groups: {
-        READ: "readGroups",
-        WRITE: "writeGroups",
-        CREATE: "createGroups",
-        DELETE: "deleteGroups",
-    },
-    settings: {
-        QUALIFICATIONS: "manageQualificationSettings",
-        LOGS: "manageSystemLogs",
-        EVENTS: "manageEventSettings",
-        USER: "manageUserSettings",
-        GOUPS: "manageGroupSettings",
-        SYSTEM: "manageSystemSettings",
-    }
-}
+    const rolesMap = authEnums.rolesMap;
+    const rolesEnum = authEnums.rolesEnum;
+    const groupsEnum = authEnums.groupsEnum;
+    const groupActionsEnum = authEnums.groupActionsEnum;
+    const roles = authEnums.roles;
+    const operations = authEnums.operations;
 
 let defaultMember = {
     title: "member",
@@ -125,8 +47,8 @@ let defaultUserAdmin = {
 
         operations.access.READACL,
 
-        operations.settings.USER,
-        operations.settings.QUALIFICATIONS,
+        operations.system.USER,
+        operations.system.QUALIFICATIONS,
     ]
 }
 
@@ -143,7 +65,7 @@ let defaultEventAdmin = {
         operations.access.GRANTEVENTCONTROL,
         operations.access.REVOKEEVENTCONTROL,
 
-        operations.settings.EVENTS,
+        operations.system.EVENTS,
     ]
 }
 
@@ -174,7 +96,7 @@ let defaultAclAdmin = {
         operations.groups.CREATE,
         operations.groups.DELETE,
 
-        operations.settings.GOUPS,
+        operations.system.GOUPS,
     ]
 }
 
@@ -225,13 +147,14 @@ let defaultSysAdmin = {
         operations.groups.CREATE,
         operations.groups.DELETE,
 
-        operations.settings.EVENTS,
-        operations.settings.USER,
-        operations.settings.LOGS,
-        operations.settings.GOUPS,
-        operations.settings.SYSTEM,
-        operations.settings.QUALIFICATIONS,
-
+        operations.system.EVENTS,
+        operations.system.USER,
+        operations.system.LOGS,
+        operations.system.GOUPS,
+        operations.system.SYSTEM,
+        operations.system.QUALIFICATIONS,
+        operations.system.AUTH,
+        operations.system.DEVELOPMENT,
     ]
 }
 
@@ -249,6 +172,11 @@ class AuthService {
         console.log("initializing authentication service...\n");
         let self = this;
         this.groups = defaultGroups;
+        this.roles = roles;
+        this.rolesMap = rolesMap;
+        this.rolesEnum = rolesEnum;
+        this.groupsEnum = groupsEnum;
+        this.groupActionsEnum = groupActionsEnum;
         this.operations = operations;
 
         self.init = new Promise(function(resolve, reject){
@@ -287,11 +215,10 @@ class AuthService {
             self.init
                 .then(result => {
                     let id = typeof(requestingUser) === "string" ? requestingUser : requestingUser.id;
-                    // UserACL.findOne({user: id}).populate("userGroups")
-                    aclService.getUserACL(id, true)
+                    aclService.getUserACL(id, {populate: {userGroups: true}})
                         .then(function(userACL){
                             //check if superadmin
-                            if (userACL.userRole === authService.rolesEnum.SUPERADMIN) {
+                            if (userACL.userRole === self.rolesEnum.SUPERADMIN) {
                                 console.log("authoprized by role: " + userACL.userRole); //debug TODO: remove once done testing
                                 resolve({status: 200, message: "authorization successful"});
                             }
@@ -598,7 +525,7 @@ class AuthService {
         return new Promise(function(resolve, reject){
             if(target === "self" || user.id.toString() === targetId.toString()) {
                 //trying to write self
-                aclService.getUserACL(user.id, true)
+                aclService.getUserACL(user.id, {populate: {userGroups: true}})
                     .then(userACL => {
                         //role write access is required
                         let writeRoles = self.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE);
@@ -628,8 +555,8 @@ class AuthService {
 
             }
             else {
-                let userACL = aclService.getUserACL(user.id, true);
-                let targetACL = aclService.getUserACL(targetId, true);
+                let userACL = aclService.getUserACL(user.id, {populate: {userGroups: true}});
+                let targetACL = aclService.getUserACL(targetId, {populate: {userGroups: true}});
                 Promise.all([userACL, targetACL])
                     .then(results => {
                         userACL = results[0];
@@ -822,7 +749,7 @@ class AuthService {
                                     let bakGroup = {};
                                     Object.assign(bakGroup, dbGroup);
                                     delete bakGroup.id;
-                                    bakGroup.title = "BACKUP: " + dbGroup.title;
+                                    bakGroup.title = "BACKUP: " + dbGroup.title + "-" + Date.now();
                                     bakGroup.type = "system";
                                     bakGroup.default = false;
                                     let bak = new UserGroup(bakGroup);
@@ -956,9 +883,5 @@ class AuthService {
 
 
 let authService = new AuthService()
-authService.roles = roles;
-authService.operations = operations;
-authService.rolesEnum = rolesEnum;
-authService.rolesMap = rolesMap;
 export default authService;
 

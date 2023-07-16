@@ -1,11 +1,12 @@
+@use "@material/button";
+@use "@material/button/styles" as button-styles;
 @use "@material/icon-button";
+@use "@material/icon-button/styles";
 @use "@material/floating-label/mdc-floating-label";
 @use "@material/line-ripple/mdc-line-ripple";
 @use "@material/notched-outline/mdc-notched-outline";
 @use "@material/textfield";
 @use "@material/textfield/icon";
-
-
 
 @import "../color-rules";
 @import "../variables";
@@ -13,7 +14,6 @@
 
 @import "~material-icons-font/material-icons-font.css";
 
-@include icon-button.core-styles;
 @include textfield.core-styles;
 @include icon.icon-core-styles;
 

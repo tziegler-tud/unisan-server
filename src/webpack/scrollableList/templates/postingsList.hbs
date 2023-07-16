@@ -27,24 +27,24 @@
                             more_vert
                         </button>
                         <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
-                            <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                                <li class="mdc-list-item posting-details" role="menuitem" data-postingId="{{this._id}}">
-                            <span class="mdc-list-item__graphic material-icons">
+                            <ul class="mdc-deprecated-list mdc-deprecated-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                <li class="mdc-deprecated-list-item posting-details" role="menuitem" data-postingId="{{this._id}}">
+                            <span class="mdc-deprecated-list-item__graphic material-icons">
                                 info
                             </span>
-                                    <span class="mdc-list-item__text">Details</span>
+                                    <span class="mdc-deprecated-list-item__text">Details</span>
                                 </li>
-                                <li class="mdc-list-item participant-details" role="menuitem" data-userid="{{this.assigned.user.id}}">
-                            <span class="mdc-list-item__graphic material-icons">
+                                <li class="mdc-deprecated-list-item participant-details" role="menuitem" data-userid="{{this.assigned.user.id}}">
+                            <span class="mdc-deprecated-list-item__graphic material-icons">
                                 contact_page
                             </span>
-                                    <span class="mdc-list-item__text">Akte öffnen</span>
+                                    <span class="mdc-deprecated-list-item__text">Akte öffnen</span>
                                 </li>
-                                <li class="mdc-list-item posting-unassign" role="menuitem" data-postingId="{{this._id}}" data-userId="{{this.assigned.user.id}}">
-                            <span class="mdc-list-item__graphic material-icons">
+                                <li class="mdc-deprecated-list-item posting-unassign" role="menuitem" data-postingId="{{this._id}}" data-userId="{{this.assigned.user.id}}">
+                            <span class="mdc-deprecated-list-item__graphic material-icons">
                                 person_remove
                             </span>
-                                    <span class="mdc-list-item__text">Abmelden</span>
+                                    <span class="mdc-deprecated-list-item__text">Abmelden</span>
                                 </li>
                             </ul>
                         </div>
@@ -63,39 +63,39 @@
                             more_vert
                         </button>
                         <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface">
-                            <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                            <ul class="mdc-deprecated-list mdc-deprecated-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
                                 {{#if this.userIsAllowed}}
-                                    <li class="mdc-list-item posting-assignCurrentUser" role="menuitem" data-postingId="{{this._id}}">
-                                        <span class="mdc-list-item__graphic material-icons">
+                                    <li class="mdc-deprecated-list-item posting-assignCurrentUser" role="menuitem" data-postingId="{{this._id}}">
+                                        <span class="mdc-deprecated-list-item__graphic material-icons">
                                             person_add
                                         </span>
-                                        <span class="mdc-list-item__text">Mich anmelden</span>
+                                        <span class="mdc-deprecated-list-item__text">Mich anmelden</span>
                                     </li>
                                 {{/if}}
                                 {{#if ../args.allowEdit}}
-                                <li class="mdc-list-item posting-edit" role="menuitem" data-postingId="{{this._id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
+                                <li class="mdc-deprecated-list-item posting-edit" role="menuitem" data-postingId="{{this._id}}">
+                                    <span class="mdc-deprecated-list-item__graphic material-icons">
                                         edit
                                     </span>
-                                    <span class="mdc-list-item__text">Posten bearbeiten</span>
+                                    <span class="mdc-deprecated-list-item__text">Posten bearbeiten</span>
                                 </li>
-                                <li class="mdc-list-item posting-move-up" role="menuitem" data-postingId="{{this._id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
+                                <li class="mdc-deprecated-list-item posting-move-up" role="menuitem" data-postingId="{{this._id}}">
+                                    <span class="mdc-deprecated-list-item__graphic material-icons">
                                         keyboard_arrow_up
                                     </span>
-                                    <span class="mdc-list-item__text">Nach oben</span>
+                                    <span class="mdc-deprecated-list-item__text">Nach oben</span>
                                 </li>
-                                <li class="mdc-list-item posting-move-down" role="menuitem" data-postingId="{{this._id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
+                                <li class="mdc-deprecated-list-item posting-move-down" role="menuitem" data-postingId="{{this._id}}">
+                                    <span class="mdc-deprecated-list-item__graphic material-icons">
                                         keyboard_arrow_down
                                     </span>
-                                    <span class="mdc-list-item__text">Nach unten</span>
+                                    <span class="mdc-deprecated-list-item__text">Nach unten</span>
                                 </li>
-                                <li class="mdc-list-item posting-delete" role="menuitem" data-postingId="{{this._id}}">
-                                    <span class="mdc-list-item__graphic material-icons">
+                                <li class="mdc-deprecated-list-item posting-delete" role="menuitem" data-postingId="{{this._id}}">
+                                    <span class="mdc-deprecated-list-item__graphic material-icons">
                                         person_remove
                                     </span>
-                                    <span class="mdc-list-item__text">Posten entfernen</span>
+                                    <span class="mdc-deprecated-list-item__text">Posten entfernen</span>
                                 </li>
                                 {{/if}}
                             </ul>

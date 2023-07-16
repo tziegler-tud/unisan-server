@@ -25,8 +25,8 @@ function getDockerArguments (req, res, next) {
 }
 
 
-//hooked at /unisams/user
-const baseUrl = "/unisams/user";
+//hooked at /user
+const baseUrl = "/user";
 
 // routes
 router.get("/*", getDockerArguments)
@@ -151,7 +151,7 @@ function profile(req, res, next) {
             userService.getByUsername(req.params.username)
                 .then(user => {
                     if (user) {
-                        aclService.getUserACL(user.id, true)
+                        aclService.getUserACL(user.id, {populate: {userGroups: true}})
                             .then(userACL => {
                                 //build docker arguments
                                 let docker = userACL.docker;
@@ -350,7 +350,7 @@ function userRoles(req, res, next) {
         .then(result => {
             userService.getByUsername(req.params.username)
                 .then(user => {
-                    aclService.getUserACL(user.id, true)
+                    aclService.getUserACL(user.id, {populate: {userGroups: true, events: true}})
                         .then(userACL => {
                             if (user) {
                                 res.render("unisams/user/roles", {

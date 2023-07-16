@@ -38,9 +38,9 @@ var eventActions = {
             data: JSON.stringify(data),
             success: function(result) {
                 if (result.id) {
-                    location.replace("/unisams/events/" + result.id)
+                    location.replace("/events/" + result.id)
                 }
-                else location.replace("/unisams/events");
+                else location.replace("/events");
             }
         });
     },
@@ -48,7 +48,7 @@ var eventActions = {
     deleteEvent: function(eventid, callback) {
         callback = (callback == null) ? function(){
             alert("event " + eventid + " deleted.");
-            window.location.replace("/unisams/events");
+            window.location.replace("/events");
         } : callback;
 
         // build a json object or do something with the form, store in data
@@ -67,7 +67,7 @@ var eventActions = {
             type: 'POST',
             success: function(result) {
                 alert("Event " + eventid + " image updated");
-                window.location.replace("/unisams/events/view/" + eventid);
+                window.location.replace("/events/view/" + eventid);
             }
         });
     },

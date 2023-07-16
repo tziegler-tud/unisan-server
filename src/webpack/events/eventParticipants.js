@@ -446,7 +446,7 @@ let eventParticipants = {
                         //push changes to server
                         e.preventDefault();
                         let userId = e.currentTarget.dataset.userid;
-                        window.location.href= "/unisams/user/"+userId;
+                        window.location.href= "/user/"+userId;
                     })
                 });
             }
@@ -591,7 +591,7 @@ let eventParticipants = {
                         e.preventDefault();
                         e.stopPropagation();
                         let userId = e.currentTarget.dataset.userid;
-                        window.location.href= "/unisams/user/"+userId;
+                        window.location.href= "/user/"+userId;
                     })
                 });
             }

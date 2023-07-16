@@ -105,13 +105,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     //initalize top-nav dropdown
     const navDrop = new DropdownMenu("#topNav-dropdown", "click", ".topNav-dropdown-trigger", {});
     navDrop.addHandler(".navTop-dropdown--user", function(){
-        window.location = "/unisams/user/current";
+        window.location = "/user/current";
     }, {});
     navDrop.addHandler(".navTop-dropdown--settings", function(){
-        window.location = "/unisams/settings";
+        window.location = "/settings";
     }, {});
     navDrop.addHandler(".navTop-dropdown--logout", function(){
-        window.location = "/unisams/logout";
+        window.location = "/logout";
     }, {});
 });
 

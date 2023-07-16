@@ -1,0 +1,42 @@
+<div class="itemlist-header-container generic-list-top borderBottom">
+    <ul class="common-list generic-list scrollableItemList list-view border scrollableList-top">
+        <li class="noSelect rowHeading">
+            <div class="inner">
+                {{#each args.listcolumns}}
+                    <div class="item-property scrollableList-header-column userlist-ch" data-property="{{this.property}}">{{this.name}}</div>
+                {{/each}}
+            </div>
+        </li>
+    </ul>
+</div>
+{{#arrayNotEmpty listdata}}
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list generic-list scrollableItemList scrollableList-body list-view border">
+    {{#each listdata}}
+        <li class="generic-entry scrollableList-item" id='listEntry--{{this.id}}' data-dataId="{{this.id}}" data-key="{{this.key}}" data-value="{{this.value}}">
+            <a class="inner noSelect">
+                {{#each this.columns}}
+                    <div class="scrollableList-body-column center item-property">
+                        <span class="item-container-element">{{this.data}}</span>
+                    </div>
+                {{/each}}
+            </a>
+        </li>
+    {{/each}}
+    </ul>
+</div>
+{{else}}
+    <div class="itemlist-content-container scrollableList-content">
+        <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+            <li class="event-entry noSelect" id=''>
+                <a class="inner">
+                    <div class="item-property item-container noEntries-container">
+                        <span class=" item-container-element">Keine Einträge vorhanden</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+{{/arrayNotEmpty}}
+
+

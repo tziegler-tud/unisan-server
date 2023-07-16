@@ -18,7 +18,7 @@
 @include textfield.core-styles;
 @include helper-text.helper-text-core-styles;
 @include icon.icon-core-styles;
-@include list.core-styles;
+@include list.deprecated-core-styles;
 
 .mdc-text-field{
   @include textfield.focused-outline-color(rgba(0, 41, 60, 0.55));

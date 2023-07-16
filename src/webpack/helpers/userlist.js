@@ -85,7 +85,7 @@ function initEventHandlers(callbacks) {
     //init event Handlers
     $(".userlist-view").click(function(e){
         let userid = this.dataset.userid;
-        location.replace("/unisams/user/"+userid);
+        location.replace("/user/"+userid);
     })
 }
 

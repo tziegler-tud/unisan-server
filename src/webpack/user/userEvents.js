@@ -69,7 +69,7 @@ $(document).ready (function () {
                 onClick: function(e){
                     let self = e.currentTarget;
                     e.preventDefault();
-                    window.location = "/unisams/events/view/"+self.dataset.id;
+                    window.location = "/events/view/"+self.dataset.id;
                 }
             }
         }

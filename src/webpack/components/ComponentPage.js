@@ -12,10 +12,12 @@ import {MDCMenu} from "@material/menu";
 import {MDCTextField} from "@material/textfield";
 import {MDCTextFieldHelperText} from "@material/textfield/helper-text";
 
-import "./componentPage.scss";
+import "./scss/componentPage.scss";
 import PasswordComponent from "./PasswordComponent";
 import GeneralSettingsComponent from "./GeneralSettingsComponent";
 import ConnectedServicesComponent from "./ConnectedServicesComponent";
+import OpenIdSettingsComponent from "./OpenIdSettingsComponent";
+import InteractiveListComponent from "./interactiveList";
 
 /**
  * generic component page Object
@@ -35,11 +37,14 @@ export default class ComponentPage {
      */
     static componentTypes = {
         SETTINGS: {
-            GENERAL:    "1",
-            PASSWORD:   "2",
-            LOGINS:     "3",
+            GENERAL:            "settings.general",
+            PASSWORD:           "settings.password",
+            CONNECTEDSERVICES:  "settings.connectedServices",
         },
-        GENERIC:       "0",
+        SYSTEM: {
+            OPENID:             "system.openid",
+        },
+        GENERIC:            "generic",
     };
 
     constructor({container=null, data=null, sidebar=null, snackbar=window.snackbar, args={}}={}) {
@@ -70,22 +75,28 @@ export default class ComponentPage {
         let self = this;
         return new Promise(function(resolve, reject){
             self.componentContainer.append(html);
-            resolve();
+            let result = {
+                error: false,
+            }
+            resolve(result);
         })
     }
 
-    addComponent(componentType, args) {
+    addComponent(componentType, args, data) {
         let componentId = this.componentCounter.next();
         let component;
         switch(componentType){
             case ComponentPage.componentTypes.SETTINGS.PASSWORD:
-                component = new PasswordComponent({page: this, componentId: componentId, componentType: componentType, data: this.data, args: args});
+                component = new PasswordComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
             case ComponentPage.componentTypes.SETTINGS.GENERAL:
-                component = new GeneralSettingsComponent({page: this, componentId: componentId, componentType: componentType, data: this.data, args: args});
+                component = new GeneralSettingsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
-            case ComponentPage.componentTypes.SETTINGS.LOGINS:
-                component = new ConnectedServicesComponent({page: this, componentId: componentId, componentType: componentType, data: this.data, args: args});
+            case ComponentPage.componentTypes.SETTINGS.CONNECTEDSERVICES:
+                component = new ConnectedServicesComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
+                break;
+            case ComponentPage.componentTypes.SYSTEM.OPENID:
+                component = new OpenIdSettingsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
         }
         return this.addInternal(component)

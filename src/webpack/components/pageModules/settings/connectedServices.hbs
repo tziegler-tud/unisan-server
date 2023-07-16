@@ -1,9 +1,46 @@
-<div class="componentPage-component">
+<div class="componentPage-component connectedservices-component">
     <div class="componentPage-component-inner">
         <div class="componentPage-component-header"><span>Verbundene Konten</span></div>
         <div class="componentPage-component-item">
-            <div class="userinfo-item-inner">
-                Coming soon...
+            <div class="openid-sessions">
+                {{#each data.sessions}}
+                    <div class="openid-sessionCard">
+                        <div class="openid-sessionCard-inner">
+                            <div class="openid-sessionCard-header">
+                                <span class="openid-sessionCard-header--clients">
+                                    Clients
+                                </span>
+                                <span class="openid-sessionCard-header--expires">
+                                    gültig bis&nbsp;
+                                </span>
+                                <span class="openid-sessionCard-header--expiryDate">
+                                    {{transformDateTimeString this.expires}}
+                                </span>
+                            </div>
+                            <div class="openid-sessionCard-body">
+                                <ul class="openid-sessionCard-sessionList">
+                                    {{#arrayNotEmpty this.clients}}
+                                        {{#each this.clients}}
+                                            <li class="openid-sessionCard-sessionList-item">
+                                                {{this.name}}
+                                            </li>
+                                        {{/each}}
+                                    {{else}}
+                                        <li class="openid-sessionCard-sessionList-item openid-sessionCard-sessionList-item__disabled">
+                                            Keine Clients verbunden.
+                                        </li>
+                                    {{/arrayNotEmpty}}
+                                </ul>
+                            </div>
+                            <div class="openid-sessionCard-buttons">
+                                <button class="mdc-icon-button material-icons openid-sessionCard--deleteButton" data-sessionid="{{this._id}}">
+                                    <div class="mdc-icon-button__ripple"></div>
+                                    delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
             </div>
         </div>
     </div>

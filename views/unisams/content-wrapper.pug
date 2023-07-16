@@ -5,7 +5,8 @@
                 #unisams-label.nav-item.label-container
                     span.nav-span.acc1 uni
                     span.nav-span.acc2 Sams
-                    span.nav-span.acc3 |  alpha v0.1r
+                    span.nav-span.acc3
+                        | | !{app.version}
                     div.clear
         #nav-mid.nav-element.mid
             .nav-element-inner
@@ -18,19 +19,19 @@
                                 svg.nav-svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down") <polyline points="6 9 12 15 18 9"></polyline></svg>
 
                             .mdc-menu.mdc-dropdown-menu.mdc-menu-surface
-                                ul.mdc-list.mdc-list--icon-list.mdc-list--dense(role='menu', aria-hidden='true', aria-orientation='vertical', tabindex='-1')
-                                    li.mdc-list-item.navTop-dropdown--user(role='menuitem')
-                                        span.mdc-list-item__ripple
-                                        span.mdc-list-item__graphic.material-icons contact_page
-                                        span.mdc-list-item__text Meine Akte
-                                    li.mdc-list-item.navTop-dropdown--settings(role='menuitem')
-                                        span.mdc-list-item__ripple
-                                        span.mdc-list-item__graphic.material-icons settings
-                                        span.mdc-list-item__text Einstellungen
-                                    li.mdc-list-item.menu-entry__delete.navTop-dropdown--logout(role='menuitem')
-                                        span.mdc-list-item__ripple
-                                        span.mdc-list-item__graphic.material-icons logout
-                                        span.mdc-list-item__text Logout
+                                ul.mdc-deprecated-list.mdc-deprecated-list--icon-list.mdc-deprecated-list--dense(role='menu', aria-hidden='true', aria-orientation='vertical', tabindex='-1')
+                                    li.mdc-deprecated-list-item.navTop-dropdown--user(role='menuitem')
+                                        span.mdc-deprecated-list-item__ripple
+                                        span.mdc-deprecated-list-item__graphic.material-icons contact_page
+                                        span.mdc-deprecated-list-item__text Meine Akte
+                                    li.mdc-deprecated-list-item.navTop-dropdown--settings(role='menuitem')
+                                        span.mdc-deprecated-list-item__ripple
+                                        span.mdc-deprecated-list-item__graphic.material-icons settings
+                                        span.mdc-deprecated-list-item__text Einstellungen
+                                    li.mdc-deprecated-list-item.menu-entry__delete.navTop-dropdown--logout(role='menuitem')
+                                        span.mdc-deprecated-list-item__ripple
+                                        span.mdc-deprecated-list-item__graphic.material-icons logout
+                                        span.mdc-deprecated-list-item__text Logout
                     else
                         .usermenu-label
                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user") <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>

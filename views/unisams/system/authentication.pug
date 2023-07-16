@@ -1,0 +1,50 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
+    //script(src="/static/unisams/js/settings.js")
+    script(src="/dist/system.js")
+
+
+
+    script.
+        //used to tell the bundled js which modules to load.
+        window.jsmodule = {
+            module: "system",
+            loaders: ["auth"],
+        };
+        window.dockerArgs.activeContainer = "systemContainer";
+        window.dockerArgs.activeElementId = "systemAuthentication";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .sec-heading-label.propertypage-heading
+                                .propertypage-heading-container
+                                    h3
+                                        | Authentifizierung
+                                    .clear
+                                .clear
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .info-container
+                                    #tab-info-general.info-inner
+                                        .info-section.info-card.card-full.userwidget-description
+                                            .info-section-inner
+                                                .info-sectionheader
+                                                    span OpenId Login
+                                                div
+                                                    .info-item
+                            .subpage-content
+                                .info-container
+                                    #systemPage-component-container.systemPage-component-container.componentPage-component-container
+
+
+
+
+

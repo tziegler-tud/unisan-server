@@ -1,0 +1,7 @@
+{
+  "connectionString": "mongodb://localhost:27017/unisan-server",
+  "secret": "yourSecret",
+  "username": "unisan-server",
+  "pwd": "yourDbPassword",
+  "authSource": "unisan-server"
+}

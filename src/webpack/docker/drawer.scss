@@ -1,6 +1,7 @@
 @use "@material/drawer";
 @use "@material/list";
 @use "@material/icon-button";
+@use "@material/icon-button/styles";
 
 @import "../variables";
 @import "../color-rules";
@@ -9,8 +10,7 @@
 @include drawer.core-styles;
 @include drawer.dismissible-core-styles;
 @include drawer.modal-core-styles;
-@include list.core-styles;
-@include icon-button.core-styles;
+@include list.deprecated-core-styles;
 
 .mdc-drawer {
   width: 300px;

@@ -70,6 +70,12 @@ let operations = {
         GRANTSYSTEMADMINRIGHTS: "grantSystemAdminRights", //grant system admin rights to other users
         REVOKESYSTEMADMINRIGHTS: "revokeSystemAdminRights", //revoke system admin rights from other users
     },
+    groups: {
+        READ: "readGroups",
+        WRITE: "writeGroups",
+        CREATE: "createGroups",
+        DELETE: "deleteGroups",
+    },
     system: {
         QUALIFICATIONS: "manageQualificationSettings",
         LOGS: "manageSystemLogs",
@@ -77,6 +83,8 @@ let operations = {
         USER: "manageUserSettings",
         GOUPS: "manageGroupSettings",
         SYSTEM: "manageSystemSettings",
+        AUTH: "manageAuthenticationSettings",
+        DEVELOPMENT: "manageDevelopmentSettings",
     }
 }
 

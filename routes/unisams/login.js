@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 router.get('/login', function(req, res, next) {
   if(req.isAuthenticated()) {
-    res.redirect('/unisams')
+    res.redirect('/')
   } else {
     res.render('unisams/login', { title: 'uniSams login' });
   }
@@ -22,14 +22,14 @@ router.get('/login', function(req, res, next) {
 /* POST user login */
 router.post('/login', function(req, res, next) {
   if(req.isAuthenticated()) {
-    res.redirect('/unisams')
+    res.redirect('/')
   } else {
     passport.authenticate('local', {}, (err, user, info) => {
-      if (!user) { return res.redirect("/unisams/login"); }
+      if (!user) { return res.redirect("/login"); }
       req.login(user, {}, (err) => {
         //passport.js race condition bug requires you to save the session explicitly before redirecting.
         req.session.save(function(){
-          var redirectTo = req.session.redirectTo || "/unisams";
+          var redirectTo = req.session.redirectTo || "/";
           res.redirect(redirectTo);
         })
 
@@ -41,7 +41,7 @@ router.post('/login', function(req, res, next) {
 router.all("/logout", function(req, res, next) {
   req.logout();
   req.session.destroy(function(err){
-    res.redirect("/unisams");
+    res.redirect("/");
   })
 
 });

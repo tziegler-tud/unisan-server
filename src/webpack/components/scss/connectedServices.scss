@@ -1,0 +1,56 @@
+@use "@material/icon-button";
+
+@import "../../variables.scss";
+@import "../../color-rules.scss";
+
+.connectedservices-component {
+
+  .openid-sessions {
+    display: flex;
+    flex-flow: column nowrap;
+    .openid-sessionCard {
+      background-color: $item-container-background;
+      color: $item-container-secondary;
+      margin-bottom: 15px;
+      max-width: 35em;
+
+      .openid-sessionCard-inner {
+        padding: 15px 10px;
+        display: flex;
+        flex-flow: column nowrap;
+
+
+        .openid-sessionCard-header {
+          display: flex;
+          flex-flow: row nowrap;
+          font-weight: lighter;
+
+          .openid-sessionCard-header--clients {
+            flex: 1 1 auto;
+          }
+        }
+        .openid-sessionCard-body {
+          .openid-sessionCard-sessionList {
+            list-style: none;
+            margin: 0;
+            padding: 10px 0 0 10px;
+          }
+          .openid-sessionCard-sessionList-item {
+            display: block;
+            color: $item-container-primary;
+            &__disabled {
+              color: $item-container-secondary;
+            }
+          }
+        }
+        .openid-sessionCard-buttons {
+          display: flex;
+          flex-flow: row nowrap;
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
+
+}

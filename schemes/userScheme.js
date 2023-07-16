@@ -15,6 +15,12 @@ var UserSchema = new Schema({
         required: true,
         trim: true
     },
+    internalEmail: {
+        type: String,
+        default: function(){
+            return (this.generalData.firstName.value + "." + this.generalData.lastName.value + "@unisan-server.de").toLowerCase();
+        }
+    },
     generalData: {
         //TODO: create db getter
         firstName: {

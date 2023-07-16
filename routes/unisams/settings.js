@@ -29,7 +29,7 @@ function getDockerArguments (req, res, next) {
     // next();
 }
 
-//hooked at /unisams/settings
+//hooked at /settings
 
 /* GET home page. */
 // router.get("/*", auth);
