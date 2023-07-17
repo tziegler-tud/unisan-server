@@ -386,7 +386,15 @@ class OidcService {
                         console.log("Starting Oauth2 provider service...\n");
                         self.loadConfiguration()
                             .then(configuration => {
-                                const provider = new Provider(self.issuer, configuration);
+                                let provider;
+                                try {
+                                    provider = new Provider(self.issuer, configuration);
+                                }
+                                catch(e){
+                                    const system = SystemService.getSystemInformation()
+                                    self.issuer = system.hostname;
+                                    provider = new Provider(self.issuer, configuration);
+                                }
                                 provider.proxy = true;
 
                                 self.provider = provider;
