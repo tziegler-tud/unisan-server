@@ -130,15 +130,6 @@ server.use('/bdd-apps/divi', publicProtocolRouter);
 server.use('/', loginRouter);
 server.use('/apps/protocol', protocolRouter);
 
-//auth required
-server.use("/", webAuth);
-server.use('/', mainRouter);
-server.use('/dashboard', dashboardRouter);
-server.use('/user', userManagementRouter);
-server.use('/events', eventManagementRouter);
-server.use('/system', systemRouter);
-server.use('/settings', settingsRouter);
-
 //API calls
 server.use('/api/v1', authRouter);
 server.use('/api/v1/*', apiAuth);
@@ -159,6 +150,14 @@ server.use("/api", function(req, res, next) {
 // api error handler
 server.use("/api", errorHandler.apiErrorHandler);
 
+//auth required
+server.use("/", webAuth);
+server.use('/', mainRouter);
+server.use('/dashboard', dashboardRouter);
+server.use('/user', userManagementRouter);
+server.use('/events', eventManagementRouter);
+server.use('/system', systemRouter);
+server.use('/settings', settingsRouter);
 
 //forwarding
 server.use("/", indexRouter);

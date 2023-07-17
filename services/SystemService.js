@@ -96,6 +96,7 @@ class SystemService {
         params = Object.assign(defaults, params);
         params.identifier = params.identifier ? params.identifier : "UnisanServer-default-" + Date.now();
         let settings = new Settings(params)
+        this.settings = settings;
         this.settingsObject = settings.toJSON();
         return settings.save()
     }
