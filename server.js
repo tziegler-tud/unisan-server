@@ -162,15 +162,6 @@ server.use('/settings', settingsRouter);
 //forwarding
 server.use("/", indexRouter);
 
-// catch 404 and forward to error handler
-server.use("/", function(req, res, next) {
-    next(createError(404));
-});
-
-// webpage error handler
-server.use("/", errorHandler.webErrorHandler);
-
-
 
 
 
@@ -191,6 +182,12 @@ SystemService.start({config: config})
             .then(() => {
                 server.use(oidcService.url, oidcRouter);
                 server.use(oidcService.interactionsUrl, oidcInteractionsRouter);
+                // catch 404 and forward to error handler
+                server.use("/", function(req, res, next) {
+                    next(createError(404));
+                });
+                // webpage error handler
+                server.use("/", errorHandler.webErrorHandler);
                 if (settings.auth.openid.enabled) {
                     oidcService.start();
                 }
