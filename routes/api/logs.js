@@ -23,9 +23,6 @@ router.get('/get/:id', getById);
 router.delete("/all", _deleteAll);
 router.delete("/:id", _delete);
 
-
-router.get("/addModelUser", addModelUser);
-
 function getAll(req, res, next){
     logService.getAll()
         .then(function(result){
@@ -72,15 +69,5 @@ function _deleteAll(req, res, next) {
         .then(() => res.json({}))
         .catch(err => next(err));
 }
-
-
-
-
-function addModelUser(req, res, next){
-    logService.addModelUser()
-        .then(result => res.json(result))
-        .catch(err => next(err));
-}
-
 
 export default router;

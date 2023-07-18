@@ -101,9 +101,15 @@ LogSchema.virtual('description').get(function() {
 
     let minDescription = "", logType = "";
 
+
+    let authorizedUser = "UNKNOWN_USER"
+    let authorizedUserId = "UNKNOWN_USER_ID"
     //try if authorizedUser was populated
-    let authorizedUser = (this.authorizedUser.username) ? this.authorizedUser.username : this.authorizedUser;
-    let authorizedUserId = (this.authorizedUser.id) ? this.authorizedUser.id : this.authorizedUser;
+    if(this.authorizedUser){
+        authorizedUser = (this.authorizedUser.username) ? this.authorizedUser.username : this.authorizedUser;
+        authorizedUserId = (this.authorizedUser.id) ? this.authorizedUser.id : this.authorizedUser;
+    }
+
 
     variables.authorizedUser = {
         type: variableTypes.USER,
