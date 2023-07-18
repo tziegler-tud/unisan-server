@@ -150,17 +150,7 @@ server.use("/api", function(req, res, next) {
 // api error handler
 server.use("/api", errorHandler.apiErrorHandler);
 
-//auth required
-server.use("/", webAuth);
-server.use('/', mainRouter);
-server.use('/dashboard', dashboardRouter);
-server.use('/user', userManagementRouter);
-server.use('/events', eventManagementRouter);
-server.use('/system', systemRouter);
-server.use('/settings', settingsRouter);
 
-//forwarding
-server.use("/", indexRouter);
 
 
 
@@ -182,15 +172,11 @@ SystemService.start({config: config})
             .then(() => {
                 server.use(oidcService.url, oidcRouter);
                 server.use(oidcService.interactionsUrl, oidcInteractionsRouter);
-                // catch 404 and forward to error handler
-                server.use("/", function(req, res, next) {
-                    next(createError(404));
-                });
-                // webpage error handler
-                server.use("/", errorHandler.webErrorHandler);
                 if (settings.auth.openid.enabled) {
                     oidcService.start();
                 }
+
+                loadPublicRoutes();
             })
 
     })
@@ -199,7 +185,26 @@ SystemService.start({config: config})
       process.exit();
     })
 
+function loadPublicRoutes(){
+    //auth required
+    server.use("/", webAuth);
+    server.use('/', mainRouter);
+    server.use('/dashboard', dashboardRouter);
+    server.use('/user', userManagementRouter);
+    server.use('/events', eventManagementRouter);
+    server.use('/system', systemRouter);
+    server.use('/settings', settingsRouter);
 
+    //forwarding
+    server.use("/", indexRouter);
+
+    // catch 404 and forward to error handler
+    server.use("/", function(req, res, next) {
+        next(createError(404));
+    });
+    // webpage error handler
+    server.use("/", errorHandler.webErrorHandler);
+}
 
 
 
