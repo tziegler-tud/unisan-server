@@ -62,8 +62,8 @@ class OidcService {
                 description: "Emailadresse"
             },
             profile: {
-                fields: ['username', 'family_name', 'given_name', 'locale', 'name', 'full_name', 'updated_at'],
-                description: "Nutzername, Vorname, Nachname"
+                fields: ['id', 'username', 'family_name', 'given_name', 'locale', 'name', 'full_name', 'updated_at'],
+                description: "ID, Nutzername, Vorname, Nachname"
             },
             picture: {
                 fields: ['picture'],
@@ -114,6 +114,33 @@ class OidcService {
             const compiledFunction = pug.compileFile(appRoot + '/views/oidc/error.pug', {});
             const html = compiledFunction({error: error, homeurl: self.getServerUrl()});
             ctx.body = html
+        }
+
+
+        this.findAccount = async function(ctx, id, token) {
+            const user = await UserService.getById(id)
+            if(user){
+                let groups = await AclService.getUserGroups(id, {populate: false, json: true})
+                groups = groups.map(group => group.toString());
+                let result = {
+                    accountId: user.id,
+                    scope: undefined,
+                    rejected: undefined,
+                    async claims(use, scope, claims, rejected) { return {
+                        sub: id,
+                        id: user.id,
+                        email: user.internalEmail,
+                        username: user.username,
+                        given_name: user.generalData.firstName.value,
+                        family_name: user.generalData.lastName.value,
+                        full_name: user.generalData.firstName.value + " " + user.generalData.lastName.value,
+                        groups: groups,
+                        // picture: self.issuer + "/data/uploads/user_images/" + user.id + "/" + user.id + ".jpg",
+                    };
+                    },
+                };
+                return result
+            }
         }
 
         this.starting = false;
@@ -336,7 +363,7 @@ class OidcService {
                             renderError: self.renderError,
                             claims: self.config.claims,
                             cookies: self.config.cookies,
-                            findAccount: findAccount,
+                            findAccount: self.findAccount,
                             jwks: self.config.jwks,
                             pkce: {
                                 required: function pkceRequired(ctx, client) {
@@ -484,40 +511,6 @@ class OidcService {
     getStatus(){
         return this.state;
     }
-}
-
-function findAccount(ctx, id, token) {
-    return new Promise(function(resolve, reject){
-        UserService.getById(id)
-            .then(user=> {
-                if(user){
-                    AclService.getUserGroups(id, {populate: false, json: true})
-                        .then(groups => {
-                            groups = groups.map(group => group.toString());
-                            let result = {
-                                accountId: user.id,
-                                scope: undefined,
-                                rejected: undefined,
-                                async claims(use, scope, claims, rejected) { return {
-                                    sub: id,
-                                    email: user.internalEmail,
-                                    username: user.username,
-                                    given_name: user.generalData.firstName.value,
-                                    family_name: user.generalData.lastName.value,
-                                    full_name: user.generalData.firstName.value + " " + user.generalData.lastName.value,
-                                    groups: groups,
-                                    // picture: self.issuer + "/data/uploads/user_images/" + user.id + "/" + user.id + ".jpg",
-                                    // picture: self.issuer + "/data/uploads/user_images/" + user.id + "/" + user.id + ".jpg",
-                                    // picture: "https://static.wikia.nocookie.net/lotr/images/8/8d/Gandalf-2.jpg/revision/latest?cb=20130209172436",
-                                };
-                                },
-                            };
-                            resolve( result);
-                        })
-
-                }
-            })
-    })
 }
 
 function buildLogoutSource(formHtml){
