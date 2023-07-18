@@ -19,7 +19,6 @@ export default {
     getTargetLogs,
     getAllFiltered,
     getTargetLogsById,
-    addModelUser,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -221,14 +220,4 @@ async function _delete(req, id) {
  */
 async function _deleteAll() {
     return dbLog.deleteMany()
-}
-
-
-
-async function addModelUser(){
-    let logs = await dbLog.find();
-    logs.forEach(function(log){
-        log.target.targetModel = "User";
-        log.save();
-    })
 }
