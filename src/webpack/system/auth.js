@@ -13,9 +13,8 @@ let auth = {
         let self  = this;
         self.initPromise = new Promise(function(resolve, reject){
             $(document).ready(function () {
-
                 //debug line, remove before flight
-                console.log("loading js module: user."+self.title);
+                console.log("loading js module: " + self.title);
 
                 self.pageData = {};
                 var lidlRTO = window.lidlRTO;

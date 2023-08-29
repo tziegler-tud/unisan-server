@@ -17,6 +17,7 @@ import PasswordComponent from "./PasswordComponent";
 import GeneralSettingsComponent from "./GeneralSettingsComponent";
 import ConnectedServicesComponent from "./ConnectedServicesComponent";
 import OpenIdSettingsComponent from "./OpenIdSettingsComponent";
+import MemberCreationComponent from "./componentPageModules/MemberCreationComponent";
 import InteractiveListComponent from "./interactiveList";
 
 /**
@@ -43,6 +44,7 @@ export default class ComponentPage {
         },
         SYSTEM: {
             OPENID:             "system.openid",
+            MEMBER_CREATION:    "system.memberCreation",
         },
         GENERIC:            "generic",
     };
@@ -97,6 +99,9 @@ export default class ComponentPage {
                 break;
             case ComponentPage.componentTypes.SYSTEM.OPENID:
                 component = new OpenIdSettingsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
+                break;
+            case ComponentPage.componentTypes.SYSTEM.MEMBER_CREATION:
+                component = new MemberCreationComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
         }
         return this.addInternal(component)
