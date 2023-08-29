@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import autoIncrement from "mongoose-plugin-autoinc-fix";
 
 
 /** @typedef {{ name: string, qualType: string, acquiredDate: Date, expireDate: Date, trainingDate: Date, isValid: boolean, hasDocument: boolean, documentPath: string }} QualificationObject */
@@ -158,8 +157,6 @@ UserSchema.post('save', function(error, doc, next) {
     throw new Error(error);
 });
 
-UserSchema.plugin(autoIncrement.plugin, { model: 'User', field: 'generalData.memberId.value', startAt: 30, incrementBy: 1, unique: false});
-
 UserSchema.set('toJSON', { virtuals: true });
 
 
@@ -176,29 +173,5 @@ UserSchema.virtual('contactDefault').get(function() {
         return contactDataObject.default;
     })
 });
-
-/**
- * this resets the counter from  plugin. just run once at server startup or move to own function
- */
-// let User = mongoose.model('User', UserSchema);
-// let user = new User();
-// user.save(err => {
-//
-//     // user._id === 100 -> true
-//
-//     user.nextCount().then(count => {
-//
-//         // count === 101 -> true
-//
-//         user.resetCount().then(nextCount => {
-//
-//             // nextCount === 100 -> true
-//
-//         });
-//
-//     });
-//
-// });
-// module.exports = user;
 
 export default mongoose.model('User', UserSchema);
