@@ -17,6 +17,7 @@ $phone-medium: #{"only screen and (min-width: 25em) and (max-width: 35em)"};
 $phone-large: #{"only screen and (min-width: 35em) and (max-width: 50em)"};
 $phone: #{"only screen and #{$phone-width}"};
 
+$tablet: #{"only screen and #{$tablet-width}"};
 $tablet-portrait: #{"only screen and #{$tablet-width} and (orientation: portrait)"};
 $tablet-landscape: #{"only screen and #{$tablet-width} and (orientation: landscape)"};
 
