@@ -1,0 +1,99 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=")
+
+    script(src='/static/unisams/js/preloader.js')
+    script(src='/dist/login.js')
+    script(src='/dist/login_style.js')
+
+    //
+      ***********************************
+      ** no js fallback
+      ***********************************
+    noscript
+      link(rel='stylesheet' type='text/css' href='/static/unisams/stylesheets/no-js.css')
+
+
+
+
+  body.no-js
+    include preloader
+    #wrapper.wrapper-full-height
+      .login-page.mobile-full
+        .login-page-container
+          .login-additional-box
+            .additonal-content-container.centered
+              .img-container
+                img(src="/static/images/logo/unisams-kompakt.jpg")
+              //.unisams-label
+              //  span.acc1 uni
+              //  span.acc2 Sams
+                .clear
+              .clear
+          .login-content.scroll
+            .login-content-inner
+              .login-form-container.margin-bottom
+                .login-form-greeter
+                  .greeter-label
+                    | Datenschutzvereinbarung
+                  .greeter-content
+                    | Bitte lies die Angaben aufmerksam durch. Wenn du einverstanden bist, klick auf "Akzeptieren".
+                .login-form-content
+                  .login-form-textbox
+                    .login-form-textbox-heading
+                      | Was ist unisan-server.de?
+                    .login-form-textbox-body
+                      .login-form-textbox-body--paragraph
+                        | Der
+                        |
+                        span.label unisanServer
+                        |
+                        | ist eine Webanwendung, welche die Organisation und Zusammenarbeit innerhalb der Hochschulgruppe "Studentischer Sanitätsdienst der TU Dresden" unterstützt. Hier findet auch die digitale Verwaltung deiner Mitgliedsdaten statt.
+                      .login-form-textbox-body--paragraph Außerdem erfolgt hier die Verwaltung deiner Zugangsdaten für andere Online-Angebote der Hochschulgruppe, z.B. cloud.unisan-server.de. Die Anmeldung bei diesen Diensten nutzt den unisanServer zur Authentifizierung.
+
+                    .login-form-textbox-heading
+                      | Welche Daten werden gespeichert?
+                    .login-form-textbox-body
+                      .login-form-textbox-body--paragraph Es werden nur Daten erfasst, die für deine Mitarbeit in der Hochschulgruppe notwendig sind. Alle über dich gespeicherten Daten kannst du jederzeit online einsehen und verändern oder löschen. Außerdem hast du natürlich Anspruch darauf, eine Auflistung aller deiner personenbezogenen Daten von uns zur Verfügung gestellt zu bekommen.
+                      .login-form-textbox-body--paragraph Sobald über dich gespeicherte Daten nicht länger für die Tätigkeit innerhalb der Hochschulgruppe relevant sind, werden diese gelöscht.
+
+                    .login-form-textbox-heading
+                      | Wo werden meine Daten gespeichert?
+                    .login-form-textbox-body
+                      .login-form-textbox-body--paragraph Die Speicherung aller Daten erfolgt auf Servern des Hosting-Anbieters Strato. Der Standort dieser Server befindet sich in Deutschland. Es werden keine Daten an Stellen außerhalb der EU übertragen.
+
+                    .login-form-textbox-heading
+                      | Wie sind meine Daten gegen unberechtigten Zugriff gesichert?
+                    .login-form-textbox-body
+                      .login-form-textbox-body--paragraph Zur Anmeldung an der Webanwendung wird eine Kombination aus Nutzername und Passwort verwendet. Verwendete Passwörter müssen eine bestimmte Länge und Zeichenvielfalt aufweisen. Eine Umgehung dieser Zugangsbeschränkung wird, soweit technisch möglich, durch die Software verhindert.
+                      .login-form-textbox-body--paragraph Sollte uns bekannt werden, dass unberechtigter Zugriff auf deine Daten erfolgt ist, werden wir dich sofort darüber informieren.
+
+                    .login-form-textbox-heading
+                      | Wer hat Zugriff auf meine Daten?
+                    .login-form-textbox-body
+                      .login-form-textbox-body--paragraph Keine deiner personenbezogene Daten sind öffentlich einsehbar. Mitglieder der Hochschulgruppe können verschiedene Teile deiner Daten einsehen - abhängig davon, welche Rolle diese in der Hochschulgruppe haben und ob mit dieser Rolle die Notwendigkeit der Verarbeitung dieser Daten entsteht.
+                      .login-form-textbox-body--paragraph Eine detaillierte Auflistung aller Personen, die deine Daten einsehen können, kannst du beim Vorstand der Hochschulgruppe erfragen.
+
+                    .login-form-textbox-heading
+                      | Kann ich der Speicherung und Verarbeitung meiner Daten widersprechen?
+                    .login-form-textbox-body
+                      .login-form-textbox-body--paragraph Die Nutzung des unisanServers ist keine Vorraussetzung, um an Veranstaltungen der Hochschulgruppe teilnehmen oder aktives Mitglied sein zu können. Im Rahmen deiner Teilnahme an Veranstaltungen des Studentischen Sanitätsdienstes müssen jedoch Daten über dich erfasst werden. Wenn du der Speicherung der Daten im unisanServer widersprichst, werden diese anderweitig gespeichert und verarbeitet, z.B. in schriftlicher Form. Details dazu erfährst von der für Datenschutz innerhalb der Hochschulgruppe verantwortlichen Person.
+                      .login-form-textbox-body--paragraph Du kannst der Nutzung des unisanServer widersprechen, indem du unten auf "Ablehnen" klickst.
+
+                #login-form01.login-form.privacy-accept-form
+                  button.submit-button.mdc-button.mdc-button--raised.next.button-privacyAccept
+                    .mdc-button__ripple
+                    span.mdc-button__label
+                      | Akzeptieren
+                  button.decline-button.mdc-button.mdc-button--raised.next.button-privacyDecline
+                    .mdc-button__ripple
+                    span.mdc-button__label
+                      | Ablehnen
+
+
+
+

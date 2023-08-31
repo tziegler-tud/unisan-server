@@ -137,6 +137,10 @@ var UserSchema = new Schema({
         type: Boolean,
         default: true
     },
+    privacyAgreement: {
+        type: Boolean,
+        default: false,
+    },
     createdDate: {
         type: Date,
         default: Date.now

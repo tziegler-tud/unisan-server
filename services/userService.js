@@ -42,6 +42,7 @@ export default {
     removeIndividualEventAccess,
     clearDocuments,
     ensureAdminUser,
+    setPrivacyAgreement,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -1630,4 +1631,65 @@ async function ensureAdminUser(){
         return userACL.save()
     }
 }
+
+
+/**
+ *
+ * @param req
+ * @param {String} userid
+ * @param {Boolean} value
+ * @returns {Promise<User>}
+ */
+async function setPrivacyAgreement(req, userid, value){
+    const user = await User.findById(userid);
+    // validate
+    if (!user) throw new Error('User not found');
+
+    //check current value
+    const old = user.privacyAgreement;
+    if(old === value){
+        return user;
+    }
+    else {
+        //set privacyAgreement key
+        user.privacyAgreement = value;
+        return new Promise(function(resolve, reject) {
+            user.save()
+                .then(result => {
+                    let log = new Log({
+                        type: "server",
+                        action: {
+                            objectType: "user",
+                            actionType: "modify",
+                            actionDetail: "userModify",
+                            key: "privacyAgreement",
+                            fullKey: "privacyAgreement",
+                            originalValue: old,
+                            value: value,
+                            tag: "<OVERWRITE>"
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "user",
+                            targetObject: user._id,
+                            targetObjectId: user._id,
+                            targetModel: "User",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    LogService.create(log).then().catch();
+                    resolve(result);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })
+    }
+}
+
+
+
 
