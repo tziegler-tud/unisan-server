@@ -24,8 +24,19 @@ var actions = {
 
             }
         });
-    }
+    },
 
+    http: function(url, method="GET", data={}, callback) {
+        callback = (callback == null) ? function(){} : callback;
+        if(!url) return false;
+        return $.ajax({
+            url: url,
+            type: method,
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+        });
+    },
 }
 
 export {actions, groupActions, userActions, eventActions, qualificationActions, systemActions}

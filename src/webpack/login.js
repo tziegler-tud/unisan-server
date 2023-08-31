@@ -1,5 +1,6 @@
 import {MDCTextField} from '@material/textfield';
 import {Preloader} from "./helpers/preloader.js";
+import {actions} from "./actions/actions";
 
 import "./common.scss";
 
@@ -24,6 +25,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
             })
         }
     })
+
+    const privacy = document.querySelector(".privacy-accept-form");
+    if(privacy){
+        let accBtn = privacy.querySelector(".button-privacyAccept");
+        let decBtn = privacy.querySelector(".button-privacyDecline");
+
+        if(accBtn) accBtn.addEventListener("click", function(){
+            window.location = "/acceptPrivacyAgreement"
+        })
+        if(decBtn) decBtn.addEventListener("click", function(){
+            window.location = "/declinePrivacyAgreement"
+        })
+    }
 
 
 });

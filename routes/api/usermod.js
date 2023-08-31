@@ -105,6 +105,7 @@ router.post('/getKey/:id', getKey);
 // router.use("/*", checkWriteAccess);
 router.put('/:id', update);
 router.post('/:id/uploadUserImage', upload.single('image'), postUpload);
+router.post('/:id/privacyAgreement', setPrivacyAgreement);
 
 router.post('/updateCurrentUserPassword', updateCurrentUserPassword);
 router.post('/updateUserPassword', updateUserPassword);
@@ -509,6 +510,19 @@ function _delete(req, res, next) {
         .then(result => {
             userService.delete(req, req.params.id)
                 .then(() => res.json({}))
+                .catch(err => next(err));
+        })
+        .catch(err =>{
+            next(err);
+        })
+}
+
+function setPrivacyAgreement(req, res, next) {
+    //auth
+    AuthService.checkUserWriteAccess(req.user, req.params.id, false)
+        .then(result => {
+            userService.setPrivacyAgreement(req, req.params.id, req.body.accept)
+                .then((result) => res.json({privacyAgreement: result.privacyAgreement}))
                 .catch(err => next(err));
         })
         .catch(err =>{
