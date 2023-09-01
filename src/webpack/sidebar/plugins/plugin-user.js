@@ -887,6 +887,7 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
     function(sidebar, args, type, contentHandler) {
         var userId = args.userid;
         var onConfirm = args.callback.onConfirm;
+        var requireCurrentPassword = args.requireCurrentPassword;
         var corrupted = false;
 
         var res = {};
@@ -907,6 +908,10 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
                 const pwCheck = new MDCTextField(document.querySelector('#passwordCheck'));
                 const pwCheckHelper = new MDCTextFieldHelperText(document.querySelector('#passwordCheck-helper'));
 
+                if(!requireCurrentPassword) {
+                    currentPwField.disabled = true;
+                }
+
                 let customValidator = function(current, pw1, pw2){
                     /*
                     resons:
@@ -925,17 +930,17 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
                     if (!pwReg.test(pw1))  result = {state: false, reason: 3};
 
                     //new password must not match the current one
-                    if(pw1 === current) result = {state: false, reason: 4};
+                    if(requireCurrentPassword && pw1 === current) result = {state: false, reason: 4};
 
                     return result;
                 };
                 let customValidatorCallback = {
                     onSuccess: function(){
                         data = {
-                            current: currentPwField.value,
                             pw: pwField.value,
                             check: pwCheck.value,
                         };
+                        if(requireCurrentPassword) data.current = currentPwField.value;
                         onConfirm(args.userid, data);
                     },
                     onFailure: function(reason){
