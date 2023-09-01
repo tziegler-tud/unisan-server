@@ -489,8 +489,8 @@ $(document).ready (function () {
                                 //isArray: false
                             };
                             const changeContent = {
-                                title: "unisams-Nutzername ändern",
-                                message: "Achtung: Anmeldung zum Unisams-System ist danach nur noch mit dem neuen Nutzernamen möglich.",
+                                title: "Nutzername ändern",
+                                message: "Achtung: Anmeldung bei unisanServer ist danach nur noch mit dem neuen Nutzernamen möglich.",
                                 titleArg: "",
                                 messageArg: ""
                             };
