@@ -74,6 +74,7 @@ body {
     @media #{$phone, $tablet} {
       justify-content: flex-start !important;
       .login-page-container {
+        height: 100%;
         & > div {
           flex: 1 1 auto;
           height: auto;
@@ -276,4 +277,20 @@ body {
     -webkit-box-shadow: none;
     box-shadow: none;
   }
+}
+
+.button-set {
+  display: flex;
+  gap: 25px;
+
+  &.button-set--horizontal{
+    flex-flow: row wrap;
+  }
+  &.button-set--vertical{
+    flex-flow: column nowrap;
+  }
+  .button-set-item {
+
+  }
+
 }
