@@ -256,10 +256,9 @@ function updateCurrentUserPassword(req, res, next) {
 function updateUserPassword(req, res, next) {
     //routine for the current user updating its own password. requires the current password to be correct.
     //auth
-    if (!req.body.currentPassword || !req.body.newPassword) {
+    if (!req.body.newPassword) {
         return false;
     }
-    let password = req.body.currentPassword;
     let newPassword = req.body.newPassword;
     let targetUserId = req.body.userid;
 
@@ -270,34 +269,26 @@ function updateUserPassword(req, res, next) {
                 .then(result => {
                     userService.getUserHash(targetUser)
                         .then(targetWithHash=> {
-                            //verify password is correct
-                            bcrypt.compare(password, targetWithHash.hash)
+                            //password matches. set new Password
+                            userService.updatePassword(req, targetUser.id, newPassword)
                                 .then(result => {
-                                    if(result) {
-                                        //password matches. set new Password
-                                        userService.updatePassword(req, targetUser.id, newPassword)
-                                            .then(result => {
-                                                res.json({})
-                                            })
-                                            .catch(err => {
-                                                next(err)
-                                            });
-                                    }
-                                    else {
-                                        let err = {name: "ValidationError", message: "Validation failed."}
-                                        next(err);
-                                    }
+                                    res.json({})
                                 })
                                 .catch(err => {
-                                    next(err);
-                                })
+                                    next(err)
+                                });
+                            })
+                            .catch(err => {
+                                next(err);
+                            })
                         })
-                })
-                .catch(err =>{
+                .catch(err => {
                     next(err);
                 })
         })
-        .catch(err => next(err));
+        .catch(err =>{
+            next(err);
+        })
 }
 
 
