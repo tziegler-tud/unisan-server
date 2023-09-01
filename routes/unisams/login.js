@@ -67,7 +67,7 @@ router.get("/acceptPrivacyAgreement",  (req, res, next) => {
   else {
     userService.setPrivacyAgreement(req, req.user.id, true)
         .then(result => {
-          let redirectTo = "/";
+          let redirectTo = req.session.redirectTo || "/";
           res.redirect(redirectTo)
         })
         .catch(err => next(err));
