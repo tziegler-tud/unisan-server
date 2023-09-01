@@ -1,4 +1,4 @@
-// import "../user/userprofile.scss";
+import "../user/userprofile.scss";
 import "./user.scss";
 
 import {userActions, eventActions, groupActions} from "../actions/actions"
