@@ -1,0 +1,34 @@
+@use "@material/icon-button";
+
+@import "../../variables.scss";
+@import "../../color-rules.scss";
+
+.news-component {
+  .newsList-container {
+    display: flex;
+    flex-flow: column nowrap;
+
+    .news-card {
+      width: 100%;
+      flex: 0 0 auto;
+      .news-card-heading {
+
+      }
+      .news-card-meta {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+        .news-card-meta-author {
+          flex: 1 1 auto;
+        }
+        .news-card-meta-date {
+          flex: 1 1 auto;
+        }
+      }
+      .news-card-body {
+
+      }
+    }
+  }
+
+}

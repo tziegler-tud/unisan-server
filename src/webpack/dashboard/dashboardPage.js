@@ -79,17 +79,20 @@ var Component = function(componentId, componentType, data, args){
 
         switch(componentType) {
             case (DashPage.componentTypes.NEWS):
-                //build description module
-                templateUrl = "/webpack/dashboard/pageModules/news.hbs";
-                $.get(templateUrl, function (templateData) {
-                    template = Handlebars.compile(templateData);
-                    self.container.innerHTML = template(handleData);
-                    let callback = {};
-                    //custom handlers
-                    self.args.handlers.forEach(function(handler){
-                        handler(self);
-                    })
-                });
+
+                let currentNews = getNews(1).then(result => {
+                    handleData.news = result;
+                    templateUrl = "/webpack/dashboard/pageModules/news.hbs";
+                    $.get(templateUrl, function (templateData) {
+                        template = Handlebars.compile(templateData);
+                        self.container.innerHTML = template(handleData);
+                        let callback = {};
+                        //custom handlers
+                        self.args.handlers.forEach(function (handler) {
+                            handler(self);
+                        })
+                    });
+                })
                 break;
             case (DashPage.componentTypes.EVENTPREVIEW):
                 //show next event
@@ -185,6 +188,37 @@ var getNextEvent = function (userid){
             data: JSON.stringify(data),
             success: function(events) {
                 resolve(events[0])
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
+                reject(errorThrown)
+            }
+        });
+    })
+}
+
+
+var getNews = function (limit){
+    let self = this;
+    let data = {
+        filter: [
+
+        ],
+        args: {
+            or: true,
+            limit: limit,
+        }
+    }
+    //get user list from server
+    return new Promise(function(resolve, reject){
+        $.ajax({
+            url: "/api/v1/news/filter",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(news) {
+                resolve(news)
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);

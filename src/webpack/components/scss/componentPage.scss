@@ -34,12 +34,20 @@
     }
     .componentPage-component {
       width: 100%;
+
       .componentPage-component-inner {
+
+
         margin: 10px;
         padding-bottom: 10px;
         background-color: $page-bg-color;
         box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
         width: calc(100% - 20px);
+        &.transparent {
+          background-color: transparent;
+          box-shadow: unset;
+        }
+
         .componentPage-component-header {
           font-size: 120%;
           margin-bottom: .5em;

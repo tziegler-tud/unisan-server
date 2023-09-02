@@ -12,19 +12,15 @@ import "../helpers/handlebarsHelpers";
 import "./dash.scss";
 
 
-
-var actions = window.actions;
-
-
-let dash = {
-    title: "dash",
+let activity = {
+    title: "activity",
     pageData: {},
     init: function (args) {
         let self  = this;
         $(document).ready(function () {
 
             //debug line, remove before flight
-            console.log("loading js module: dashboard."+self.title);
+            console.log("loading js module: dashboard.activity");
 
             self.pageData = {};
             var lidlRTO = window.lidlRTO;
@@ -81,18 +77,9 @@ let dash = {
         });
         window.dashPage = dashPage;
 
-        dashPage.addComponent(DashPage.componentTypes.NEWS,
-            {
-                size: "half",
-            })
-        dashPage.addComponent(DashPage.componentTypes.EVENTPREVIEW,
-            {
-                size: "half",
-            })
         dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
             {
                 size: "full",
-                limitAmount: 10,
             })
     },
     updatePage: function(user, args){
@@ -100,5 +87,4 @@ let dash = {
     }
 };
 
-
-export {dash}
+export {activity}
