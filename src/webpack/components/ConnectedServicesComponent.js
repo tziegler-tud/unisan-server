@@ -19,7 +19,7 @@ import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
 export default class ConnectedServicesComponent extends Component {
     constructor({page, componentId, componentType, pageData, data, args}={}) {
         super({page, componentId, componentType, pageData, data, args});
-        this.templateUrl = "/webpack/components/pageModules/settings/connectedServices.hbs";
+        this.templateUrl = "/webpack/components/templates/settings/connectedServices.hbs";
     }
 
     async preRender(){

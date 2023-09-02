@@ -43,7 +43,9 @@ function getDockerArguments (req, res, next) {
 router.get("/*", getDockerArguments);
 router.get('/', dashboard);
 router.get('/events', dashboardEvents);
-router.get('/notifications', dashboardNotifications);
+router.get('/activity', dashboardActivity);
+router.get('/news/add', addNewsEntry);
+router.get('/news', dashboardNews);
 function dashboard (req, res, next) {
     res.render("unisams/dashboard/dashboard", {title: "Dashboard - uniSams",
         user: req.user._doc,
@@ -59,13 +61,26 @@ function dashboardEvents (req, res, next) {
 }
 
 
-function dashboardNotifications (req, res, next) {
-    res.render("unisams/dashboard/notifications", {title: "Benachrichtigungen - uniSams",
+function dashboardActivity (req, res, next) {
+    res.render("unisams/dashboard/activity", {title: "Aktivität - uniSams",
         user: req.user._doc,
         acl: req.acl,
     })
 }
 
+function dashboardNews (req, res, next) {
+    res.render("unisams/dashboard/news", {title: "News - uniSams",
+        user: req.user._doc,
+        acl: req.acl,
+    })
+}
+
+function addNewsEntry (req, res, next) {
+    res.render("unisams/news/add", {title: "News - uniSams",
+        user: req.user._doc,
+        acl: req.acl,
+    })
+}
 
 
 

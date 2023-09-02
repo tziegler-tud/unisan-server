@@ -5,24 +5,26 @@
             <div class="dashinfo-item-inner dash-news">
                 <div class="dash-news-container">
                     <ul class="dash-news-list">
-                        <li class="dash-news-listItem dash-newsItem">
-                            <div class="dash-newsItem--wrapper">
-                                <div class="dash-newsItem-meta">
-                                    <div class="dash-newsItem-meta--date">
-
+                        {{#each news}}
+                            <li class="dash-news-listItem dash-newsItem">
+                                <div class="dash-newsItem--wrapper">
+                                    <div class="dash-newsItem-meta">
+                                        <div class="dash-newsItem-meta--date">
+                                            {{news.created}}
+                                        </div>
+                                        <div class="dash-newsItem-meta--user">
+                                            {{news.author.generaldata.firstname.value}} {{news.author.generaldata.lastname.value}}
+                                        </div>
                                     </div>
-                                    <div class="dash-newsItem-meta--user">
-
+                                    <div class="dash-newsItem--heading">
+                                        {{news.title}}
+                                    </div>
+                                    <div class="dash-newsItem--body">
+                                        {{news.content.value}}
                                     </div>
                                 </div>
-                                <div class="dash-newsItem--heading">
-                                    <span></span>
-                                </div>
-                                <div class="dash-newsItem--body">
-                                    <span></span>
-                                </div>
-                            </div>
-                        </li>
+                            </li>
+                        {{/each}}
                     </ul>
                 </div>
 

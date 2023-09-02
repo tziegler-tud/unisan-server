@@ -22,7 +22,7 @@ import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
 export default class OpenIdSettingsComponent extends Component {
     constructor({page, componentId, componentType, pageData={}, data, args}={}) {
         super({page, componentId, componentType, pageData, data, args});
-        this.templateUrl = "/webpack/components/pageModules/system/openIdSettings.hbs"
+        this.templateUrl = "/webpack/components/templates/system/openIdSettings.hbs"
     }
 
     async postRender(){
