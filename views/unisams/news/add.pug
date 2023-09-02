@@ -1,20 +1,16 @@
 extends ../layout
 
 block page_includes
+    script(src="/dist/news.js")
 
     script.
         window.jsmodule = {
-            module: "settings",
-            loaders: ["authSettings"],
+            module: "news",
+            loaders: ["add"],
         };
-        window.dockerArgs.activeContainer = "userprofileContainer";
-        window.dockerArgs.activeElementId = "userprofileSettings";
-        window.allowedit = #{allowedit};
+        window.dockerArgs.activeContainer =  "dashboardContainer";
+        window.dockerArgs.activeElementId = "dashboardNews";
 
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-
-    script(src="/dist/settings.js")
 
 block content
     #wrapper
@@ -26,15 +22,10 @@ block content
                             .sec-heading-label.propertypage-heading
                                 .propertypage-heading-container
                                     h3
-                                        | Meine Einstellungen
+                                        | News erstellen
                                     .clear
                                 .clear
                         #content1-text.sec-content.border-top
                             .subpage-content
                                 .userinfo-container
                                     #componentPage-component-container.componentPage-component-container
-
-
-
-
-

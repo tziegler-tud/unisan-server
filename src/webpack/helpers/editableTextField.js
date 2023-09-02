@@ -4,6 +4,9 @@
 
 import "./editableTextField.scss";
 import "./editor.scss";
+import Quill from "quill";
+import '/lib/quill/quill.snow-custom.css';
+import '/lib/quill/quill.bubble-custom.css';
 
 /**
  * constructor for EditableTextField objects

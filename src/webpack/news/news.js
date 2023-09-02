@@ -1,38 +1,24 @@
+import "../user/userprofile.scss";
+import "./news.scss";
+
 import {userActions, eventActions, groupActions} from "../actions/actions"
-import {dash} from "./dash";
-import {events} from "./events";
-import {activity} from "./activity";
-import {news} from "./news";
+import {addNews} from "./addNews.js";
 
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
 
-    const moduleIdentifier = "dashboard";
-
-
+    let moduleName = "news";
 
     //setup module specific loaders
     let loaders = [];
-    let dashLoader = {
-        title: dash.title,
-        loader: dash,
-    };
-    let eventsLoader = {
-        title: events.title,
-        loader: events,
-    };
 
-    let notificationsLoader = {
-        title: activity.title,
-        loader: activity,
-    };
     let newsLoader = {
-        title: news.title,
-        loader: news,
+        title: "add",
+        loader: addNews,
     };
-    loaders.push(dashLoader, eventsLoader, notificationsLoader, newsLoader);
 
+    loaders.push(newsLoader);
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;
     if (jsmodule === undefined) jsmodule = {};
@@ -44,9 +30,8 @@ $(document).ready (function () {
     };
     let args = Object.assign(defaultArgs, jsmodule.args);
 
-
-    if(!jsmodule.module === moduleIdentifier) {
-        console.error("invalid jsmodule information: Expected "+ moduleIdentifier + " but found " + jsmodule.module)
+    if(!jsmodule.module === moduleName) {
+        console.error("invalid jsmodule information: Expected " + moduleName + " , but found " + jsmodule.module)
         return false;
     }
 
