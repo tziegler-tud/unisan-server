@@ -1,0 +1,29 @@
+<div class="componentPage-component news-component">
+    <div class="componentPage-component-inner transparent">
+        <div class="componentPage-component-header"><span>News</span></div>
+        <div class="componentPage-component-item">
+            <div class="newsList-container">
+                {{#each data.news}}
+                    <div class="news-card" data-id="{{news.id}}">
+                        <div class="news-card-heading">
+                            {{this.title}}
+                        </div>
+                        <div class="news-card-meta">
+                            <div class="news-card-meta-author">
+                                <span>{{this.author.generalData.firstname.value}} {{this.author.generalData.lastname.value}}</span>
+                            </div>
+                            <div class="news-card-meta-date">
+                                <span>{{transformDateTimeString this.created}}</span>
+                            </div>
+                        </div>
+                        <div class="news-card-body">
+                            <div class="news-card-body--deltaContent">
+
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>

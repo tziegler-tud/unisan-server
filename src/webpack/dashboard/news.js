@@ -10,17 +10,18 @@ import {EventRequest} from "../events/eventRequest";
 import "../helpers/handlebarsHelpers";
 
 import "./dash.scss";
+import ComponentPage from "../components/ComponentPage";
 
 
-let notifications = {
-    title: "notifications",
+let news = {
+    title: "news",
     pageData: {},
     init: function (args) {
         let self  = this;
         $(document).ready(function () {
 
             //debug line, remove before flight
-            console.log("loading js module: dashboard.notifications");
+            console.log("loading js module: dashboard."+self.title);
 
             self.pageData = {};
             var lidlRTO = window.lidlRTO;
@@ -68,23 +69,26 @@ let notifications = {
             sidebar.show();
         }
 
-        let pageContainer = document.getElementById("dashPage-component-container");
-        var dashPage = new DashPage({
+        let pageContainer = document.getElementById("componentPage-component-container");
+        var componentPage = new ComponentPage({
             container: pageContainer,
             sidebar: sidebar,
             data: {user: user},
             args: {},
         });
-        window.dashPage = dashPage;
+        window.componentPage = componentPage;
 
-        dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
-            {
-                size: "full",
-            })
+        componentPage.addComponent(ComponentPage.componentTypes.DASHBOARD.NEWS, {size: "full", order: 1});
+
+
+        //
+        // componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full", order: 1});
+        // componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", order: 2}, {user: user, targetUser: "current"});
+        // componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.CONNECTEDSERVICES, {allowEdit: true, size: "full", order: 3});
     },
     updatePage: function(user, args){
         this.buildPage(user, args)
     }
 };
 
-export {notifications}
+export {news}

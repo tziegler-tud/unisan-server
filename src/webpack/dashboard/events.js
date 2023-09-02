@@ -9,6 +9,7 @@ var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import "/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
 
 let events = {
+    title: "events",
     data: {},
     init: function () {
         let self = this;
@@ -16,7 +17,7 @@ let events = {
             $(document).ready(function () {
 
                 //debug line, remove before flight
-                console.log("loading js module: dashboard.events");
+                console.log("loading js module: dashboard."+self.title);
 
                 self.view = "both";
                 self.sort = "date.startDate";

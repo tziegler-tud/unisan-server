@@ -16,7 +16,7 @@ import Component from "./Component";
 export default class GeneralSettingsComponent extends Component {
     constructor({page, componentId, componentType, pageData, data, args}={}) {
         super({page, componentId, componentType, pageData, data, args});
-        this.templateUrl = "/webpack/components/pageModules/settings/generalSettings.hbs"
+        this.templateUrl = "/webpack/components/templates/settings/generalSettings.hbs"
     }
 
     async postRender(){
