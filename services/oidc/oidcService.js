@@ -151,11 +151,12 @@ class OidcService {
         this.initPromise = new Promise(function(resolve, reject){
             self.#initResolve = resolve;
             self.#initReject = reject;
-        })
+        }).then().catch(err => console.log(err))
         this.startupPromise = new Promise(function(resolve, reject){
             self.#startupResolve = resolve;
             self.#startupReject = reject;
-        })
+        }).then().catch(err => console.log(err))
+
 
         this.providerHandler = function(){
             return false;
@@ -281,7 +282,12 @@ class OidcService {
     async addEncryptionKey({index, positionString}={}){
         let self = this;
         const errMsg = "OidcService: Failed to add encryption key. Error: ";
-        await self.initPromise;
+        try{
+            await self.initPromise;
+        }
+        catch(e) {
+            console.error(errMsg + "OidcService failed to initialize");
+        }
 
         return await self.keyManager.addKey({index, positionString});
     }
@@ -295,7 +301,12 @@ class OidcService {
     async moveEncryptionKey({kid, index}){
         let self = this;
         const errMsg = "OidcService: Failed to add encryption key. Error: ";
-        await self.initPromise;
+        try{
+            await self.initPromise;
+        }
+        catch(e) {
+            console.error(errMsg + "OidcService failed to initialize");
+        }
 
         return await self.keyManager.moveKey({kid, index});
     }
@@ -308,7 +319,12 @@ class OidcService {
     async deleteEncryptionKey({kid}={}){
         let self = this;
         const errMsg = "OidcService: Failed to remove encryption key. Error: ";
-        await self.initPromise;
+        try{
+            await self.initPromise;
+        }
+        catch(e) {
+            console.error(errMsg + "OidcService failed to initialize");
+        }
 
         return await self.keyManager.deleteKey({kid});
     }
