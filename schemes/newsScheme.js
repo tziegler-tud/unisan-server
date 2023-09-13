@@ -7,8 +7,12 @@ const Schema = mongoose.Schema;
 // create instance of Schema
 var NewsScheme = new Schema({
     title: {
-        type: String,
-        required: true,
+        value: {
+            type: String,
+            required: true,
+        },
+        delta: {
+        }
     },
     author: {
         type: Schema.Types.ObjectId,

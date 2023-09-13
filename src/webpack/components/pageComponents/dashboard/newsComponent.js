@@ -5,6 +5,7 @@ import Component from "../../Component";
 import {EditableTextField} from "../../../helpers/editableTextField";
 
 import "../../scss/newsComponent.scss";
+import {newsActions} from "../../../actions/actions";
 
 /**
  *
@@ -20,6 +21,26 @@ export default class NewsComponent extends Component {
     constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
         super({page, componentId, componentType, pageData, data, args});
         this.templateUrl = "/webpack/components/templates/dashboard/newsComponent.hbs"
+        this.data.news = [];
+        this.filter = {};
+    }
+
+    retrieveFiltered(filter){
+        return new Promise(function(resolve, reject){
+            let args = {}
+            newsActions.getFiltered(filter, args)
+                .then(newsArray => {
+                    resolve(newsArray)
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })
+
+    }
+
+    async preRender(){
+        const news = await this.retrieveFiltered();
     }
 
     async postRender(){
