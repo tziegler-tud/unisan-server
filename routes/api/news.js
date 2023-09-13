@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 // routes
 router.get('/get', getAll);
 router.post("/add", create);
+router.put("update/:id", update);
 router.get('/author/:id', getByAuthor);
 router.post('/tags', getByTags);
 router.post('/filter', getFiltered);
@@ -72,7 +73,15 @@ function getFiltered(req, res, next){
 }
 
 function create(req, res, next){
-    NewsService.create(req.body)
+    NewsService.create(req, req.body)
+        .then(function(result){
+            res.json(result)
+        })
+        .catch(err => next(err));
+}
+
+function update(req, res, next){
+    NewsService.update(req, req.body)
         .then(function(result){
             res.json(result)
         })

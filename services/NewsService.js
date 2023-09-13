@@ -3,6 +3,7 @@ import db from '../schemes/mongo.js';
 import mongoose from "mongoose";
 import AuthService from './authService.js';
 import Log from '../utils/log.js';
+import LogService from "./logService.js";
 
 const News = db.News;
 const User = db.User;
@@ -16,6 +17,7 @@ export default {
     getAllByTags,
     getById,
     create,
+    update,
     delete: _delete,
     deleteAll: _deleteAll,
     getAllFiltered,
@@ -138,12 +140,83 @@ async function getById(id) {
  * Creates a new news entry from data object and saves it to the db
  * @param {Object} data The object to save as event
  */
-async function create(data) {
+async function create(req, data) {
     //validation
 
-    //save log
-    let news = new News(data.toJson());
-    await news.save();
+    let news = new News(data);
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "news",
+            actionType: "create",
+            actionDetail: "newsAdd",
+            key: news.id,
+            value: news.title.value,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "news",
+            targetObject: news._id,
+            targetObjectId: news._id,
+            targetModel: "News",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    return new Promise(function(resolve, reject){
+        news.save()
+            .then(result => {
+                LogService.create(log).then().catch();
+                resolve(result);
+            })
+            .catch(err => {
+                reject(err);
+            })
+    });
+}
+
+async function update(req, id, data) {
+    const errMsg = "Failed to update News entry: "
+    if (data === undefined) {
+        throw new Error("Invalid data received.")
+    }
+    let news = await News.findById(id);
+    if(!news) {
+        throw new Error("Unable to find news entry with ID:" + id);
+    }
+
+    news = Object.assign(news, data);
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "news",
+            actionType: "create",
+            actionDetail: "newsModify",
+            key: news.id,
+            value: news.title.value,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "news",
+            targetObject: news._id,
+            targetObjectId: news._id,
+            targetModel: "News",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    news.save()
+        .then(result => {
+            LogService.create(log).then().catch();
+        })
+        .catch(err => {
+            reject(err);
+        })
+
 }
 
 /**
