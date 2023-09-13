@@ -3,6 +3,7 @@ import "./news.scss";
 
 import {userActions, eventActions, groupActions} from "../actions/actions"
 import {addNews} from "./addNews.js";
+import {editNews} from "./editNews.js";
 
 $(document).ready (function () {
 
@@ -13,12 +14,17 @@ $(document).ready (function () {
     //setup module specific loaders
     let loaders = [];
 
-    let newsLoader = {
+    let addNewsLoader = {
         title: "add",
         loader: addNews,
     };
 
-    loaders.push(newsLoader);
+    let editNewsLoader = {
+        title: "edit",
+        loader: editNews,
+    };
+
+    loaders.push(addNewsLoader, editNewsLoader);
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;
     if (jsmodule === undefined) jsmodule = {};

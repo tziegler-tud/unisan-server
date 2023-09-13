@@ -18,19 +18,15 @@ import {EditableInputField} from "../../../helpers/editableInputField";
  * @returns {NewsComponent}
  * @constructor
  */
-export default class CreateNewsComponent extends Component {
+export default class EditNewsComponent extends Component {
     constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
         super({page, componentId, componentType, pageData, data, args});
-        this.templateUrl = "/webpack/components/templates/news/createNews.hbs"
+        this.templateUrl = "/webpack/components/templates/news/editNews.hbs"
 
         const defaultData = {
             news: {
-                content: {
-
-                },
-                title: {
-
-                },
+                content: {},
+                title: {},
             },
         }
 
@@ -49,13 +45,6 @@ export default class CreateNewsComponent extends Component {
         this.titleField = new EditableInputField(titleFieldContainer, this.data.news.content.delta, this.data.news.content.html, "text", callback, {readOnly: false, active: true, disableButtons: true});
         let contentFieldContainer = self.container.querySelector(".news-content--input");
         this.contentField = new EditableTextField(contentFieldContainer, this.data.news.content.delta, this.data.news.content.html, callback, {readOnly: false, active: true, disableButtons: true});
-
-        const saveButtons = document.querySelectorAll(".news-saveButton");
-        saveButtons.forEach(btn => {
-            btn.addEventListener("click", function(){
-                self.save();
-            })
-        })
     }
 
     save(){

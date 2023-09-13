@@ -292,6 +292,16 @@ a {
 
       }
 
+      &.has-interactions {
+
+        justify-content: space-between;
+        padding-right: 4em;
+
+        .subpage-heading-interactions {
+          display: flex;
+        }
+      }
+
       &.padding {
         padding-left: 1em;
       }
@@ -306,6 +316,17 @@ a {
         }
         @media #{$tablet-landscape} {
           font-size: 120%;
+        }
+      }
+
+      .subpage-heading-interactions {
+        display: none;
+        flex: 0 0 auto;
+
+        .subpage-heading-interactions-buttons {
+          .heading-add-button {
+
+          }
         }
       }
 
@@ -1280,6 +1301,12 @@ common btn styling
 
   @include transition(background-color, 250ms);
 
+  &--highlight {
+    color: $allowed-color;
+    border-color: $allowed-color;
+
+  }
+
   &:hover {
     background-color: $btnHover;
   }
@@ -1302,6 +1329,70 @@ common btn styling
     line-height: 1em;
   }
 }
+
+.btn {
+  $btn: transparent;
+  $btnHover: #f9f9ff;
+  @include transition(background-color, 250ms);
+
+  &:hover {
+    background-color: $btnHover;
+  }
+
+  &.disabled {
+    color: #AAA;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 1em;
+    display: block;
+
+    margin-right: .5em;
+    float: left;
+  }
+  span {
+    display: inline-block;
+    float: left;
+    line-height: 1em;
+  }
+}
+
+.btn-save {
+  $btn: transparent;
+  $btnHover: #f9f9ff;
+
+  @include transition(background-color, 250ms);
+
+  &--highlight {
+    color: $allowed-color;
+    border-color: $allowed-color;
+
+  }
+
+  &:hover {
+    background-color: $btnHover;
+  }
+
+  &.disabled {
+    color: #AAA;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 1em;
+    display: block;
+
+    margin-right: .5em;
+    float: left;
+  }
+  span {
+    display: inline-block;
+    float: left;
+    line-height: 1em;
+  }
+}
+
 
 .btn-listExt {
   background-color: transparent;
@@ -1413,6 +1504,10 @@ common btn styling
   @include transition(transform,200ms);
   @media #{$desktop, $tablet-landscape} {
   font-size:  100%;
+
+  &.highlight {
+    color: $allowed-color;
+  }
 }
 
   &.gallery {

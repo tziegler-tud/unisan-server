@@ -3,12 +3,25 @@ var newsActions = {
     create: function(data, callback){
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function(){}
-        var postData = {
-            delta: data.delta,
-            value: data.value,
-        };
+        var postData = data;
         return $.ajax({
-            url: "/api/v1/news/add/" +id,
+            url: "/api/v1/news/add/",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(postData),
+            success: function(result) {
+                callback.onSuccess(result);
+            }
+        });
+    },
+
+    save: function(id, data, callback){
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function(){}
+        var postData = data;
+        return $.ajax({
+            url: "/api/v1/news/update/" +id,
             type: 'PUT',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
@@ -18,87 +31,40 @@ var newsActions = {
             }
         });
     },
-    saveTitle: function(id, data, callback){
+    getAll: function(callback){
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function(){}
-        var postData = {
-            delta: data.delta,
-            value: data.value,
-        };
+        var postData = data;
         return $.ajax({
-            url: "/api/v1/eventmod/updateTitle/" +id,
-            type: 'PUT',
+            url: "/api/v1/news/get",
+            type: 'GET',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
-            data: JSON.stringify(postData),
             success: function(result) {
                 callback.onSuccess(result);
             }
         });
     },
-    saveContent: function(id, data, callback){
+
+    getFiltered: function(filter, args, callback) {
         if (callback === undefined) callback = {};
-        if (callback.onSuccess === undefined) callback.onSuccess = function(){}
+        if (callback.onSuccess === undefined) callback.onSuccess = function () {
+        }
         var postData = {
-            longDesc: data.longDesc,
-            shortDesc: data.shortDesc,
+            filter: filter,
+            args: args,
         }
         return $.ajax({
-            url: "/api/v1/eventmod/updateDescription/" +id,
-            type: 'PUT',
+            url: "/api/v1/news/filter",
+            type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
             data: JSON.stringify(postData),
-            success: function(result) {
+            success: function (result) {
                 callback.onSuccess(result);
             }
         });
-    },
-
-    saveDelta: function(id, delta, callback){
-        if (callback === undefined) callback = {};
-        if (callback.onSuccess === undefined) callback.onSuccess = function(){}
-        var data = {
-            key: "description.longDesc.delta",
-            value: delta,
-        };
-        return $.ajax({
-            url: "/api/v1/eventmod/updateKey/" +id,
-            type: 'PUT',
-            contentType: "application/json; charset=UTF-8",
-            dataType: 'json',
-            data: JSON.stringify(data),
-            success: function(result) {
-                callback.onSuccess(result);
-            }
-        });
-    },
-
-    updateDate: function(id, args, callback) {
-        if (callback === undefined) callback = {};
-        if (callback.onSuccess === undefined) callback.onSuccess = function(){}
-
-        var startDate = parseHTMLInputDate(args.date, args.startTime);
-        var endDate = parseHTMLInputDate(args.date, args.endTime);
-
-        let data = {
-            key: "date",
-            value: {
-                startDate: startDate,
-                endDate: endDate,
-            }
-        }
-        return $.ajax({
-            url: "/api/v1/eventmod/updateKey/" +id,
-            type: 'PUT',
-            contentType: "application/json; charset=UTF-8",
-            dataType: 'json',
-            data: JSON.stringify(data),
-            success: function(result) {
-                callback.onSuccess(result);
-            }
-        });
-    },
+    }
 }
 
 function parseHTMLInputDate(date, time){

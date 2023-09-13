@@ -59,7 +59,6 @@ var applyArgs = function(args){
         active: false,
         disableButtons: false,
         readOnly: false,
-        limit: 0,
     }
     args = (args === undefined) ? {}: args;
     return Object.assign(defaults, args);

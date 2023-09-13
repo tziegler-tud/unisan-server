@@ -20,6 +20,7 @@ import OpenIdSettingsComponent from "./OpenIdSettingsComponent";
 import InteractiveListComponent from "./interactiveList";
 import NewsComponent from "./pageComponents/dashboard/newsComponent";
 import CreateNewsComponent from "./pageComponents/news/createNewsComponent";
+import EditNewsComponent from "./pageComponents/news/editNewsComponent";
 
 /**
  * generic component page Object
@@ -109,6 +110,7 @@ export default class ComponentPage {
                 component = new CreateNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
             case ComponentPage.componentTypes. NEWS.EDIT:
+                component = new EditNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
             case ComponentPage.componentTypes.SETTINGS.PASSWORD:
                 component = new PasswordComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
