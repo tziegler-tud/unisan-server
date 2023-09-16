@@ -1,5 +1,4 @@
-# uniSAMS - Server application
-## NodeJs web application
+# unisanServer -  A web-based personnel and resource management application for medical service groups
 ### Author: Tom Ziegler
 #### Contributers: 
 github.com/SoulKa
@@ -20,8 +19,10 @@ Planned features include a user management, event mangement, an eLearning area a
 #### Planned:
 - user management (implemented)
 - calendar and event management (implemented)
-- web-based CMS for public website (de-continued)
-- eLearning area providing course materials and information (planned)
+- web-based CMS for public website (discontinued)
+- eLearning area providing course materials and information (discontinued)
+- News feature for in-system notifications (in progress)
+- public event registration (planned)
 - user documentation (will be ready for release, whenever that may be)
 
 ### Tech
@@ -32,32 +33,14 @@ Planned features include a user management, event mangement, an eLearning area a
 Our project uses [SASS](https://sass-lang.com/) and webpack.
 
 ##### Backend
-Noder >= 16
+Node >= 16
 ES2017
 
 check package.json for npm dependencies
 
 ##### Frontend
 
-ES6 2017
-CSS3
-HTML5
-
-libraries:
-- jQuery
-- jQuery UI
-- hammer.js
-- handlebars.js
-- lidl.js, a targeted framework created solely for this project
-- some more...
-
-All frontend libraries are included in the source files.
-
-### Usage
-
-Feel free to re-use this code in whichever kind you can think of. You do not need to mention us in any way. However, feel free to send us a link to your project. We would love to see how you could make use of our work.
-
-This repo lacks any images used on our website and refered to in the source. Just replace these these with your images.
+nothing special, check package.json
 
 ### Todos
 
