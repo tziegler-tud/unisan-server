@@ -1592,7 +1592,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
         }
 
         //check if user is registered
-        var index = event.participants.map(e => e.user.toString()).indexOf(userId);
+        var index = event.participants.map(e => e.user.toString()).indexOf(userId.toString());
         if (index > -1) {
             // user already registered.
             if(!args.overwrite){

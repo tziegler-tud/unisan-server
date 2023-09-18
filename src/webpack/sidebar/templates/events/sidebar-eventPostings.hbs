@@ -68,11 +68,8 @@
             </div>
         </div>
         <div class="sidebar-bottom">
-            <div id="sidebar-participate-button-notregistered" class="select-button content-link slim sidebar-confirm sidebar-participate-button">Teilnehmen</div>
-            <select id="sidebar-participate-button-registered" class="hidden select-button content-link slim style2 sidebar-participate-button">
-                <option value="remove">Abmelden</option>
-                <option value="keep" selected>Du nimmst teil</option>
-            </select>
+            <a href="/events/{{event.id}}/postings" id="sidebar-participate-button-notregistered" class="select-button content-link slim sidebar-confirm sidebar-participate-button">Teilnehmen</a>
+            <a href="/events/{{event.id}}/postings" id="sidebar-participate-button-registered" class="hidden select-button content-link slim style2 sidebar-participate-button">Du nimmst teil</a>
         </div>
         
     </div>
