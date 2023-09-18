@@ -145,7 +145,7 @@ async function create(req, data) {
 
     let news = new News(data);
     let log = new Log({
-        type: "modification",
+        type: "activity",
         action: {
             objectType: "news",
             actionType: "create",
@@ -232,7 +232,31 @@ async function _delete(req, id) {
     // validate
     if (!news) throw new Error('News not found');
     //check write access
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "news",
+            actionType: "delete",
+            actionDetail: "newsRemove",
+            key: news.id,
+            value: news.title.value,
+            tag: "<DELETE>"
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "news",
+            targetObject: news._id,
+            targetObjectId: news._id,
+            targetModel: "News",
+            targetState: "DELETED"
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
     await News.findByIdAndRemove(id);
+    LogService.create(log).then().catch();
     return true;
 }
 
