@@ -546,6 +546,24 @@ let showPostings = new ContentHandler("eventPostings",
 
             sidebar.registerBackButton(".sidebar-back-btn");
 
+            let notRegisteredSelector = "#sidebar-participate-button-notregistered"
+            let notRegistered = $(notRegisteredSelector);
+            let registeredSelector = "#sidebar-participate-button-registered";
+            let registered = $(registeredSelector);
+
+            if (args.isParticipant) {
+                notRegistered.addClass("hidden");
+                registered.removeClass("hidden");
+            } else {
+                sidebar.registerButton(notRegisteredSelector,
+                    {
+                        customHandler: true,
+                        handler: function () {
+                            args.callback.onConfirm();
+                        }
+                    });
+            }
+
         })
     })
 
