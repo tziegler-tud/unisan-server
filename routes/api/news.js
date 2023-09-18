@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 // routes
 router.get('/get', getAll);
 router.post("/add", create);
-router.put("update/:id", update);
+router.put("/update/:id", update);
 router.get('/author/:id', getByAuthor);
 router.post('/tags', getByTags);
 router.post('/filter', getFiltered);
@@ -64,7 +64,7 @@ function getByAuthor(req, res, next){
 }
 
 function getFiltered(req, res, next){
-    if (req.body.filter === undefined) req.body.filter = "";
+    if (req.body.filter === undefined) req.body.filter = [];
     NewsService.getAllFiltered(req.body.filter, req.body.args)
         .then(function(resultlist) {
             res.json(resultlist);
@@ -81,7 +81,7 @@ function create(req, res, next){
 }
 
 function update(req, res, next){
-    NewsService.update(req, req.body)
+    NewsService.update(req, req.params.id, req.body)
         .then(function(result){
             res.json(result)
         })

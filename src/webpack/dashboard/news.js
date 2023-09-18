@@ -73,7 +73,7 @@ let news = {
         var componentPage = new ComponentPage({
             container: pageContainer,
             sidebar: sidebar,
-            data: {user: user},
+            data: {user: user, acl: window.dockerAcl},
             args: {},
         });
         window.componentPage = componentPage;

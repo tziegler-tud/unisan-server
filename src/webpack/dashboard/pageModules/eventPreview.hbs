@@ -1,19 +1,35 @@
-<div class="dashPage-component dashWidget-news">
+<div class="dashPage-component dashWidget-eventPreview">
     <div class="dashPage-component-inner">
-        <div class="dashPage-component-header"><span>Mein nächstes Event:</span></div>
+        <div class="dashPage-component-header"><span>Meine nächsten Events:</span></div>
         <div class="dashPage-component-item">
             <div class="dashinfo-item-inner dash-item-eventPreview">
-                <div class="eventCard" data-viewkey={{event.id}}>
-                    <div class="inner">
-                        <div class="item-property title gallery-heading eventcard-heading">
-                            {{{event.title.html}}}
-                            <div class="gallery-heading-inner date">{{{event.type.value}}}</div>
-                            <div class="gallery-heading-inner date">{{{event.dateRangeString}}}</div>
+                {{#arrayNotEmpty events}}
+                    {{#each events}}
+                        <div class="eventCard" data-viewkey={{this.id}}>
+                            <div class="inner">
+                                <div class="item-property title gallery-heading eventcard-heading">
+                                    {{{this.title.html}}}
+                                    <div class="gallery-heading-inner date">{{{this.type.value}}}</div>
+                                    <div class="gallery-heading-inner date">{{{this.dateRangeString}}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <div class="eventCard" data-viewkey={{this.id}}>
+                        <div class="inner">
+                            <div class="item-property title gallery-heading eventcard-heading">
+                                <div class="gallery-heading-inner date">Du bist derzeit für keine Events gemeldet</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                {{/arrayNotEmpty}}
+
             </div>
             <div class="eventinfo-item-spacer"></div>
+        </div>
+        <div class="dashinfo-button-container">
+            <a href="dashboard/events" class="dashinfo-button dashinfo-button--more dashinfo-item-activity--more content-link style3">Mehr anzeigen</a>
         </div>
     </div>
 </div>

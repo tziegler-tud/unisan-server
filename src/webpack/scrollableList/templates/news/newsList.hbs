@@ -1,0 +1,57 @@
+<div class="itemlist-header-container borderBottom">
+    <ul class="common-list eventlist-top eventlist scrollableItemList list-view border scrollableList-top">
+        <li class="noSelect rowHeading">
+            <div class="inner">
+                <div class="item-property scrollableList-header-column userlist-ch name" data-property="title.html">Bezeichnung</div>
+                <div class="item-property scrollableList-header-column userlist-ch type" data-property="type.value">Typ</div>
+                <div class="item-property scrollableList-header-column userlist-ch dateTime" data-property="date.startDate">Datum</div>
+                <div class="item-property scrollableList-header-column userlist-ch date" data-property="date.startDate">Datum</div>
+            </div>
+        </li>
+    </ul>
+</div>
+
+{{#arrayNotEmpty listdata}}
+    <div class="itemlist-content-container scrollableList-content">
+        <ul class="common-list eventlist scrollableItemList list-view border">
+        {{#each listdata}}
+            <li class="event-entry scrollableList-item " id='eventId{{this.id}}' data-id= {{this.id}}>
+                <a class="inner">
+
+                    <div class="item-property item-container name">
+                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                        <span class=" item-container-element">{{{this.title.html}}}</span>
+                    </div>
+                    <div class="item-property item-container type">
+                        <span class="item-container-element">{{this.type.value}}</span>
+                    </div>
+                    <div class="item-property item-container dateTime">
+                        <span class="item-container-element">{{this.dateRangeString}}</span>
+                    </div>
+                    <div class="item-property item-container date">
+                        <span class="item-container-element">{{this.date.startDateString}}</span>
+                    </div>
+                </a>
+            </li>
+    {{/each}}
+        </ul>
+    </div>
+{{else}}
+<div class="itemlist-content-container scrollableList-content">
+    <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+        <li class="event-entry noSelect">
+            <a class="inner">
+                <div class="item-property item-container noEntries-container">
+                    <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                    <span class=" item-container-element">Keine Einträge vorhanden</span>
+                </div>
+            </a>
+        </li>
+    </ul>
+</div>
+{{/arrayNotEmpty}}
+
+
+
+
+
