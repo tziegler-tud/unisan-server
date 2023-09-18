@@ -655,8 +655,11 @@ LogSchema.virtual('description').get(function() {
                     shortDescription.de = target + ": " + authorizedUser + " hat " + targetUser + "abgemeldet: " + qualificationName;
                 }
                 else {
+                    fullDescription.template.de = "$target: $targetUser hat sich von einem Posten abgemeldet: $qualificationName";
                     fullDescription.en = targetUser + " has signed up for an event posting: " + qualificationName;
                     fullDescription.de = targetUser + " hat sich für von Posten abgemeldet: " + qualificationName;
+
+                    shortDescription.template.de = "$target: $targetUser hat sich als $qualificationName abgemeldet";
                     shortDescription.en = targetUser + " signed up for " + qualificationName;
                     shortDescription.de = targetUser + "hat sich abgemeldet: " + qualificationName;
                 }
