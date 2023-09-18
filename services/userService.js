@@ -1661,7 +1661,7 @@ async function setPrivacyAgreement(req, userid, value){
                         action: {
                             objectType: "user",
                             actionType: "modify",
-                            actionDetail: "userModify",
+                            actionDetail: "userSetPrivacyAgreement",
                             key: "privacyAgreement",
                             fullKey: "privacyAgreement",
                             originalValue: old,

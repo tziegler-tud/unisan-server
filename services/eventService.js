@@ -1078,7 +1078,7 @@ async function removeFileReference(req, event, filename, args) {
         .then( event => {
             //create log
             let log = new Log({
-                type: "activity",
+                type: "modification",
                 action: {
                     objectType: "event",
                     actionType: "modify",

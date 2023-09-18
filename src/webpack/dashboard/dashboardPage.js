@@ -250,7 +250,7 @@ var getActivityReport = function (userid, limit){
         filter: [
             {
                 filter: "logType",
-                value: {"$in": ["activity", "modification"]}
+                value: {"$in": ["activity"]}
             },
             {
                 filter: "target.targetObjectId",

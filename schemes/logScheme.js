@@ -387,6 +387,37 @@ LogSchema.virtual('description').get(function() {
                 minDescription = this.action.value;
                 logType = "Rolle geändert";
                 break;
+
+            case "userSetPrivacyAgreement":
+                const valString = {
+                    de: this.action.value ? "akzeptiert" : "abgelehnt",
+                    en: this.action.value ? "accepted" : "declined",
+                }
+                variables = Object.assign(variables,{
+                    newVal: {
+                        type: variableTypes.TEXT,
+                        value: valString.de,
+                    },
+                    optionalApostrophe: {
+                        type: variableTypes.TEXT,
+                        value: optionalApostrophe
+                    },
+                });
+                fullDescription.template.de = "$authorizedUser hat die Datenschutzbestimmungen $newVal";
+                fullDescription.en = authorizedUser + " has " + valString.en + " the privacy agreement";
+                fullDescription.de = authorizedUser + " hat die Datenschutzbestimmung " + valString.de;
+
+                shortDescription.template.de = "$authorizedUser hat die Datenschutzbestimmungen $newVal";
+                shortDescription.en = authorizedUser + " has " + valString.en + " the privacy agreement";
+                shortDescription.de = authorizedUser + " hat Datenschutzbestimmung " + valString.de;
+
+                actionDescription.en = "Privacy agreement " + valString.en + ".";
+                actionDescription.de = "Rolle geändert auf: " + this.action.value;
+
+                minDescription = this.action.value;
+                logType = "Datenschutzbestimmung";
+                break;
+
         }
     }
 
@@ -845,10 +876,12 @@ LogSchema.virtual('description').get(function() {
             deleted = true;
             this.target.targetObject = {
                 id: str + this.target.targetObjectId,
-                title: str + this.target.targetObjectId
+                title: {
+                    value: str + this.target.targetObjectId
+                }
             };
         }
-        let target = this.populated("target.targetObject") ? this.target.targetObject.title.value : this.action.key;
+        let target = this.populated("target.targetObject") || deleted ? this.target.targetObject.title.value : this.action.key;
 
         variables.target = {
             type: variableTypes.NEWS,
