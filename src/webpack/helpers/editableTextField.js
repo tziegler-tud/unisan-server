@@ -4,6 +4,9 @@
 
 import "./editableTextField.scss";
 import "./editor.scss";
+import Quill from "quill";
+import '/lib/quill/quill.snow-custom.css';
+import '/lib/quill/quill.bubble-custom.css';
 
 /**
  * constructor for EditableTextField objects
@@ -56,7 +59,6 @@ var applyArgs = function(args){
         active: false,
         disableButtons: false,
         readOnly: false,
-        limit: 0,
     }
     args = (args === undefined) ? {}: args;
     return Object.assign(defaults, args);

@@ -4,6 +4,9 @@
 
 import "./editableInputField.scss";
 import "./editor.scss";
+import Quill from "quill";
+import '/lib/quill/quill.snow-custom.css';
+import '/lib/quill/quill.bubble-custom.css';
 
 /**
  * constructor for EditableInputField objects
@@ -17,7 +20,7 @@ import "./editor.scss";
  * @returns {EditableInputField}
  * @constructor
  */
-var EditableInputField = function(container, deltaContent, htmlContent, type, callback, args){
+var EditableInputField = function(container, deltaContent, htmlContent, type="text", callback, args){
     if (container === undefined) throw new Error("cannot instantiate input field without container");
     callback === undefined ? this.callback = {onConfirm: function(){console.log("no callback given")}}: this.callback = callback;
     this.id = EditableInputField.counter.next();

@@ -1,0 +1,31 @@
+extends ../layout
+
+block page_includes
+    script(src="/dist/dashboard.js")
+
+    script.
+        window.jsmodule = {
+            module: "dashboard",
+            loaders: ["news"],
+        };
+        window.dockerArgs.activeContainer =  "dashboardContainer";
+        window.dockerArgs.activeElementId = "dashboardNews";
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container.subpage-container-dimmed
+                        #content1-heading.sec-heading.subpage-heading
+                            .sec-heading-label.propertypage-heading
+                                .propertypage-heading-container
+                                    h3
+                                        | News
+                                    .clear
+                                .clear
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .userinfo-container
+                                    #componentPage-component-container.componentPage-component-container

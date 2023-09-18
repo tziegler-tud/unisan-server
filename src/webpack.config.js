@@ -53,6 +53,8 @@ module.exports = {
 
         settings: "./webpack/settings/settings.js",
 
+        news: "./webpack/news/news.js",
+
         roles: "./webpack/roles/roles.js",
 
         protocol: "./webpack/apps/protocol/protocol.js",

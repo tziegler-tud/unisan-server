@@ -60,6 +60,15 @@ $item-bg: #fff;
           background-color: $page-bg-color;
           box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
           width: calc(100% - 20px);
+
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: flex-end;
+
+          &.dimmed {
+            background-color: transparent;
+            box-shadow: none;
+          }
           .dashPage-component-header {
             font-size: 120%;
             margin-bottom: .5em;
@@ -69,6 +78,8 @@ $item-bg: #fff;
             letter-spacing: .15em;
           }
           .dashPage-component-item {
+            display: flex;
+            flex-flow: column nowrap;
             flex: 1 1 auto;
             span.dashinfo-item-label, label.dashinfo-item-label {
               width: 100%;
@@ -114,46 +125,17 @@ $item-bg: #fff;
               margin: .5em;
 
             }
-            &.dash-item-news {
-              .dash-news {
-                .dash-news-container {
-                  .dash-news-list {
-                    list-style: none;
 
-                    .dash-news-listItem {
-                      display: block;
-                      margin: 5px;
-                      .dash-newsItem--container {
-                        padding: 5px;
-                        border: 1px solid #AAA;
-                        .dash-newsItem-meta {
-                          font-size: 80%;
-                          color: #333;
-                          .dash-newsItem-meta--date {
-
-                          }
-                          .dash-newsItem-meta--user {
-
-                          }
-                        }
-                        .dash-newsItem--heading {
-                          font-size: 120%;
-                        }
-                        .dash-newsItem--body {
-                          font-size: 100%;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
             &.dash-item-eventPreview, .dash-item-eventPreview {
               .eventCard {
                 width:      100%;
                 margin:     .5em 0;
                 min-width:  200px;
                 display:    block;
+
+                &:first-child {
+                  border-bottom: 1px solid $menu-border-color;
+                }
 
                 //box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
 
@@ -388,6 +370,62 @@ special classes
     }
 
   }
+}
+
+.dashWidget-news {
+  .dashPage-component-inner {
+    .dashPage-component-header {
+      //background-color: $page-bg-color;
+      //box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+      //padding: 12px !important;
+    }
+    .dashPage-component-item {
+      &.dash-news {
+        .dash-item-news {
+          .dash-news-container {
+            .dash-news-list {
+              list-style: none;
+              padding: 0;
+
+              .dash-news-listItem {
+                display: block;
+                margin: 5px 5px 15px 5px;
+
+                background-color: $page-bg-color;
+                box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+
+                //&:first-child {
+                //  border-bottom: 1px solid $menu-border-color;
+                //}
+                .dash-newsItem--container {
+                  padding: 30px 50px;
+
+                  .dash-newsItem--heading-container {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    .dash-newsItem--title {
+                      flex: 1 1 100%;
+                      font-size: 120%;
+                    }
+                    .dash-newsItem-meta {
+                      flex: 1 1 100%;
+                      font-size: 100%;
+                    }
+                  }
+
+                  .dash-newsItem--body {
+                    font-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+
 }
 
 

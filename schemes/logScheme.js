@@ -46,7 +46,7 @@ var LogSchema = new Schema({
     target: {
         targetType: {
             type: String,
-            // [user, event, qualification, userGroup, dataset]
+            // [user, event, qualification, userGroup, dataset, news]
             required: true,
             default: "user"
         },
@@ -63,7 +63,7 @@ var LogSchema = new Schema({
         targetModel: {
             type: String,
             required: true,
-            enum: ['User', 'Event',  "UserGroup"],
+            enum: ['User', 'Event',  "UserGroup", "News"],
         },
         targetState: {
             type: String,
@@ -120,7 +120,7 @@ LogSchema.virtual('description').get(function() {
 
 
 
-    // //case-specific describtions
+    //case-specific descriptions
     if(this.target.targetModel === "User"){
 
         //validate
@@ -834,6 +834,77 @@ LogSchema.virtual('description').get(function() {
         }
     }
 
+    if (this.target.targetModel === "News") {
+        //validate
+        let deleted = false;
+        if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
+            let str = "<DELETED>";
+            deleted = true;
+            this.target.targetObject = {
+                id: str + this.target.targetObjectId,
+                title: str + this.target.targetObjectId
+            };
+        }
+        let target = this.populated("target.targetObject") ? this.target.targetObject.title.value : this.action.key;
+
+        variables.target = {
+            type: variableTypes.NEWS,
+            value: target,
+            ref: this.target.targetObjectId
+        }
+
+        switch (this.action.actionDetail) {
+            case "newsAdd":
+
+                fullDescription.template.de = "$authorizedUser hat einen Newsbeitrag erstellt: $target";
+                fullDescription.en = authorizedUser + " created new news entry: " + target;
+                fullDescription.de = authorizedUser + " hat einen Newsbeitrag erstellt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Newsbeitrag $target erstellt";
+                shortDescription.en = authorizedUser + " created news entry: " + target;
+                shortDescription.de = authorizedUser + " hat Newsbeitrag '" + target + "' erstellt";
+
+                actionDescription.en = "created news: " + target;
+                actionDescription.de = target + "erstellt";
+
+                minDescription = this.action.value;
+                logType = "Newsbeitrag erstellt";
+                break;
+            case "newsRemove":
+
+                fullDescription.template.de = "$authorizedUser hat einem Newsbeitrag entfernt: $target";
+                fullDescription.en = authorizedUser + " removed news entry: " + target;
+                fullDescription.de = authorizedUser + " hat einen Newsbeitrag entfernt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Gruppe $target entfernt";
+                shortDescription.en = authorizedUser + " removed userGroup: " + target;
+                shortDescription.de = authorizedUser + " hat Gruppe '" + target + "' entfernt";
+
+                actionDescription.en = "removed userGroup: " + target;
+                actionDescription.de = target + "entfernt";
+
+                minDescription = this.action.value;
+                logType = "Newsbeitrag entfernt";
+                break;
+            case "newsModify":
+
+                fullDescription.template.de = "$authorizedUser hat einen Newsbeitrag geändert: $target";
+                fullDescription.en = authorizedUser + " changed news entry: " + target;
+                fullDescription.de = authorizedUser + " hat einen Newsbeitrag geändert: " + target;
+
+                shortDescription.de = "$authorizedUser hat Newsbeitrag $target geändert";
+                shortDescription.en = authorizedUser + " changed news: " + target;
+                shortDescription.de = authorizedUser + " hat News '" + target + "' geändert";
+
+                actionDescription.en = "changed news: " + target;
+                actionDescription.de = target + "geändert";
+
+                minDescription = this.action.value;
+                logType = "Newsbeitrag geändert";
+                break;
+        }
+    }
+
     let description = {
         fullDescription: fullDescription,
         shortDescription: shortDescription,
@@ -865,6 +936,8 @@ LogSchema.virtual('target.title').get(function() {
                     return oj.title.value;
                 case "UserGroup":
                     return oj.title;
+                case "News":
+                    return oj.title.value;
             }
         }
     }
@@ -890,6 +963,14 @@ LogSchema.post('find', async function(docs) {
                 await doc.populate({
                     path: "target.targetObject",
                     model: "UserGroup",
+                    select: "title",
+                });
+                break;
+
+            case "News":
+                await doc.populate({
+                    path: "target.targetObject",
+                    model: "News",
                     select: "title",
                 });
                 break;
@@ -943,4 +1024,5 @@ const variableTypes = {
     ATTRIBUTE: "ATTRIBUTE",
     TEXT: "TEXT",
     VALUE: "VALUE",
+    NEWS: "NEWS",
 }

@@ -17,6 +17,7 @@ export default class Component {
     constructor({page, componentId=Date.now(), componentType, pageData, data={}, args}={}) {
         let defaults = {
             allowEdit: true,
+            acl: undefined,
             size: "full",
             classes: "",
             order: componentId,
@@ -51,6 +52,7 @@ export default class Component {
         };
         this.handleData.args = {
             allowEdit: this.args.allowEdit,
+            acl: this.args.acl,
         };
 
         this.errorMessage = "Component " + this.componentId + " failed to render:"
@@ -67,6 +69,7 @@ export default class Component {
         }
 
         self.handleData.data = self.data;
+        self.handleData.pageData = self.pageData;
 
         try {
             if (pre) await self.preRender();

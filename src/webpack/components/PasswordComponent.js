@@ -18,7 +18,7 @@ export default class PasswordComponent extends Component {
     constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
         super({page, componentId, componentType, pageData, data, args});
         this.data.targetUser = this.data.targetUser ?? "current";
-        this.templateUrl = "/webpack/components/pageModules/settings/password.hbs"
+        this.templateUrl = "/webpack/components/templates/settings/password.hbs"
     }
 
     async postRender(){

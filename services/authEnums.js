@@ -17,6 +17,7 @@ let groupsEnum = {
     MEMBER: "member",
     USERADMIN: "userAdmin",
     EVENTADMIN: "eventAdmin",
+    NEWSADMIN: "newsAdmin",
     ACLADMIN: "aclAdmin",
     SYSADMIN: "systemAdmin"
 }
@@ -47,6 +48,12 @@ let operations = {
         WRITE: "writeEvent",
         CREATE: "createEvent",
         DELETE: "deleteEvent",
+    },
+    news: {
+        READ: "readNews",
+        WRITE: "writeNews",
+        CREATE: "createNews",
+        DELETE: "deleteNews",
     },
     access: {
         READACL: "readAcl",

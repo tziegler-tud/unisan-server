@@ -1,30 +1,37 @@
 import {userActions, eventActions, groupActions} from "../actions/actions"
 import {dash} from "./dash";
 import {events} from "./events";
-import {notifications} from "./notifications";
+import {activity} from "./activity";
+import {news} from "./news";
 
 $(document).ready (function () {
 
     var lidlRTO = window.lidlRTO;
+
+    const moduleIdentifier = "dashboard";
 
 
 
     //setup module specific loaders
     let loaders = [];
     let dashLoader = {
-        title: "dash",
+        title: dash.title,
         loader: dash,
     };
     let eventsLoader = {
-        title: "events",
+        title: events.title,
         loader: events,
     };
 
     let notificationsLoader = {
-        title: "notifications",
-        loader: notifications,
+        title: activity.title,
+        loader: activity,
     };
-    loaders.push(dashLoader, eventsLoader, notificationsLoader);
+    let newsLoader = {
+        title: news.title,
+        loader: news,
+    };
+    loaders.push(dashLoader, eventsLoader, notificationsLoader, newsLoader);
 
     //read from window.jsmodule which modules are to be loaded
     let jsmodule = window.jsmodule;
@@ -38,8 +45,8 @@ $(document).ready (function () {
     let args = Object.assign(defaultArgs, jsmodule.args);
 
 
-    if(!jsmodule.module === "dashboard") {
-        console.error("invalid jsmodule information: Expected 'system', but found " + jsmodule.module)
+    if(!jsmodule.module === moduleIdentifier) {
+        console.error("invalid jsmodule information: Expected "+ moduleIdentifier + " but found " + jsmodule.module)
         return false;
     }
 
