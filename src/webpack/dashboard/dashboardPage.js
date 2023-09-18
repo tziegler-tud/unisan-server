@@ -50,14 +50,16 @@ var Component = function(componentId, componentType, data, args){
         size: "full",
         classes: "",
         order: componentId,
+        minWidth: undefined,
+        limitAmount: 1,
         handlers: [],
-
+        disableDefaultHandler: false,
     }
 
     args = (args === undefined) ? {}: args;
     this.args = Object.assign(defaults, args);
     this.componentId = componentId;
-    this.data = data;
+    this.data = Object.create(data);
     this.container = document.createElement("div");
     this.container.classList.add("dashPage-component-wrapper");
     switch (this.args.size) {
@@ -68,19 +70,20 @@ var Component = function(componentId, componentType, data, args){
             this.container.classList.add("dashPage-component-wrapper--half");
             break;
     }
+    if(this.args.minWidth) this.container.style.minWidth = this.args.minWidth;
     this.container.style.order = args.order;
     this.html = this.container;
 
     this.init = new Promise(function(resolve, reject){
         var templateUrl ="";
         var template;
-        let handleData = data;
-        handleData.args = args;
+        let handleData = Object.create(data);
+        handleData.args = self.args;
 
         switch(componentType) {
             case (DashPage.componentTypes.NEWS):
 
-                let currentNews = getNews(1).then(result => {
+                let currentNews = getNews(args.limitAmount).then(result => {
                     handleData.news = result;
                     templateUrl = "/webpack/dashboard/pageModules/news.hbs";
                     $.get(templateUrl, function (templateData) {
@@ -98,13 +101,23 @@ var Component = function(componentId, componentType, data, args){
                 //show next event
                 //get next user event
 
-                let nextEvent = getNextEvent(self.data.user.id).then(result => {
-                    handleData.event = result;
+                let nextEvents = getNextEvents(self.data.user.id).then(result => {
+                    handleData.events = result;
                     templateUrl = "/webpack/dashboard/pageModules/eventPreview.hbs";
                     $.get(templateUrl, function (templateData) {
                         template = Handlebars.compile(templateData);
                         self.container.innerHTML = template(handleData);
                         let callback = {};
+                        //onclick handler
+                        const cards = self.container.querySelectorAll(".eventCard");
+                        if(!self.args.disableDefaultHandler){
+                            cards.forEach(card => {
+                                card.addEventListener("click", function(){
+                                    window.location="/events/"+card.dataset.viewkey;
+                                })
+                            })
+                        }
+
                         //custom handlers
                         self.args.handlers.forEach(function(handler){
                             handler(self);
@@ -170,13 +183,13 @@ DashPage.componentTypes = {
 };
 
 
-var getNextEvent = function (userid){
+var getNextEvents = function (userid){
     let self = this;
     let url;
     let data = {
         userid: userid,
         sort: "date.startDate",
-        amount: 1,
+        amount: 2,
     }
     //get user list from server
     return new Promise(function(resolve, reject){
@@ -187,7 +200,7 @@ var getNextEvent = function (userid){
             dataType: 'json',
             data: JSON.stringify(data),
             success: function(events) {
-                resolve(events[0])
+                resolve(events)
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + XMLHttpRequest.status + " " + XMLHttpRequest.statusText);
@@ -205,11 +218,12 @@ var getNews = function (limit){
 
         ],
         args: {
+            sort: {"created":-1},
             or: true,
             limit: limit,
         }
     }
-    //get user list from server
+    //get news list from server
     return new Promise(function(resolve, reject){
         $.ajax({
             url: "/api/v1/news/filter",

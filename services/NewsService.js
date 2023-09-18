@@ -77,7 +77,7 @@ async function getAllByTags(tagArray, combiner="OR") {
  */
 async function getAllFiltered(complexFilterObject, args){
     //we allow complex filtering with this function.
-    complexFilterObject = (complexFilterObject === undefined) ? {} : complexFilterObject;
+    complexFilterObject = (complexFilterObject === undefined) ? [] : complexFilterObject;
     args = (args === undefined) ? {} : args;
     let defaultArgs = {
         sort: {"timestamp": -1},
@@ -150,7 +150,7 @@ async function create(req, data) {
             objectType: "news",
             actionType: "create",
             actionDetail: "newsAdd",
-            key: news.id,
+            key: news._id,
             value: news.title.value,
         },
         authorizedUser: req.user,
@@ -209,13 +209,16 @@ async function update(req, id, data) {
             url: req.originalUrl,
         }
     })
-    news.save()
-        .then(result => {
-            LogService.create(log).then().catch();
-        })
-        .catch(err => {
-            reject(err);
-        })
+    return new Promise(function(resolve, reject){
+        news.save()
+            .then(result => {
+                resolve(news);
+                LogService.create(log).then().catch();
+            })
+            .catch(err => {
+
+            })
+    })
 
 }
 

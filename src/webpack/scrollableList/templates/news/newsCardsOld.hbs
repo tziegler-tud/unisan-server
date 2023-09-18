@@ -1,0 +1,78 @@
+<div class="gallery-container news-cards-container">
+    <ul class="common-list documentlist gallery-view protocol-gallery news-cards" id="documentlist-top">
+        {{#each listdata}}
+            {{#arrayNotEmpty this.entries}}
+                <div class="news-cards--groupLabel">
+                    <span>{{this.label}}</span>
+                </div>
+                {{#each this.entries}}
+                    <li class="gallery-item viewKey-item cards-item news-item news-cards-item noSelect" data-viewkey={{this.id}}>
+                        <div class="inner news-cards-item--inner">
+                            <!--                    <div class="image"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                            <div class="image-overlay"></div>
+                            <div class="item-property title gallery-heading news-cards-item--author">
+                                <div class="gallery-heading-inner author">
+                                    <div class="userDisplay">
+                                        <div class="userDisplay-avatar"><img src="/data/uploads/user_images/{{this.author.id}}/{{this.author.id}}.jpg"/></div>
+                                        <div class="userDisplay-label">
+                                            <span class="userDisplay-label--name">
+                                                {{this.author.generalData.firstName.value}} {{this.author.generalData.lastName.value}}
+                                            </span>
+                                            <span class="userDisplay-label--text">
+                                                {{transformDateTimeString this.created}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-property title gallery-text news-cards-item--title">
+                                {{{this.title.value}}}
+                            </div>
+                            <div class="item-property gallery-text news-cards-item--body">
+                                <p>
+                                    {{{this.content.html}}}
+                                </p>
+                            </div>
+                            <div class="gallery-item-actions">
+                                <div class="news-card--menu-container card-menu-container mdc-menu-surface--anchor">
+                                    <button class="news-card--menu-button card-menu-button mdc-icon-button material-icons">
+                                        <div class="mdc-icon-button__ripple"></div>
+                                        more_vert
+                                    </button>
+                                    <div class="mdc-menu mdc-dropdown-menu mdc-menu-surface news-cards--menu">
+                                        <ul class="mdc-deprecated-list mdc-deprecated-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                            {{#if ../../acl.news.write}}
+                                                <li class="mdc-deprecated-list-item news-edit news-cards--menu-item" role="menuitem" data-id="{{this._id}}">
+                                                <span class="mdc-deprecated-list-item__graphic material-icons">
+                                                    edit
+                                                </span>
+                                                    <span class="mdc-deprecated-list-item__text">Beitrag bearbeiten</span>
+                                                </li>
+                                            {{else}}
+                                                <li class="mdc-deprecated-list-item news-show" role="menuitem" data-id="{{this._id}}">
+                                                <span class="mdc-deprecated-list-item__graphic material-icons">
+                                                    info
+                                                </span>
+                                                    <span class="mdc-deprecated-list-item__text">Beitrag anzeigen</span>
+                                                </li>
+                                            {{/if}}
+                                            {{#if ../../acl.news.delete}}
+                                                <li class="mdc-deprecated-list-item news-delete" role="menuitem" data-id="{{this._id}}">
+                                                    <span class="mdc-deprecated-list-item__graphic material-icons">
+                                                        delete
+                                                    </span>
+                                                    <span class="mdc-deprecated-list-item__text">Beitrag löschen</span>
+                                                </li>
+                                            {{/if}}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {{/each}}
+            {{/arrayNotEmpty}}
+        {{/each}}
+    </ul>
+</div>
+

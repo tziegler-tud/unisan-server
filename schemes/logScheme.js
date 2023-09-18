@@ -848,7 +848,7 @@ LogSchema.virtual('description').get(function() {
         let target = this.populated("target.targetObject") ? this.target.targetObject.title.value : this.action.key;
 
         variables.target = {
-            type: variableTypes.GROUP,
+            type: variableTypes.NEWS,
             value: target,
             ref: this.target.targetObjectId
         }
@@ -1024,4 +1024,5 @@ const variableTypes = {
     ATTRIBUTE: "ATTRIBUTE",
     TEXT: "TEXT",
     VALUE: "VALUE",
+    NEWS: "NEWS",
 }
