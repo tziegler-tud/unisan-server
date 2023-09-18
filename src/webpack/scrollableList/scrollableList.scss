@@ -1029,7 +1029,7 @@ news cards
   $page-bg: #AAA;
   padding: 0;
   list-style: none;
-  width: 96%;
+  width: 100%;
   margin: 0 auto;
   font-size: 90%;
   position: relative;
@@ -1052,6 +1052,7 @@ news cards
     .news-cards--groupLabel {
       font-weight: lighter;
       font-size: 140%;
+      padding: 0 0 0 10px;
     }
 
     li.news-cards-item {
