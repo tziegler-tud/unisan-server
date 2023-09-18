@@ -1,9 +1,14 @@
 import fetch from 'node-fetch';
 import db from '../schemes/mongo.js';
 const Settings = db.SystemSettings;
-import 'dotenv/config'
+import dotenv from 'dotenv'
 
 import {refJSON} from "../helpers/helpers.js"
+import path from "path";
+
+import {fileURLToPath} from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @class
@@ -15,6 +20,10 @@ class SystemService {
         let self = this;
         this.initStarted = false;
         this.status = this.statusEnum.NOTSTARTED;
+
+
+        dotenv.config({path: path.join(__dirname, "../", "default.env"),override: false})
+        dotenv.config({path: path.join(__dirname, "../", ".env"), override: true})
 
         this.init = new Promise(function (resolve, reject) {
             self.resolveInit = resolve;
