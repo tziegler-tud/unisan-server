@@ -71,6 +71,12 @@ UserACLSchema.methods.updateDockerObject = function(){
                     create: opArray.includes(authEnums.operations.events.CREATE),
                     delete: opArray.includes(authEnums.operations.events.DELETE),
                 },
+                news: {
+                    read: opArray.includes(authEnums.operations.news.READ),
+                    write: opArray.includes(authEnums.operations.news.WRITE),
+                    create: opArray.includes(authEnums.operations.news.CREATE),
+                    delete: opArray.includes(authEnums.operations.news.DELETE),
+                },
                 apps: {
                     protocol: true,
                 },

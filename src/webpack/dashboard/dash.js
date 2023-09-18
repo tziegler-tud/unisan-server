@@ -24,7 +24,7 @@ let dash = {
         $(document).ready(function () {
 
             //debug line, remove before flight
-            console.log("loading js module: dashboard.dash");
+            console.log("loading js module: dashboard."+self.title);
 
             self.pageData = {};
             var lidlRTO = window.lidlRTO;
@@ -81,18 +81,21 @@ let dash = {
         });
         window.dashPage = dashPage;
 
-        dashPage.addComponent(DashPage.componentTypes.NEWS,
-            {
-                size: "half",
-            })
+
         dashPage.addComponent(DashPage.componentTypes.EVENTPREVIEW,
             {
                 size: "half",
             })
         dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
             {
+                size: "half",
+                limitAmount: 9,
+                minWidth: "30em"
+            })
+        dashPage.addComponent(DashPage.componentTypes.NEWS,
+            {
                 size: "full",
-                limitAmount: 10,
+                limitAmount: 2,
             })
     },
     updatePage: function(user, args){

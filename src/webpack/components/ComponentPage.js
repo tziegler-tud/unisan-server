@@ -18,6 +18,9 @@ import GeneralSettingsComponent from "./GeneralSettingsComponent";
 import ConnectedServicesComponent from "./ConnectedServicesComponent";
 import OpenIdSettingsComponent from "./OpenIdSettingsComponent";
 import InteractiveListComponent from "./interactiveList";
+import NewsComponent from "./pageComponents/dashboard/newsComponent";
+import CreateNewsComponent from "./pageComponents/news/createNewsComponent";
+import EditNewsComponent from "./pageComponents/news/editNewsComponent";
 
 /**
  * generic component page Object
@@ -36,6 +39,13 @@ export default class ComponentPage {
      * @type {{GENERIC: string, SETTINGS: {PASSWORD: string}}}
      */
     static componentTypes = {
+        DASHBOARD: {
+            NEWS:               "dashboard.news",
+        },
+        NEWS: {
+            ADD:                "news.add",
+            EDIT:               "news.edit",
+        },
         SETTINGS: {
             GENERAL:            "settings.general",
             PASSWORD:           "settings.password",
@@ -47,7 +57,7 @@ export default class ComponentPage {
         GENERIC:            "generic",
     };
 
-    constructor({container=null, data=null, sidebar=null, snackbar=window.snackbar, args={}}={}) {
+    constructor({container=null, data={}, sidebar=null, snackbar=window.snackbar, args={}}={}) {
 
         this.data = data;
         this.container = container;
@@ -82,10 +92,26 @@ export default class ComponentPage {
         })
     }
 
+    /**
+     *
+     * @param componentType
+     * @param args
+     * @param data
+     * @returns {Promise<void>}
+     */
     addComponent(componentType, args, data) {
         let componentId = this.componentCounter.next();
         let component;
         switch(componentType){
+            case ComponentPage.componentTypes.DASHBOARD.NEWS:
+                component = new NewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
+                break;
+            case ComponentPage.componentTypes.NEWS.ADD:
+                component = new CreateNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
+                break;
+            case ComponentPage.componentTypes. NEWS.EDIT:
+                component = new EditNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
+                break;
             case ComponentPage.componentTypes.SETTINGS.PASSWORD:
                 component = new PasswordComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;

@@ -2,7 +2,7 @@ import "./scrollableList.scss";
 import "./scrollableListMobile.scss";
 const Handlebars = require("handlebars");
 import "../helpers/handlebarsHelpers";
-import {refJSON} from "../helpers/helpers";
+import {dateFromNow, refJSON, transformDateTimeString} from "../helpers/helpers";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 import {phone, tablet} from "../helpers/variables";
 
@@ -22,19 +22,22 @@ let ScrollableListCounter = {
  * constructor for ScrollableList objects
  *
  * @param {HTMLElement} container - container dom element
- * @param {String} type - type of data. ["user", "event", "qualification"]
+ * @param {string} type - type of data. ["user", "event", "qualification", "news", "userQualification", "participants", "postings", "log", "logDetails"]
  * @param {Object} data - iterateable object containing data for list entries
  * @param {Object} args constructor args
- * @param [args.enableMobile = false] {Boolean} true to render mobile version.
- * @param [args.view = "list"] {String} choose between "list" and "cards" view
- * @param [args.height = "fixed"] {String} limits container dimensions. Options: "full": expand to fill parent container, "fixed": fixed height, use fixedHeight parameter to set a value, "force-fixed": like fixed, but does not collapse
- * @param [args.fixedHeight = "40em"] {String} css-parseable value. Requires "height" parameter to be set to "fixed".
+ * @param {boolean}  [args.enableMobile] true to render mobile version.
+ * @param [args.view = "list"] {string} choose between "list" and "cards" view. Default: list
+ * @param [args.height = "fixed"] {string} limits container dimensions. Options: "full": expand to fill parent container, "fixed": fixed height, use fixedHeight parameter to set a value, "force-fixed": like fixed, but does not collapse. Default: fixed
+ * @param [args.fixedHeight = "40em"] {string} css-parseable value. Requires "height" parameter to be set to "fixed".
  * @param args.sorting {Object} sorting object
- * @param args.sorting.property {String} property to be sorted
- * @param args.sorting.direction {String} direction. Either "asc" or "desc"
+ * @param args.sorting.property {string} property to be sorted
+ * @param args.sorting.direction {string} direction. Either "asc" or "desc"
+ * @param args.grouping {Object} grouping object
+ * @param args.grouping.property {string} property to use for grouping
+ * @param args.grouping.mode {string} grouping mode ["smartDate", "value"]
  * @param [args.acl] {Object} Contains additional information for rendering purposes, usually concerning user access rights. This object is passed to the template as Object named "acl".
  * @param args.hasTitle {Boolean} true if title is provided
- * @param args.title {String} title of scrollable List. Requires hasTitle to be set to true.
+ * @param args.title {string} title of scrollable List. Requires hasTitle to be set to true.
  * @param {Object} [callback] callback object
  * @param {Object} [callback.listItem] Callback object for generated list items
  * @param {function[]} [callback.customHandlers] Array of functions to be applied
@@ -50,19 +53,24 @@ var ScrollableList = function(container,type="generic", data,  args, callback){
     container.classList.add("scrollableList");
     this.args = args;
     this.data = data;
+    this.groupedData = undefined;
+    this.isGrouped = false;
     // this.initialData = jQuery.extend(true, {}, data);
     this.initialData = data.slice();
     this.callback = callback;
     this.container = container;
     this.type = type;
-    this.viewUrl = "";
+    this.viewUrl = undefined;
     this.templateUrl = applyType(type, this);
     this.sorting = args.sorting;
+    this.grouping = args.grouping;
     this.view = applyView(args.view, args.enableMobile);
     // buildHTML(this, data, args);
-    this.sort(this.sorting.property, this.sorting.direction, true)
-    var self = this;
-
+    this.sort(this.sorting.property, this.sorting.direction, false, false);
+    if(this.grouping) {
+        this.group(this.grouping.property, this.grouping.mode, false, false);
+    }
+    buildHTML(this, this.data, this.args);
     return this;
 };
 
@@ -129,6 +137,12 @@ var applyType = function(type, self) {
         case "logDetails":
             url.list = '/webpack/scrollableList/templates/logdetailsList.hbs'
             break;
+        case "news":
+            url.mobile = '/webpack/scrollableList/templates/news/newsListMobile.hbs'
+            url.list = '/webpack/scrollableList/templates/news/newsList.hbs'
+            url.cards = '/webpack/scrollableList/templates/news/newsCards.hbs'
+            // self.viewUrl = "/news/view/:id"
+            break;
         case "generic":
         default:
             url.mobile = "/webpack/scrollableList/templates/genericList.hbs";
@@ -173,6 +187,11 @@ var buildHTML = function(self, data, args){
         acl: self.args.acl,
         args: args,
     };
+
+    if(self.isGrouped){
+        handleData.isGrouped = true;
+        handleData.groupedData = self.groupedData;
+    }
 
     switch(self.view) {
         case "cards":
@@ -321,10 +340,9 @@ ScrollableList.prototype.adjustList = function() {
     });
 }
 
-ScrollableList.prototype.sort = function(property, direction, forceRebuild) {
+ScrollableList.prototype.sort = function(property, direction, forceRebuild=false, render=true) {
     let self = this;
     if(property === undefined || property === null) direction = 0;
-    if(forceRebuild === undefined) forceRebuild = false;
     if (typeof(direction)==="string") {
         switch(direction){
             case "asc":
@@ -350,14 +368,14 @@ ScrollableList.prototype.sort = function(property, direction, forceRebuild) {
         else {
 
             if (self.sorting.direction !== 0) {
-                buildHTML(self, self.initialData, self.args)
+                if(render) buildHTML(self, self.initialData, self.args)
             }
         }
     }
     else {
         let sortedData = sortData(self.data, sortObj);
         self.data = sortedData;
-        buildHTML(self, sortedData, self.args);
+        if(render) buildHTML(self, sortedData, self.args);
     }
     this.sorting = {
         property: property,
@@ -431,6 +449,108 @@ var sortByColumn = function(self, headerElement) {
     }
 }
 
+ScrollableList.prototype.group = function(property, mode, forceRebuild=false, render=true) {
+    let self = this;
+    if(property === undefined || property === null) {
+        this.isGrouped = false;
+        return;
+    }
+
+    self.groupingObject = {
+        property: property,
+        mode: mode,
+    }
+
+    if (typeof(mode)==="string") {
+        switch(mode){
+            case "smartDate":
+                this.groupedData = groupBySmartDate(self.data, property)
+                break;
+            case "value":
+            default:
+                //not implemented
+                this.isGrouped = false;
+                this.groupedData = groupByValue(self.data, property);
+                return;
+        }
+    }
+    this.isGrouped = true;
+    if(render) buildHTML(this, this.data, this.args);
+}
+
+var groupBySmartDate = function(data, property) {
+    //smart grouping
+    //get current date
+    const date = new Date();
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const yesterday = dateFromNow({days: -1}, today);
+    const lastWeek =  dateFromNow({weeks:-1}, today);
+
+    const groups = [
+        {
+            label: "Heute",
+            minDate: today,
+            maxDate: date,
+        },
+        {
+            label: "Gestern",
+            minDate: yesterday,
+            maxDate: today,
+        },
+        {
+            label: "letzte Woche",
+            minDate: lastWeek,
+            maxDate: yesterday,
+        },
+    ];
+
+    data.forEach(function(item){
+        sortIntoGroup(item);
+    })
+    return groups;
+
+    function sortIntoGroup(item){
+        const prop = item[property]
+        const itemDate = new Date(prop);
+        let matchingGroup = undefined;
+        matchingGroup = groups.find(group => {
+            return (group.minDate <= itemDate && group.maxDate > itemDate);
+        })
+        if(matchingGroup){
+            if(matchingGroup.items === undefined) {
+                matchingGroup.items = []
+            }
+            matchingGroup.items.push(item);
+        }
+        else {
+            if(prop >= Date.now()){
+                //entry is dated in the future. Create a group containing only the date
+                const newGroup = {label: transformDateTimeString(itemDate).date, items: [item]}
+                groups.push(newGroup)
+            }
+            else {
+                //create month group and add entry
+                const monthYear = transformDateTimeString(itemDate).monthYear;
+                const minDate = new Date(itemDate);
+                minDate.setDate(1);
+                minDate.setHours(0,0,0,0);
+                const maxDate = new Date(itemDate);
+                maxDate.setMonth(maxDate.getMonth()+1);
+                maxDate.setDate(0);
+                maxDate.setHours(23,59,59,999);
+                const newGroup = {label: monthYear, minDate: minDate, maxDate: maxDate, items: [item]}
+                groups.push(newGroup);
+            }
+        }
+    }
+}
+
+var groupByValue = function(data, property){
+
+}
+
+
 var setupEventHandlers = function(self){
     $(window).on('resize',function(){
         self.adjustList();
@@ -454,7 +574,6 @@ var setupEventHandlers = function(self){
             });
         }
     }
-
 };
 
 var cardEventHandlers = function(self){

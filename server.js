@@ -50,6 +50,7 @@ import userDatasetApiRouter from './routes/api/userDataset.js';
 import logsRouter from './routes/api/logs.js';
 import protocolApiRouter from './routes/api/protocol.js';
 import systemApiRouter from './routes/api/system.js';
+import newsApiRouter from './routes/api/news.js';
 
 
 //initialize server
@@ -142,6 +143,7 @@ server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
 server.use('/api/v1/logs', logsRouter);
 server.use('/api/v1/system', systemApiRouter);
+server.use('/api/v1/news', newsApiRouter);
 server.use('/api/v1/apps/protocol', protocolApiRouter);
 // catch 404 and forward to error handler
 server.use("/api", function(req, res, next) {
@@ -149,12 +151,6 @@ server.use("/api", function(req, res, next) {
 });
 // api error handler
 server.use("/api", errorHandler.apiErrorHandler);
-
-
-
-
-
-
 
 SystemService.start({config: config})
     .then(() => {
@@ -173,16 +169,24 @@ SystemService.start({config: config})
                 server.use(oidcService.url, oidcRouter);
                 server.use(oidcService.interactionsUrl, oidcInteractionsRouter);
                 if (settings.auth.openid.enabled) {
-                    oidcService.start();
-                }
+                    oidcService.start()
+                        .then(res => {
 
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }
                 loadPublicRoutes();
+            })
+            .catch(err => {
+                throw new Error(err)
             })
 
     })
     .catch(err => {
-      console.log("Failed to get SystemSettings. This is a critical error, shutting down...");
-      process.exit();
+        console.log("Failed to get SystemSettings. This is a critical error, shutting down...");
+        process.exit();
     })
 
 function loadPublicRoutes(){

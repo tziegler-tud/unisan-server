@@ -1,0 +1,38 @@
+<div class="componentPage-component news-component">
+    <div class="componentPage-component-inner transparent">
+<!--        <div class="componentPage-component-header"><span>News</span></div>-->
+        <div class="componentPage-component-interactions">
+            {{#if pageData.acl.news.create}}
+                <a href="/dashboard/news/add" class="heading-add-button btn-addItem btn-addItem--highlight">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"> <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Hinzufügen</span>
+                </a>
+            {{/if}}
+
+        </div>
+        <div class="componentPage-component-item">
+            <div class="newsList-container">
+<!--                {{#each data.news}}-->
+<!--                    <div id="news-{{this.id}}" class="news-card" data-id="{{this.id}}">-->
+<!--                        <div class="news-card-heading">-->
+<!--                            {{this.title.value}}-->
+<!--                        </div>-->
+<!--                        <div class="news-card-meta">-->
+<!--                            <div class="news-card-meta-author">-->
+<!--                                <span>{{this.author.generalData.firstname.value}} {{this.author.generalData.lastname.value}}</span>-->
+<!--                            </div>-->
+<!--                            <div class="news-card-meta-date">-->
+<!--                                <span>{{transformDateTimeString this.created}}</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="news-card-body">-->
+<!--                            <div class="news-card-body--deltaContent">-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                {{/each}}-->
+            </div>
+        </div>
+    </div>
+</div>

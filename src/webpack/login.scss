@@ -31,9 +31,17 @@
 .submit-button {
   @include button.container-fill-color(#c31d34);
 }
+.decline-button {
+  @include button.container-fill-color($tab-inactive-color);
+}
 
 body {
   font-family:        "Open Sans", sans-serif;
+  margin: 0;
+}
+
+.margin-bottom {
+  margin-bottom: 5em;
 }
 
 .centered {
@@ -62,6 +70,19 @@ body {
     overflow: hidden;
   }
 
+  &.mobile-full {
+    @media #{$phone, $tablet} {
+      justify-content: flex-start !important;
+      .login-page-container {
+        height: 100%;
+        & > div {
+          flex: 1 1 auto;
+          height: auto;
+        }
+      }
+    }
+  }
+
   .login-page-container {
     display: flex;
     flex-flow: column nowrap;
@@ -75,6 +96,8 @@ body {
       height: 100%;
       flex-flow: row nowrap;
     }
+
+
 
     .login-additional-box {
       display: flex;
@@ -130,6 +153,9 @@ body {
       justify-content: center;
       @media #{$desktop, $tablet-landscape} {
         justify-content: flex-start;
+      }
+      &.scroll {
+        overflow: scroll;
       }
       .login-content-inner {
         padding: 1em 5%;
@@ -191,6 +217,23 @@ body {
                 }
               }
             }
+            .login-form-textbox {
+              margin-bottom: 50px;
+              .login-form-textbox-heading{
+                font-size: 120%;
+                margin: 15px 0 15px 0
+              }
+              .login-form-textbox-body{
+                font-weight: lighter;
+                margin-bottom: 10px;
+                .login-form-textbox-body--paragraph {
+                  margin-bottom: 10px;
+                }
+              }
+              .label {
+                font-weight: bold;
+              }
+            }
             .login-form {
               label {
                 display: block;
@@ -234,4 +277,20 @@ body {
     -webkit-box-shadow: none;
     box-shadow: none;
   }
+}
+
+.button-set {
+  display: flex;
+  gap: 25px;
+
+  &.button-set--horizontal{
+    flex-flow: row wrap;
+  }
+  &.button-set--vertical{
+    flex-flow: column nowrap;
+  }
+  .button-set-item {
+
+  }
+
 }

@@ -405,7 +405,8 @@ let eventDetails = {
                     event: event,
                     user: user,
                     isParticipant: userIsParticipant,
-                    callback: {},
+                    callback: {
+                    },
                 });
             }
         }

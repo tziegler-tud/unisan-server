@@ -7,9 +7,6 @@ block page_includes
         window.dockerArgs.activeContainer = "userprofileContainer";
         window.dockerArgs.activeElementId = "userprofile";
 
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-
     script(src="/lib/fineUploader/fine-uploader.js")
     link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
     script(src="/dist/editUser.js")
@@ -59,7 +56,7 @@ block content
                                             .userinfo-section.userinfo-card.card-full.userwidget-description
                                                 .userinfo-section-inner
                                                     .userinfo-sectionheader
-                                                        span unisams
+                                                        span unisanServer
                                                     div
                                                         ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
                                                             - var combinedKey = "username"

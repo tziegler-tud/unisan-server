@@ -2,11 +2,12 @@
 @import "../../variables";
 
 .componentPage-component-container {
-  padding: 1em;
+  padding: 0;
   display: flex;
   flex-flow: column nowrap;
 
   @media #{$desktop, $tablet-landscape} {
+    padding: 1em;
     flex-flow: row wrap;
   }
 
@@ -34,23 +35,44 @@
     }
     .componentPage-component {
       width: 100%;
+
       .componentPage-component-inner {
-        margin: 10px;
-        padding-bottom: 10px;
+
+        margin: 10px 0;
         background-color: $page-bg-color;
         box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
-        width: calc(100% - 20px);
+        width: 100%;
+        padding: 10px 0;
+        @media #{$desktop, $tablet-landscape} {
+          margin: 10px;
+          width: calc(100% - 20px);
+          padding: 10px 12px;
+
+        }
+
+        &.transparent {
+          background-color: transparent;
+          box-shadow: unset;
+        }
+
+        .componentPage-component-interactions {
+          padding: 0 0 0 10px;
+          @media #{$desktop, $tablet-landscape} {
+            padding: 0;
+          }
+        }
+
         .componentPage-component-header {
           font-size: 120%;
           margin-bottom: .5em;
           color: #666;
-          padding: 12px 12px 0 12px;
+          padding: 12px 0 0 0;
           font-variant: small-caps;
           letter-spacing: .15em;
         }
         .componentPage-component-item {
           flex: 1 1 auto;
-          padding: 12px 12px 0 12px;
+          padding: 12px 0 0 0;
           &__full {
             padding: 0;
           }

@@ -6,10 +6,10 @@ block page_includes
     script.
         window.jsmodule = {
             module: "dashboard",
-            loaders: ["notifications"],
+            loaders: ["activity"],
         };
         window.dockerArgs.activeContainer =  "dashboardContainer";
-        window.dockerArgs.activeElementId = "dashboardNotifications";
+        window.dockerArgs.activeElementId = "dashboardActivity";
 
 
 block content

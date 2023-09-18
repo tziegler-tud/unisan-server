@@ -3,6 +3,7 @@ var router = express.Router();
 import uuid from 'uuid';
 import passport from 'passport';
 import bodyParser from "body-parser";
+import userService from "../../services/userService.js";
 
 var app = express();
 
@@ -29,10 +30,12 @@ router.post('/login', function(req, res, next) {
       req.login(user, {}, (err) => {
         //passport.js race condition bug requires you to save the session explicitly before redirecting.
         req.session.save(function(){
-          var redirectTo = req.session.redirectTo || "/";
+          let redirectTo = req.session.redirectTo || "/";
+          if(!user.privacyAgreement){
+            redirectTo = "/privacyAgreement";
+          }
           res.redirect(redirectTo);
         })
-
       })
     })(req, res, next);
   }
@@ -45,6 +48,46 @@ router.all("/logout", function(req, res, next) {
   })
 
 });
+
+router.get("/privacyAgreement", (req, res, next) => {
+  if(!req.isAuthenticated()) {
+    res.redirect('/login')
+  }
+  else {
+    res.render("unisams/privacyAgreement", {title: "Privacy agreement - uniSams",
+      user: req.user._doc,
+    })
+  }
+});
+
+router.get("/acceptPrivacyAgreement",  (req, res, next) => {
+  if(!req.isAuthenticated()) {
+    res.redirect('/login')
+  }
+  else {
+    userService.setPrivacyAgreement(req, req.user.id, true)
+        .then(result => {
+          let redirectTo = req.session.redirectTo || "/";
+          res.redirect(redirectTo)
+        })
+        .catch(err => next(err));
+  }
+});
+
+
+router.get("/declinePrivacyAgreement",  (req, res, next) => {
+  if(!req.isAuthenticated()) {
+    res.redirect('/login')
+  }
+  else {
+    userService.setPrivacyAgreement(req, req.user.id, false)
+        .then(result => {
+          res.redirect("/logout");
+        })
+        .catch(err => next(err));
+    }
+});
+
 
 
 

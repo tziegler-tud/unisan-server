@@ -20,12 +20,13 @@ $item-bg: #fff;
   background-color: $page-bg-color-v2;
 
   .dashPage-component-container {
-    padding: 1em;
+    padding: 1em 0;
     display: flex;
     flex-flow: column nowrap;
 
     @media #{$desktop, $tablet-landscape} {
       flex-flow: row wrap;
+      padding: 1em 1em;
     }
 
     .dashPage-component-wrapper {
@@ -55,11 +56,27 @@ $item-bg: #fff;
       .dashPage-component {
         width: 100%;
         .dashPage-component-inner {
-          margin: 10px;
+          margin: 10px 0;
           padding-bottom: 10px;
           background-color: $page-bg-color;
           box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
-          width: calc(100% - 20px);
+          width: 100%;
+
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: flex-end;
+
+          @media #{$desktop, $tablet-landscape} {
+            margin: 10px;
+            width: calc(100% - 20px);
+          }
+
+
+
+          &.dimmed {
+            background-color: transparent;
+            box-shadow: none;
+          }
           .dashPage-component-header {
             font-size: 120%;
             margin-bottom: .5em;
@@ -69,6 +86,8 @@ $item-bg: #fff;
             letter-spacing: .15em;
           }
           .dashPage-component-item {
+            display: flex;
+            flex-flow: column nowrap;
             flex: 1 1 auto;
             span.dashinfo-item-label, label.dashinfo-item-label {
               width: 100%;
@@ -114,46 +133,17 @@ $item-bg: #fff;
               margin: .5em;
 
             }
-            &.dash-item-news {
-              .dash-news {
-                .dash-news-container {
-                  .dash-news-list {
-                    list-style: none;
 
-                    .dash-news-listItem {
-                      display: block;
-                      margin: 5px;
-                      .dash-newsItem--container {
-                        padding: 5px;
-                        border: 1px solid #AAA;
-                        .dash-newsItem-meta {
-                          font-size: 80%;
-                          color: #333;
-                          .dash-newsItem-meta--date {
-
-                          }
-                          .dash-newsItem-meta--user {
-
-                          }
-                        }
-                        .dash-newsItem--heading {
-                          font-size: 120%;
-                        }
-                        .dash-newsItem--body {
-                          font-size: 100%;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
             &.dash-item-eventPreview, .dash-item-eventPreview {
               .eventCard {
                 width:      100%;
                 margin:     .5em 0;
                 min-width:  200px;
                 display:    block;
+
+                &:first-child {
+                  border-bottom: 1px solid $menu-border-color;
+                }
 
                 //box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
 
@@ -366,10 +356,15 @@ special classes
 .dash-item-activity {
   .dashinfo-activity-entry {
     display: flex;
-    flex-flow: row nowrap;
-    align-items: flex-end;
+    flex-flow: column nowrap;
+    align-items: flex-start;
     padding: .4em .5em;
     cursor: default;
+
+    @media #{$desktop} {
+      flex-flow: row nowrap;
+      align-items: flex-end;
+    }
 
     &:hover {
       background-color: $text-hover-color-light;
@@ -388,6 +383,73 @@ special classes
     }
 
   }
+}
+
+.dashWidget-news {
+  .dashPage-component-inner {
+    .dashPage-component-header {
+      //background-color: $page-bg-color;
+      //box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+      //padding: 12px !important;
+    }
+    .dashPage-component-item {
+      &.dash-news {
+        .dash-item-news {
+          @media #{$phone} {
+            margin: 0.5em 0 !important;
+          }
+          .dash-news-container {
+            .dash-news-list {
+              list-style: none;
+              padding: 0;
+
+              .dash-news-listItem {
+                display: block;
+                margin: 5px 0 15px 0;
+
+                @media #{$desktop, $tablet-landscape} {
+                  margin: 5px 5px 15px 5px;
+
+                }
+
+                background-color: $page-bg-color;
+                box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+
+                //&:first-child {
+                //  border-bottom: 1px solid $menu-border-color;
+                //}
+                .dash-newsItem--container {
+                  padding: 30px 25px;
+                  @media #{$desktop, $tablet-landscape} {
+                    padding: 30px 50px;
+                  }
+
+                  .dash-newsItem--heading-container {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    .dash-newsItem--title {
+                      flex: 1 1 100%;
+                      font-size: 120%;
+                    }
+                    .dash-newsItem-meta {
+                      flex: 1 1 100%;
+                      font-size: 100%;
+                    }
+                  }
+
+                  .dash-newsItem--body {
+                    font-size: 100%;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+
 }
 
 

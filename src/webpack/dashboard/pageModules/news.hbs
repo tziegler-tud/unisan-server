@@ -1,31 +1,42 @@
 <div class="dashPage-component dashWidget-news">
-    <div class="dashPage-component-inner">
-        <div class="dashPage-component-header"><span>Aktuelles</span></div>
-        <div class="dashPage-component-item dash-item-news">
-            <div class="dashinfo-item-inner dash-news">
+    <div class="dashPage-component-inner dimmed">
+        <div class="dashPage-component-header clickable"><span>Aktuelles</span></div>
+        <div class="dashPage-component-item dash-news">
+            <div class="dashinfo-item-inner dash-item-news">
                 <div class="dash-news-container">
                     <ul class="dash-news-list">
-                        <li class="dash-news-listItem dash-newsItem">
-                            <div class="dash-newsItem--wrapper">
-                                <div class="dash-newsItem-meta">
-                                    <div class="dash-newsItem-meta--date">
+                        {{#each news}}
+                            <li class="dash-news-listItem dash-newsItem">
+                                <div class="dash-newsItem--container">
+                                    <div class="dash-newsItem-meta">
+                                        <div class="userDisplay">
+                                            <div class="userDisplay-avatar"><img src="/data/uploads/user_images/{{this.author.id}}/{{this.author.id}}.jpg"/></div>
+                                            <div class="userDisplay-label">
+                                                    <span class="userDisplay-label--name">
+                                                        {{this.author.generalData.firstName.value}} {{this.author.generalData.lastName.value}}
+                                                    </span>
+                                                <span class="userDisplay-label--text">
+                                                    {{transformDateTimeString this.created}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="dash-newsItem--heading-container">
+                                        <div class="dash-newsItem--title">
+                                            {{{this.title.html}}}
+                                        </div>
+                                    </div>
+                                    <div class="dash-newsItem--body">
+                                        {{{this.content.html}}}
+                                    </div>
+                                    <div class="dash-newsItem--footer">
 
                                     </div>
-                                    <div class="dash-newsItem-meta--user">
-
-                                    </div>
                                 </div>
-                                <div class="dash-newsItem--heading">
-                                    <span></span>
-                                </div>
-                                <div class="dash-newsItem--body">
-                                    <span></span>
-                                </div>
-                            </div>
-                        </li>
+                            </li>
+                        {{/each}}
                     </ul>
                 </div>
-
             </div>
             <div class="eventinfo-item-spacer"></div>
         </div>

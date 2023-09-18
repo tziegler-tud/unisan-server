@@ -18,7 +18,7 @@ export default class PasswordComponent extends Component {
     constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
         super({page, componentId, componentType, pageData, data, args});
         this.data.targetUser = this.data.targetUser ?? "current";
-        this.templateUrl = "/webpack/components/pageModules/settings/password.hbs"
+        this.templateUrl = "/webpack/components/templates/settings/password.hbs"
     }
 
     async postRender(){
@@ -29,9 +29,11 @@ export default class PasswordComponent extends Component {
             for (let button of buttonList) {
                 button.addEventListener("click", function (event) {
                     if (self.page.sidebar) {
-                        let targetUserId = self.data.targetUser === "current" ? self.data.user.id : self.data.targetUser;
+                        const isSelf = self.data.targetUser === "current";
+                        let targetUserId = isSelf ? self.data.user.id : self.data.targetUser;
                         self.page.sidebar.addContent("UserChangePassword", {
                             userid: targetUserId,
+                            requireCurrentPassword: isSelf,
                             callback: {
                                 onConfirm: function (userid, data) {
                                     console.log("userid: " + userid);
@@ -41,7 +43,7 @@ export default class PasswordComponent extends Component {
 
                                     let action;
 
-                                    if (self.data.targetUser === "current") {
+                                    if (isSelf) {
                                         action = userActions.updateCurrentUserPassword(data.current, data.pw, {})
                                     }
                                     else {
