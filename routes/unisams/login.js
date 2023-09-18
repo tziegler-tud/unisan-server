@@ -42,11 +42,12 @@ router.post('/login', function(req, res, next) {
 });
 
 router.all("/logout", function(req, res, next) {
-  req.logout();
-  req.session.destroy(function(err){
-    res.redirect("/");
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    req.session.destroy(function(err){
+      res.redirect("/");
+    })
   })
-
 });
 
 router.get("/privacyAgreement", (req, res, next) => {
