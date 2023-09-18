@@ -104,7 +104,7 @@ Snackbar.prototype.show = function(message, options) {
 
 /**
  *
- * shows an error in the snackbar
+ * shows an jqxhr error in the snackbar
  *
  * @param jqxhr {Object} jqxhr object
  * @param textstatus {String} string containing status message
@@ -122,6 +122,38 @@ Snackbar.prototype.showError = function(jqxhr, textstatus, error, options){
     let snackbar = self.snackbar;
     let message = jqxhr.responseJSON.message;
     let text = (error ? error: "Error " + jqxhr.status) +": " + (message ? message : jqxhr.responseText);
+    let defaultOptions = {
+        timeout: -1,
+        closeOnEscape: true,
+        actionButton: {
+            display: true,
+            text: "Nagut",
+        }
+    }
+    options = (options === undefined) ? {}: options;
+    options = Object.assign(defaultOptions, options);
+    this.show(text, options);
+}
+
+/**
+ *
+ * shows an error in the snackbar
+ *
+ * @param message {string}
+ * @param textstatus {String} string containing status message
+ * @param error {Error} error Object
+ * @param options {Object}
+ * @param options.timeout {Number} timeout in ms
+ * @param options.closeOnEscape {Boolean} true to close sidebar if action button is clicked
+ * @param options.actionButton {Object}
+ * @param options.actionButton.display {Boolean} true to show action button
+ * @param options.actionButton.text {String} action button text
+ * @returns {boolean}
+ */
+Snackbar.prototype.showCustomError = function(message, textstatus, error, options){
+    let self = this;
+    let snackbar = self.snackbar;
+    let text = (error ? error: "Error " + textstatus) +": " + message;
     let defaultOptions = {
         timeout: -1,
         closeOnEscape: true,

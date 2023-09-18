@@ -29,6 +29,7 @@ let defaultMember = {
         operations.user.READSELF,
         operations.user.WRITESELF,
         operations.events.READ,
+        operations.news.READ,
     ],
 }
 
@@ -66,6 +67,21 @@ let defaultEventAdmin = {
         operations.access.REVOKEEVENTCONTROL,
 
         operations.system.EVENTS,
+    ]
+}
+
+let defaultNewsAdmin = {
+    title: "newsAdmin",
+    description: "News erstellen, bearbeiten und löschen",
+    default: true,
+    type: "newsadmin",
+    allowedOperations: [
+        operations.news.READ,
+        operations.news.CREATE,
+        operations.news.WRITE,
+        operations.news.DELETE,
+
+        operations.system.NEWS,
     ]
 }
 
@@ -163,6 +179,7 @@ let defaultGroups = [
     defaultMember,
     defaultUserAdmin,
     defaultEventAdmin,
+    defaultNewsAdmin,
     defaultAclAdmin,
     defaultSysAdmin,
 ]

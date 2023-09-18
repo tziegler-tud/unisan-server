@@ -7,6 +7,8 @@ import {EditableTextField} from "../../../helpers/editableTextField";
 import "../../scss/news/createNewsComponent.scss";
 import {newsActions} from "../../../actions/actions";
 import {EditableInputField} from "../../../helpers/editableInputField";
+import {Dialog as LidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
+
 
 /**
  *
@@ -42,9 +44,23 @@ export default class EditNewsComponent extends Component {
             }
         };
         let titleFieldContainer = self.container.querySelector(".news-title--input");
-        this.titleField = new EditableInputField(titleFieldContainer, this.data.news.content.delta, this.data.news.content.html, "text", callback, {readOnly: false, active: true, disableButtons: true});
+        this.titleField = new EditableInputField(titleFieldContainer, this.data.news.title.delta, this.data.news.title.value, "text", callback, {readOnly: false, active: true, disableButtons: true});
         let contentFieldContainer = self.container.querySelector(".news-content--input");
-        this.contentField = new EditableTextField(contentFieldContainer, this.data.news.content.delta, this.data.news.content.html, callback, {readOnly: false, active: true, disableButtons: true});
+        this.contentField = new EditableTextField(contentFieldContainer, this.data.news.content.delta, this.data.news.content.value, callback, {readOnly: false, active: true, disableButtons: true});
+
+        const saveButtons = document.querySelectorAll(".news-saveButton");
+        saveButtons.forEach(btn => {
+            btn.addEventListener("click", function(){
+                self.save();
+            })
+        })
+
+        const deleteButtons = document.querySelectorAll(".news-deleteButton");
+        deleteButtons.forEach(btn => {
+            btn.addEventListener("click", function(){
+                self.delete();
+            })
+        })
     }
 
     save(){
@@ -59,11 +75,43 @@ export default class EditNewsComponent extends Component {
             },
             author: this.data.user.id,
         }
-        newsActions.create(data, {
-            onSuccess: function(result){
+        newsActions.save(this.data.news.id, data, {})
+            .then(result => {
                 window.location = "/dashboard/news";
+            })
+            .fail((jqxhr, textstatus, error) => {
+                window.snackbar.showError(jqxhr, textstatus, error)
+            });
+    }
+
+    delete(){
+        const newsId = this.data.news.id;
+        const deleteContent = {
+            title: "Newsbeitrag löschen",
+            message: "Dieser Vorgang kann nicht rückgängig gemacht werden. Fortfahren?",
+            titleArg: "",
+            messageArg: ""
+        };
+
+        var deleteArgs = {
+            id: newsId,
+            callback: {
+                onConfirm: function () {
+                    newsActions.delete(newsId, {},{
+                        onSuccess: function(result){
+                            window.location = "/dashboard/news";
+                        }
+                    })
+                        .fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                }
             }
-        })
+        };
+
+        var token = lidlRTO.objectManager.createNewObjectToken();
+        const dialogDeleteEvent = new LidlDialog(token, ".eventDelete", 'confirmDelete', deleteContent, deleteArgs);
+        lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
+        dialogDeleteEvent.openDialog();
+
     }
 
     getHtml(){

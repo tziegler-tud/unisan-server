@@ -1,6 +1,6 @@
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
-import {userActions, eventActions, groupActions} from "../actions/actions"
+import {userActions, eventActions, groupActions, newsActions} from "../actions/actions"
 
 import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
@@ -47,20 +47,31 @@ let editNews = {
                 let userPromise = userProfile.getUserAndSubscribe(ob1)
                 window.userProfile = userProfile;
 
-                userPromise.then(user => {
-                    self.pageData.user = user;
-                    self.buildPage(self.pageData.user, args)
-                        .then(result => {
-                            resolve();
-                        })
-                        .catch(err => {
-                            reject(err)
-                        })
-                })
+                const newsId = window.newsId;
+                let newsPromise = newsActions.get(newsId);
+
+                Promise.all([userPromise, newsPromise])
+                    .then(results => {
+                        const user = results[0];
+                        const news = results[1];
+                        self.pageData.user = user;
+                        self.pageData.news = news;
+                        self.buildPage(self.pageData.user, self.pageData.news, args)
+                            .then(result => {
+                                resolve();
+                            })
+                            .catch(err => {
+                                reject(err)
+                            })
+
+                    })
+                    .catch(err => {
+                        window.snackbar.showCustomError("Failed to retrieve data from server", "500", undefined, {});
+                    })
             })
         })
     },
-    buildPage: function(user, args) {
+    buildPage: function(user, news, args) {
         let self = this;
         var lidlRTO = window.lidlRTO;
 
@@ -78,7 +89,7 @@ let editNews = {
                 args: {},
             });
             window.componentPage = componentPage;
-            componentPage.addComponent(ComponentPage.componentTypes.NEWS.EDIT, {size: "full", order: 1}, {user: user})
+            componentPage.addComponent(ComponentPage.componentTypes.NEWS.EDIT, {size: "full", order: 1}, {user: user, news: news})
                 .then()
                 .catch()
         })

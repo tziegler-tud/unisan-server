@@ -22,11 +22,12 @@ moment().format();
  *
  * @param dateString
  * @param format
- * @returns {{dateTime: string, date: string, dateExtended: string, dateTimeExtended: string, time: ((function(*): (string|string))|*)}}
+ * @returns {{dateTime: string, date: string, dateExtended: string, dateTimeExtended: string, monthYear: string, time: ((function(*): (string|string))|*)}}
  */
-var transformDateTimeString = function(dateString, format) {
-    format = (format === undefined || typeof(format) !== "string") ? "text" : format;
+var transformDateTimeString = function(dateString, format="text") {
+    format = (typeof(format) !== "string") ? "text" : format;
     let weekDays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",  "Freitag", "Samstag"];
+    let months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
     var myDate = new Date(dateString);
     var month = (myDate.getMonth()+ 1).toString().length < 2 ? "0"+(myDate.getMonth()+ 1).toString() : (myDate.getMonth()+ 1).toString();
     var day = myDate.getDate().toString().length < 2 ? "0"+myDate.getDate().toString() : myDate.getDate().toString();
@@ -41,12 +42,14 @@ var transformDateTimeString = function(dateString, format) {
     let dow = weekDays[myDate.getDay()];
     var dateTimeExtended = dow + ", " + dateTime;
     var dateExtended = dow + ", " + date;
+    const monthYear = months[myDate.getMonth()] + " " + myDate.getFullYear();
 
     return {
         dateTime: dateTime,
         dateTimeExtended: dateTimeExtended,
         date: date,
         dateExtended: dateExtended,
+        monthYear: monthYear,
         time: function (timeFormat) {
             switch(timeFormat) {
                 case "hh:mm:ss":
@@ -206,9 +209,10 @@ let Counter = function(args) {
  * @param args.months months to add/substract.
  * @param args.weeks weeks to add/substract.
  * @param args.days days to add/substract.
+ * @param date optional date to use as starting point instead of current date.
  * @constructor
  */
-var dateFromNow = function(args) {
+var dateFromNow = function(args, date= new Date()) {
     let defaults = {
         years: 0,
         months: 0,
@@ -216,9 +220,9 @@ var dateFromNow = function(args) {
         days: 0
     }
     let vals = Object.assign(defaults, args)
-    let current = Date.now();
+    let current = date;
     let duration = moment.duration({years: vals.years, months: vals.months, weeks: vals.weeks, days: vals.days})
-    let m = moment(new Date());
+    let m = moment(current);
     m.add(duration);
     return m.toDate();
 }

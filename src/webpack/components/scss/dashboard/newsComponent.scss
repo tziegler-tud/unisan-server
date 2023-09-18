@@ -1,0 +1,16 @@
+@use "@material/icon-button";
+@use "@material/card";
+
+@import "../../../variables.scss";
+@import "../../../color-rules.scss";
+
+@include card.core-styles;
+
+.news-component {
+  .newsList-container {
+    .news-card {
+      background-color: {}
+
+    }
+  }
+}
