@@ -70,7 +70,10 @@ var Component = function(componentId, componentType, data, args){
             this.container.classList.add("dashPage-component-wrapper--half");
             break;
     }
-    if(this.args.minWidth) this.container.style.minWidth = this.args.minWidth;
+    if(this.args.minWidth) {
+        this.container.style.flex = "1 1 " + this.args.minWidth;
+        this.container.style.minWidth = "50%";
+    }
     this.container.style.order = args.order;
     this.html = this.container;
 
