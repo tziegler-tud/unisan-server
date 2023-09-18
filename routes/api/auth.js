@@ -29,8 +29,10 @@ router.post('/auth', function(req, res, next) {
 });
 
 router.all("/logout", function(req, res, next) {
-  req.logout();
-  res.status(200).send("Cya.");
+  req.logout(function(err) {
+      if (err) { return next(err); }
+      res.status(200).send("Cya.");
+  })
 });
 
 export default router;
