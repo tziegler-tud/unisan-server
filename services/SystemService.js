@@ -166,6 +166,7 @@ class SystemService {
         this.settingsObject = this.settings.toJSON();
         return this.settingsObject;
     }
+
     statusEnum = {
         NOTSTARTED: 0,
         RUNNING: 1,

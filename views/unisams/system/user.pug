@@ -12,26 +12,29 @@ block page_includes
         //used to tell the bundled js which modules to load.
         window.jsmodule = {
             module: "system",
-            loaders: ["user"],
+            loaders: ["user"]
         };
         window.dockerArgs.activeContainer = "systemContainer";
         window.dockerArgs.activeElementId = "systemUser";
 
 
 block content
-    #wrapper
-        #page-container.page-container
-            #page-container-inner.page-container-inner
-                section#sec1
-                    #sec-content.subpage-container
-                        #content1-heading.sec-heading.subpage-heading
-                            h3 Einstellungen: Mitglieder
-                        #content1-text.sec-content
-                            .subpage-options
-                            .subpage-content
-
-                            #usermanagment-menu.subpage-menu
-                                #btn01.subpage-menu-btn
+#wrapper
+    #page-container.page-container
+        #page-container-inner.page-container-inner.full-width.full-height
+            section#sec1
+                #sec-content.subpage-container
+                    #content1-heading.sec-heading.subpage-heading
+                        .sec-heading-label.propertypage-heading
+                            .propertypage-heading-container
+                                h3
+                                    | Einstellungen: Mitglieder
+                                .clear
+                            .clear
+                    #content1-text.sec-content.border-top
+                        .subpage-content
+                            .info-container
+                                #systemPage-component-container.systemPage-component-container.componentPage-component-container
 
 
 
