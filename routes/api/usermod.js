@@ -13,6 +13,7 @@ import path from 'path';
 import fs from 'fs-extra';
 
 import upload from "../../config/multer.js";
+import userManager from "../../managers/userManager.js";
 
 
 
@@ -127,6 +128,8 @@ router.post('/removeGroupFromAllUser', removeGroupFromAllUser);
 
 //role modification requires appropriate access rights
 router.post('/setUserRole/:id', setUserRole);
+
+router.post('/subscribe/:id', addPushSubscription);
 
 export default router;
 
@@ -608,10 +611,36 @@ function clearUserDocuments(req, res, next){
 }
 
 
-function transformQuals(req, res, next){
-    userService.replaceQualificationsByRef()
-        .then(function(result) {
-            res.status(200).send();
+// function transformQuals(req, res, next){
+//     userService.replaceQualificationsByRef()
+//         .then(function(result) {
+//             res.status(200).send();
+//         })
+//         .catch(err => next(err))
+// }
+
+
+function addPushSubscription (req, res, next) {
+    let err = new Error("invalid arguments received")
+    if (req.body === undefined) {
+        next(err);
+    }
+    if(req.body.user === undefined){
+        next(err)
+    }
+    if(req.body.subscription === undefined){
+        next(err)
+    }
+
+    var token = req.body.subscription.token;
+    var isSafari = (req.headers['user-agent'].indexOf("Safari") > 0);
+    var auth = req.body.subscription.auth;
+    var endpoint = req.body.subscription.endpoint;
+
+    userService.getById(req.params.id)
+        .then(function(user){
+            userManager.registerPushSubscription(user, {token:token,auth:auth,isSafari:isSafari,endpoint:endpoint})
+                .then(result => res.json(result))
+                .catch(err => next(err));
         })
-        .catch(err => next(err))
 }

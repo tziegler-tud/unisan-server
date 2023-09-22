@@ -9,6 +9,8 @@ import {UserProfile} from "./userprofile/userprofile";
 import {Preloader} from "./helpers/preloader";
 import {DropdownMenu} from "./helpers/dropdownMenu";
 
+import "./pushhandler";
+
 
 
 var lidlRTO = window.lidlRTO;
