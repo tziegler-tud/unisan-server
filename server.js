@@ -9,6 +9,7 @@ import SessionFileStore from "session-file-store";
 const FileStore = SessionFileStore(session);
 import uuid from 'uuid';
 import 'dotenv/config'
+import favicon from "serve-favicon";
 
 import config from "./config/config.json" assert {type: "json"};
 
@@ -121,9 +122,11 @@ let webAuth = function(req, res, next){
   }
 };
 
+// server.use(favicon(path.join(__dirname, 'src', 'static','favicon.ico')))
 // data folder requires authentication
 server.use('/data/*', apiAuth);
 server.use(express.static(path.join(__dirname, 'src')));
+server.use(express.static(path.join(__dirname, 'src', 'static/icons/pwa')));
 
 server.use('/bdd-apps/divi', publicProtocolRouter);
 //html calls
