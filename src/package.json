@@ -8,6 +8,7 @@
     "@fullcalendar/list": "^5.11.0",
     "@fullcalendar/timegrid": "^5.11.0",
     "@material/button": "14.0.0",
+    "@material/banner": "14.0.0",
     "@material/card": "14.0.0",
     "@material/drawer": "14.0.0",
     "@material/fab": "14.0.0",

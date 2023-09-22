@@ -3,6 +3,7 @@ import {Preloader} from "./helpers/preloader.js";
 import {actions} from "./actions/actions";
 
 import "./common.scss";
+import "./pushhandler";
 
 document.addEventListener("DOMContentLoaded", function(event) {
     console.log("js active, removing noscript fallback");
