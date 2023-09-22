@@ -4,7 +4,7 @@
   "description": "unisan-server.de App",
   "start_url": "/login",
   "display": "standalone",
-  "background_color": "#f9f9f9",
+  "background_color": "#fff",
   "theme_color": "#fff",
   "orientation": "natural",
   "icons": [
