@@ -80,6 +80,8 @@ let activity = {
         dashPage.addComponent(DashPage.componentTypes.ACTIVITY,
             {
                 size: "full",
+                limitAmount: undefined,
+                logTypes: ["activity", "modification"]
             })
     },
     updatePage: function(user, args){
