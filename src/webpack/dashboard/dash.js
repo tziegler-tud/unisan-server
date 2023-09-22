@@ -96,6 +96,7 @@ let dash = {
             {
                 size: "full",
                 limitAmount: 2,
+                logTypes: ["activity"]
             })
     },
     updatePage: function(user, args){
