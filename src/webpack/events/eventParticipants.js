@@ -15,20 +15,19 @@ var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
-import {EditableInputField} from "../helpers/editableInputField";
+import EditableInputField from "../helpers/editableInputField";
 
 import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
-import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {actions, eventActions, qualificationActions} from "../actions/actions";
+import {eventActions} from "../actions/actions";
 
 import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
 import {Snackbar} from "../helpers/snackbar";
-import {common, getMatchingQualifications, getDataFromServer} from "../helpers/helpers";
+import {getMatchingQualifications, getDataFromServer} from "../helpers/helpers";
 
 
 

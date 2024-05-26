@@ -1,6 +1,5 @@
 // factory for building html elements related to event pages
 import {EditableTextField} from "../helpers/editableTextField";
-import {EditableInputField} from "../helpers/editableInputField";
 import {eventActions} from "../actions/eventActions";
 import Handlebars from "handlebars";
 import * as FilePond from "filepond";

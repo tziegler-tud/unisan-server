@@ -24,7 +24,7 @@ import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
 import {EditableTextField} from "../helpers/editableTextField";
-import {EditableInputField} from "../helpers/editableInputField";
+import EditableInputField from "../helpers/editableInputField";
 
 import * as FilePond from "filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
