@@ -158,7 +158,7 @@ async function getTargetLogs(target, logType){
  * @returns {Promise<void>}
  */
 async function getTargetLogsById(targetId, logType){
-    let id = mongoose.Types.ObjectId(targetId);
+    let id = new mongoose.Types.ObjectId(targetId);
 
     if (logType === undefined || logType === "ALL"){
         return dbLog.find({"target.targetObject": targetId}).populate({
