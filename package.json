@@ -58,16 +58,16 @@
     "web-push": "^3.6.6"
   },
   "devDependencies": {
-    "autoprefixer": "^9.8.6",
-    "css-loader": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "css-loader": "^7.1.2",
     "extract-loader": "^5.1.0",
-    "file-loader": "^6.0.0",
-    "imports-loader": "^3.1.1",
-    "postcss-loader": "^3.0.0",
-    "sass": "^1.43.3",
-    "sass-loader": "^12.2.0",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.3.1"
+    "file-loader": "^6.2.0",
+    "imports-loader": "^5.0.0",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.77.2",
+    "sass-loader": "^14.2.1",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
   }
 }
