@@ -1,6 +1,6 @@
 // factory for building html elements related to user pages
 import {EditableTextField} from "../helpers/editableTextField";
-import {EditableInputField} from "../helpers/editableInputField";
+import EditableInputField from "../helpers/editableInputField";
 import {userActions, eventActions, groupActions} from "../actions/actions"
 import Handlebars from "handlebars";
 import * as FilePond from "filepond";

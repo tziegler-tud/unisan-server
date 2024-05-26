@@ -6,7 +6,7 @@ import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
 import {EditableTextField} from "../helpers/editableTextField";
-import {EditableInputField} from "../helpers/editableInputField";
+import EditableInputField from "../helpers/editableInputField";
 
 import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2"
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer"

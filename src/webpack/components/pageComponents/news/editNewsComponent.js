@@ -6,7 +6,7 @@ import {EditableTextField} from "../../../helpers/editableTextField";
 
 import "../../scss/news/createNewsComponent.scss";
 import {newsActions} from "../../../actions/actions";
-import {EditableInputField} from "../../../helpers/editableInputField";
+import EditableInputField from "../../../helpers/editableInputField";
 import {Dialog as LidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 

@@ -28,7 +28,7 @@ import {MDCList} from '@material/list';
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getDataFromServer, getMatchingQualifications} from "../../helpers/helpers";
-import {EditableInputField} from "../../helpers/editableInputField";
+import EditableInputField from "../../helpers/editableInputField";
 import {EditableTextField} from "../../helpers/editableTextField";
 
 import {MDCTooltip} from '@material/tooltip';
