@@ -49,16 +49,17 @@ async function getAllByTags(tagArray, combiner="OR") {
     const filterArray = tagArray.map(tag => {
         return {tags: tag}
     })
-    switch(combiner){
-        case "AND":
-            query = query.or(filterArray)
-            break;
-        case "OR":
-        default:
-            query = query.and(filterArray);
-            break;
+    if(filterArray.length > 0){
+        switch(combiner){
+            case "AND":
+                query = query.or(filterArray)
+                break;
+            case "OR":
+            default:
+                query = query.and(filterArray);
+                break;
+        }
     }
-
     query = query.populate({
         path: 'author',
         select: 'generalData username',
@@ -101,13 +102,14 @@ async function getAllFiltered(complexFilterObject, args){
 
     let newslist = News.find();
     //apply filter
-    if(args.or) {
-        newslist = newslist.or(filterArray)
+    if(filterArray.length > 0) {
+        if(args.or) {
+            newslist = newslist.or(filterArray)
+        }
+        else {
+            newslist = newslist.and(filterArray)
+        }
     }
-    else {
-        newslist = newslist.and(filterArray)
-    }
-
     newslist = newslist.populate({
         path: 'author',
         select: 'generalData username',

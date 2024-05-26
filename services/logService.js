@@ -70,19 +70,20 @@ async function getAllFiltered(complexFilterObject, args){
     })
 
     //apply filter
-    if(args.or) {
-        loglist = dbLog.find().or(filterArray).populate({
-            path: 'authorizedUser',
-            select: 'generalData username',
-        });
-    }
-    else {
-        loglist = dbLog.find().and(filterArray).populate({
-            path: 'authorizedUser',
-            select: 'generalData username',
-        });
+    loglist = dbLog.find();
+    if(filterArray.length > 0) {
+        if(args.or) {
+            loglist = loglist.or(filterArray)
+        }
+        else {
+            loglist = loglist.and(filterArray);
+        }
     }
 
+    loglist.populate({
+        path: 'authorizedUser',
+        select: 'generalData username',
+    });
 
     if (args.sort) {
         loglist = loglist.sort(args.sort);
