@@ -21,6 +21,8 @@ export default {
     delete: _delete,
     deleteAll: _deleteAll,
     getAllFiltered,
+
+    devUpdateDocuments,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -269,4 +271,12 @@ async function _delete(req, id) {
  */
 async function _deleteAll() {
     return News.deleteMany()
+}
+
+async function devUpdateDocuments() {
+    let news = await News.find();
+    for (let newsEntry of news) {
+        await newsEntry.save();
+    }
+    return news;
 }
