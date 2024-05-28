@@ -15,13 +15,14 @@ export default class EditableInputField {
     quill = undefined;
     domElements = {};
 
-    counter = {
+    static counter = {
         current: 0,
         next: function(){
             this.current++;
             return this.current;
         }
     }
+
 
     /**
      * constructor for EditableInputField objects
@@ -46,12 +47,16 @@ export default class EditableInputField {
             container.classList.add(EditableInputField.#cssAllowEditingClassName);
         }
 
-        this.args = args;
         this.container = container;
         this.deltaContent = deltaContent;
 
         this.quillcontainer = document.createElement("div");
         this.quillcontainer.className = "text-editor"
+
+        this.active = active;
+        this.disableButtons = disableButtons;
+        this.readOnly = readOnly;
+        this.limit = limit;
 
         var toolbarOptions = [
             ['bold', 'italic', 'underline'/*, 'strike'*/],        // toggled buttons
@@ -93,7 +98,7 @@ export default class EditableInputField {
                     }
                 },
             },
-            bounds: quillcontainer,
+            bounds: this.quillcontainer,
 
         });
         quill.setContents(this.deltaContent);
@@ -101,7 +106,7 @@ export default class EditableInputField {
         this.quill = quill;
 
         //deactivate on default
-        if (args.active === true){
+        if (this.active === true){
             this.activate();
         }
         else {
@@ -138,7 +143,7 @@ export default class EditableInputField {
         return buttonContainer;
     };
 
-    deactivate = function(){
+    deactivate() {
         this.isactive = false;
         //create div
         let textContainer = document.createElement("div");
@@ -158,14 +163,14 @@ export default class EditableInputField {
 
     }
 
-    setupEventHandlers = function(editableInputFieldHTML){
+    setupEventHandlers(editableInputFieldHTML){
         this.dialogDOM.confirmButton.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.callback.onConfirm(this);
             this.deactivate();
         })
-        this.dialogDOM.cancelButton.addEventListener("click", function(e){
+        this.dialogDOM.cancelButton.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.deactivate();
@@ -181,7 +186,7 @@ export default class EditableInputField {
 
     }
 
-    activate = function(){
+    activate(){
         if(this.readOnly) return false;
         this.isactive = true;
         this.container;
@@ -196,20 +201,19 @@ export default class EditableInputField {
         this.setupEventHandlers(buttons);
     }
 
-    isActive = function(){
+    isActive(){
         return this.isactive;
     };
 
-    getQuill = function() {
+    getQuill() {
         return this.quill;
     }
 
-    getHtmlContent = function() {
+    getHtmlContent() {
         return this.quill.getSemanticHTML();
     }
 
-    reset = function(container, deltaContent, type, callback, args) {
-        let resetObj = this.constructor(container, deltaContent, type, callback, args);
-        return resetObj;
+    reset(container, deltaContent, type, callback, {active, disableButtons, readOnly, limit}) {
+        return new EditableInputField(container, deltaContent, type, callback, {active, disableButtons, readOnly, limit});
     }
 }

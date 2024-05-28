@@ -124,7 +124,7 @@ let eventDetails = {
         function buildPageView(user, event, args) {
 
             let titleInputContainer = document.getElementById("eventtitle-input");
-            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
 
             switch(event.type.index){
                 case 1:
@@ -257,7 +257,7 @@ let eventDetails = {
                     }
                     eventActions.saveTitle(event.id, data, {
                         onSuccess: function(result){
-                            editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, result.title.html, "text", cb, {})
+                            editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, "text", cb, {})
                             //update docker nav
                             window.eventProfile.refreshEvent()
                                 .then(function(ev){
@@ -272,7 +272,7 @@ let eventDetails = {
                 }
             };
             let titleInputContainer = document.getElementById("eventtitle-input");
-            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", cb, {limit: 40});
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, "text", cb, {limit: 40});
 
             let eventDate = function(component){
                 $("#eventDateEditor").on("click", function(){
