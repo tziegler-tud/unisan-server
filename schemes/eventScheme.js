@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-import { convertDeltaToHtml } from 'node-quill-converter';
 import humanFileSize from "../helpers/humanFileSize.js";
+import {QuillDeltaToHtmlConverter} from "quill-delta-to-html";
 
 /** @typedef {{ username: string, firstName: string, lastName: string, email?: string, hash: string, generalData?: { memberId?: string, phone?: string, customData?: any, qualifications: QualificationObject[], hasPhoto: boolean, isDisplayedOnPublic: boolean, loginEnabled: boolean, createdDate: Date } }} UserScheme */
 /** @typedef {{ title: {title: string, value: string}, description: {shortDesc: string, longDesc: string}, date: {startDate: Date, endDate: Date}, participants: User[], createdDate: Date}} EventScheme */
@@ -34,6 +34,9 @@ var EventSchema = new Schema({
         },
         delta: {
 
+        },
+        html: {
+            type: String,
         }
     },
     type: {
@@ -60,6 +63,9 @@ var EventSchema = new Schema({
             delta: {
 
             },
+            html: {
+                type: String,
+            }
         },
         longDesc: {
             title: {
@@ -72,6 +78,9 @@ var EventSchema = new Schema({
             value: {
                 type: String,
             },
+            html: {
+                type: String,
+            }
         },
     },
     date: {
@@ -252,20 +261,22 @@ EventSchema.virtual('dateRangeString').get(function() {
     return dateString;
 });
 
-EventSchema.virtual('description.longDesc.html').get(function() {
-    if (this.description === undefined) return "";
-    if (this.description.longDesc === undefined) return "";
-
-    let delta = this.description.longDesc.delta;
-    if (delta === undefined) return "";
-    return convertDeltaToHtml(delta);
-});
-
-EventSchema.virtual('title.html').get(function() {
-    let delta = this.title.delta;
-    if (delta === undefined) return "";
-    return convertDeltaToHtml(delta);
-});
+// EventSchema.virtual('description.longDesc.html').get(function() {
+//     if (this.description === undefined) return "";
+//     if (this.description.longDesc === undefined) return "";
+//
+//     let delta = this.description.longDesc.delta;
+//     if (delta === undefined) return "";
+//     var converter = new QuillDeltaToHtmlConverter(delta, {});
+//     return converter.convert();
+// });
+//
+// EventSchema.virtual('title.html').get(function() {
+//     let delta = this.title.delta;
+//     if (delta === undefined) return "";
+//     var converter = new QuillDeltaToHtmlConverter(delta, {});
+//     return converter.convert();
+// });
 
 EventSchema.virtual('type.index').get(function() {
     let type = this.type.value;
@@ -299,6 +310,16 @@ EventSchema.pre('save', function(next) {
         d.setSeconds(0);
         d.setMilliseconds(0)
         return d;
+    }
+
+    this.title.html = convertDelta(this.title.delta);
+    this.description.shortDesc.html = convertDelta(this.description.shortDesc.delta);
+    this.description.longDesc.html = convertDelta(this.description.longDesc.delta);
+
+    function convertDelta(delta) {
+        if (delta === undefined || delta.ops === undefined) return "";
+        var converter = new QuillDeltaToHtmlConverter(delta.ops, {});
+        return converter.convert();
     }
     next();
 });
