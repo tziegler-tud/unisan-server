@@ -6,9 +6,6 @@ import config from "../config/config.json" assert {type: "json"};
  */
 
 import app from '../server.js';
-// var debug = require('debug')('replicator:server');
-import makeDebug from 'debug';
-const debug = makeDebug('unisan-server:server');
 import http from 'http';
 
 /**
@@ -89,5 +86,5 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  console.log('Listening on ' + bind);
 }

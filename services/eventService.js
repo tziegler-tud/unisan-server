@@ -7,15 +7,12 @@ import UserService from "./userService.js";
 import Log from '../utils/log.js';
 
 
-// const authService = new AuthService();
-
-import { convertDeltaToHtml, convertTextToDelta, convertHtmlToDelta } from 'node-quill-converter';
-
 const Event = db.Event;
 const User = db.User;
 const Qualifications = db.Qualifications;
 
 import fs from 'fs-extra';
+import {convertValueToDelta} from "../utils/QuillHelper.js";
 
 export default {
     getAll,
@@ -45,6 +42,8 @@ export default {
     removeFileReference,
 
     checkUserForAssignment,
+
+    devUpdateDocuments,
 };
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
@@ -132,6 +131,7 @@ async function getById(id) {
  * @returns {Promise<Query|*|number>}
  */
 async function matchAny(matchString, args){
+    const dateFilterPropertyName = "date.endDate";
     //matches a given string username, firstname and lastname, and optionally filters by date
     let eventlist;
     let dateFilter = {};
@@ -209,20 +209,26 @@ async function matchAny(matchString, args){
                     innerFilter["$gte"] = inner.min;
                     innerFilter["$lte"] = inner.max;
             }
-            dateFilter = {"date.endDate": innerFilter}
+            dateFilter = {};
+            dateFilter[dateFilterPropertyName] = innerFilter;
         }
     }
 
     //if filter is empty, return all results
-    if (matchString.length === 0) {
-        eventlist = Event.find().and([dateFilter]).and(universalFilterArray);
+
+    eventlist = Event.find();
+
+    if(dateFilter[dateFilterPropertyName]) {
+        eventlist.and([dateFilter])
     }
-    else {
+    if (matchString.length !== 0) {
         //filter user by given string, using title and type
-        // eventlist = Event.find().and([dateFilter, universalFilter]).or([{'title.value': { $regex: matchString, $options: "-i" }}, {'type.value': { $regex: matchString, $options: "-i" }}])
-        eventlist = Event.find().and([dateFilter, {'title.value': { $regex: matchString, $options: "-i" }}]).and(universalFilterArray); //dont filter for type
+
+        eventlist = eventlist.and([dateFilter, {'title.value': { $regex: matchString, $options: "-i" }}]); //dont filter for type
     }
 
+    if(universalFilterArray.length > 0)
+        eventlist = eventlist.and(universalFilterArray);
     if (args.sort) {
         eventlist = eventlist.sort(args.sort);
     }
@@ -250,7 +256,7 @@ async function create(req, eventParam) {
         }
         if(!eventParam.title.delta){
             console.warn("Trying to create event with no title. Building from value...");
-            eventParam.title.delta = convertTextToDelta(eventParam.title.value);
+            eventParam.title.delta = convertValueToDelta(eventParam.title.value);
         }
     }
     else {
@@ -1861,6 +1867,14 @@ async function checkUserForAssignment(userId, eventId, postingId, args) {
         throw new Error(errMsg + " posting not found.")
     }
 
+}
+
+async function devUpdateDocuments() {
+    let events = await Event.find();
+    for (let event of events) {
+        await event.save();
+    }
+    return events;
 }
 
 

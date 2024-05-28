@@ -1,6 +1,8 @@
 var lidlRTO = window.lidlRTO;
 var actions = window.actions;
 
+import EditableInputField from "../../../../webpack/helpers/editableInputField";
+
 $(document).ready (function () {
 
     var currentExploredEvent;
@@ -33,7 +35,7 @@ $(document).ready (function () {
         var sidebar = new common.Sidebar('wrapper', {title: "Test"});
 
         let titleInputContainer = document.getElementById("eventtitle-input");
-        let editableInputField = new common.EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+        let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
 
         // init event sidebar
         //find if current user is already registered

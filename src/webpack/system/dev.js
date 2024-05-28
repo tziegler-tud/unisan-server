@@ -33,6 +33,52 @@ let dev = {
                         }
                     })
             })
+
+            const saveNewsButton = document.getElementById("button-updateNews");
+            saveNewsButton.addEventListener("click", () => {
+                systemActions.updateNewsTable()
+                    .done(result => {
+                        if (window.snackbar) {
+                            window.snackbar.show("successfully updated news documents.", {});
+                        }
+                    })
+                    .fail(result => {
+                        if (window.snackbar) {
+                            let errJSON = result.responseJSON ?? {};
+                            let message = errJSON.message ?? "Error";
+                            window.snackbar.show("Failed to save news documents | " + "Error " + result.status + ": " + message, {
+                                actionButton: {
+                                    display: true,
+                                    text: "Okay."
+                                },
+                                closeOnEscape: true,
+                            });
+                        }
+                    })
+            })
+
+            const saveEventsButton = document.getElementById("button-updateEvents");
+            saveEventsButton.addEventListener("click", () => {
+                systemActions.updateNewsTable()
+                    .done(result => {
+                        if (window.snackbar) {
+                            window.snackbar.show("successfully updated event documents.", {});
+                        }
+                    })
+                    .fail(result => {
+                        if (window.snackbar) {
+                            let errJSON = result.responseJSON ?? {};
+                            let message = errJSON.message ?? "Error";
+                            window.snackbar.show("Failed to save events documents | " + "Error " + result.status + ": " + message, {
+                                actionButton: {
+                                    display: true,
+                                    text: "Okay."
+                                },
+                                closeOnEscape: true,
+                            });
+                        }
+                    })
+            })
         })
     }
 };
