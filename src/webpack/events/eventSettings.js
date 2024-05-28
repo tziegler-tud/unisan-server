@@ -58,7 +58,7 @@ let eventSettings = {
                 let userIsParticipant = eventProfile.checkIfUserIsRegistered(window.user);
 
                 let titleInputContainer = document.getElementById("eventtitle-input");
-                let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+                let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
 
                 const deleteContent = {
                     title: "Event löschen",

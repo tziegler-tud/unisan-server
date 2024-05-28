@@ -160,7 +160,7 @@ let eventParticipants = {
         window.eventPage = eventPage;
 
         let titleInputContainer = document.getElementById("eventtitle-input");
-        let editableInputField = new EditableInputField(titleInputContainer,self.pageData.event.title.delta,self.pageData.event.title.html, "text", {}, {readOnly: true});
+        let editableInputField = new EditableInputField(titleInputContainer,self.pageData.event.title.delta, "text", {}, {readOnly: true});
 
         const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
         const deleteContent = {
