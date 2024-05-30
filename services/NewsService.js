@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import db from '../schemes/mongo.js';
 import mongoose from "mongoose";
 import AuthService from './authService.js';

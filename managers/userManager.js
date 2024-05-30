@@ -1,6 +1,4 @@
 import UserService from "../services/userService.js";
-import bcrypt from 'bcrypt';
-
 import db from '../schemes/mongo.js';
 const User = db.User;
 
