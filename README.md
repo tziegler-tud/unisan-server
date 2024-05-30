@@ -40,7 +40,8 @@ check package.json for npm dependencies
 
 ##### Frontend
 
-nothing special, check package.json
+located in ./src, requires npm install and webpack build
+check package.json for details
 
 ### Todos
 
@@ -51,6 +52,16 @@ nothing special, check package.json
 For any communication concerning this project, contact us under the following adress:
 admin@unisan-dresden.de
  
- 
 
+## Usage
 
+### Installation
+- clone repo
+- switch to project root `cd unisan-server`
+- install backend dependencies:  `npm install --production`
+- switch to frontend src directory: `cd src`
+- build frontend files: `npx webpack --config webpack.prod.js`
+
+#### Development setup
+- in root dir: `npm install`
+- build frontend in dev mode and enable watcher: `npx webpack --config webpack.dev.js`
