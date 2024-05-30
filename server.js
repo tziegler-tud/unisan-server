@@ -52,7 +52,7 @@ import logsRouter from './routes/api/logs.js';
 import protocolApiRouter from './routes/api/protocol.js';
 import systemApiRouter from './routes/api/system.js';
 import newsApiRouter from './routes/api/news.js';
-
+import devApiRouter from './routes/api/development.js';
 
 //initialize server
 var server = express();
@@ -147,6 +147,7 @@ server.use('/api/v1/dataset/user', userDatasetApiRouter);
 server.use('/api/v1/logs', logsRouter);
 server.use('/api/v1/system', systemApiRouter);
 server.use('/api/v1/news', newsApiRouter);
+server.use('/api/v1/dev', devApiRouter);
 server.use('/api/v1/apps/protocol', protocolApiRouter);
 // catch 404 and forward to error handler
 server.use("/api", function(req, res, next) {

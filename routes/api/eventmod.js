@@ -106,6 +106,7 @@ function allowCreateEvent(req, res, next) {
 
 
 // routes
+// hooked at api/v1/eventmod
 
 // //check url access by user group
 // router.use('/:id', checkUrlAccess);

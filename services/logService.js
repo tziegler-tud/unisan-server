@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import db from '../schemes/mongo.js';
 import mongoose from "mongoose";
 import AuthService from './authService.js';
@@ -70,19 +69,20 @@ async function getAllFiltered(complexFilterObject, args){
     })
 
     //apply filter
-    if(args.or) {
-        loglist = dbLog.find().or(filterArray).populate({
-            path: 'authorizedUser',
-            select: 'generalData username',
-        });
-    }
-    else {
-        loglist = dbLog.find().and(filterArray).populate({
-            path: 'authorizedUser',
-            select: 'generalData username',
-        });
+    loglist = dbLog.find();
+    if(filterArray.length > 0) {
+        if(args.or) {
+            loglist = loglist.or(filterArray)
+        }
+        else {
+            loglist = loglist.and(filterArray);
+        }
     }
 
+    loglist.populate({
+        path: 'authorizedUser',
+        select: 'generalData username',
+    });
 
     if (args.sort) {
         loglist = loglist.sort(args.sort);
@@ -158,7 +158,7 @@ async function getTargetLogs(target, logType){
  * @returns {Promise<void>}
  */
 async function getTargetLogsById(targetId, logType){
-    let id = mongoose.Types.ObjectId(targetId);
+    let id = new mongoose.Types.ObjectId(targetId);
 
     if (logType === undefined || logType === "ALL"){
         return dbLog.find({"target.targetObject": targetId}).populate({

@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import db from '../../schemes/mongo.js';
 import AuthService from '../authService.js';
 import userService from "../userService.js";

@@ -28,7 +28,7 @@ import {MDCList} from '@material/list';
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getDataFromServer, getMatchingQualifications} from "../../helpers/helpers";
-import {EditableInputField} from "../../helpers/editableInputField";
+import EditableInputField from "../../helpers/editableInputField";
 import {EditableTextField} from "../../helpers/editableTextField";
 
 import {MDCTooltip} from '@material/tooltip';
@@ -49,7 +49,7 @@ let eventDetails = new ContentHandler("eventDetails",
             sidebar.registerBackButton( ".sidebar-back-btn");
 
             let titleInputContainer = document.getElementById("sidebar-eventDetails--titleRenderer");
-            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, event.title.html, "text", {}, {readOnly: true});
+            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
 
             let descContainer = document.getElementById("sidebar-eventDetails--descRenderer");
             let descField = new EditableTextField(descContainer, event.description.longDesc.delta, event.description.longDesc.html, {}, {readOnly: true});

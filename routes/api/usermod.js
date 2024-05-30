@@ -1,6 +1,6 @@
 import express from 'express';
 var router = express.Router();
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import bodyParser from "body-parser";
 import userService from "../../services/userService.js";
 import LogService from '../../services/logService.js';

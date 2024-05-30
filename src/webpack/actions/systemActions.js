@@ -164,6 +164,24 @@ var systemActions = {
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
         })
+    },
+
+    updateEventsTable(){
+        return $.ajax({
+            url: "/api/v1/dev/database/updateEvents",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    updateNewsTable(){
+        return $.ajax({
+            url: "/api/v1/dev/database/updateNews",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
     }
 }
 
