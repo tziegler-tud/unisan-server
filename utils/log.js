@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import db from '../schemes/mongo.js';
 
 const UserGroup = db.UserGroup;

@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import db from '../schemes/mongo.js';
 import AuthService from './authService.js';
 import LogService from "./logService.js";

@@ -1,14 +1,9 @@
 import express from 'express';
 var router = express.Router();
-import bcrypt from 'bcrypt';
-import bodyParser from "body-parser";
-import passport from 'passport';
 import Provider from "oidc-provider";
 import MongooseAdapter from "./mongooseAdapter.js";
 import UserService from "../userService.js";
-import oidcRouter from "../../routes/oidc/index.js";
 import SystemService from "../SystemService.js";
-import server from "../../server.js";
 import { nanoid } from 'nanoid'
 import 'dotenv/config'
 import pug from 'pug';

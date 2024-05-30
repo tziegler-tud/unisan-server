@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import db from '../schemes/mongo.js';
 const Settings = db.SystemSettings;
 import dotenv from 'dotenv'
