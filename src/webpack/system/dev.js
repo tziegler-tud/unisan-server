@@ -59,7 +59,7 @@ let dev = {
 
             const saveEventsButton = document.getElementById("button-updateEvents");
             saveEventsButton.addEventListener("click", () => {
-                systemActions.updateNewsTable()
+                systemActions.updateEventsTable()
                     .done(result => {
                         if (window.snackbar) {
                             window.snackbar.show("successfully updated event documents.", {});
