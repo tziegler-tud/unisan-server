@@ -5,8 +5,6 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 
 module.exports = {
-    watch: true,
-    mode: 'development',
     entry: {
         login: "./webpack/login.js",
         login_style: "./webpack/login.scss",
