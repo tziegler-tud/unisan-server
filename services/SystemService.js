@@ -165,6 +165,29 @@ class SystemService {
         this.settingsObject = this.settings.toJSON();
         return this.settingsObject;
     }
+
+    async setMemberIdSettings({mode, offset}){
+        const allowedValues = ["auto", "auto-free", "free", "off"];
+        if(!allowedValues.includes(mode)){
+            throw new Error("Invalid value for parameter: 'mode' received.");
+        }
+
+        if(offset === undefined) offset = 0;
+        else {
+            offset = parseInt(offset)
+        }
+        if(typeof offset !== "number" || offset < 0){
+            throw new Error("Invalid value for parameter: 'offset' received.");
+        }
+        this.settings.members.memberId = {
+            mode: mode,
+            offset: offset,
+        }
+        await this.save();
+        this.settingsObject = this.settings.toJSON();
+        return this.settingsObject;
+    }
+
     statusEnum = {
         NOTSTARTED: 0,
         RUNNING: 1,

@@ -235,7 +235,28 @@ body{
               .content-item {
                 display: block;
                 width: 100%;
+
+                &.content-item--margin-top, &.content-item--margin {
+                  margin-top: 1em;
+                }
+
+                &.content-item--margin-bottom {
+                  margin-bottom: 1em;
+                }
+
+                .content-item--header {
+                  color: $text-color-heading;
+                  display: block;
+                  width: 100%;
+                }
+                .content-item--content {
+                  color: $text-color-secondary;
+                  display: block;
+                  width: 100%;
+                }
               }
+
+
 
             }
           }

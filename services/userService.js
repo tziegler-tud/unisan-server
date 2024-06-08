@@ -3,6 +3,7 @@ import db from '../schemes/mongo.js';
 import AuthService from './authService.js';
 import LogService from "./logService.js";
 import aclService from "./aclService.js";
+import SystemService from "./SystemService.js";
 import Log from '../utils/log.js';
 
 const User = db.User;
@@ -149,13 +150,51 @@ async function getByUsernameWithHash(username, populate) {
  * @param args {Object} further args for user creation. args = {userImg: {tmp: <boolean>, tmpKey: <integer>}}
  */
 async function create(req, userParam, args) {
+    const systemSettings = SystemService.getSettings();
     if (args === undefined) args = {};
     // validate
+    if(userParam.generalData === undefined || userParam.username === undefined) throw new Error("Failed to create user: invalid data given");
     if (await User.findOne({ username: userParam.username }))
         throw new Error(`Username "${userParam.username}" is already taken`);
 
-    if (await User.findOne({ generalData: {memberId: userParam.generalData.memberId }}))
-        throw new Error(`MemberId ` + userParam.generalData.memberId + ` is already taken`);
+    //check if memberId is given
+    if(userParam.generalData.memberId && userParam.generalData.memberId.value) {
+        if (await User.findOne({ generalData: {memberId: {value: userParam.generalData.memberId.value }}}))
+            throw new Error(`MemberId ` + userParam.generalData.memberId.value + ` is already taken`);
+    }
+    else {
+        //check settings on how to auto-assign memberId
+        let memberId = undefined;
+        if(systemSettings.members.memberId) {
+            let offset = systemSettings.members.memberId.offset ?? 0;
+            switch(systemSettings.members.memberId.mode) {
+                case 'auto':
+                    //assign next number and increment offset
+                    memberId = offset+1;
+                    await SystemService.set({key: "members.memberId.offset", value: memberId});
+                    break;
+                case 'auto-free':
+                    //find lowest untaken number after offset
+                    const presentMemberIdsOffset = await User.distinct('generalData.memberId.value', { "generalData.memberId.value": { $gte: offset} });
+                    memberId = lowestMissing(presentMemberIdsOffset, offset);
+                    break;
+                case 'free':
+                    const presentMemberIds = await User.distinct('generalData.memberId.value');
+                    memberId = lowestMissing(presentMemberIds, 0);
+                    break;
+                default:
+                case 'unset':
+                case 'off':
+                    //dont generate ID
+                    memberId = undefined;
+
+            }
+            if (await User.findOne({ "generalData.memberId.value": memberId })) {
+                memberId = undefined;
+            }
+            userParam.generalData.memberId.value = memberId;
+        }
+    }
 
     const user = new User(userParam);
 
@@ -259,6 +298,18 @@ async function create(req, userParam, args) {
         let {hash: _, ...userNoHash} = user._doc;
         userNoHash.id = userNoHash._id;
         return userNoHash;
+    }
+
+    function lowestMissing(array, offset){
+        const seen = new Map();
+        for (let i = 0; i < array.length; i++) {
+            seen.set(array[i]);
+        }
+        const max = Math.max(...array);
+        for (let i = offset; i <= max ; i++) {
+            if (!seen.has(i)) return i;
+        }
+        return max+1;
     }
 }
 
