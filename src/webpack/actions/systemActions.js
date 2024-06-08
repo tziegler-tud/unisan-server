@@ -182,6 +182,19 @@ var systemActions = {
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
         })
+    },
+
+    setMemberIdSettings({mode, offset}){
+        return $.ajax({
+            url: "/api/v1/system/settings/members/memberid",
+            type: "PUT",
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({
+                mode: mode,
+                offset: offset
+            })
+        })
     }
 }
 

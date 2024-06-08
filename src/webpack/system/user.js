@@ -30,12 +30,12 @@ let user = {
 
                 systemActions.getSystemSettings()
                     .then(settings => {
-
+                        self.buildPage({},{systemSettings: settings});
                     })
             })
         })
     },
-    buildPage: function(args, data) {
+    buildPage: function(args={}, data={}) {
         let self = this;
         var lidlRTO = window.lidlRTO;
 
@@ -49,12 +49,12 @@ let user = {
                 container: pageContainer,
                 sidebar: sidebar,
                 data: {
-
+                    systemSettings: data.systemSettings,
                 },
                 args: {},
             });
             window.systemPage = systemPage;
-            // systemPage.addComponent(ComponentPage.componentTypes.SYSTEM.OPENID, {allowEdit: true, size: "full"}, {enabled: data.enabled, issuer: data.issuer, port: data.port, cookieSecrets: data.cookieSecrets, clients: data.clients});
+            systemPage.addComponent(ComponentPage.componentTypes.SYSTEM.MEMBER_CREATION, {allowEdit: true, size: "full"}, {systemSettings: data.systemSettings});
         })
 
     },

@@ -111,7 +111,7 @@ export default class ComponentPage {
             case ComponentPage.componentTypes.NEWS.ADD:
                 component = new CreateNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
-            case ComponentPage.componentTypes. NEWS.EDIT:
+            case ComponentPage.componentTypes.NEWS.EDIT:
                 component = new EditNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
                 break;
             case ComponentPage.componentTypes.SETTINGS.PASSWORD:

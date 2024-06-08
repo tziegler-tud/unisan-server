@@ -7,10 +7,29 @@ import {MDCList} from "@material/list";
 import {nanoid} from "nanoid";
 
 /**
+ * @typedef ListEntry
+ * @property label {string} list entry label as displayed
+ * @property value {any} corresponding value. String or Int for Labels, inputs and selects , Boolean for switch
+ */
+
+/**
+ * @typedef InteractionConfig
+ * @property type {string} one of "label", "switch", "input", "select"
+ * @property identifier {string} Must be unique. Used internally, is added to the interaction dom element as data-identifier
+ * @property valueFunc {Function} function to be parsed to obtain the value. Receives a ListEntry as single argument
+ * @property params {Object} passed as variable "params" to handlebars
+ * @property config {Object}
+ * @property config.classes {String | String[]} css class names to be added to the interaction
+ *
+ */
+
+/**
  *
  * @param element {HTMLElement} container element
  * @param config {Object}
  * @param data {Object}
+ * @param data.listEntries {ListEntry[]} Array of list entries. Each entry requires a "label" and "value" property
+ * @param data.interactions {InteractionConfig[]} Array of Interaction configurations
  * @param config.order {Integer} order inside componentContainer
  * @param config.entryLabel {Function} function to obtain label for entries. Receives entry as argument
  * @returns {InteractiveListComponent}
@@ -78,7 +97,7 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
 
     }
 
-    buildInteraction({type, identifier, value, params, config}){
+    buildInteraction({type, identifier, value, options, params, config}){
         let self = this;
         let interaction;
         let templateUrl = "/webpack/components/templates/switchInteraction.hbs";
@@ -92,12 +111,15 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
             case "label":
                 templateUrl = "/webpack/components/templates/labelInteraction.hbs";
                 break;
+            case "select":
+                templateUrl = "/webpack/components/templates/selectInteraction.hbs";
+
         }
         const uid = this.getNewIdentifier(type);
         return new Promise(function(resolve, reject){
             $.get(templateUrl, function (templateData) {
                 let template = Handlebars.compile(templateData);
-                let interaction = new Interaction({type, uid, identifier, template, templateData: {params: params}, value, config});
+                let interaction = new Interaction({type, uid, identifier, template, templateData: {params: params}, value, options, config});
                 resolve(interaction);
             })
         })
@@ -140,17 +162,20 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
 }
 
 class Interaction {
-    constructor({type, uid, identifier, template, templateData={}, value, config={}}={}){
+    constructor({type, uid, identifier, template, templateData={}, value, options=[], config={}}={}){
         this.id = uid;
         this.type = type;
         this.identifier = identifier;
         this.config = config
+        this.options = options;
+        this.value = value;
         templateData.id = this.id;
         templateData.identifier = this.identifier;
         templateData.type = this.type;
+        templateData.options = this.options;
+        templateData.config = this.config;
         this.html = template(templateData);
         this.element = undefined;
-        this.value = value
         this.getValFunc = function(){return undefined;}
         this.setValFunc = function(){return undefined;}
         this.observers = [];
@@ -213,7 +238,7 @@ class Interaction {
                     input.value = value;
                     return value;
                 }
-                input.addEventListener("changed", function(){
+                input.addEventListener("change", function(){
                     self.hasChanged();
                 })
                 self.element.addEventListener("click", function(){
@@ -242,6 +267,31 @@ class Interaction {
                     this.setValue(this.value)
                 }
                 break;
+
+            case "select":
+                let select = document.getElementById(this.id + "__select");
+                let description = document.getElementById(this.id + "__description")
+                this.getValFunc = function(){
+                    return select.value;
+                }
+                this.setValFunc = function(value){
+                    select.value = value;
+                    return value;
+                }
+                select.addEventListener("change", () => {
+                    this.hasChanged();
+                })
+                this.element.addEventListener("click", () => {
+                    this.isClicked();
+                })
+                //set value if one was given
+                if(this.value) {
+                    this.setValue(this.value)
+                }
+
+                function findSelectedOption(options, value){
+                    return options.find(option => option.value === value);
+                }
         }
 
     }
