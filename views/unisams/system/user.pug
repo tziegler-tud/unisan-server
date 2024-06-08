@@ -2,8 +2,6 @@ extends ../layout
 
 block page_includes
     link(rel='stylesheet', href='/static/unisams/stylesheets/user.css')
-    script(src="/static/unisams/js/qualificationActions.js")
-    //script(src="/static/unisams/js/settings.js")
     script(src="/dist/system.js")
 
 
@@ -19,22 +17,22 @@ block page_includes
 
 
 block content
-#wrapper
-    #page-container.page-container
-        #page-container-inner.page-container-inner.full-width.full-height
-            section#sec1
-                #sec-content.subpage-container
-                    #content1-heading.sec-heading.subpage-heading
-                        .sec-heading-label.propertypage-heading
-                            .propertypage-heading-container
-                                h3
-                                    | Einstellungen: Mitglieder
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .sec-heading-label.propertypage-heading
+                                .propertypage-heading-container
+                                    h3
+                                        | Einstellungen: Mitglieder
+                                    .clear
                                 .clear
-                            .clear
-                    #content1-text.sec-content.border-top
-                        .subpage-content
-                            .info-container
-                                #systemPage-component-container.systemPage-component-container.componentPage-component-container
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .info-container
+                                    #systemPage-component-container.systemPage-component-container.componentPage-component-container
 
 
 

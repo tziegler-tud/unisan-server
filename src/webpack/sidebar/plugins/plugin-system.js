@@ -175,10 +175,51 @@ let addOidcClient = new ContentHandler("addOidcClient",
     });
 
 
+
+let setMemberIdAssignment = new ContentHandler("setMemberIdAssignment",
+    function(sidebar, args, type) {
+
+        var onConfirm = args.callback.onConfirm;
+
+        let context = {
+            data: {
+                modeOptions: args.data.modeOptions,
+                offset: args.data.offset,
+                mode: args.data.mode,
+            },
+            title: args.title,
+        }
+        $.get('/webpack/sidebar/templates/system/sidebar-setMemberIdAssignment.hbs', function (data) {
+            var template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerCancelButton(".sidebar-cancel");
+
+            const mode = document.getElementById("sidebar-select-memberId--mode")
+            const offset = document.getElementById("sidebar-input-memberId--offset")
+
+            mode.value = args.data.mode;
+
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        const data = {
+                            mode: mode.value,
+                            offset: offset.value
+                        };
+                        onConfirm(data, {});
+                    }.bind(args)
+                });
+        });
+    });
+
+
 systemPlugin.addContentHandler(editSettings);
 systemPlugin.addContentHandler(editSettingsAdvanced);
 systemPlugin.addContentHandler(updateOidcClient);
 systemPlugin.addContentHandler(addOidcClient);
+systemPlugin.addContentHandler(setMemberIdAssignment);
 
 /**
  *

@@ -1,0 +1,9 @@
+<div id="{{id}}" class="interactiveList-interaction interaction--select" data-identifier="{{identifier}}" data-interactiontype="{{type}}">
+    <select id="{{id}}__select" class="common-select" name="{{identifier}}__select" {{#if params.disabled}}disabled{{/if}} {{#if params.required}}required{{/if}} {{#if params.multiple}}multiple{{/if}}>
+        {{#each options}}
+            <option value="{{this.value}}" {{#if this.disabled}}disabled{{/if}}>
+                {{this.label}}
+            </option>
+        {{/each}}
+    </select>
+</div>

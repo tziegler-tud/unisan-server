@@ -159,7 +159,7 @@ async function create(req, userParam, args) {
 
     //check if memberId is given
     if(userParam.generalData.memberId && userParam.generalData.memberId.value) {
-        if (await User.findOne({ generalData: {memberId: userParam.generalData.memberId.value }}))
+        if (await User.findOne({ generalData: {memberId: {value: userParam.generalData.memberId.value }}}))
             throw new Error(`MemberId ` + userParam.generalData.memberId.value + ` is already taken`);
     }
     else {
@@ -180,11 +180,17 @@ async function create(req, userParam, args) {
                     break;
                 case 'free':
                     const presentMemberIds = await User.distinct('generalData.memberId.value');
-                    memberId = lowestMissing(presentMemberIds, offset);
+                    memberId = lowestMissing(presentMemberIds, 0);
                     break;
                 default:
                 case 'unset':
+                case 'off':
+                    //dont generate ID
+                    memberId = undefined;
 
+            }
+            if (await User.findOne({ "generalData.memberId.value": memberId })) {
+                memberId = undefined;
             }
             userParam.generalData.memberId.value = memberId;
         }
@@ -299,10 +305,11 @@ async function create(req, userParam, args) {
         for (let i = 0; i < array.length; i++) {
             seen.set(array[i]);
         }
-        for (let i = offset; i <= array.length + 1; i++) {
+        const max = Math.max(...array);
+        for (let i = offset; i <= max ; i++) {
             if (!seen.has(i)) return i;
         }
-        return array.length + offset;
+        return max+1;
     }
 }
 
