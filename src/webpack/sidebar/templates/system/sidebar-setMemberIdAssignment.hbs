@@ -1,0 +1,88 @@
+
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span>{{title}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+                <div class="sidebar-title">
+                    <span>Nutzer anlegen: Mitgliedsnummer</span>
+                </div>
+                <div class="section-content">
+
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title participant-heading">
+                    Automatische Zuweisung
+                </div>
+                <div class="section-content">
+                    <div class="ak-form">
+                        <div class="ak-item">
+                            <label for="memberid-mode"></label>
+                            <select class="common-select" id="sidebar-select-memberId--mode" name="memberid-mode">
+                                {{#each data.modeOptions}}
+                                    <option value="{{this.value}}" {{#if this.disabled}}disabled{{/if}}>{{this.label}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="ak-item">
+                            <label for="memberid-offset">Startwert</label>
+                            <input class="common-input" id="sidebar-input-memberId--offset" name="memberid-offset" placeholder="0" value="{{data.offset}}" type="text"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section body-section">
+                <div class="section-title participant-heading">
+                    Erklärung
+                </div>
+                <div class="section-content">
+                    <div class="content-item">
+                        <span class="content-item--header">Frei ab Startwert:</span>
+                        <span class="content-item--content">Die nächste freie Nummer nach dem Startwert vergeben.</span>
+                    </div>
+                    <div class="content-item content-item--margin">
+                        <span class="content-item--header">Ab Startwert:</span>
+                        <span class="content-item--content">Die nächste Nummer nach dem Startwert wählen. Der Startwert wird dabei erhöht. Wenn die Nummer bereits vergeben ist, wird kein Wert gesetzt.</>
+                    </div>
+                    <div class="content-item content-item--margin">
+                        <span class="content-item--header">Frei:</span>
+                        <span class="content-item--content">Die niedrigste, unvergebene Nummer wählen. Startwert wird hierbei ignoriert.</span>
+                    </div>
+                    <div class="content-item content-item--margin">
+                        <span class="content-item--header">Deaktiviert:</span>
+                        <span class="content-item--content">Beim Erstellen wird keine Mitgliedsnummer vergeben.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
+            <a class="sidebar-delete sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    delete
+                </button>
+            </a>
+        </div>
+    </div>
+</div>

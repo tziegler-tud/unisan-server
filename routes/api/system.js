@@ -27,6 +27,8 @@ router.get('/settings/:key', getSettingsByKey);
 router.put('/settings/oidc', updateOidcSettings);
 router.put('/settings/key', updateSettingsByKey);
 
+router.put('/settings/members/memberid', updateMemberIdSettings);
+
 router.post("/oidc/restart", restartOidcService);
 router.post("/oidc/stop", stopOidcService);
 router.get("/oidc/status", getOidcServiceStatus);
@@ -108,6 +110,25 @@ function updateSettingsByKey(req, res, next){
 function updateSystemSettings(req, res, next){
     AuthService.auth(req.user, AuthService.operations.system.SYSTEM)
         .then(result => {
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+function updateMemberIdSettings(req, res, next){
+    AuthService.auth(req.user, AuthService.operations.system.SYSTEM)
+        .then(result => {
+            let data = SystemService.getSettings();
+            let mode = req.body.mode;
+            let offset = req.body.offset;
+            SystemService.setMemberIdSettings({mode: mode, offset: offset})
+                .then(result => {
+                    res.json(result);
+                })
+                .catch(err => {
+                    next(err);
+                })
         })
         .catch(err => {
             next(err);

@@ -29,6 +29,19 @@ var SystemSettingsScheme = new Schema({
                 type: String
             }],
         }
+    },
+    members: {
+        memberId: {
+            mode: {
+                type: String,
+                default: 'auto-free',
+            },
+            offset: {
+                type: Number,
+                auto: 0,
+            }
+        },
+
     }
 });
 
