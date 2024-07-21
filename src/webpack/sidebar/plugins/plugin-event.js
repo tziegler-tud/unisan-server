@@ -16,57 +16,57 @@
  *
  */
 
-import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton, SidebarTooltip} from "../sidebar.js";
-import {Searchbar} from "../../searchbar/searchbar.js";
-
 import "../sidebar-events.scss";
 import "../sidebar-addParticipant.scss";
 
-import {MDCList} from '@material/list';
+import SidebarPlugin from "../SidebarPlugin"
+import ContentHandler from "../ContentHandler";
+import SidebarButton from "../SidebarButton";
+import SidebarTooltip from "../SidebarTooltip";
 
+import {Searchbar} from "../../searchbar/searchbar.js";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
-import {getDataFromServer, getMatchingQualifications} from "../../helpers/helpers";
+import {getMatchingQualifications} from "../../helpers/helpers";
 import EditableInputField from "../../helpers/editableInputField";
 import {EditableTextField} from "../../helpers/editableTextField";
 
-import {MDCTooltip} from '@material/tooltip';
 
 let eventPlugin = new SidebarPlugin("event");
 
 
 let eventDetails = new ContentHandler("eventDetails",
     function(sidebar, args, type){
-        var event = args.event;
+        let event = args.event;
         let context = {
             event: event,
             args: args,
         }
         $.get('/webpack/sidebar/templates/events/sidebar-eventDetails.hbs', function (data) {
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton( ".sidebar-back-btn");
 
             let titleInputContainer = document.getElementById("sidebar-eventDetails--titleRenderer");
-            let editableInputField = new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
+            new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
 
             let descContainer = document.getElementById("sidebar-eventDetails--descRenderer");
-            let descField = new EditableTextField(descContainer, event.description.longDesc.delta, event.description.longDesc.html, {}, {readOnly: true});
+            new EditableTextField(descContainer, event.description.longDesc.delta, event.description.longDesc.html, {}, {readOnly: true});
 
         });
     });
 
 let showEventParticipants = new ContentHandler("eventParticipants",
     function(sidebar, args, type){
-        var event = args.event;
+        let event = args.event;
         let context = {
             event: event,
             args: args,
         }
         //populate
         $.get('/webpack/sidebar/templates/events/sidebar-eventParticipants.hbs', function (data) {
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton( ".sidebar-back-btn");
             // find if current user is registered for event
@@ -74,7 +74,6 @@ let showEventParticipants = new ContentHandler("eventParticipants",
             let notRegistered = $(notRegisteredSelector);
             let registeredSelector = "#sidebar-participate-button-registered";
             let registered = $(registeredSelector);
-            let target;
             if (args.isParticipant) {
                 notRegistered.addClass("hidden");
                 registered.removeClass("hidden");
@@ -97,17 +96,16 @@ let showEventParticipants = new ContentHandler("eventParticipants",
 
 let addEventParticipant = new ContentHandler("addEventParticipant",
     function(sidebar, args, type){
-        var event = args.event;
-        var filteredList = args.select
-        var onConfirm = args.callback.onConfirm;
-        var selectedUser = {role: "participant"};
+        let event = args.event;
+        let onConfirm = args.callback.onConfirm;
+        let selectedUser = {role: "participant"};
 
         //populate
         $.get('/webpack/sidebar/templates/events/sidebar-eventParticipantsAdd.hbs', function (data) {
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(event));
-            let backBtn = sidebar.registerBackButton(".sidebar-back-btn");
-            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerCancelButton(".sidebar-cancel");
             let confirmButton = new SidebarButton({
                 sidebar: sidebar,
                 selector: ".sidebar-confirm",
@@ -124,9 +122,8 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
             // displayUserList()
 
             //setup searchbar
-            let searchContainer = document.getElementById("search-container")
             let searchbarContainer = document.getElementById("usersearch");
-            var searchbar = new Searchbar(searchbarContainer, {
+            let searchbar = new Searchbar(searchbarContainer, {
                 hidden: false,
                 label: "Suche:",
                 noIcon: true,
@@ -166,7 +163,7 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
                         handleData.userlist = result;
                         // render userlist template
                         $.get('/webpack/sidebar/plugins/userselect-plugin.hbs', function (data) {
-                            var template = Handlebars.compile(data);
+                            let template = Handlebars.compile(data);
                             appendContent(template(handleData))
                         });
                     },
@@ -234,15 +231,15 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
 
 let assignUserSubpage = new ContentHandler("assignUserSubpage",
     function(sidebar, args, type){
-        var event = args.event;
-        var postingId = args.postingId;
-        var onConfirm = args.callback.onConfirm;
-        var onCancel = args.callback.onCancel;
-        var selectedUser = {};
+        let event = args.event;
+        let postingId = args.postingId;
+        let onConfirm = args.callback.onConfirm;
+        let onCancel = args.callback.onCancel;
+        let selectedUser = {};
 
         //populate
         $.get('/webpack/sidebar/templates/events/assignUserSubpage.hbs', function (data) {
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(event));
             let backBtn = sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel", {
@@ -265,9 +262,8 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
             // displayUserList()
 
             //setup searchbar
-            let searchContainer = document.getElementById("search-container")
             let searchbarContainer = document.getElementById("usersearch");
-            var searchbar = new Searchbar(searchbarContainer, {
+            let searchbar = new Searchbar(searchbarContainer, {
                 hidden: false,
                 label: "Suche:",
                 noIcon: true,
@@ -307,7 +303,7 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
                         handleData.userlist = result;
                         // render userlist template
                         $.get('/webpack/sidebar/plugins/userselect-plugin.hbs', function (data) {
-                            var template = Handlebars.compile(data);
+                            let template = Handlebars.compile(data);
                             appendContent(template(handleData))
                         });
                     },
@@ -432,8 +428,8 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
 
 let showUpdateEventDateContent = new ContentHandler("editEventDate",
     function(sidebar, args, type){
-        var onConfirm = args.callback.onConfirm;
-        var onDelete = args.callback.onDelete;
+        let onConfirm = args.callback.onConfirm;
+        let onDelete = args.callback.onDelete;
 
         let context = {
             userAgent: {
@@ -441,11 +437,10 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
             },
         };
         context.event = args.event;
-        var corrupted = false;
 
         $.get('/webpack/sidebar/templates/events/sidebar-updateEventDate.hbs', function (data) {
 
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
 
             let currentStartDate = new Date(context.event.date.startDate);
@@ -453,18 +448,17 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
             if (isNaN(currentStartDate.getFullYear()) || isNaN(currentEndDate.getFullYear())) {
                 currentStartDate = new Date();
                 currentEndDate = new Date();
-                var corrupted = true;
                 console.warn("trying to read corrupted data");
                 sidebar.addErrorMessage("Failed to read event date from database. Please set a new date.",  function(data){
                     $("#sidebar-inner").before(data);
                 }, false, true);
             }
 
-            var d1 = document.getElementById("eventinp-date");
-            var t1 = document.getElementById("eventinp-timeStart");
-            // var d2 = document.getElementById("endDate-input");
-            var t2 = document.getElementById("eventinp-timeEnd");
-            var l = document.getElementById("eventinp-location");
+            let d1 = document.getElementById("eventinp-date");
+            let t1 = document.getElementById("eventinp-timeStart");
+            // let d2 = document.getElementById("endDate-input");
+            let t2 = document.getElementById("eventinp-timeEnd");
+            let l = document.getElementById("eventinp-location");
 
             $(d1).val(currentStartDate.toDateInputValue())
             $(t1).val(currentStartDate.toTimeInputValue())
@@ -496,27 +490,23 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
 
 let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
     function(sidebar, args, type){
-        var onConfirm = args.callback.onConfirm;
+        let onConfirm = args.callback.onConfirm;
 
         let context = {};
         context.event = args.event;
-        var corrupted = false;
-
         $.get('/webpack/sidebar/templates/events/sidebar-updateEventLocation.hbs', function (data) {
 
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
 
             let location = context.event.location;
             if (location === undefined) {
-                location = "";
-                var corrupted = true;
                 console.warn("trying to read corrupted data");
                 sidebar.addErrorMessage("Failed to read event location from database.",  function(data){
                     $("#sidebar-inner").before(data);
                 }, false, true);
             }
-            var l = document.getElementById("eventinp-location");
+            let l = document.getElementById("eventinp-location");
 
             sidebar.registerBackButton(".sidebar-back-btn");
             let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
@@ -537,15 +527,14 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
 
 let showPostings = new ContentHandler("eventPostings",
     function(sidebar, args, type){
-        var onConfirm = args.callback.onConfirm;
+        let onConfirm = args.callback.onConfirm;
 
         let context = {};
         context.event = args.event;
-        var corrupted = false;
 
         $.get('/webpack/sidebar/templates/events/sidebar-eventPostings.hbs', function (data) {
 
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
 
             sidebar.registerBackButton(".sidebar-back-btn");
@@ -573,15 +562,14 @@ let showPostings = new ContentHandler("eventPostings",
 
 let addPosting = new ContentHandler("addEventPosting",
     function(sidebar, args, type){
-        var onConfirm = args.callback.onConfirm;
+        let onConfirm = args.callback.onConfirm;
 
         let context = {};
         context.event = args.event;
         context.title = "Dienstposten erstellen";
         context.args = args;
-        var corrupted = false;
 
-        var res = {qualifications: {}}
+        let res = {qualifications: {}}
 
         sidebar.getDataFromServer("/api/v1/qualification/groupByType", function(context){
 
@@ -598,7 +586,7 @@ let addPosting = new ContentHandler("addEventPosting",
             $.get('/webpack/sidebar/templates/events/sidebar-addEventPosting.hbs', function (tdata) {
 
                 context.qualifications = res.qualifications;
-                var template = Handlebars.compile(tdata);
+                let template = Handlebars.compile(tdata);
                 sidebar.sidebarHTML.html(template(context));
 
                 sidebar.registerBackButton(".sidebar-back-btn");
@@ -629,11 +617,11 @@ let addPosting = new ContentHandler("addEventPosting",
                         }.bind(args)
                     });
 
-                var levelObject = document.getElementById("qual-level");
-                var q = $("#qual-type");
+                let levelObject = document.getElementById("qual-level");
+                let q = $("#qual-type");
                 q.on("change",function(e){
-                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
-                    var qualNameObject = document.getElementById("qual-name");
+                    let typeData = res.qualifications.byType.find(element => element._id === e.target.value);
+                    let qualNameObject = document.getElementById("qual-name");
                     // remove existing options
                     qualNameObject.options.length = 0;
                     //add available options for selected type
@@ -646,9 +634,9 @@ let addPosting = new ContentHandler("addEventPosting",
                         qualNameObject.options[index] = option;
                     });
                 })
-                var n = $("#qual-name");
+                let n = $("#qual-name");
                 n.on("change",function(e){
-                    var qual = sidebar.findQualByIdInTypeArray(res.qualifications.byType, e.target.selectedOptions[0].dataset.qualid)
+                    let qual = sidebar.findQualByIdInTypeArray(res.qualifications.byType, e.target.selectedOptions[0].dataset.qualid)
                     levelObject.value = qual.level;
                 })
                 n.trigger("change");
@@ -659,10 +647,10 @@ let addPosting = new ContentHandler("addEventPosting",
 let showPostingDetails = new ContentHandler("showPostingDetails",
     function(sidebar, args, type){
         return new Promise(function(resolve, reject){
-            var onDelete = args.callback.onDelete;
-            var onConfirm = args.callback.onConfirm;
-            var onAssign = args.callback.onAssign;
-            var onUnassign = args.callback.onUnassign;
+            let onDelete = args.callback.onDelete;
+            let onConfirm = args.callback.onConfirm;
+            let onAssign = args.callback.onAssign;
+            let onUnassign = args.callback.onUnassign;
 
             let context = {};
             if(args.allowEdit === undefined) args.allowEdit = {};
@@ -674,8 +662,8 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
             context.args = args;
             context.isAssignedToSelf = false;
             context.assignedUser = undefined;
-            var corrupted = false;
-            var hasChanges = false;
+            let corrupted = false;
+            let hasChanges = false;
 
             context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
 
@@ -713,7 +701,7 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
             $.get('/webpack/sidebar/templates/events/sidebar-showPostingDetails.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 //create tooltips
                 let tooltipSetup = [
@@ -733,8 +721,8 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
                         });
                     }
                 })
-                var t1;
-                var t2;
+                let t1;
+                let t2;
                 if(args.allowEdit){
                     let currentStartDate = new Date(posting.date.startDate);
                     let currentEndDate = new Date(posting.date.endDate);
@@ -768,7 +756,7 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
                 if(posting.assigned.isAssigned){
                     if (args.allowEdit || context.isAssignedToSelf) {
-                        let unassignButton = new sidebar.registerButton(".sidebar-unassign",
+                        let unassignButton = sidebar.registerButton(".sidebar-unassign",
                             {
                                 type: "delete",
                                 customHandler: true,
@@ -787,7 +775,7 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
                 }
                 else {
-                    let assignSelfButton = new sidebar.registerButton(".sidebar-assignSelf",
+                    let assignSelfButton = sidebar.registerButton(".sidebar-assignSelf",
                         {
                             type: "allowed",
                             customHandler: true,
@@ -801,7 +789,7 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
                             },
                         }
                     )
-                    let assignButton = new sidebar.registerButton(".sidebar-assign",
+                    let assignButton = sidebar.registerButton(".sidebar-assign",
                         {
                             type: "custom",
                             customHandler: true,

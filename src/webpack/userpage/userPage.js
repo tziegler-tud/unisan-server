@@ -11,6 +11,7 @@ import {MDCRipple} from "@material/ripple";
 import {MDCMenu} from "@material/menu";
 import {MDCTextField} from "@material/textfield";
 import {MDCTextFieldHelperText} from "@material/textfield/helper-text";
+import Sidebar from "../sidebar/Sidebar";
 
 /**
  * user page Object

@@ -17,8 +17,8 @@ import {systemActions} from "../../actions/systemActions";
  * @constructor
  */
 export default class MemberCreationComponent extends Component {
-    constructor({page, componentId, componentType, pageData, data, args}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    constructor({page, componentId,  pageData, data, args}={}) {
+        super({page, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/system/memberCreation.hbs"
     }
 

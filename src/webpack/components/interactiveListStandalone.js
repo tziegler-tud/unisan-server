@@ -8,36 +8,39 @@ import {nanoid} from "nanoid";
 
 /**
  * @typedef ListEntry
- * @property label {string} list entry label as displayed
- * @property value {any} corresponding value. String or Int for Labels, inputs and selects , Boolean for switch
+ * @property {String} label - list entry label as displayed
+ * @property {String|Integer|Boolean} value  - corresponding value. String or Int for Labels, inputs and selects , Boolean for switch
+ * @property [String] icon - material ui icon font code. If unset, the default icon will be used
+ * @property {Boolean=true} interactive - if false, disables hover animations. Default true.
+ * @property {Boolean=true} disabled - if true, displays the list as disabled. Default false.
  */
 
 /**
  * @typedef InteractionConfig
- * @property type {string} one of "label", "switch", "input", "select"
- * @property identifier {string} Must be unique. Used internally, is added to the interaction dom element as data-identifier
- * @property valueFunc {Function} function to be parsed to obtain the value. Receives a ListEntry as single argument
- * @property params {Object} passed as variable "params" to handlebars
- * @property config {Object}
- * @property config.classes {String | String[]} css class names to be added to the interaction
+ * @property {String} type - one of "label", "switch", "input", "select"
+ * @property {String} identifier - Must be unique. Used internally, is added to the interaction dom element as data-identifier
+ * @property {Function} valueFunc - function to be parsed to obtain the value. Receives a ListEntry as single argument
+ * @property {Object} params - passed as variable "params" to handlebars
+ * @property {Boolean=true} interactive - if false, disables hover animations. Default true.
+ * @property {Boolean=true} disabled - if true, displays the list as disabled. Default false.
+ * @property {String} defaultIcon - default icon to be shown before list entries
+ * @property {String | String[]} config.classes - css class names to be added to the interaction
  *
  */
-
-/**
- *
- * @param element {HTMLElement} container element
- * @param config {Object}
- * @param data {Object}
- * @param data.listEntries {ListEntry[]} Array of list entries. Each entry requires a "label" and "value" property
- * @param data.interactions {InteractionConfig[]} Array of Interaction configurations
- * @param config.order {Integer} order inside componentContainer
- * @param config.entryLabel {Function} function to obtain label for entries. Receives entry as argument
- * @returns {InteractiveListComponent}
- * @constructor
- */
-
 
 export default class InteractiveListStandaloneComponent extends StandaloneComponent{
+    /**
+     *
+     * @param element {HTMLElement} container element
+     * @param config {Object}
+     * @param data {Object}
+     * @param data.listEntries {ListEntry[]} Array of list entries. Each entry requires a "label" and "value" property
+     * @param data.interactions {InteractionConfig[]} Array of Interaction configurations
+     * @param config.order {Integer} order inside componentContainer
+     * @param config.entryLabel {Function} function to obtain label for entries. Receives entry as argument
+     * @returns {InteractiveListComponent}
+     * @constructor
+     */
     constructor({element, config={}, data={listEntries: [], interactions: []}}={}) {
         super({name: "interactiveList", element: element, config: config, data: data});
         let defaultLabelFunc = function(entry){
@@ -51,6 +54,10 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
         this.templateUrl = "/webpack/components/templates/standalone/interactiveList.hbs";
         this.uid = nanoid();
         this.container.dataset.uid = this.uid;
+
+        this.config.defaultIcon = this.config.defaultIcon ?? "task_alt"
+        this.config.disabled = this.config.disabled ?? false;
+        this.config.interactive = this.config.interactive ?? true;
     }
 
     preRender(){
@@ -79,6 +86,9 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
                             entry.interactions = interactions;
                             entry.label = self.config.entryLabel(listEntry);
                             entry.listEntry = listEntry;
+                            entry.icon = listEntry.icon ?? self.config.defaultIcon;
+                            entry.interactive = listEntry.interactive ?? self.config.interactive;
+                            entry.disabled = listEntry.disabled ?? self.config.disabled;
                             self.entries.push(entry);
                             resolve();
                         })

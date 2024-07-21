@@ -13,7 +13,7 @@ import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 

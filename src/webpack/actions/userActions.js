@@ -173,9 +173,7 @@ var userActions = {
         });
     },
 
-    updateUserPassword: function (userid, currentPassword, newPassword, args, callback) {
-        callback = (callback == null) ? function () {
-        } : callback;
+    updateUserPassword: function (userid, currentPassword, newPassword, args, callback=()=>{}) {
         var data = {
             userid: userid,
             currentPassword: currentPassword,

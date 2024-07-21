@@ -14,8 +14,8 @@ import Component from "./Component";
  * @constructor
  */
 export default class GeneralSettingsComponent extends Component {
-    constructor({page, componentId, componentType, pageData, data, args}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    constructor({page, componentId,  pageData, data, args}={}) {
+        super({page, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/settings/generalSettings.hbs"
     }
 

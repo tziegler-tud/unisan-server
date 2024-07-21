@@ -1,4 +1,4 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions, eventActions, groupActions, newsActions} from "../actions/actions"
 

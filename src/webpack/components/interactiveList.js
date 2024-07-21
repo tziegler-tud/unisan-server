@@ -20,8 +20,8 @@ import {MDCList} from "@material/list";
 
 
 export default class InteractiveListComponent extends Component{
-    constructor({page, componentId=Date.now(), componentType, config={}}={}, data={listEntries: [], interactions: []}) {
-        super({page, componentId, componentType, data: data, args: config, });
+    constructor({page, componentId=Date.now(),  config={}}={}, data={listEntries: [], interactions: []}) {
+        super({page, componentId,  data: data, args: config, });
         let defaultLabelFunc = function(entry){
             return entry.toString();
         }
