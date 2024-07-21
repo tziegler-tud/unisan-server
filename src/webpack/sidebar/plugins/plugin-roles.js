@@ -1,4 +1,5 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
+import SidebarPlugin from "../SidebarPlugin"
+import ContentHandler from "../ContentHandler";
 
 import "../sidebar-addParticipant.scss";
 

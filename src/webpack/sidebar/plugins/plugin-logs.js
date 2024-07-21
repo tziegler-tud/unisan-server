@@ -1,5 +1,5 @@
-import {Sidebar, SidebarPlugin, ContentHandler, SidebarButton} from "../sidebar.js";
-
+import SidebarPlugin from "../SidebarPlugin"
+import ContentHandler from "../ContentHandler";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";

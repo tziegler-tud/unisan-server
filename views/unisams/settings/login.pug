@@ -1,0 +1,18 @@
+extends ./settings
+
+block page_includes
+
+    script.
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["settings.login"],
+        };
+        window.dockerArgs.activeContainer = "personalSettingsContainer";
+        window.dockerArgs.activeElementId = "personalSettings_login";
+        window.allowedit = #{allowedit};
+
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
+
+    script(src="/dist/settings.js")
+

@@ -2,7 +2,7 @@ import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
 
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
 import {EditableTextField} from "../helpers/editableTextField";

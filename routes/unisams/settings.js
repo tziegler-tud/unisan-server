@@ -34,14 +34,78 @@ function getDockerArguments (req, res, next) {
 /* GET home page. */
 // router.get("/*", auth);
 router.get("/*", getDockerArguments);
-router.get('/', userSettings);
+router.get('/general', userSettingsGeneral);
+router.get('/login', userSettingsLogin);
+router.get('/mail', userSettingsMail);
+router.get('/notifications', userSettingsNotifications);
+router.get('/privacy', userSettingsPrivacy);
 
 
 
-function userSettings(req, res, next) {
+function userSettingsGeneral(req, res, next) {
     userService.getByUsername(req.user.username)
         .then(user => {
-            res.render("unisams/settings/settings", {
+            res.render("unisams/settings/general", {
+                user: req.user._doc,
+                acl: req.acl,
+                title: user.username + " | Einstellungen",
+                refurl: req.params.username,
+                allowedit: true
+            })
+        })
+        .catch(err => next(err));
+}
+
+
+function userSettingsLogin(req, res, next) {
+    userService.getByUsername(req.user.username)
+        .then(user => {
+            res.render("unisams/settings/login", {
+                user: req.user._doc,
+                acl: req.acl,
+                title: user.username + " | Einstellungen",
+                refurl: req.params.username,
+                allowedit: true
+            })
+        })
+        .catch(err => next(err));
+}
+
+
+function userSettingsMail(req, res, next) {
+    userService.getByUsername(req.user.username)
+        .then(user => {
+            res.render("unisams/settings/mail", {
+                user: req.user._doc,
+                acl: req.acl,
+                title: user.username + " | Einstellungen",
+                refurl: req.params.username,
+                allowedit: true
+            })
+        })
+        .catch(err => next(err));
+}
+
+
+function userSettingsNotifications(req, res, next) {
+    userService.getByUsername(req.user.username)
+        .then(user => {
+            res.render("unisams/settings/notifications", {
+                user: req.user._doc,
+                acl: req.acl,
+                title: user.username + " | Einstellungen",
+                refurl: req.params.username,
+                allowedit: true
+            })
+        })
+        .catch(err => next(err));
+}
+
+
+function userSettingsPrivacy(req, res, next) {
+    userService.getByUsername(req.user.username)
+        .then(user => {
+            res.render("unisams/settings/privacy", {
                 user: req.user._doc,
                 acl: req.acl,
                 title: user.username + " | Einstellungen",

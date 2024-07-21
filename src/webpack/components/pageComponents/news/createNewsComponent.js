@@ -19,8 +19,8 @@ import EditableInputField from "../../../helpers/editableInputField";
  * @constructor
  */
 export default class CreateNewsComponent extends Component {
-    constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    constructor({page, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/news/createNews.hbs"
 
         const defaultData = {
