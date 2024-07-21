@@ -16,8 +16,18 @@ var UserSchema = new Schema({
     },
     internalEmail: {
         type: String,
-        default: function(){
-            return (this.generalData.firstName.value + "." + this.generalData.lastName.value + "@unisan-server.de").toLowerCase();
+        unique: true,
+        trim: true,
+    },
+    mail: {
+        applicationToken: {
+            type: String,
+        },
+        senderName: {
+            type: String,
+            default: function(){
+                return (this.generalData.firstName.value + " " + this.generalData.lastName.value)
+            },
         }
     },
     generalData: {

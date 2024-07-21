@@ -53,6 +53,8 @@ import protocolApiRouter from './routes/api/protocol.js';
 import systemApiRouter from './routes/api/system.js';
 import newsApiRouter from './routes/api/news.js';
 import devApiRouter from './routes/api/development.js';
+import mailRouter from './routes/api/mail.js';
+import apiSettingsRouter from './routes/api/settings.js';
 
 //initialize server
 var server = express();
@@ -63,6 +65,7 @@ import upload from "./config/multer.js";
 import oidcRouter from "./routes/oidc/index.js";
 import oidcInteractionsRouter from "./routes/oidc/interactions.js";
 import UserService from "./services/userService.js";
+import mailService from "./services/mail/mailService.js";
 
 
 
@@ -148,6 +151,8 @@ server.use('/api/v1/logs', logsRouter);
 server.use('/api/v1/system', systemApiRouter);
 server.use('/api/v1/news', newsApiRouter);
 server.use('/api/v1/dev', devApiRouter);
+server.use('/api/v1/mail', mailRouter);
+server.use('/api/v1/settings', apiSettingsRouter);
 server.use('/api/v1/apps/protocol', protocolApiRouter);
 // catch 404 and forward to error handler
 server.use("/api", function(req, res, next) {
@@ -187,6 +192,11 @@ SystemService.start({config: config})
                 throw new Error(err)
             })
 
+        if(settings.mail.enabled){
+            mailService.start()
+                .then(result => {})
+                .catch(err => {})
+        }
     })
     .catch(err => {
         console.log("Failed to get SystemSettings. This is a critical error, shutting down...");

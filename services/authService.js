@@ -168,6 +168,7 @@ let defaultSysAdmin = {
         operations.system.GOUPS,
         operations.system.SYSTEM,
         operations.system.QUALIFICATIONS,
+        operations.system.MAIL,
         operations.system.AUTH,
         operations.system.DEVELOPMENT,
     ]

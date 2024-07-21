@@ -184,7 +184,9 @@ function profile(req, res, next) {
                                     })
 
                             })
-                            .catch()
+                            .catch(err => {
+                                next(err)
+                            })
                     }
                     else {
                         // try if id was given
