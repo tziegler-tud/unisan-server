@@ -1,6 +1,6 @@
 import "./userprofile.scss";
 
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 import {UserProfile} from "../userprofile/userprofile";

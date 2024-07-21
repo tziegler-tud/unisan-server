@@ -1,19 +1,13 @@
-import {Sidebar} from "../sidebar/sidebar";
-import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
-
-import {groupActions} from "../actions/actions";
-import {Preloader} from "../helpers/preloader"
+import PageModule from "../utils/PageModule";
 
 
-let events = {
-    init: function () {
-        $(document).ready(function () {
+export default new PageModule({
+    title: "system.events",
+    pageData: {},
+    init: async function (args) {
+            return {args: {}, data: {}}
+        },
+    buildPage: async function({args={}, data={}}={}) {
 
-            //debug line, remove before flight
-            console.log("loading js module: system.events");
-
-        })
     }
-};
-
-export {events}
+});

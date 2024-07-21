@@ -11,7 +11,7 @@ import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 
 import {Preloader} from "../helpers/preloader";
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import {logPlugin} from "../sidebar/plugins/plugin-logs";

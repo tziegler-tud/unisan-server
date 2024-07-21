@@ -1,0 +1,14 @@
+extends ./settings
+
+block page_includes
+
+    script.
+        window.jsmodule = {
+            module: "settings",
+            loaders: ["settings.privacy"],
+        };
+        window.dockerArgs.activeContainer = "personalSettingsContainer";
+        window.dockerArgs.activeElementId = "personalSettings_privacy";
+        window.allowedit = #{allowedit};
+
+    script(src="/dist/settings.js")

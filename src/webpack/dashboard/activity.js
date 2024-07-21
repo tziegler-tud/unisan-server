@@ -1,4 +1,4 @@
-import {Sidebar} from "../sidebar/sidebar";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {phone, tablet} from "../helpers/variables";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";

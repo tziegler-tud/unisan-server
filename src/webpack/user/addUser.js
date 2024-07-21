@@ -3,16 +3,9 @@ import "./addUser.scss";
 
 import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
-import {MDCTextFieldIcon} from '@material/textfield/icon';
 import {MDCList} from '@material/list';
 import {MDCRipple} from '@material/ripple';
 
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
-import {userPlugin} from "../sidebar/plugins/plugin-user";
-
-import {lidl} from "../../lib/lidl-modules/core/lidlModular-0.2";
-import {Observer as lidlObserver} from "../../lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
 import PageSlider from "../../lib/lidl-modules/pageSlider/pageSlider";
 
 

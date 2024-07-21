@@ -2,20 +2,6 @@ extends ../layout
 
 block page_includes
 
-    script.
-        window.jsmodule = {
-            module: "settings",
-            loaders: ["authSettings"],
-        };
-        window.dockerArgs.activeContainer = "userprofileContainer";
-        window.dockerArgs.activeElementId = "userprofileSettings";
-        window.allowedit = #{allowedit};
-
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_userprofile.css')
-    //link(rel='stylesheet', href='/static/unisams/stylesheets/editUser.css')
-
-    script(src="/dist/settings.js")
-
 block content
     #wrapper
         #page-container.page-container

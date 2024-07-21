@@ -1,39 +1,17 @@
-// factory for building html elements
-import {EditableTextField} from "../helpers/editableTextField";
-import EditableInputField from "../helpers/editableInputField";
-import {userActions, eventActions, groupActions} from "../actions/actions"
-import Handlebars from "handlebars";
-import * as FilePond from "filepond";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import FilePondPluginGetFile from "filepond-plugin-get-file";
-import {MDCList} from "@material/list";
-import {MDCRipple} from "@material/ripple";
-import {MDCMenu} from "@material/menu";
-import {MDCTextField} from "@material/textfield";
-import {MDCTextFieldHelperText} from "@material/textfield/helper-text";
-
 import "./scss/componentPage.scss";
 import PasswordComponent from "./PasswordComponent";
 import GeneralSettingsComponent from "./GeneralSettingsComponent";
 import ConnectedServicesComponent from "./ConnectedServicesComponent";
-import OpenIdSettingsComponent from "./OpenIdSettingsComponent";
+import OpenIdSettingsComponent from "./pageComponents/system/OpenIdSettingsComponent";
 import MemberCreationComponent from "./componentPageModules/MemberCreationComponent";
-import InteractiveListComponent from "./interactiveList";
 import NewsComponent from "./pageComponents/dashboard/newsComponent";
 import CreateNewsComponent from "./pageComponents/news/createNewsComponent";
 import EditNewsComponent from "./pageComponents/news/editNewsComponent";
+import UserMailSettingsComponent from "./pageComponents/settings/UserMailSettingsComponent";
+import UserMailPasswordComponent from "./pageComponents/settings/UserMailPasswordComponent";
+import UserMailDevComponent from "./pageComponents/settings/UserMailDevComponent";
+import MailSettingsComponent from "./pageComponents/system/MailSettingsComponent";
 
-/**
- * generic component page Object
- * @param args
- * @param args.container {HTMLElement} container element for the page
- * @param args.data {Object} data to be available inside user page object
- * @param args.sidebar {Sidebar} sidebar object
- * @param args.snackbar {Snackbar} snackbar object
- * @param args.args {Object} additional args
- * @returns {ComponentPage}
- * @constructor
- */
 export default class ComponentPage {
     /**
      *
@@ -41,24 +19,35 @@ export default class ComponentPage {
      */
     static componentTypes = {
         DASHBOARD: {
-            NEWS:               "dashboard.news",
+            NEWS:               NewsComponent,
         },
         NEWS: {
-            ADD:                "news.add",
-            EDIT:               "news.edit",
+            ADD:                CreateNewsComponent,
+            EDIT:               EditNewsComponent,
         },
         SETTINGS: {
-            GENERAL:            "settings.general",
-            PASSWORD:           "settings.password",
-            CONNECTEDSERVICES:  "settings.connectedServices",
+            GENERAL:            GeneralSettingsComponent,
+            PASSWORD:           PasswordComponent,
+            USER_MAIL:          UserMailSettingsComponent,
+            USER_MAIL_PASSWORD:          UserMailPasswordComponent,
+            USER_MAIL_DEV:          UserMailDevComponent,
+            CONNECTEDSERVICES:  ConnectedServicesComponent,
         },
         SYSTEM: {
-            OPENID:             "system.openid",
-            MEMBER_CREATION:    "system.memberCreation",
+            OPENID:             OpenIdSettingsComponent,
+            MEMBER_CREATION:    MemberCreationComponent,
+            MAIL:               MailSettingsComponent,
         },
-        GENERIC:            "generic",
     };
 
+    /**
+     *
+     * @param {HTMLElement} container
+     * @param [Object={}] data
+     * @param {Sidebar} sidebar
+     * @param {Snackbar} snackbar
+     * @param {Object} args
+     */
     constructor({container=null, data={}, sidebar=null, snackbar=window.snackbar, args={}}={}) {
 
         this.data = data;
@@ -81,12 +70,13 @@ export default class ComponentPage {
                 return this.current;
             }
         }
+
+        this.args = args;
     }
 
     renderComponentHtml(html){
-        let self = this;
-        return new Promise(function(resolve, reject){
-            self.componentContainer.append(html);
+        return new Promise((resolve, reject) => {
+            this.componentContainer.append(html);
             let result = {
                 error: false,
             }
@@ -97,39 +87,14 @@ export default class ComponentPage {
     /**
      *
      * @param componentType
-     * @param args
+     * @param componentArgs
      * @param data
      * @returns {Promise<void>}
      */
-    addComponent(componentType, args, data) {
+    addComponent(componentType, componentArgs, data) {
+        const args = Object.assign(this.args, componentArgs)
         let componentId = this.componentCounter.next();
-        let component;
-        switch(componentType){
-            case ComponentPage.componentTypes.DASHBOARD.NEWS:
-                component = new NewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.NEWS.ADD:
-                component = new CreateNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.NEWS.EDIT:
-                component = new EditNewsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.SETTINGS.PASSWORD:
-                component = new PasswordComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.SETTINGS.GENERAL:
-                component = new GeneralSettingsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.SETTINGS.CONNECTEDSERVICES:
-                component = new ConnectedServicesComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.SYSTEM.OPENID:
-                component = new OpenIdSettingsComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-            case ComponentPage.componentTypes.SYSTEM.MEMBER_CREATION:
-                component = new MemberCreationComponent({page: this, componentId: componentId, componentType: componentType, pageData: this.data, data: data, args: args});
-                break;
-        }
+        let component = new componentType({page: this, componentId: componentId,  pageData: this.data, data: data, args: args});
         return this.addInternal(component)
     }
 

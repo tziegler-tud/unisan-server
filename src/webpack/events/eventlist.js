@@ -1,15 +1,11 @@
 import "./eventlist.scss";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
-const {ScrollableList} = require("../scrollableList/scrollableList");
-const {Sidebar} = require("../sidebar/sidebar");
+import {ScrollableList}  from "../scrollableList/scrollableList";
+import Sidebar from "../sidebar/Sidebar";
 import {Searchbar} from "../searchbar/searchbar";
-import {Corner, DropdownMenu} from "../helpers/dropdownMenu";
 import {eventActions} from "../actions/eventActions";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
-
-var phone = window.matchMedia("only screen and (max-width: 50em)");
-var tablet = window.matchMedia("only screen and (min-width: 50em) and (max-width: 75em)");
 
 $(document).ready (function () {
     buildPage();

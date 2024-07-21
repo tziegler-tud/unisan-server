@@ -1,7 +1,4 @@
-
-
-var qualificationActions = {
-
+export default {
     removeQualification: function(qualificationId, value, args, callback){
         callback = (callback == null) ? function(){} : callback;
         var data = {
@@ -58,6 +55,16 @@ var qualificationActions = {
             }
         });
     },
-}
 
-export {qualificationActions}
+    /**
+     *
+     * @returns {jQuery.jqXHR}
+     */
+    getGrouped: function(){
+        return $.ajax({
+            url: "/api/v1/qualification/groupByType",
+            type: 'GET',
+            contentType: "application/json; charset=UTF-8",
+        })
+    }
+}

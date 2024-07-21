@@ -9,6 +9,6 @@ const common = require('./webpack.common.js');
 
 
 module.exports = merge(common, {
-    watch: true,
+    watch: false,
     mode: 'production',
 });

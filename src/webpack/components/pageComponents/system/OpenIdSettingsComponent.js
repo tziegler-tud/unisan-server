@@ -1,13 +1,11 @@
-import Handlebars from "handlebars";
-import {userActions} from "../actions/userActions";
-import {ComponentPage} from "./ComponentPage";
-import ComponentObserver from "./ComponentObserver.js";
-import Component from "./Component";
-import InteractiveListStandaloneComponent from "./interactiveListStandalone";
-import {qualificationActions, systemActions} from "../actions/actions";
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {escapeSelector} from "../helpers/helpers";
-import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
+import {ComponentPage} from "../../ComponentPage";
+import ComponentObserver from "../../ComponentObserver.js";
+import Component from "../../Component";
+import InteractiveListStandaloneComponent from "../../interactiveListStandalone";
+import {systemActions} from "../../../actions/actions";
+import {ScrollableList} from "../../../scrollableList/scrollableList";
+import {Dialog as lidlDialog} from "../../../../lib/lidl-modules/dialog/lidl-dialog";
+import {systemPlugin} from "../../../sidebar/plugins/plugin-system";
 
 /**
  *
@@ -20,9 +18,11 @@ import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
  * @constructor
  */
 export default class OpenIdSettingsComponent extends Component {
-    constructor({page, componentId, componentType, pageData={}, data, args}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    constructor({page, componentId,  pageData={}, data, args}={}) {
+        super({page, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/system/openIdSettings.hbs"
+        page.sidebar.addPlugin(systemPlugin)
+
     }
 
     async postRender(){
