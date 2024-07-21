@@ -75,6 +75,7 @@ class SystemService {
             self.load()
                 .then(result=> {
                     self.settings = result;
+                    self.save();
                     resolve(result)
                 })
                 .catch(err=> {

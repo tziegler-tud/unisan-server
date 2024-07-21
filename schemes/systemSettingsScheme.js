@@ -30,6 +30,37 @@ var SystemSettingsScheme = new Schema({
             }],
         }
     },
+    mail: {
+        enabled: {
+            type: Boolean,
+            default: true,
+        },
+        createAccountOnUserCreation: {
+            type: Boolean,
+            default: false,
+        },
+        url: {
+            type: String,
+        },
+        port: {
+            type: Number,
+        },
+        baseUrl: {
+            type: String,
+        },
+        imap_url: {
+            type: String,
+        },
+        smtp_url: {
+            type: String,
+        },
+        apiKey: {
+            type: String,
+        },
+        domain: {
+            type: String,
+        }
+    },
     members: {
         memberId: {
             mode: {
