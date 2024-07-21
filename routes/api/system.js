@@ -8,6 +8,7 @@ import AuthService from "../../services/authService.js";
 import SystemService from "../../services/SystemService.js";
 import OidcService from "../../services/oidc/oidcService.js";
 import {transformTimestamp} from "../../helpers/helpers.js";
+import MailService from "../../services/mail/mailService.js";
 
 var app = express();
 
@@ -25,6 +26,7 @@ router.post('/settings/update', updateSystemSettings);
 
 router.get('/settings/:key', getSettingsByKey);
 router.put('/settings/oidc', updateOidcSettings);
+router.put('/settings/mail', updateMailSettings);
 router.put('/settings/key', updateSettingsByKey);
 
 router.put('/settings/members/memberid', updateMemberIdSettings);
@@ -38,6 +40,10 @@ router.get("/oidc/secrets/:id", getOidcClientSecret);
 router.post("/oidc/clients", addOidcClient);
 router.put("/oidc/clients/:id", updateOidcClient);
 router.delete("/oidc/clients/:id", removeOidcClient);
+
+router.post("/mail/restart", restartMailService);
+router.post("/mail/stop", stopMailService);
+router.get("/mail/status", getMailServiceStatus);
 
 router.post("/oidc/jwk/add", addJwkKey);
 router.post("/oidc/jwk/move", moveJwkKey);
@@ -349,6 +355,60 @@ function deleteJwkKey(req, res, next){
                 .catch(err => {
                     next(err);
                 })
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+
+function updateMailSettings(req, res, next){
+    AuthService.auth(req.user, AuthService.operations.system.MAIL)
+        .then(result => {
+            let key = "mail";
+            let body = req.body;
+            SystemService.set({key: key, value: body})
+                .then(result => {
+                    res.json(result);
+                })
+                .catch(err => {
+                    next(err);
+                })
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+async function stopMailService(req, res, next){
+    try {
+        await AuthService.auth(req.user, AuthService.operations.system.MAIL)
+        await MailService.stop()
+        await SystemService.set({key: "mail", value: {enabled: false}})
+        res.json({});
+    }
+    catch(e){
+        next(e);
+    }
+}
+
+async function restartMailService(req, res, next){
+    try {
+        await AuthService.auth(req.user, AuthService.operations.system.MAIL)
+        await MailService.restart()
+        await SystemService.set({key: "mail", value: {enabled: true}})
+        res.json({});
+    }
+    catch(e){
+        next(e);
+    }
+}
+
+function getMailServiceStatus(req, res, next){
+    AuthService.auth(req.user, AuthService.operations.system.MAIL)
+        .then(result => {
+            const status = MailService.getState();
+            res.json({status: status});
         })
         .catch(err => {
             next(err);
