@@ -1,35 +1,36 @@
-import {Sidebar} from "../sidebar/sidebar";
+import Sidebar from "../sidebar/Sidebar.js";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 
 import {groupActions} from "../actions/actions";
 import {Preloader} from "../helpers/preloader"
+import PageModule from "../utils/PageModule";
 
 
-let groups = {
-    init: function () {
-        $(document).ready(function () {
-
-            //debug line, remove before flight
-            console.log("loading js module: system.roles");
-
+export default new PageModule({
+    title: "system.groups",
+    pageData: {},
+    init: async function (args) {
             //init sidebar
-            let addDBKey_sidebar = new Sidebar('wrapper', "test");
-            addDBKey_sidebar.addPlugin(rolesPlugin);
+        let addDBKey_sidebar = new Sidebar('wrapper', "test");
+        addDBKey_sidebar.addPlugin(rolesPlugin);
+        window.sidebar = addDBKey_sidebar;
+        return {args: {sidebar: addDBKey_sidebar}, data: {}}
 
-            $(".addRoleButton").on("click", function (e) {
-                e.preventDefault();
-                addDBKey_sidebar.addContent('addGroup', {
-                        callback: {
-                            onConfirm: function (data, args) {
-                                groupActions.addGroup(data, args);
-                            }
+    },
+    buildPage: async function({args={}, data={}}={}) {
+        const sidebar = args.sidebar ?? window.sidebar;
+        $(".addRoleButton").on("click", function (e) {
+            e.preventDefault();
+            sidebar.addContent('addGroup', {
+                    callback: {
+                        onConfirm: function (data, args) {
+                            groupActions.addGroup(data, args);
                         }
-                    },
-                );
-                addDBKey_sidebar.show();
-            });
-        })
+                    }
+                },
+            );
+            sidebar.show();
+        });
     }
-};
 
-export {groups}
+})

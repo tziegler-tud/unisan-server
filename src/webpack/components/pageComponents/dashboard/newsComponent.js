@@ -1,17 +1,8 @@
-import Handlebars from "handlebars";
-import ComponentPage from "../../ComponentPage";
 import Component from "../../Component";
-import {EditableTextField} from "../../../helpers/editableTextField";
-
-var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 const {ScrollableList} = require("../../../scrollableList/scrollableList");
-const {Sidebar} = require("../../../sidebar/sidebar");
-import {Searchbar} from "../../../searchbar/searchbar";
-import {Corner, DropdownMenu} from "../../../helpers/dropdownMenu";
 import {Dialog as LidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
-
 import "../../scss/newsComponent.scss";
-import {eventActions, newsActions} from "../../../actions/actions";
+import {newsActions} from "../../../actions/actions";
 import {dateFromNow, transformDateTimeString} from "../../../helpers/helpers";
 
 /**
@@ -25,8 +16,8 @@ import {dateFromNow, transformDateTimeString} from "../../../helpers/helpers";
  * @constructor
  */
 export default class NewsComponent extends Component {
-    constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    constructor({page, componentId, pageData={}, data={}, args={}}={}) {
+        super({page, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/dashboard/newsComponent.hbs"
         this.data.news = [];
         this.filter = {};

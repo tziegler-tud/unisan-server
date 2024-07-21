@@ -9,6 +9,13 @@
 .interactiveList {
 
   .interactiveList-list {
+    &.interactiveList-list--disable-hover {
+      .interactiveList-list-item:hover {
+        cursor: default !important;
+      }
+
+
+    }
     .interactiveList-list-item {
       .interactiveList-item-content {
         display: flex;

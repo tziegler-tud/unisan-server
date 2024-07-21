@@ -21,8 +21,8 @@ import {Dialog as LidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
  * @constructor
  */
 export default class EditNewsComponent extends Component {
-    constructor({page, componentId, componentType, pageData={}, data={}, args={}}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    constructor({page, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/news/editNews.hbs"
 
         const defaultData = {
