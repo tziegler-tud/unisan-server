@@ -10,6 +10,7 @@ import {nanoid} from "nanoid";
  * @typedef ListEntry
  * @property {String} label - list entry label as displayed
  * @property {String|Integer|Boolean} value  - corresponding value. String or Int for Labels, inputs and selects , Boolean for switch
+ * @property {String} identifier - should be unique, can be used to identify the entry
  * @property [String] icon - material ui icon font code. If unset, the default icon will be used
  * @property {Boolean=true} interactive - if false, disables hover animations. Default true.
  * @property {Boolean=true} disabled - if true, displays the list as disabled. Default false.
@@ -43,13 +44,28 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
      */
     constructor({element, config={}, data={listEntries: [], interactions: []}}={}) {
         super({name: "interactiveList", element: element, config: config, data: data});
+
+        /**
+         * @type {Interaction[]}
+         */
+        this.interactions = [];
+
+        /**
+         * @type {Entry[]}
+         */
+        this.entries = [];
+
+        /**
+         *
+         * @param {Entry} entry
+         * @returns {string}
+         */
         let defaultLabelFunc = function(entry){
             return entry.toString();
         }
         this.config.entryLabel = this.config.entryLabel ? this.config.entryLabel : defaultLabelFunc;
         this.interactionData = data.interactions;
-        this.interactions = [];
-        this.entries = [];
+
         this.identifierCounter = 0;
         this.templateUrl = "/webpack/components/templates/standalone/interactiveList.hbs";
         this.uid = nanoid();
@@ -70,11 +86,20 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
             let index = 0;
             self.data.listEntries.forEach(listEntry => {
                 index++;
-                let entry = {order: index}
+                let entry = new Entry({
+                    label: self.config.entryLabel(listEntry),
+                    listEntry: listEntry,
+                    icon: listEntry.icon ?? self.config.defaultIcon,
+                    order: index,
+                    interactive: listEntry.interactive ?? self.config.interactive,
+                    disabled: listEntry.disabled ?? self.config.disabled,
+                })
+                self.entries.push(entry);
                 outerPromises.push(new Promise(function(resolve, reject){
                     let promises = [];
                     self.interactionData.forEach(interactionData => {
                         interactionData.value = interactionData.valueFunc(listEntry);
+                        interactionData.entry = listEntry;
                         promises.push(self.buildInteraction(interactionData))
                     })
                     Promise.all(promises)
@@ -83,13 +108,7 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
                                 self.interactions.push(interaction);
                             })
                             //add interactions to list entry
-                            entry.interactions = interactions;
-                            entry.label = self.config.entryLabel(listEntry);
-                            entry.listEntry = listEntry;
-                            entry.icon = listEntry.icon ?? self.config.defaultIcon;
-                            entry.interactive = listEntry.interactive ?? self.config.interactive;
-                            entry.disabled = listEntry.disabled ?? self.config.disabled;
-                            self.entries.push(entry);
+                            entry.setInteractions(interactions);
                             resolve();
                         })
                 }))
@@ -107,7 +126,7 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
 
     }
 
-    buildInteraction({type, identifier, value, options, params, config}){
+    buildInteraction({type, identifier, value, entry, options, params, config}){
         let self = this;
         let interaction;
         let templateUrl = "/webpack/components/templates/switchInteraction.hbs";
@@ -129,7 +148,7 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
         return new Promise(function(resolve, reject){
             $.get(templateUrl, function (templateData) {
                 let template = Handlebars.compile(templateData);
-                let interaction = new Interaction({type, uid, identifier, template, templateData: {params: params}, value, options, config});
+                let interaction = new Interaction({type, uid, identifier, template, templateData: {params: params}, value, entry, options, config});
                 resolve(interaction);
             })
         })
@@ -172,13 +191,14 @@ export default class InteractiveListStandaloneComponent extends StandaloneCompon
 }
 
 class Interaction {
-    constructor({type, uid, identifier, template, templateData={}, value, options=[], config={}}={}){
+    constructor({type, uid, identifier, template, templateData={}, value, entry, options=[], config={}}={}){
         this.id = uid;
         this.type = type;
         this.identifier = identifier;
         this.config = config
         this.options = options;
         this.value = value;
+        this.entry = entry;
         templateData.id = this.id;
         templateData.identifier = this.identifier;
         templateData.type = this.type;
@@ -318,6 +338,7 @@ class Interaction {
         const data = {
             value: this.getValue(),
             interaction: this,
+            entry: this.entry,
         }
         //notify observers
         this.observers.forEach(observer => {
@@ -329,6 +350,7 @@ class Interaction {
         const data = {
             value: this.getValue(),
             interaction: this,
+            entry: this.entry,
         }
         //notify observers
         this.observers.forEach(observer => {
@@ -339,6 +361,32 @@ class Interaction {
     addObserver(observer){
         this.observers.push(observer);
     }
+}
 
+class Entry {
+    /**
+     *
+     * @param {String} label
+     * @param {Object} listEntry
+     * @param {String} icon
+     * @param {Integer} order
+     * @param {Boolean} interactive
+     * @param {Boolean} disabled
+     */
+    constructor({label, listEntry, icon, order, interactive, disabled}) {
+        this.label = label
+        this.listEntry = listEntry;
+        this.icon = icon;
+        this.order = order;
+        this.interactive = interactive;
+        this.disabled = disabled;
+    }
 
+    /**
+     *
+     * @param {Interaction[]} interactions
+     */
+    setInteractions(interactions){
+        this.interactions = interactions;
+    }
 }
