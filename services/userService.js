@@ -28,6 +28,7 @@ class UserService{
         this.userCreateAsyncMiddlewareHooks = [];
         this.userCreatePostHooks = [];
         this.userCreateAsyncPostHooks = [];
+        this.userDeleteAsyncPostHooks = [];
     }
 
     /*************************
@@ -82,38 +83,56 @@ class UserService{
         this.userCreateAsyncPostHooks.push(new AsyncServiceMiddleware(func, defaultArgs));
     }
 
-    executeUserCreateMiddlewares(userObject, allowModification=false) {
-        let updatedUserObject = userObject;
-        for (let middleware of this.userCreateMiddlewareHooks) {
-            let middlewareResult = middleware.call({user: userObject});
-            const result = middlewareResult.result;
-            if(result) updatedUserObject = middlewareResult.data;
-        }
-        return updatedUserObject;
+    /**
+     * Adds a function to be executed after a user is deleted.
+     * Gets called with one argument, which is an object containing the default keys, and additonally a key "user" containing the deleted user object.
+     * if a key "user" already exists in default args, it is overwritten.
+     * @param {Function} func
+     * @param {Object} defaultArgs
+     */
+    addPostUserDeleteHookAsync(func, defaultArgs) {
+        this.userDeleteAsyncPostHooks.push(new AsyncServiceMiddleware(func, defaultArgs));
+    }
+
+    executeUserCreateMiddlewares(userObject) {
+        return this._executeMiddlewares(this.userCreateMiddlewareHooks, userObject)
     }
 
     async executeUserCreateAsyncMiddlewares(userObject, allowModification=false) {
+        return await this._executeAsyncMiddlewares(this.userCreateAsyncMiddlewareHooks, userObject)
+    }
+
+    executePostUserCreateMiddlewares(userObject) {
+        return this._executeMiddlewares(this.userCreatePostHooks, userObject)
+    }
+
+    async executePostUserCreateMiddlewaresAsync(userObject) {
+        return await this._executeAsyncMiddlewares(this.userCreateAsyncPostHooks, userObject)
+    }
+
+    async executePostUserDeleteMiddlewaresAsync(userObject) {
+        return await this._executeAsyncMiddlewares(this.userDeleteAsyncPostHooks, userObject)
+    }
+
+    _executeMiddlewares(middlewareArray, userObject) {
         let updatedUserObject = userObject;
-        for (let middleware of this.userCreateAsyncMiddlewareHooks) {
-            let middlewareResult = await middleware.call({user: userObject});
+
+        for(let middleware of middlewareArray) {
+            let middlewareResult = middleware.call({user: userObject})
             const result = middlewareResult.result;
             if(result) updatedUserObject = middlewareResult.data;
         }
         return updatedUserObject;
     }
 
-    executePostUserCreateMiddlewares(userObject) {
-        this.userCreatePostHooks.forEach(middleware => {
-            let middlewareResult = middleware.call({user: userObject})
-            const result = middlewareResult.result;
-        })
-    }
-
-    async executePostUserCreateMiddlewaresAsync(userObject) {
-        for(let middleware of this.userCreateAsyncPostHooks) {
+    async _executeAsyncMiddlewares(middlewareArray, userObject) {
+        let updatedUserObject = userObject;
+        for(let middleware of middlewareArray) {
             let middlewareResult = await middleware.call({user: userObject})
             const result = middlewareResult.result;
+            if(result) updatedUserObject = middlewareResult.data;
         }
+        return updatedUserObject;
     }
 
     /***************************
@@ -1608,47 +1627,44 @@ class UserService{
     async delete(req, id) {
 
         let user = await User.findById(id);
-
-        return new Promise(function(resolve, reject) {
-            // await User.findByIdAndRemove(id);
-            let deleteUser = User.findByIdAndRemove(id);
-            let deleteUserACL = UserACL.deleteOne({user: id});
-            Promise.all([deleteUser, deleteUserACL])
-                .then((resultArray)=> {
-                    let user = resultArray[0];
-                    resolve(user);
-                    console.log("Deleted user with id: " + user._id);
-                    //create log
-                    let log = new Log({
-                        type: "modification",
-                        action: {
-                            objectType: "user",
-                            actionType: "delete",
-                            actionDetail: "userDelete",
-                            key: user.id,
-                            originalValue: user.username,
-                            value: "",
-                            tag: "<DELETE>"
-                        },
-                        authorizedUser: req.user,
-                        target: {
-                            targetType: "user",
-                            targetObject: user._id,
-                            targetObjectId: user._id,
-                            targetModel: "User",
-                        },
-                        httpRequest: {
-                            method: req.method,
-                            url: req.originalUrl,
-                        }
-                    })
-                    LogService.create(log)
-                        .then()
-                        .catch()
-                    //TODO: update exisiting logs for user
-                })
-
+        if(!user) {
+            throw new Error("Failed to delete user with ID '" + id + "': User not found.")
+        }
+        let deletedUser = await User.findByIdAndRemove(id);
+        let deleteUserACL = await UserACL.deleteOne({user: id});
+        console.log("Deleted user with id: " + deletedUser._id);
+        //create log
+        let log = new Log({
+            type: "modification",
+            action: {
+                objectType: "user",
+                actionType: "delete",
+                actionDetail: "userDelete",
+                key: deletedUser.id,
+                originalValue: deletedUser.username,
+                value: "",
+                tag: "<DELETE>"
+            },
+            authorizedUser: req.user,
+            target: {
+                targetType: "user",
+                targetObject: deletedUser._id,
+                targetObjectId: deletedUser._id,
+                targetModel: "User",
+            },
+            httpRequest: {
+                method: req.method,
+                url: req.originalUrl,
+            }
         })
+        LogService.create(log)
+            .then()
+            .catch()
+        //TODO: update exisiting logs for user
+
+        //run hooks
+        await this.executePostUserDeleteMiddlewaresAsync(deletedUser);
+        return deletedUser;
     }
 
 

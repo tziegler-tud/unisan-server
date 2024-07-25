@@ -129,6 +129,23 @@ class MailService extends AbstractService {
 
                             }, {})
                         }
+
+                        if(mailSettings.deleteAccountOnUserDeletion){
+                            UserService.addPostUserDeleteHookAsync(async (args)=> {
+                                if(!args.user || !args.user.internalEmail) return {result: 0, data: {}};
+                                try {
+                                    const deleteResponse = await this.api.deleteUser(args.user)
+                                    if(deleteResponse.ok){
+                                        return {result: 1, data: args.user};
+                                    }
+                                    else return {result: 0, data: {}};
+                                }
+                                catch(err) {
+                                    return  {result: 0, data: {}};
+                                }
+                            }, {})
+                        }
+
                         this.setStarted();
                         resolve(this)
                     }
@@ -284,6 +301,10 @@ class MailService extends AbstractService {
         return this.api.getUser(email);
     }
 
+    deleteUser(email){
+        if (!this.isRunning()) throw new Error("Service inactive.");
+        return this.api.deleteUser(email);    }
+
     async syncMailAccounts(){
         if (!this.isRunning()) throw new Error("Service inactive.");
         //creates missing mail accounts and deletes superflous accounts
@@ -295,7 +316,14 @@ class MailService extends AbstractService {
         }
     }
 
-    async syncUserAccount(user){
+    /**
+     *
+     * @param userid
+     * @param replaceToken - if the user account exists already, settings this to true will create a new token and assign it to the user
+     * @param strictAddress - If the preferred address is unavailable, this function will try to find a valid variant address. Set to true to disable.
+     * @returns {Promise<*|undefined>}
+     */
+    async syncUserAccount(user, {replaceToken=false, strictAddress=false}){
         if (!this.isRunning()) throw new Error("Service inactive.");
         //check that internalEmail is set correctly
         const preferredPrefix = user.generalData.firstName.value + "." + user.generalData.lastName.value
@@ -303,7 +331,7 @@ class MailService extends AbstractService {
         if(user.internalEmail === undefined){
             //find a valid address
             try {
-                const address = await this.api.generateValidEmailAddress({prefix: preferredPrefix})
+                const address = await this.api.generateValidEmailAddress({prefix: preferredPrefix, retry: !strictAddress})
                 //set preferred address
                 await userService.setInternalEmail(user.id, address);
             }
@@ -312,7 +340,7 @@ class MailService extends AbstractService {
             }
         }
 
-        let mailUser;
+        let mailUser = undefined;
         try {
             const mailUserResponse = await this.api.getUser(user.internalEmail);
             if(mailUserResponse.ok) {
@@ -329,7 +357,7 @@ class MailService extends AbstractService {
             }
         }
 
-        if(mailUser) {
+        if(mailUser && replaceToken) {
             //Email account found, associate token and we are done!
             try{
                 const tokenResponse = await this.api.createUserToken(user.internalEmail)
@@ -377,8 +405,8 @@ class MailService extends AbstractService {
                 throw new Error("Failed to create user mail token: " + err);
 
             }
-            return mailUser;
         }
+        return mailUser
     }
 
     async createAccountForUser(userid) {

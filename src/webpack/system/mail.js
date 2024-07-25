@@ -18,6 +18,7 @@ export default new PageModule({
         let data = {
             enabled: settings.mail.enabled,
             createAccountOnUserCreation: settings.mail.createAccountOnUserCreation,
+            deleteAccountOnUserDeletion: settings.mail.deleteAccountOnUserDeletion,
             url: settings.mail.url,
             port: settings.mail.port,
             baseUrl: settings.mail.baseUrl,
