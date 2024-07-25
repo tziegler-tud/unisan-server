@@ -4,5 +4,5 @@ export function convertValueToDelta(value){
             {'insert': value}
         ]
     }
-    return JSON.stringify(delta);
+    return delta;
 }

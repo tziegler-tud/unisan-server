@@ -33,7 +33,7 @@ var EventSchema = new Schema({
             required: true,
         },
         delta: {
-
+            type: Object,
         },
         html: {
             type: String,
@@ -86,11 +86,9 @@ var EventSchema = new Schema({
     date: {
         startDate: {
             type: Date,
-            default: Date.now,
         },
         endDate: {
             type: Date,
-            default: Date.now,
         },
 
     },

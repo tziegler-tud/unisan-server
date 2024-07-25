@@ -3,31 +3,21 @@ var eventActions = {
 
     addEvent: function(args) {
 
-        var startDate = parseHTMLInputDate(args.date, args.startTime);
-        var endDate = parseHTMLInputDate(args.date, args.endTime);
+        var startDate = parseHTMLInputDate(args.date, args.startTime).getTime();
+        var endDate = parseHTMLInputDate(args.date, args.endTime).getTime();
+
 
         var data = {
-            title: {
-                title: "Bezeichnung",
-                value: args.title,
-            },
-            type: {
-                title: "Art",
-                value: args.type,
-            },
+            title: args.title,
             description: {
-                shortDesc: {value: args.shortDescVal, delta: args.shortDescDelta},
-                longDesc: {value: args.longDescVal, delta: args.longDescDelta},
+                longDescription: {value: args.longDescVal, delta: args.longDescDelta},
+                shortDescription: {value: args.shortDescVal, delta: args.shortDescDelta},
             },
-            location: {
-                title: "Adresse",
-                value: args.location,
-            },
-            date: {
-                startDate: startDate,
-                endDate: endDate,
-            },
-        };
+            type: args.type,
+            location: args.location,
+            startDate: startDate,
+            endDate: endDate,
+        }
 
         return $.ajax({
             url: "/api/v1/eventmod/create",
@@ -138,8 +128,8 @@ var eventActions = {
     addPosting: function(eventId, postingData, callback, args) {
         callback = (callback == null) ? function(){} : callback;
 
-        var startDate = parseHTMLInputDate(args.date, args.startTime);
-        var endDate = parseHTMLInputDate(args.date, args.endTime);
+        var startDate = parseHTMLInputDate(args.date, args.startTime).getTime();
+        var endDate = parseHTMLInputDate(args.date, args.endTime).getTime();
 
         postingData.date = {
             startDate: startDate,
@@ -169,8 +159,8 @@ var eventActions = {
         callback = (callback == null) ? function(){} : callback;
 
 
-        var startDate = parseHTMLInputDate(args.date, args.startTime);
-        var endDate = parseHTMLInputDate(args.date, args.endTime);
+        var startDate = parseHTMLInputDate(args.date, args.startTime).getTime();
+        var endDate = parseHTMLInputDate(args.date, args.endTime).getTime();
 
         postingData.date = {
             startDate: startDate,
@@ -324,8 +314,8 @@ var eventActions = {
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function(){}
 
-        var startDate = parseHTMLInputDate(args.date, args.startTime);
-        var endDate = parseHTMLInputDate(args.date, args.endTime);
+        var startDate = parseHTMLInputDate(args.date, args.startTime).getTime();
+        var endDate = parseHTMLInputDate(args.date, args.endTime).getTime();
 
         let data = {
             key: "date",
@@ -389,16 +379,23 @@ var eventActions = {
     },
 }
 
+
+/**
+ *
+ * @param {String} date YYYY-MM-DD
+ * @param {String} time hh:mm
+ * @returns {Date}
+ */
 function parseHTMLInputDate(date, time){
     //date is of form YYYY-MM-DD
     //TODO: make this more robust
-    var dateYear = date.substr(0,4);
+    var dateYear = parseInt(date.substr(0,4));
     var dateMonth = parseInt(date.substr(5,2))-1; //months are 0-based in js date
-    var dateDay = date.substr(8,2);
+    var dateDay = parseInt(date.substr(8,2))
 
     //time is of form hh:mm
-    var timeHours = time.substr(0,2);
-    var timeMinutes = time.substr(3,2);
+    var timeHours = parseInt(time.substr(0,2));
+    var timeMinutes = parseInt(time.substr(3,2));
 
     var d = new Date();
     d.setFullYear(dateYear);
@@ -408,7 +405,6 @@ function parseHTMLInputDate(date, time){
     d.setMinutes(timeMinutes);
     d.setSeconds(0);
     d.setMilliseconds(0);
-
     return d;
 }
 

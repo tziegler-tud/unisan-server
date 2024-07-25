@@ -237,48 +237,79 @@ async function matchAny(matchString, args){
 
 
 /**
- *
+ *   Creates a new user
  * @param req {Object} express request
- * Creates a new user by a given object of the user scheme
- * @param {EventScheme} eventParam The object to save as event
+ * @param title {String}
+ * @param description {Object}
+ * @param description.shortDescription {Object}
+ * @param description.shortDescription.value {String}
+ * @param description.shortDescription.delta {Object}
+ * @param description.longDescription {Object}
+ * @param description.longDescription.value {Object}
+ * @param description.longDescription.delta {Object}
+ * @param type {String}
+ * @param startDate {EpochTimeStamp}
+ * @param endDate {EpochTimeStamp}
+ * @param location {String}
+ * @returns {Promise<unknown>}
  */
-async function create(req, eventParam) {
+async function create(req, {title, description={}, type, startDate, endDate, location}) {
 
     //validate
     //has title?
-    if(eventParam.title){
-        if(!eventParam.title.title){
-            eventParam.title.title = "Name"
-        }
-        if(!eventParam.title.value){
-            console.warn("Trying to create event with no title. Setting default...");
-            eventParam.title.value = "Neues Event";
-        }
-        if(!eventParam.title.delta){
-            console.warn("Trying to create event with no title. Building from value...");
-            eventParam.title.delta = convertValueToDelta(eventParam.title.value);
-        }
+
+    let eventParam = {title: {}, type: {}, description: {}, date: {}, location: {}};
+
+    if(!title){
+        console.warn("Trying to create event with no title. Setting default...");
+        title = "Neues Event";
     }
-    else {
-        eventParam.title = {
-            title: "Name",
-            value: "Neues Event",
-        }
+
+    eventParam.title = {
+        title: "Name",
+        value: title,
+        delta: convertValueToDelta(title)
     }
+
     //has Description?
-    if(eventParam.description){
-        if(!eventParam.description.shortDesc){
-            eventParam.description.shortDesc = "keine Kurzbeschreibung verfügbar."
+    if(!description.shortDescription){
+        description.shortDescription = {
+            value: "Keine Beschreibung verfügbar",
         }
-        if(!eventParam.description.longDesc){
-            eventParam.description.longDesc = "keine Beschreibung verfügbar."
+    }
+    if(!description.longDescription){
+        description.longDescription = {
+            value: "keine Beschreibung verfügbar."
         }
     }
 
+    eventParam.description =
+        {
+            longDesc: description.longDescription,
+            shortDesc: description.shortDescription
+        }
+
+    eventParam.location = {
+        value: location,
+    }
+
+    eventParam.type = {
+        value: type,
+    }
+
     //has date?
-    if(eventParam.date){
-        if(eventParam.date.startDate === null) eventParam.date.startDate = undefined;
-        if(eventParam.date.endDate === null) eventParam.date.endDate = undefined;
+    if(!startDate) {
+        eventParam.date.startDate = undefined;
+    }
+    else {
+        eventParam.date.startDate = new Date(startDate)
+    }
+
+    if(!endDate) {
+        eventParam.date.endDate = undefined;
+    }
+    else {
+        eventParam.date.endDate = new Date(endDate)
     }
 
     const event = new Event(eventParam);
@@ -486,12 +517,17 @@ async function updateKey(req, id, key, value, eventParams) {
             if (k === undefined) {
                 ojVal = "N/A"
             }
-            else {
-                ojVal = (k.value === undefined) ? k : k.value;
-            }
-            event.set(key, value, {strict: false} );
-            //check if date was modified and adjust postings accordingly
-            if (key === "date" || key === "date.startDate") {
+            if (key === "date" || key === "date.startDate" || key === "date.endDate") {
+
+                if(key === "date"){
+                    let startDate = value["startDate"] ?? undefined;
+                    let endDate = value["endDate"] ?? undefined;
+
+                    if(startDate) startDateTimestamp = new Date(startDate)
+                }
+                event.set(key, value, {strict: false});
+
+                //check if date was modified and adjust postings accordingly
                 event.postings.forEach(posting => {
                     posting.date.startDate.setUTCFullYear(event.date.startDate.getUTCFullYear());
                     posting.date.startDate.setUTCMonth(event.date.startDate.getUTCMonth());
@@ -501,6 +537,10 @@ async function updateKey(req, id, key, value, eventParams) {
                     posting.date.endDate.setUTCDate(event.date.endDate.getUTCDate());
                 })
                 event.markModified("postings");
+            }
+            else {
+                ojVal = (k.value === undefined) ? k : k.value;
+                event.set(key, value, {strict: false});
             }
         }
 

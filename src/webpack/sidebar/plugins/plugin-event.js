@@ -435,7 +435,11 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
         var onConfirm = args.callback.onConfirm;
         var onDelete = args.callback.onDelete;
 
-        let context = {};
+        let context = {
+            userAgent: {
+                locale: Intl.DateTimeFormat().resolvedOptions()
+            },
+        };
         context.event = args.event;
         var corrupted = false;
 

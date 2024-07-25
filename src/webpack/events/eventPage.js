@@ -8,6 +8,7 @@ import FilePondPluginGetFile from "filepond-plugin-get-file";
 import {MDCList} from "@material/list";
 import {MDCRipple} from "@material/ripple";
 import {MDCMenu} from "@material/menu";
+import {transformToLocalizedDateString} from "../helpers/helpers";
 
 var EventPage = function(args){
     let defaults = {
@@ -81,7 +82,11 @@ var Component = function(componentId, componentType, data, args){
         let handleData = data;
         handleData.args = {
             allowEdit: self.args.allowEdit,
+            displayLocalizedDate: false,
         };
+        handleData.userAgent = {
+            locale: Intl.DateTimeFormat().resolvedOptions(),
+        }
 
         switch(componentType) {
             case (EventPage.componentTypes.DESCRIPTION):
@@ -121,9 +126,24 @@ var Component = function(componentId, componentType, data, args){
                 break;
             case (EventPage.componentTypes.DATE):
                 //build date and location module
+                const localLangIdentifier = "de-DE"
+                const localTimeZone = "Europe/Berlin"
+                let displayLocalizedDate = false;
                 templateUrl = "/webpack/events/pageModules/eventDate.hbs";
+                if(handleData.userAgent.locale.timeZone) {
+                    if(handleData.userAgent.locale.timeZone !== localTimeZone){
+                        displayLocalizedDate = true;
+                        handleData.localizedDate= {
+                            timezone: localTimeZone,
+                            startDate: transformToLocalizedDateString(event.date.startDate, localLangIdentifier, localTimeZone),
+                            endDate: transformToLocalizedDateString(event.date.endDate, localLangIdentifier, localTimeZone),
+                        }
+                    }
+                }
+
                 $.get(templateUrl, function (templateData) {
                     template = Handlebars.compile(templateData);
+                    handleData.args.displayLocalizedDate = displayLocalizedDate;
                     self.container.innerHTML = template(handleData);
 
                     self.args.handlers.forEach(function(handler){
