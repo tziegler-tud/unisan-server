@@ -317,5 +317,17 @@ Date.prototype.toTimeInputValue = (function() {
 });
 
 
+/**
+ *
+ * @param {Date|String} date
+ * @param {String} region region identifier e.g. en-US, de-DE
+ * @param timezoneString timezone identifier e.g. Europe/Berlin
+ * @returns {String}
+ */
+var transformToLocalizedDateString = function(date, region="de-DE", timezoneString="Europe/Berlin") {
+    const d = (typeof date === "string" ? new Date(date) : date);
+    return d.toLocaleString(region, {timeZone: timezoneString});
+}
 
-export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, escapeSelector, refJSON, stringToBoolean, common}
+
+export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, escapeSelector, refJSON, stringToBoolean, transformToLocalizedDateString, common}

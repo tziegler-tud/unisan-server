@@ -26,7 +26,6 @@ $(document).ready (function () {
     // $("#eventinp-timeEnd").val(new Date().toDateInputValue())
 
     // window.addEventListener("resize", setupTimePickerWidget);
-
     let pagesliderContainer = document.getElementById("pageslider-container-01");
     $.get('/webpack/events/templates/addEvent-container.hbs', function (data) {
         var template = Handlebars.compile(data);
@@ -38,6 +37,11 @@ $(document).ready (function () {
 
 
 function buildPageSlider(container) {
+    const handleData = {
+        userAgent: {
+            locale: Intl.DateTimeFormat().resolvedOptions(),
+        }
+    }
     let token = lidlRTO.objectManager.createNewObjectToken();
     let pageslider = new PageSlider(container, token);
     pageslider.setCallback({
@@ -65,17 +69,17 @@ function buildPageSlider(container) {
     //get first page
     $.get('/webpack/events/templates/addEvent-general.hbs', function (data) {
         var template = Handlebars.compile(data);
-        let page1 = pageslider.addPage(template());
+        let page1 = pageslider.addPage(template(handleData));
 
         //get second page
         $.get('/webpack/events/templates/addEvent-dateLocation.hbs', function (data) {
             var template = Handlebars.compile(data);
-            let page2 = pageslider.addPage(template());
+            let page2 = pageslider.addPage(template(handleData));
 
             //get third page
             $.get('/webpack/events/templates/addEvent-description.hbs', function (data) {
                 var template = Handlebars.compile(data);
-                let page3 = pageslider.addPage(template());
+                let page3 = pageslider.addPage(template(handleData));
 
                 var editableTextFieldContainer = document.getElementById("eventitem-longdesc");
                 var longDescInput = new EditableTextField(editableTextFieldContainer, {}, "", {}, {active: true, disableButtons: true});

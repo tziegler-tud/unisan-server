@@ -9,6 +9,13 @@
                 <div class="eventinfo-date-time">
                     {{event.date.timeString}}
                 </div>
+                {{#if args.displayLocalizedDate}}
+                    <div class="eventinfo-date-time--small">
+                        <div>In {{localizedDate.timezone}}:</div>
+                        <div>{{localizedDate.startDate}} - {{localizedDate.endDate}}</div>
+                    </div>
+                {{/if}}
+
                 <div class="eventinfo-item-spacer"></div>
             </div>
         </div>
