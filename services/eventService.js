@@ -517,16 +517,11 @@ async function updateKey(req, id, key, value, eventParams) {
             if (k === undefined) {
                 ojVal = "N/A"
             }
+            else {
+                ojVal = (k.value === undefined) ? k : k.value;
+            }
+            event.set(key, value, {strict: false});
             if (key === "date" || key === "date.startDate" || key === "date.endDate") {
-
-                if(key === "date"){
-                    let startDate = value["startDate"] ?? undefined;
-                    let endDate = value["endDate"] ?? undefined;
-
-                    if(startDate) startDateTimestamp = new Date(startDate)
-                }
-                event.set(key, value, {strict: false});
-
                 //check if date was modified and adjust postings accordingly
                 event.postings.forEach(posting => {
                     posting.date.startDate.setUTCFullYear(event.date.startDate.getUTCFullYear());
@@ -537,10 +532,6 @@ async function updateKey(req, id, key, value, eventParams) {
                     posting.date.endDate.setUTCDate(event.date.endDate.getUTCDate());
                 })
                 event.markModified("postings");
-            }
-            else {
-                ojVal = (k.value === undefined) ? k : k.value;
-                event.set(key, value, {strict: false});
             }
         }
 
