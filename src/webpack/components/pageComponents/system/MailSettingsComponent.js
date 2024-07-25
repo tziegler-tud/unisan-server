@@ -145,9 +145,14 @@ export default class MailSettingsComponent extends Component {
          */
 
             //init interactive list subcomponent
-        let switchSettingsEntries = [{
-                label: "Account automatisch anlegen",
+        let switchSettingsEntries = [
+            {
+                label: "Email-Account automatisch anlegen",
                 value: self.data.createAccountOnUserCreation,
+            },
+            {
+                label: "Email-Account automatisch entfernen",
+                value: self.data.deleteAccountOnUserDeletion,
             }]
 
         const switchSettingsSwitch = {
@@ -173,7 +178,8 @@ export default class MailSettingsComponent extends Component {
         let switchSettingsObserver = new ComponentObserver(function(event, data) {
             if(event === "changed"){
                 const updateData = {
-                    createAccountOnUserCreation: data.value
+                    createAccountOnUserCreation: data.value,
+                    deleteAccountOnUserDeletion: data.value
                 }
                 systemActions.updateMailSettings(updateData)
                     .then(result => {
