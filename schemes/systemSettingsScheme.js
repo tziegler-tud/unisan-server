@@ -37,7 +37,11 @@ var SystemSettingsScheme = new Schema({
         },
         createAccountOnUserCreation: {
             type: Boolean,
-            default: false,
+            default: true,
+        },
+        deleteAccountOnUserDeletion: {
+            type: Boolean,
+            default: true,
         },
         url: {
             type: String,

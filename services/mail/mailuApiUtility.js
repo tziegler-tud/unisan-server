@@ -123,9 +123,7 @@ export default class MailuApiUtility {
         });
     }
 
-    async generateValidEmailAddress({prefix, counter=0, retry=true}){
-        const maxRetryCount = 5;
-
+    async generateValidEmailAddress({prefix, counter=0, retry=true, retryLimit=5}){
         let delimiter = "@";
         if(counter > 0) {delimiter = counter+delimiter}
         let fullAddress = prefix + delimiter + this.domain;
@@ -133,7 +131,7 @@ export default class MailuApiUtility {
             let response = await this.getUser(fullAddress)
             if(response.ok && retry) {
                 counter++;
-                if(counter >= maxRetryCount) throw new Error("Unable to find a valid email address for user: Maximum retry count exceeded ("+maxRetryCount+").");
+                if(counter >= retryLimit) throw new Error("Unable to find a valid email address for user: Maximum retry count exceeded ("+retryLimit+").");
                 return this.generateValidEmailAddress({prefix:prefix, counter: counter, retry: retry})
             }
         }
