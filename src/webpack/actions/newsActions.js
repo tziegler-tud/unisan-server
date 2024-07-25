@@ -102,28 +102,4 @@ var newsActions = {
         });
     }
 }
-
-function parseHTMLInputDate(date, time){
-    //date is of form YYYY-MM-DD
-    //TODO: make this more robust
-    var dateYear = date.substr(0,4);
-    var dateMonth = parseInt(date.substr(5,2))-1; //months are 0-based in js date
-    var dateDay = date.substr(8,2);
-
-    //time is of form hh:mm
-    var timeHours = time.substr(0,2);
-    var timeMinutes = time.substr(3,2);
-
-    var d = new Date();
-    d.setFullYear(dateYear);
-    d.setMonth(dateMonth);
-    d.setDate(dateDay);
-    d.setHours(timeHours);
-    d.setMinutes(timeMinutes);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
-
-    return d;
-}
-
 export {newsActions}

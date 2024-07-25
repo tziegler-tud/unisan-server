@@ -185,7 +185,34 @@ router.get('/:id', getById);
 export default router;
 
 function create(req, res, next) {
-    eventService.create(req, req.body)
+
+    /**
+     * @typedef {Object} create_body
+     * @property title {Object}
+     * @property type {String}
+     * @property startDate {Int} timestamp
+     * @property endDate {Int} timestamp
+     * @property description {Object}
+     * @property description.longDescription {String}
+     * @property description.shortDescription {String}
+     * @property location {String}
+     */
+
+    /**
+     * @type create_body
+     */
+    const body = req.body;
+    eventService.create(req, {
+        title: body.title,
+        type: body.type,
+        description: {
+            shortDescription: body.description.shortDescription,
+            longDescription: body.description.longDescription
+        },
+        location: body.location,
+        startDate: body.startDate,
+        endDate: body.endDate
+    })
         .then(event => {
             res.json(event)
         })
