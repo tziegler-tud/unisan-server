@@ -80,6 +80,16 @@ var systemActions = {
         })
     },
 
+    syncUserMailToken(userid){
+        return $.ajax({
+            url: "/api/v1/mail/user/recreateAccountToken",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({userid: userid}),
+        })
+    },
+
     updateAuthSettings(data){
         return new Promise(function(resolve, reject){
             $.ajax({

@@ -344,6 +344,9 @@ $(document).ready (function () {
             var key = self.dataset.key;
 
 
+            if(self.dataset.disabled !== undefined) {
+                return;
+            }
             var field = refJSON(currentExploredUser, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
@@ -354,6 +357,8 @@ $(document).ready (function () {
                     user: currentExploredUser,
                     type: field.type,
                     default: field.default,
+                    isRemoveable: self.dataset.removeable ?? true,
+                    readonly: self.dataset.readonly ?? false,
                     callback: {
                         onConfirm: function (userid, key, value, args) {
                             profile.updateDBKey(key, value, args, function () {

@@ -318,7 +318,7 @@ class MailService extends AbstractService {
 
     /**
      *
-     * @param userid
+     * @param {User} user
      * @param replaceToken - if the user account exists already, settings this to true will create a new token and assign it to the user
      * @param strictAddress - If the preferred address is unavailable, this function will try to find a valid variant address. Set to true to disable.
      * @returns {Promise<*|undefined>}
@@ -413,7 +413,14 @@ class MailService extends AbstractService {
         if (!this.isRunning()) throw new Error("Service inactive.");
         const user = await userService.getById(userid)
         if(!user) throw new Error('User not found');
-        return this.syncUserAccount(user);
+        return this.syncUserAccount(user, {strictAddress: true});
+    }
+
+    async recreateAccountToken(userid) {
+        if (!this.isRunning()) throw new Error("Service inactive.");
+        const user = await userService.getById(userid)
+        if(!user) throw new Error('User not found');
+        return this.syncUserAccount(user, {replaceToken: true, strictAddress: true});
     }
 
     /**

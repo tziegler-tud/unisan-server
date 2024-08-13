@@ -3,21 +3,25 @@ import {userSettingsActions} from "../../../actions/actions";
 import {ComponentPage} from "../../ComponentPage";
 import Component from "../../Component";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param data.targetUser {String} target user id or "current" (default)
- * @param args {Object}
- * @returns {UserMailSettingsComponent}
- * @constructor
- */
+
 export default class UserMailSettingsComponent extends Component {
-    constructor({page, componentId,  pageData={}, data={}, args={}}={}) {
-        super({page, componentId,  pageData, data, args});
-        this.data.targetUser = this.data.targetUser ?? "current";
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param data {Object}
+     * @param data.user {Object} current user object
+     * @param data.targetUser {String} target user object or "current" (default)
+     * @param args {Object}
+     * @returns {UserMailSettingsComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId,  pageData, data, args});
+        if (this.data.targetUser === "current") this.data.targetUser = this.data.user;
+        if(this.data.targetUser === undefined) throw new Error("Invalid Arguments received: targetUser cannot be undefined.")
         this.templateUrl = "/webpack/components/templates/settings/UserMailPassword.hbs"
     }
 
@@ -29,10 +33,8 @@ export default class UserMailSettingsComponent extends Component {
             for (let button of buttonList) {
                 button.addEventListener("click", function (event) {
                     if (self.page.sidebar) {
-                        const isSelf = self.data.targetUser === "current";
-                        let targetUserId = isSelf ? self.data.user.id : self.data.targetUser;
                         self.page.sidebar.addContent("UserChangePassword", {
-                            userid: targetUserId,
+                            userid: self.data.targetUser.id,
                             requireCurrentPassword: false,
                             callback: {
                                 onConfirm: function (userid, data) {

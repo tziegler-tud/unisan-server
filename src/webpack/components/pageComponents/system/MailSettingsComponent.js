@@ -12,6 +12,7 @@ export default class MailSettingsComponent extends Component {
     /**
      *
      * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
      * @param componentId {String} component id number, assigend by page on creation
      * @param componentType {ComponentPage.componentTypes} type of the component
      * @param data {Object}
@@ -19,8 +20,8 @@ export default class MailSettingsComponent extends Component {
      * @returns {OpenIdSettingsComponent}
      * @constructor
      */
-    constructor({page, componentId,  pageData={}, data, args}={}) {
-        super({page, componentId,  pageData, data, args});
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId, pageData, data, args});
         this.templateUrl = "/webpack/components/templates/system/mailSettings.hbs"
         page.sidebar.addPlugin(systemPlugin)
 
@@ -147,12 +148,15 @@ export default class MailSettingsComponent extends Component {
             //init interactive list subcomponent
         let switchSettingsEntries = [
             {
-                label: "Email-Account automatisch anlegen",
+                label: "Email-Accounts automatisch anlegen",
                 value: self.data.createAccountOnUserCreation,
+                identifier: "list-entry--createAccount"
             },
             {
-                label: "Email-Account automatisch entfernen",
+                label: "Email-Accounts automatisch entfernen",
                 value: self.data.deleteAccountOnUserDeletion,
+                identifier: "list-entry--deleteAccount"
+
             }]
 
         const switchSettingsSwitch = {
@@ -178,8 +182,18 @@ export default class MailSettingsComponent extends Component {
         let switchSettingsObserver = new ComponentObserver(function(event, data) {
             if(event === "changed"){
                 const updateData = {
-                    createAccountOnUserCreation: data.value,
-                    deleteAccountOnUserDeletion: data.value
+                    createAccountOnUserCreation: self.data.createAccountOnUserCreation,
+                    deleteAccountOnUserDeletion: self.data.deleteAccountOnUserDeletion,
+                }
+                switch(data.entry.identifier){
+                    case "list-entry--deleteAccount":
+                        updateData.deleteAccountOnUserDeletion = data.value;
+                        break;
+                    case "list-entry--createAccount":
+                        updateData.createAccountOnUserCreation = data.value;
+                        break;
+                    default:
+                        return;
                 }
                 systemActions.updateMailSettings(updateData)
                     .then(result => {

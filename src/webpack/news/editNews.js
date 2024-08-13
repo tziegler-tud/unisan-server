@@ -89,7 +89,7 @@ let editNews = {
                 args: {},
             });
             window.componentPage = componentPage;
-            componentPage.addComponent(ComponentPage.componentTypes.NEWS.EDIT, {size: "full", order: 1}, {user: user, news: news})
+            componentPage.addComponent({componentType: ComponentPage.componentTypes.NEWS.EDIT, componentArgs: {size: "full", order: 1}, data: {user: user, news: news}})
                 .then()
                 .catch()
         })

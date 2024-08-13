@@ -488,15 +488,24 @@ special classes
   font-size:          100%;
 
   @media #{$desktop, $tablet-landscape} {
-  font-size:          100%;
-}
+    font-size:          100%;
+  }
+
+  &.content-link--disabled {
+    color:              white !important ;
+    background-color:   $disabled-color !important;
+    border:             1px solid $disabled-color !important;
+
+    &:hover {
+      background-color: $disabled-color !important;
+      cursor:         not-allowed !important;
+    }
+  }
 
   @include transition(background-color,100ms);
   a {
-
-    display:        inline-block;
+    display: inline-block;
     color: white;
-
   }
 
   svg.icon {
@@ -505,18 +514,12 @@ special classes
   }
 
   &:hover {
-
-
     background-color: $link-hover-color;
     cursor:         pointer;
-
-
     @include transition(background-color,200ms);
-
   }
 
   &.slim {
-
     color:              white;
     background-color:   $link-bg-color;
     display:            inline-block;
@@ -531,12 +534,9 @@ special classes
 
     }
     &:hover {
-
-
       background-color: $link-hover-color;
       cursor:         pointer;
       @include transition(background-color,200ms);
-
     }
 
     &.light {

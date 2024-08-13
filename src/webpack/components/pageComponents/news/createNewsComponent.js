@@ -8,19 +8,21 @@ import "../../scss/news/createNewsComponent.scss";
 import {newsActions} from "../../../actions/actions";
 import EditableInputField from "../../../helpers/editableInputField";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param args {Object}
- * @returns {NewsComponent}
- * @constructor
- */
+
 export default class CreateNewsComponent extends Component {
-    constructor({page, componentId,  pageData={}, data={}, args={}}={}) {
-        super({page, componentId,  pageData, data, args});
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param data {Object}
+     * @param args {Object}
+     * @returns {NewsComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/news/createNews.hbs"
 
         const defaultData = {

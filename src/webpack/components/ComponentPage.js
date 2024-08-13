@@ -11,11 +11,13 @@ import UserMailSettingsComponent from "./pageComponents/settings/UserMailSetting
 import UserMailPasswordComponent from "./pageComponents/settings/UserMailPasswordComponent";
 import UserMailDevComponent from "./pageComponents/settings/UserMailDevComponent";
 import MailSettingsComponent from "./pageComponents/system/MailSettingsComponent";
+import ComponentSection from "./ComponentSection";
 
 export default class ComponentPage {
+
     /**
      *
-     * @type {{GENERIC: string, SETTINGS: {PASSWORD: string}}}
+     * @type {{SYSTEM: {OPENID: OpenIdSettingsComponent, MAIL: MailSettingsComponent, MEMBER_CREATION: MemberCreationComponent}, DASHBOARD: {NEWS: NewsComponent}, NEWS: {ADD: CreateNewsComponent, EDIT: EditNewsComponent}, SETTINGS: {CONNECTEDSERVICES: ConnectedServicesComponent, PASSWORD: PasswordComponent, USER_MAIL_DEV: UserMailDevComponent, USER_MAIL_PASSWORD: UserMailSettingsComponent, GENERAL: GeneralSettingsComponent, USER_MAIL: UserMailSettingsComponent}}}
      */
     static componentTypes = {
         DASHBOARD: {
@@ -59,10 +61,15 @@ export default class ComponentPage {
         /** @type {Snackbar} **/
         this.snackbar = snackbar;
 
+        this.sections = []
         this.components = [];
-        this.componentContainer = this.container;
-        this.user = data.user;
+        this.sectionContainer = undefined;
+        this._prepareContainer();
 
+        this.defaultSectionIdentifier = "default"
+        this.defaultSection = this.createSection({identifier: this.defaultSectionIdentifier});
+
+        this.user = data.user;
         this.componentCounter = {
             current: 0,
             next: function () {
@@ -74,32 +81,103 @@ export default class ComponentPage {
         this.args = args;
     }
 
-    renderComponentHtml(html){
-        return new Promise((resolve, reject) => {
-            this.componentContainer.append(html);
-            let result = {
-                error: false,
-            }
-            resolve(result);
-        })
+    _prepareContainer(){
+        this.container.classList.add("componentPage-container");
+        this.sectionContainer = document.createElement("div")
+        this.sectionContainer.classList.add("componentPage-sectionContainer");
+        this.container.appendChild(this.sectionContainer)
+    }
+
+    renderSectionHtml(html){
+        this.sectionContainer.append(html);
+        return {
+            error: false,
+        }
+    }
+
+    renderComponentHtml(section, html){
+        section.componentContainer.append(html);
+        return {
+            error: false,
+        }
+    }
+
+    /**
+     * @param componentType
+     * @param section {String}
+     * @param componentArgs {Object}
+     * @param data {Object}
+     * @returns {Promise<void>}
+     */
+    addComponent({componentType, section = this.defaultSectionIdentifier, componentArgs, data}) {
+        const args = Object.assign(this.args, componentArgs)
+        let componentId = this.componentCounter.next();
+        let sec = this.findSection(section)
+        if(sec === undefined) {
+            this.createSection({identifier: section})
+        }
+        /**
+         * @type Component
+         */
+        let component = new componentType({page: this, section: sec, componentId: componentId,  pageData: this.data, data: data, args: args});
+        return this.addInternal(sec, component)
     }
 
     /**
      *
-     * @param componentType
-     * @param componentArgs
-     * @param data
+     * @param section {ComponentSection}
+     * @param component {Component}
      * @returns {Promise<void>}
      */
-    addComponent(componentType, componentArgs, data) {
-        const args = Object.assign(this.args, componentArgs)
-        let componentId = this.componentCounter.next();
-        let component = new componentType({page: this, componentId: componentId,  pageData: this.data, data: data, args: args});
-        return this.addInternal(component)
+    async addInternal(section, component) {
+        section.addComponent(component);
+        await component.renderComponent();
     }
 
-    async addInternal(component) {
-        this.components.push(component);
-        await component.renderComponent();
+
+    /**
+     *
+     * @param sectionIdentifier
+     * @param order
+     * @param title
+     * @param displayMode
+     * @param disableComponentMargins
+     * @returns {ComponentSection}
+     */
+    addSection({sectionIdentifier, order, title, displayMode, disableComponentMargins}){
+        return this.createSection({identifier: sectionIdentifier, order: order, title: title, displayMode, disableComponentMargins})
+
+    }
+
+    /**
+     *
+     * @param componentPage
+     * @param identifier
+     * @param order
+     * @param title
+     * @param displayMode
+     * @param disableComponentMargins
+     * @returns {ComponentSection}
+     */
+    createSection({identifier, order, title, displayMode, disableComponentMargins}){
+        const section = new ComponentSection({componentPage: this, identifier, order, title, displayMode, disableComponentMargins});
+        this.sections.push(section)
+        section.render();
+        return section;
+    }
+
+    /**
+     * @param sectionIdentifier {String}
+     * @returns {ComponentSection | undefined}
+     */
+    findSection(sectionIdentifier){
+        return this.sections.find(section => section.identifier === sectionIdentifier);
+    }
+
+    /**
+     * @returns {[ComponentSection]}
+     */
+    getSections(){
+        return this.sections;
     }
 }
