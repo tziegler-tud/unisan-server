@@ -32,6 +32,6 @@ export default new PageModule({
             args: {},
         });
         window.systemPage = systemPage;
-        systemPage.addComponent(ComponentPage.componentTypes.SYSTEM.MEMBER_CREATION, {allowEdit: true, size: "full"}, {systemSettings: data.systemSettings});
+        systemPage.addComponent({componentType: ComponentPage.componentTypes.SYSTEM.MEMBER_CREATION, componentArgs: {allowEdit: true, size: "full"}, data: {systemSettings: data.systemSettings}});
     }
 })

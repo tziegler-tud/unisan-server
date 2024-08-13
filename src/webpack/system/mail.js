@@ -59,7 +59,7 @@ export default new PageModule({
                 args: pageArgs,
             });
             window.systemPage = systemPage;
-            systemPage.addComponent(ComponentPage.componentTypes.SYSTEM.MAIL, {allowEdit: true, size: "full"}, data);
+            systemPage.addComponent({componentType: ComponentPage.componentTypes.SYSTEM.MAIL, componentArgs: {allowEdit: true, size: "full"}, data: data});
         })
 
     },

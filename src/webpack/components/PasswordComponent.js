@@ -3,20 +3,22 @@ import {userActions} from "../actions/userActions";
 import {ComponentPage} from "./ComponentPage";
 import Component from "./Component";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param data.targetUser {String} target user id or "current" (default)
- * @param args {Object}
- * @returns {PasswordComponent}
- * @constructor
- */
+
 export default class PasswordComponent extends Component {
-    constructor({page, componentId,  pageData={}, data={}, args={}}={}) {
-        super({page, componentId,  pageData, data, args});
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param data {Object}
+     * @param data.targetUser {String} target user id or "current" (default)
+     * @param args {Object}
+     * @returns {PasswordComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId,  pageData, data, args});
         this.data.targetUser = this.data.targetUser ?? "current";
         this.templateUrl = "/webpack/components/templates/settings/password.hbs"
     }

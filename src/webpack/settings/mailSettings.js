@@ -61,10 +61,10 @@ export default new PageModule ({
             args: pageArgs,
         });
         window.componentPage = componentPage;
-        await componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.USER_MAIL, {allowEdit: true, size: "full", order: 1}, {user: user, targetUser: "current"});
-        await componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD, {allowEdit: true, size: "full", order: 1}, {user: user, targetUser: "current"});
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: user, targetUser: "current"}});
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: user, targetUser: "current"}});
         if(pageArgs.acl.docker.system.mail){
-            await componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV, {allowEdit: true, size: "full", order: 1}, {user: user, targetUser: "current"});
+            await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: user, targetUser: "current"}});
         }
 
     },

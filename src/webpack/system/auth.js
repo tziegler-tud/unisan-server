@@ -41,15 +41,19 @@ export default new PageModule({
                 args: {},
             });
             window.systemPage = systemPage;
-            systemPage.addComponent(ComponentPage.componentTypes.SYSTEM.OPENID, {
-                allowEdit: true,
-                size: "full"
-            }, {
-                enabled: data.enabled,
-                issuer: data.issuer,
-                port: data.port,
-                cookieSecrets: data.cookieSecrets,
-                clients: data.clients
+            systemPage.addComponent({
+                componentType: ComponentPage.componentTypes.SYSTEM.OPENID,
+                componentArgs: {
+                    allowEdit: true,
+                    size: "full"
+                },
+                data: {
+                    enabled: data.enabled,
+                    issuer: data.issuer,
+                    port: data.port,
+                    cookieSecrets: data.cookieSecrets,
+                    clients: data.clients
+                }
             });
         })
 

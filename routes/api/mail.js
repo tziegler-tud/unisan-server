@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 router.get('/user', getAll);
 router.get('/user/:email', getUser);
 router.post('/user/createUserAccount', createUserAccount);
+router.post('/user/recreateAccountToken', recreateAccountToken);
 router.post('/user/:username/sync', syncUserAccount);
 router.put('/user/:email', updateUser);
 router.put('/user/pasword/:email', updateUserPassword);
@@ -44,6 +45,13 @@ function getUser(req, res, next){
 function createUserAccount(req, res, next){
     const userid = req.body.userid;
     mailService.createAccountForUser(userid)
+        .then(result => res.json(result.body))
+        .catch(err => next(err));
+}
+
+function recreateAccountToken(req, res, next){
+    const userid = req.body.userid;
+    mailService.recreateAccountToken(userid)
         .then(result => res.json(result.body))
         .catch(err => next(err));
 }
