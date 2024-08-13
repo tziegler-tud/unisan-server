@@ -1,17 +1,6 @@
 // factory for building html elements related to user pages
-import {EditableTextField} from "../helpers/editableTextField";
-import EditableInputField from "../helpers/editableInputField";
-import {userActions, eventActions, groupActions} from "../actions/actions"
+import {userActions} from "../actions/actions"
 import Handlebars from "handlebars";
-import * as FilePond from "filepond";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import FilePondPluginGetFile from "filepond-plugin-get-file";
-import {MDCList} from "@material/list";
-import {MDCRipple} from "@material/ripple";
-import {MDCMenu} from "@material/menu";
-import {MDCTextField} from "@material/textfield";
-import {MDCTextFieldHelperText} from "@material/textfield/helper-text";
-import Sidebar from "../sidebar/Sidebar";
 
 /**
  * user page Object

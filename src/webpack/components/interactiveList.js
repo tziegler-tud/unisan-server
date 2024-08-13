@@ -5,23 +5,25 @@ import Handlebars from "handlebars";
 import {MDCSwitch} from '@material/switch';
 import {MDCList} from "@material/list";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param config {Object}
- * @param data {Object}
- * @param config.order {Integer} order inside componentContainer
- * @param config.entryLabel {Function} function to obtain label for entries. Receives entry as argument
- * @returns {InteractiveListComponent}
- * @constructor
- */
+
 
 
 export default class InteractiveListComponent extends Component{
-    constructor({page, componentId=Date.now(),  config={}}={}, data={listEntries: [], interactions: []}) {
-        super({page, componentId,  data: data, args: config, });
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param config {Object}
+     * @param data {Object}
+     * @param config.order {Integer} order inside componentContainer
+     * @param config.entryLabel {Function} function to obtain label for entries. Receives entry as argument
+     * @returns {InteractiveListComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId=Date.now(),  config={}}={}, data={listEntries: [], interactions: []}) {
+        super({page, section, componentId,  pageData: {}, data: data, args: config, });
         let defaultLabelFunc = function(entry){
             return entry.toString();
         }

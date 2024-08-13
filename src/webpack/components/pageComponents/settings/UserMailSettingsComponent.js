@@ -4,21 +4,24 @@ import {ComponentPage} from "../../ComponentPage";
 import Component from "../../Component";
 import InteractiveListStandaloneComponent from "../../interactiveListStandalone";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param data.targetUser {String} target user id or "current" (default)
- * @param args {Object}
- * @returns {UserMailSettingsComponent}
- * @constructor
- */
+
 export default class UserMailSettingsComponent extends Component {
-    constructor({page, componentId,  pageData={}, data={}, args={}}={}) {
-        super({page, componentId,  pageData, data, args});
-        this.data.targetUser = this.data.targetUser ?? "current";
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param data {Object}
+     * @param data.user {Object} current user object
+     * @param data.targetUser {String | Object} target user object or "current" (default)
+     * @param args {Object}
+     * @returns {UserMailSettingsComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId,  pageData, data, args});
+        if (this.data.targetUser === "current") this.data.targetUser = this.data.user;
+        if(this.data.targetUser === undefined) throw new Error("Invalid Arguments received: targetUser cannot be undefined.")
         this.templateUrl = "/webpack/components/templates/settings/UserMailSettings.hbs"
     }
 
@@ -47,7 +50,7 @@ export default class UserMailSettingsComponent extends Component {
                 interactive: false,
                 },
             data: {
-                listEntries: [{label: "interne Emailadresse", value: this.data.user.internalEmail}],
+                listEntries: [{label: "interne Emailadresse:", value: this.data.targetUser.internalEmail ?? "nicht verfügbar"}],
                 interactions: [emailViewerLabel]
             }});
 

@@ -51,6 +51,6 @@ export default new PageModule({
             args: {},
         });
         window.componentPage = componentPage;
-        await componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full", order: 1}, {});
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.GENERAL, componentArgs: {size: "full", order: 1}, data: {}});
     },
 });

@@ -1,5 +1,3 @@
-import "./userprofile.scss";
-
 import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {UserProfile} from "../userprofile/userprofile";
@@ -10,33 +8,51 @@ import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 import {DropdownMenu} from "../helpers/dropdownMenu";
+import PageModule from "../utils/PageModule";
+import {Snackbar} from "../helpers/snackbar";
 
-$(document).ready (function () {
-    var lidlRTO = window.lidlRTO;
 
-    var currentExploredUser;
-    var profile = new UserProfile(window.exploreUserId);
-    var sidebar = new Sidebar('wrapper', "test");
-    sidebar.addPlugin(userPlugin);
+export default new PageModule ({
+    title: "user.logs",
+    pageData: {},
+    init: async function (args) {
+        var lidlRTO = window.lidlRTO;
+        var currentExploredUser;
 
-    // create new observer
-    var observer = new lidlObserver(function(user){
-        currentExploredUser = user;
-    });
+        var currentUserProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
-    // get user data from user service
-    //subscribe as observer to get notification if user changes on server
-    profile.getUserAndSubscribe(observer)
-        .then(function(user){
-            buildPage(user)
-        })
-        .catch(function(reason){
-            console.error("Failed to retrieve user data:" + reason)
+        var targetUserProfile = new UserProfile(window.exploreUserId);
+
+        // create new observer
+        var ob1 = new lidlObserver((u) => {
+            this.pageData.user = u;
         });
 
+        var ob2 = new lidlObserver((u) => {
+            this.pageData.exploredUser = u;
+        });
+        window.snackbar = new Snackbar();
+
+        const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 
 
-    function buildPage(user) {
+        // get user data from user service
+        //subscribe as observer to get notification if user changes on server
+        let userPromise = profile.getUserAndSubscribe(ob1);
+
+        const currentUser = await currentUserProfile.getUserAndSubscribe(ob1);
+        const targetUser = await targetUserProfile.getUserAndSubscribe(ob1);
+
+
+        const data = {
+            user: currentUser,
+            targetUser: this.pageData.exploredUser
+        }
+
+        return {args, data}
+    },
+
+    buildPage: async function({args={}, data={}}={}) {
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("userEdit", user, {}, undefined, {currentUser: {edit: window.allowedit}});

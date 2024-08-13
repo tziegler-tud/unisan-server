@@ -7,19 +7,21 @@ import {ScrollableList} from "../../../scrollableList/scrollableList";
 import {Dialog as lidlDialog} from "../../../../lib/lidl-modules/dialog/lidl-dialog";
 import {systemPlugin} from "../../../sidebar/plugins/plugin-system";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param args {Object}
- * @returns {OpenIdSettingsComponent}
- * @constructor
- */
+
 export default class OpenIdSettingsComponent extends Component {
-    constructor({page, componentId,  pageData={}, data, args}={}) {
-        super({page, componentId,  pageData, data, args});
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param data {Object}
+     * @param args {Object}
+     * @returns {OpenIdSettingsComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/system/openIdSettings.hbs"
         page.sidebar.addPlugin(systemPlugin)
 

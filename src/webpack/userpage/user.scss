@@ -185,6 +185,16 @@
 
       }
 
+      ul.usercontact-list {
+        .usercontact-entry {
+          &.usercontact-entry--disabled {
+            color: $text-color-secondary;
+            cursor: default;
+          }
+        }
+
+      }
+
       ul.qualificationList {
         .inner {
           grid-template-columns: 1fr 1fr;
