@@ -9,6 +9,7 @@ import crypto from "crypto";
 
 /** @import { CreateUserConfig } from './types.js' */
 /** @import { UpdateUserConfig } from './types.js' */
+/** @import { MailUser } from  './types.js' */
 
 class MailService extends AbstractService {
     constructor({}={}){
@@ -340,40 +341,32 @@ class MailService extends AbstractService {
             }
         }
 
-        let mailUser = undefined;
-        try {
-            const mailUserResponse = await this.api.getUser(user.internalEmail);
-            if(mailUserResponse.ok) {
-                mailUser = JSON.parse(mailUserResponse.body);
-            }
-        }
-        catch(err){
-            if(err.response.statusCode === 404) {
-                // user not found
-                mailUser = undefined;
-            }
-            else {
-                throw new Error("Unable to check user account: Something went wrong (HTTP Status "+ err.response.statusCode + ")");
-            }
-        }
+        let mailUser = await this.checkMailAccountExists(user.internalEmail);
 
-        if(mailUser && replaceToken) {
-            //Email account found, associate token and we are done!
-            try{
-                const tokenResponse = await this.api.createUserToken(user.internalEmail)
-                if(tokenResponse.ok) {
-                    //try to parse response
-                    const token = JSON.parse(tokenResponse.body).token ?? undefined;
-                    if (token !== undefined) {
-                        await userService.setEmailToken(user.id, token)
+        if(mailUser !== undefined) {
+            if(replaceToken){
+                //Email account found, associate token and we are done!
+                try{
+                    const tokenResponse = await this.api.createUserToken(user.internalEmail)
+                    if(tokenResponse.ok) {
+                        //try to parse response
+                        const token = JSON.parse(tokenResponse.body).token ?? undefined;
+                        if (token !== undefined) {
+                            await userService.setEmailToken(user.id, token)
+                        }
                     }
                 }
+                catch(err) { throw err;}
             }
-            catch(err) { throw err;}
+            else {
+                //account found, but token is not to be replaced
+                return mailUser;
+            }
+
         }
         else {
+            //no account, create one!
             try {
-                //no account, create one!
                 const response = await this.createUser({
                     email: user.internalEmail,
                     raw_password: this.generateMailPassword(),
@@ -381,14 +374,15 @@ class MailService extends AbstractService {
                     displayed_name: user.generalData.firstName.value + " " + user.generalData.lastName.value,
                 })
                 if(response.ok) {
-                    //generate user token
                     mailUser = JSON.parse(response.body);
                 }
             }
             catch(err){
                 throw new Error("Failed to create user: " + err);
             }
+            // account creation successfull, now create token and associate
             try {
+                //generate user token
                 const tokenResponse = await this.api.createUserToken(user.internalEmail)
                 if(tokenResponse.ok) {
                     //try to parse response
@@ -447,6 +441,112 @@ class MailService extends AbstractService {
             throw new Error("Failed to update mail password for user: " + email + " Reason: " + err.response.statusCode);
 
         }
+    }
+
+    /**
+     *
+     * @param address {string}
+     */
+    async createSystemAccount(address){
+        let mailUser = await this.checkMailAccountExists(address)
+
+        if(mailUser !== undefined) {
+            //Account exists - abort action. We do not create a new token here.
+            return mailUser;
+        }
+        else {
+            try {
+                //no account, create one!
+                const password = this.generateMailPassword();
+                const response = await this.createUser({
+                    email: address,
+                    raw_password: password,
+                    comment: "unisan-server system account. Created: " + new Date().toISOString(),
+                    displayed_name: "unisan-server",
+                })
+                if(response.ok) {
+                    //generate user token
+                    await SystemService.set({key: "mail", value: {systemMailAccount: address, systemMailAccountPassword: password}});
+                    mailUser = JSON.parse(response.body);
+                }
+            }
+            catch(err){
+                throw new Error("Failed to create user: " + err);
+            }
+            //create token and associate
+            try {
+                const tokenResponse = await this.api.createUserToken(address)
+                if(tokenResponse.ok) {
+                    //try to parse response
+                    const token = JSON.parse(tokenResponse.body).token ?? undefined;
+                    if (token !== undefined) {
+                        await SystemService.set({key: "mail", value: {systemMailAccountToken: token}});
+                    }
+                }
+                else {
+                    throw new Error(tokenResponse.error);
+                }
+            }
+            catch(e) {
+                throw new Error("Failed to create user mail token: " + err);
+
+            }
+        }
+        return mailUser
+    }
+
+    async recreateSystemAccountToken(){
+        const address = SystemService.getSettings().mail?.systemMailAccount;
+        if (address === undefined) throw new Error("Failed to recreate system account token: Invalid system mail account setting found.")
+        let mailUser = await this.checkMailAccountExists(address)
+        if(mailUser === undefined) {
+            // Account not found - smt went wrong here. Throw an error
+            throw new Error("Failed to recreate system account token: Mail account not found on server: " + address);
+        }
+        try {
+            const tokenResponse = await this.api.createUserToken(address)
+            if(tokenResponse.ok) {
+                //try to parse response
+                const token = JSON.parse(tokenResponse.body).token ?? undefined;
+                if (token !== undefined) {
+                    await SystemService.set({key: "mail", value: {systemMailAccountToken: token}});
+                }
+            }
+            else {
+                throw new Error(tokenResponse.error);
+            }
+        }
+        catch(e) {
+            throw new Error("Failed to create user mail token: " + err);
+
+        }
+        return mailUser;
+    }
+
+    /**
+     *
+     * @param address
+     * @returns {Promise<MailUser | undefined>}
+     * @throws Error throws if mail server responds with something else than 200 or 404
+     */
+    async checkMailAccountExists(address){
+        let mailUser = undefined;
+        try {
+            const mailUserResponse = await this.api.getUser(address);
+            if(mailUserResponse.ok) {
+                mailUser = JSON.parse(mailUserResponse.body);
+            }
+        }
+        catch(err){
+            if(err.response.statusCode === 404) {
+                // user not found
+                mailUser = undefined;
+            }
+            else {
+                throw new Error("Unable to check user account: Something went wrong (HTTP Status "+ err.response.statusCode + ")");
+            }
+        }
+        return mailUser
     }
 
     generateMailPassword(

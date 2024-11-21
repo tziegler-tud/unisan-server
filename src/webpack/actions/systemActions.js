@@ -80,9 +80,28 @@ var systemActions = {
         })
     },
 
+    createSystemMailAccount(address){
+        return $.ajax({
+            url: "/api/v1/mail/system/createSystemAccount",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({address: address}),
+        })
+    },
+
+    recreateSystemMailAccountToken(){
+        return $.ajax({
+            url: "/api/v1/mail/system/recreateSystemAccountToken",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
     syncUserMailToken(userid){
         return $.ajax({
-            url: "/api/v1/mail/user/recreateAccountToken",
+            url: "/api/v1/system/mail/recreateSystemAccountToken",
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
@@ -91,14 +110,12 @@ var systemActions = {
     },
 
     updateAuthSettings(data){
-        return new Promise(function(resolve, reject){
-            $.ajax({
+        return $.ajax({
                 url: "/api/v1/system/settings/auth",
                 type: 'PUT',
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',
                 data: JSON.stringify(data)
-            })
         })
     },
 
