@@ -34,12 +34,16 @@ function getDockerArguments (req, res, next) {
 /* GET home page. */
 // router.get("/*", auth);
 router.get("/*", getDockerArguments);
+router.get("/", userSettingsIndexRoute);
 router.get('/general', userSettingsGeneral);
 router.get('/login', userSettingsLogin);
 router.get('/mail', userSettingsMail);
 router.get('/notifications', userSettingsNotifications);
 router.get('/privacy', userSettingsPrivacy);
 
+async function userSettingsIndexRoute (req, res, next) {
+    res.redirect('/settings/login')
+}
 
 
 function userSettingsGeneral(req, res, next) {

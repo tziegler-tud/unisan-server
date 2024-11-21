@@ -41,7 +41,7 @@ export default new PageModule({
             args: {},
         });
         window.componentPage = componentPage;
-        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, componentArgs: {allowEdit: true, size: "full", order: 2}, data: {user: user, targetUser: "current"}});
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, componentArgs: {allowEdit: true, size: "full", order: 2}, data: {user: user, targetUser: user, requirePassword: true}});
         await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.CONNECTEDSERVICES, componentArgs: {allowEdit: true, size: "full", order: 3}, data: {}});
     },
 });

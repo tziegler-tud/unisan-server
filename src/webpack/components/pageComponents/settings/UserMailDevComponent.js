@@ -1,4 +1,3 @@
-import Handlebars from "handlebars";
 import {systemActions, userSettingsActions} from "../../../actions/actions";
 import {ComponentPage} from "../../ComponentPage";
 import Component from "../../Component";

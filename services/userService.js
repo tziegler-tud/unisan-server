@@ -6,6 +6,8 @@ import aclService from "./aclService.js";
 import SystemService from "./SystemService.js";
 import Log from '../utils/log.js';
 
+import { Types as mongooseTypes } from 'mongoose';
+
 const User = db.User;
 const Event = db.Event;
 const UserGroup = db.UserGroup;
@@ -19,6 +21,97 @@ import ServiceMiddleware from "./utility/ServiceMiddleware.js";
 import AsyncServiceMiddleware from "./utility/AsyncServiceMiddleware.js";
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
+
+/**
+ * @typedef {Object} TitleValueStringObject
+ * @property {string} title
+ * @property {string} value
+ */
+
+/**
+ * @typedef {Object} TitleValueNumberObject
+ * @property {string} title
+ * @property {number} value
+ */
+
+/**
+ * @typedef {Object} TitleValueTypeObject
+ * @property {string} title
+ * @property {string} value
+ * @property {string} type
+ */
+
+/**
+ * @typedef {Object} UserGeneralData
+ * @property {TitleValueStringObject} firstName
+ * @property {TitleValueStringObject} lastName
+ * @property {TitleValueNumberObject} memberId
+ * @property {TitleValueTypeObject[]} customData
+ */
+
+/**
+ * @typedef {Object} UserContactDataObject
+ * @property {string} type
+ * @property {string} title
+ * @property {string} annotation
+ * @property {any} value
+ * @property {boolean} default
+ */
+
+/**
+ * @typedef {Object} otherDataObject
+ * @property {TitleValueStringObject[]} customData
+ */
+
+/**
+ * @typedef {Object} QualificationObject
+ * @property {mongooseTypes.ObjectId} qualification
+ * @property {Date} acquiredDate
+ * @property {Date} expireDate
+ * @property {Date} trainingDate
+ * @property {boolean} isValid
+ * @property {boolean} hasDocument
+ * @property {string} documentPath
+ */
+
+/** @typedef {Object} UserObject
+ *  @property {mongooseTypes.ObjectId} id
+ *  @property {string} username
+ *  @property {string} internalEmail
+ *  @property {Object} mail
+ *  @property {string} mail.applicationToken
+ *  @property {string} mail.senderName
+ *  @property {UserGeneralData} generalData
+ *  @property {UserContactDataObject[]} contactData
+ *  @property {otherDataObject} otherData
+ *  @property {string} hash
+ *  @property {QualificationObject[]} qualfications
+ *  @property {boolean} hasPhoto
+ *  @property {boolean} isDisplayedOnPublic
+ *  @property {boolean} loginEnabled
+ *  @property {boolean} privacyAgreement
+ *  @property {Date} createdDate
+ */
+
+/** @typedef {Object} UserUpdateObject
+ *  @property {mongooseTypes.ObjectId} id
+ *  @property {string} username
+ *  @property {string} internalEmail
+ *  @property {Object} mail
+ *  @property {string} mail.applicationToken
+ *  @property {string} mail.senderName
+ *  @property {UserGeneralData} generalData
+ *  @property {UserContactDataObject[]} contactData
+ *  @property {otherDataObject} otherData
+ *  @property {string} hash
+ *  @property {QualificationObject[]} qualfications
+ *  @property {boolean} hasPhoto
+ *  @property {boolean} isDisplayedOnPublic
+ *  @property {boolean} loginEnabled
+ *  @property {boolean} privacyAgreement
+ *  @property {Date} createdDate
+ *  @property {string} password
+ */
 
 
 class UserService{
@@ -192,6 +285,7 @@ class UserService{
     /**
      * Gets a user by its id
      * @param {number} id The id of the user
+     * @return Promise<UserObject>
      */
     async getById(id) {
         //populate userGroups
@@ -199,11 +293,15 @@ class UserService{
 
     }
 
+    /**
+     * returns the user object with the hash value retrieved
+     * @param user
+     * @returns {Promise<UserObject>}
+     */
     async getUserHash(user){
-        if (user === undefined) return false;
+        if (user === undefined) throw new Error("Failed to retrieve password hash from database: Invalid user object given")
         //check if user object or id was provided
         let id = user.id? user.id : user;
-
         return User.findById(id).select("hash");
     }
 
@@ -419,35 +517,29 @@ class UserService{
     }
 
     /**
-     * Updates an existing user
+     * Updates non-critical properties on an existing user
      * @param req {Object} express request
      * @param {number} id The id of the existing user
-     * @param {UserScheme} userParam The object to save as user
+     * @param {UserUpdateObject} updatedObject The object to save as user
      */
-    async update(req, id, userParam) {
+    async update(req, id, updatedObject) {
 
         const user = await User.findById(id);
         // validate
         if (!user) throw new Error('User not found');
-        if (user.username !== userParam.username && await User.findOne({ username: userParam.username }))
-            throw new Error(`Username "${userParam.username}" is already taken`);
 
-        let critical = false;
-
-        //check if username was entered
-        if (userParam.username) {
-            critical = true;
+        //only 1st level keys are supported!
+        const disallowedKeys = ["hash", "username", "password"]
+        for (const key of disallowedKeys) {
+            if(updatedObject[key] !== undefined){
+                console.log("userService: Trying to update disallowed key: " + key + ". Update operation for this key has been dismissed");
+                delete updatedObject[key];
+            }
         }
-        // hash password if it was entered
-        if (userParam.password) {
-            //TODO: Check if plaintext password is stored
-            userParam.hash = await bcrypt.hash(userParam.password, 10);
-            critical = true;
 
-        }
         return new Promise(function(resolve, reject) {
             // copy userParam properties to user
-            Object.assign(user, userParam);
+            Object.assign(user, updatedObject);
             user.save()
                 .then(user => {
                     resolve(user)
@@ -482,6 +574,63 @@ class UserService{
         })
     }
 
+
+    /**
+     * Updates an existing users username
+     * @param req {Object} express request
+     * @param {number} id The id of the existing user
+     * @param {String} username new username
+     */
+    async updateUsername(req, id, username) {
+        const user = await User.findById(id);
+        // validate
+        const errMsg = "Failed to update username: ";
+        if (!user) throw new Error(errMsg + 'User not found.');
+        if (username === undefined || (typeof(username) !== 'string')){
+            throw new Error(errMsg + 'Invalid parameter given for "username."');
+        }
+        if (await User.findOne({ username: username }))
+            throw new Error(errMsg + `Username "${username}" is already taken`);
+
+        const origValue = user.username;
+        const newValue = username;
+
+        return new Promise(function(resolve, reject) {
+            // copy userParam properties to user
+            user.username = username;
+            user.save()
+                .then(user => {
+                    resolve(user)
+                    //create log
+                    let log = new Log({
+                        type: "modification",
+                        action: {
+                            objectType: "user",
+                            actionType: "modify",
+                            actionDetail: "userModify",
+                            key: "username",
+                            fullKey: "username",
+                            originalValue: origValue,
+                            value: newValue,
+                            tag: "<OVERWRITE>"
+                        },
+                        authorizedUser: req.user,
+                        target: {
+                            targetType: "user",
+                            targetObject: user._id,
+                            targetObjectId: user._id,
+                            targetModel: "User",
+                        },
+                        httpRequest: {
+                            method: req.method,
+                            url: req.originalUrl,
+                        }
+                    })
+                    LogService.create(log).then().catch();
+                })
+                .catch(err => reject(err))
+        })
+    }
 
     /**
      * Updates an existing user
@@ -796,10 +945,9 @@ class UserService{
      * @param {number} id The id of the user do manipulate
      * @param {string} key the key to update
      * @param {string} value the new value for the key
-     * @param {Object} userParams containing additional settings. Valid properties are: {isArray: <bool>, noIndex: <bool>}
+     * @param {Object} args containing additional settings. Valid properties are: {isArray: <bool>, noIndex: <bool>}
      */
-    async updateKey(req, id, key, value, userParams) {
-        if (!userParams) userParams = {};
+    async updateKey(req, id, key, value, args={}) {
         const user = await User.findById(id);
         // validate
         if (!user) throw new Error('User not found');
@@ -811,22 +959,26 @@ class UserService{
             if (!key) throw new Error('no key given');
             if (!value) throw new Error('no value given');
 
+            //only 1st level keys are supported!
+            const disallowedKeys = ["hash", "username", "password"]
+            if(disallowedKeys.includes(key)){
+                console.log("userService: Trying to update disallowed key: " + key + ". Update operation for this key has been dismissed");
+                throw new Error('Updating username or password is not allowed with this operation.');
+            }
+
             let ojVal = undefined;
             let newVal = (value.value === undefined) ? value : value.value;
             let logKey = (value.title === undefined) ? key : value.title;
 
             //check if array operation
-            if (userParams.isArray) {
-
+            if (args.isArray) {
                 //get current array content. Usually, key refers to an indexed array element.
-                var array;
-                if (userParams.noIndex) {
-                } else {
+                if (!args.noIndex) {
                     const keyPos = key.lastIndexOf(".");
                     const i = key.substring(keyPos + 1);
                     key = key.substring(0, keyPos);
                 }
-                array = user.get(key);
+                let array = user.get(key);
                 // in-memory update.
                 // using id values to compare objects. Attention: This assumes the arrays contain objects properly added to the mongoDb via mongoose.
 

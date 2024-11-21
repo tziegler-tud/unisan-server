@@ -8,6 +8,21 @@
 
     .componentPage-section {
 
+      &.componentPage-section__disableMargins {
+        .componentPage-component-container{
+          .componentPage-component-wrapper {
+            .componentPage-component {
+              .componentPage-component-inner {
+                margin: 0 0;
+                @media #{$desktop, $tablet-landscape} {
+                  margin: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+
       .componentPage-component-container {
         padding: 0;
         display: flex;

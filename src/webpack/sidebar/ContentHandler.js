@@ -11,12 +11,11 @@
  * @constructor
  */
 export default class ContentHandler {
-    constructor(type, handlerFunction, handlerArgs) {
+    constructor(type, handlerFunction, handlerArgs = {}) {
         this.type = type;
         this.fn = handlerFunction;
         this.inputs = [];
         this.validators = [];
-        if (handlerArgs === undefined) handlerArgs = {};
         let defaultArgs = {
             callback: {
                 onSave: () => {

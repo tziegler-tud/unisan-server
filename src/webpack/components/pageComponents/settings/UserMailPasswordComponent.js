@@ -28,12 +28,13 @@ export default class UserMailSettingsComponent extends Component {
     async postRender(){
         let self = this;
         //add sidebar hook
-        const buttonList = document.getElementsByClassName("changePasswordButton");
+        const buttonList = this.container.getElementsByClassName("changePasswordButton");
         if (buttonList.length > 0) {
             for (let button of buttonList) {
                 button.addEventListener("click", function (event) {
                     if (self.page.sidebar) {
                         self.page.sidebar.addContent("UserChangePassword", {
+                            sidebarTitle: "Passwort ändern: Email Account",
                             userid: self.data.targetUser.id,
                             requireCurrentPassword: false,
                             callback: {

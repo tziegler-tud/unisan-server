@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import {userActions} from "../actions/userActions";
-import {ComponentPage} from "./ComponentPage";
+import ComponentPage from "./ComponentPage";
 import Component from "./Component";
 
 
@@ -12,32 +12,39 @@ export default class PasswordComponent extends Component {
      * @param componentId {String} component id number, assigend by page on creation
      * @param componentType {ComponentPage.componentTypes} type of the component
      * @param data {Object}
-     * @param data.targetUser {String} target user id or "current" (default)
+     * @param data.targetUser {Object} target user id or "current" (default)
+     * @param data.user {Object} authenticating user id
+     * @param data.requirePassword {boolean=true} false to disable the input field for "current password"
      * @param args {Object}
      * @returns {PasswordComponent}
      * @constructor
      */
     constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
         super({page, section, componentId,  pageData, data, args});
-        this.data.targetUser = this.data.targetUser ?? "current";
+        this.isSelf = false;
+        this.requirePassword = data.requirePassword ?? true;
+        if (this.data.targetUser === "current" || this.data.targetUser.id.toString() === this.data.user.id.toString()) {
+            this.data.targetUser = this.data.user;
+            this.isSelf = true;
+        }
+        if(this.data.targetUser === undefined) throw new Error("Invalid Arguments received: targetUser cannot be undefined.")
         this.templateUrl = "/webpack/components/templates/settings/password.hbs"
     }
 
     async postRender(){
         let self = this;
         //add sidebar hook
-        const buttonList = document.getElementsByClassName("changePasswordButton");
+        const buttonList = this.container.getElementsByClassName("changePasswordButton");
         if (buttonList.length > 0) {
             for (let button of buttonList) {
-                button.addEventListener("click", function (event) {
+                button.addEventListener("click", (event) => {
                     if (self.page.sidebar) {
-                        const isSelf = self.data.targetUser === "current";
-                        let targetUserId = isSelf ? self.data.user.id : self.data.targetUser;
                         self.page.sidebar.addContent("UserChangePassword", {
-                            userid: targetUserId,
-                            requireCurrentPassword: isSelf,
+                            sidebarTitle: "unisan-server Passwort ändern",
+                            userid: this.data.targetUser.id,
+                            requireCurrentPassword: this.requirePassword,
                             callback: {
-                                onConfirm: function (userid, data) {
+                                onConfirm: (userid, data) => {
                                     console.log("userid: " + userid);
                                     console.log("current: " + data.current);
                                     console.log("pw: " + data.pw);
@@ -45,11 +52,11 @@ export default class PasswordComponent extends Component {
 
                                     let action;
 
-                                    if (isSelf) {
+                                    if (this.isSelf) {
                                         action = userActions.updateCurrentUserPassword(data.current, data.pw, {})
                                     }
                                     else {
-                                        action = userActions.updateUserPassword(userid, data.current, data.pw, {});
+                                        action = userActions.updateUserPassword(userid, data.pw, {});
                                     }
                                     action
                                         .done(result => {
@@ -58,20 +65,29 @@ export default class PasswordComponent extends Component {
                                             }
                                             self.page.sidebar.hide();
                                         })
-                                        .fail(result => {
+                                        .catch((jqxhr, textStatus, errThrown) => {
                                             if (self.page.snackbar) {
-                                                self.page.snackbar.show("Fehler: Aktuelles Passwort ist nicht korrekt.", {
-                                                    actionButton: {
-                                                        display: true,
-                                                        text: "Okay."
-                                                    },
-                                                    closeOnEscape: true,
-                                                });
+
+                                                if(jqxhr.status === 400) {
+                                                    self.page.snackbar.show("Fehler: Aktuelles Passwort ist nicht korrekt.", {
+                                                        actionButton: {
+                                                            display: true,
+                                                            text: "Okay."
+                                                        },
+                                                        closeOnEscape: true,
+                                                    });
+                                                }
+                                                else {
+                                                    self.page.snackbar.showError(jqxhr, textStatus, errThrown, {
+                                                        actionButton: {
+                                                            display: true,
+                                                            text: "Okay."
+                                                        },
+                                                        closeOnEscape: true,
+                                                    });
+                                                }
+
                                             }
-
-                                        })
-                                        .catch(err => {
-
                                         })
                                     console.log(action)
                                 }
