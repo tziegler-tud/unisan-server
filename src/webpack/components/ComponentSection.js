@@ -36,6 +36,9 @@ export default class ComponentSection{
         let html = "";
         let container = document.createElement("div");
         container.classList.add("componentPage-section");
+        if(this.disableComponentMargins){
+            container.classList.add("componentPage-section__disableMargins");
+        }
         container.id = `component-section__${this.identifier}`
         container.style = `order: ${this.order}`;
 

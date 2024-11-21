@@ -43,6 +43,15 @@ var SystemSettingsScheme = new Schema({
             type: Boolean,
             default: true,
         },
+        systemMailAccount: {
+            type: String,
+        },
+        systemMailAccountPassword: {
+            type: String,
+        },
+        systemMailAccountToken: {
+            type: String,
+        },
         url: {
             type: String,
         },

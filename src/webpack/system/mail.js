@@ -19,6 +19,8 @@ export default new PageModule({
             enabled: settings.mail.enabled,
             createAccountOnUserCreation: settings.mail.createAccountOnUserCreation,
             deleteAccountOnUserDeletion: settings.mail.deleteAccountOnUserDeletion,
+            systemMailAccount: settings.mail.systemMailAccount,
+            systemMailAccountToken: settings.mail.systemMailAccountToken,
             url: settings.mail.url,
             port: settings.mail.port,
             baseUrl: settings.mail.baseUrl,

@@ -7,6 +7,7 @@ import "./plugin-system.scss";
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getDataFromServer} from "../../helpers/helpers";
+import {systemActions} from "../../actions/systemActions";
 
 let systemPlugin = new SidebarPlugin("system");
 
@@ -43,6 +44,33 @@ let editMailSettings = new ContentHandler("mailSettings",
                             baseUrl: baseUrl,
                             apiKey: apiKey,
                             domain: domain,
+                        };
+                        onConfirm(data, {});
+                    }.bind(args)
+                });
+        });
+    });
+
+
+let editMailSystemAccountSettings = new ContentHandler("mailSystemAccountSettings",
+    (sidebar, args, type) => {
+        var onConfirm = args.callback.onConfirm;
+        let context = {
+            systemMailAccount: args.data.systemMailAccount,
+        }
+        $.get('/webpack/sidebar/templates/system/sidebar-systemMailAccountSettings.hbs', function (data) {
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+
+                        const systemMailAccount = document.getElementById("sidebar-input-mail--address").value;
+                        const data = {
+                            systemMailAccount: systemMailAccount,
                         };
                         onConfirm(data, {});
                     }.bind(args)
@@ -258,6 +286,7 @@ let setMemberIdAssignment = new ContentHandler("setMemberIdAssignment",
 
 
 systemPlugin.addContentHandler(editMailSettings);
+systemPlugin.addContentHandler(editMailSystemAccountSettings);
 systemPlugin.addContentHandler(editOidcSettings);
 systemPlugin.addContentHandler(editOidcSettingsAdvanced);
 systemPlugin.addContentHandler(updateOidcClient);

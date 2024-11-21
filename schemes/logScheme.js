@@ -21,7 +21,7 @@ var LogSchema = new Schema({
         },
         actionDetail: {
           type: String,
-          /* [userCreate, userDelete, userModify, userImageModify, userAddQualification, userDeleteQualification, userModifyQualification,
+          /* [userCreate, userDelete, userModify, userUsernameModify, userPasswordModify, userImageModify, userAddQualification, userDeleteQualification, userModifyQualification,
                 eventCreate, eventDelete, eventModify, eventAddParticipant, eventRemoveParticipant, eventChangeParticipantRole, eventAddFile ]
            */
         },
@@ -145,6 +145,8 @@ LogSchema.virtual('description').get(function() {
             ref: this.target.targetObjectId
         }
 
+        let tagText = "";
+
         switch(this.action.actionDetail) {
             case "userCreate":
 
@@ -181,7 +183,6 @@ LogSchema.virtual('description').get(function() {
                 logType = "User entfernt";
                 break;
             case "userModify":
-                let tagText = "";
                 switch(this.action.tag){
                     case "<DELETED>":
                         tagText = this.action.tag + " ";
@@ -225,6 +226,33 @@ LogSchema.virtual('description').get(function() {
 
                 minDescription = tagText + this.action.key + ": " + this.action.value;
                 logType = "Nutzerdaten geändert";
+                break;
+
+            case "userPasswordModify":
+                variables = Object.assign(variables,{
+                    attribute: {
+                        type: variableTypes.ATTRIBUTE,
+                        value: this.action.key,
+                    },
+                    optionalApostrophe: {
+                        type: variableTypes.TEXT,
+                        value: optionalApostrophe
+                    },
+                });
+
+                fullDescription.template.de = "$authorizedUser hat das Passwort von Nutzer: $target geändert";
+                fullDescription.en = authorizedUser + " changed password of user : " + target;
+                fullDescription.de = authorizedUser + " hat das Passwort von Nutzer: " + target + " geändert";
+
+                shortDescription.template.de = "$authorizedUser änderte $target $optionalApostrophe Passwort";
+                shortDescription.en = authorizedUser + " changed password of user : " + target;
+                shortDescription.de = authorizedUser + " änderte " + target + optionalApostrophe + "Passwort";
+
+                actionDescription.en = "password changed";
+                actionDescription.de = "Passwort geändert";
+
+                minDescription = this.action.tag + " password";
+                logType = "Passwort geändert";
                 break;
 
             case "userImageModify":

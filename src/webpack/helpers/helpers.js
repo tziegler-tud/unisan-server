@@ -329,5 +329,8 @@ var transformToLocalizedDateString = function(date, region="de-DE", timezoneStri
     return d.toLocaleString(region, {timeZone: timezoneString});
 }
 
+var escapeRegExp = function(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
 
-export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, escapeSelector, refJSON, stringToBoolean, transformToLocalizedDateString, common}
+export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, escapeSelector, refJSON, stringToBoolean, transformToLocalizedDateString, escapeRegExp, common}

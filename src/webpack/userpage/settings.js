@@ -1,28 +1,12 @@
 import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {UserProfile} from "../userprofile/userprofile";
-import {UserPage} from "./userPage";
-
-import {userActions, eventActions, groupActions} from "../actions/actions"
-
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
-
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-
 import {DropdownMenu} from "../helpers/dropdownMenu";
-import {dateFromNow} from "../helpers/helpers";
-import {phone, tablet} from "../helpers/variables";
 import {Snackbar} from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
-import {EventPage} from "../events/eventPage";
-import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import ComponentPage from "../components/ComponentPage";
 import PageModule from "../utils/PageModule";
-
-var actions = window.actions;
 
 
 export default new PageModule ({
@@ -98,6 +82,10 @@ export default new PageModule ({
         // window.userPage = userPage;
         // userPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id}, {user: user, targetUser: user.id});
 
+        //check if current password is required for password changes
+        // true if the user is NOT an userAdmin
+        // false if the user is an userAdmin
+
         let pageContainer = document.getElementById("userPage-component-container");
         var componentPage = new ComponentPage({
             container: pageContainer,
@@ -106,13 +94,16 @@ export default new PageModule ({
             args: pageArgs,
         });
         window.componentPage = componentPage;
-        componentPage.addSection({sectionIdentifier: "MAIL", order: 2, title: "Email-Einstellungen", displayMode: "show", disableComponentMargins: false})
+        componentPage.addSection({sectionIdentifier: "PASSWORD", order: 1, title: "Login & Passwort", displayMode: "show", disableComponentMargins: false})
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, section:"PASSWORD", componentArgs: {allowEdit: true, size: "full"}, data: {user: data.user, targetUser: data.targetUser, requirePassword: false}});
+
+        componentPage.addSection({sectionIdentifier: "MAIL", order: 2, title: "Email-Einstellungen", displayMode: "show", disableComponentMargins: true})
         await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL, section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
         if(pageArgs.acl.docker.system.mail || pageArgs.acl.docker.system.user) {
             await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD,  section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
         }
         if(pageArgs.acl.docker.system.mail){
-            await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
+            await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV, section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
         }
     },
 });

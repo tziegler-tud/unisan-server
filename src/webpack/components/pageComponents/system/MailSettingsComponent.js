@@ -7,6 +7,7 @@ import {ScrollableList} from "../../../scrollableList/scrollableList";
 import {Dialog as lidlDialog} from "../../../../lib/lidl-modules/dialog/lidl-dialog";
 import Sidebar from "../../../sidebar/Sidebar"
 import {systemPlugin} from "../../../sidebar/plugins/plugin-system"
+import {escapeRegExp} from "../../../helpers/helpers";
 
 export default class MailSettingsComponent extends Component {
     /**
@@ -34,6 +35,13 @@ export default class MailSettingsComponent extends Component {
         const statusContainer = this.container.querySelector(".mail-status");
         const switchSettingsContainer = this.container.querySelector(".mail-switches");
         const serverSettingsContainer = this.container.querySelector(".mail-serverSettings");
+        const accountContainer = this.container.querySelector(".mail-accountSettings");
+        const checkAccountExistsButton = document.getElementById("checkAccountExistsButton");
+        this._createAccountButton = document.getElementById("createAccountButton");
+        this._syncTokenButton = document.getElementById("syncTokenButton");
+
+        this._disableCreateAccountButton();
+        this._disableSyncTokenButton();
 
         //get service status
         let statusRequest = await systemActions.getMailStatus();
@@ -300,69 +308,202 @@ export default class MailSettingsComponent extends Component {
             ]
         }
 
-        // const advancedInput = {
-        //     type: "input",
-        //     identifier: "input-advanced-data",
-        //     valueFunc: function(entry){
-        //         return (entry.value);
-        //     },
-        //     params: {
-        //         disabled: false,
-        //         readonly: true,
-        //     }
-        // }
-        //
-        // let advancedData = {
-        //     listEntries: [ {
-        //         label: "Cookie secrets",
-        //         value: self.data.cookieSecrets,
-        //         },
-        //     ],
-        //     interactions: [advancedInput]
-        // }
-        // let advancedConfig = {
-        //     entryLabel: function(entry){
-        //         return entry.label;
-        //     }
-        // }
-        // let advancedList = new InteractiveListStandaloneComponent({element: advancedContainer, config: advancedConfig, data: advancedData})
-        // advancedList.render();
-        // //create observer
-        // let advancedObserver = new ComponentObserver(function(event, data){
-        //     //handle onclick
-        //     if(event === "click"){
-        //         if(self.page.sidebar){
-        //             self.page.sidebar.addContent("openIdSettingsAdvanced", {
-        //                 title: "OpenID Settings (Advanced)",
-        //                 data: {cookieSecrets: self.data.cookieSecrets},
-        //                 callback: {
-        //                     onConfirm: function(data, args){
-        //                         systemActions.updateOidcSettingsAdvanced({cookieSecrets: data.cookieSecrets})
-        //                             .then(result => {
-        //                                 //restart service
-        //                                 systemActions.restartOidcService()
-        //                                     .then(result => {
-        //                                         self.data.cookieSecrets = data.cookieSecrets;
-        //                                         advancedList.setListEntries([ {
-        //                                             label: "Cookie secrets",
-        //                                             value: self.data.cookieSecrets,
-        //                                         }])
-        //                                         advancedList.render();
-        //                                         self.page.sidebar.hide();
-        //                                         if(self.page.snackbar){
-        //                                             self.page.snackbar.show("OpenID Service neu gestartet.", {});
-        //                                         }
-        //                                     })
-        //                             })
-        //                     }
-        //                 }
-        //             })
-        //             self.page.sidebar.show();
-        //         }
-        //     }
-        // })
-        // advancedList.addObserver(advancedObserver);
+        /**
+         *
+         * @type {InteractionConfig}
+         */
+        const accountInput = {
+            type: "input",
+            identifier: "input-service-data",
+            valueFunc: function(entry){
+                return (entry.value);
+            },
+            params: {
+                disabled: false,
+                readonly: true,
+            }
+        }
+
+
+        let accountData = {
+            /**
+             * @type ListEntry[]
+             */
+            listEntries: createAccountEntries(),
+            /**
+             * @type InteractionConfig[]
+             */
+            interactions: [accountInput]
+        }
+        let accountConfig = {
+            entryLabel: function(entry){
+                return entry.label;
+            }
+        }
+        let accountList = new InteractiveListStandaloneComponent({element: accountContainer, config: accountConfig, data: accountData})
+        accountList.render();
+
+        //create observer
+        let accountObserver = new ComponentObserver((event, data) => {
+            //handle onclick
+            if(event === "click"){
+                if(this.page.sidebar){
+                    this.page.sidebar.addContent("mailSystemAccountSettings", {
+                        title: "System Mail Account Settings",
+                        data: {systemMailAccount: this.data.systemMailAccount},
+                        callback: {
+                            onConfirm: (data, args) => {
+                                systemActions.updateMailSettings({systemMailAccount: data.systemMailAccount})
+                                    .then(result => {
+                                        //restart service
+                                        systemActions.restartMailService()
+                                            .then(result => {
+                                                this.data.systemMailAccount = data.systemMailAccount;
+                                                accountList.setListEntries(createAccountEntries())
+                                                accountList.render();
+                                                this.page.sidebar.hide();
+                                                if(this.page.snackbar){
+                                                    this.page.snackbar.show("Mail Service neu gestartet.", {});
+                                                }
+                                            })
+                                    })
+                            }
+                        }
+                    })
+                    this.page.sidebar.show();
+                }
+                else {
+                    if(this.page.snackbar){
+                        this.page.snackbar.showCustomError("Sidebar konnte nicht geladen werden.", "Error");
+                    }
+                }
+            }
+        })
+        accountList.addObserver(accountObserver);
+
+        /**
+         *
+         * @returns {ListEntry[]}
+         */
+        function createAccountEntries(){
+            return [
+                {
+                    label: "System mail address",
+                    value: self.data.systemMailAccount ?? "",
+                },
+                {
+                    label: "Account token",
+                    value: self.data.systemMailAccountToken ?? "",
+                },
+            ]
+        }
+        checkAccountExistsButton.addEventListener("click", ()=> {
+            if(!this.data.systemMailAccount) {
+                if (this.page.snackbar) {
+                    this.page.snackbar.showCustomError("Cannot check account: system mail account is undefined.", "");
+                }
+                return;
+            }
+            else {
+                //quick sanity check on entered address
+                let domainEscaped = escapeRegExp(self.data.domain);
+                const checker = new RegExp("^[a-zA-Z0-9]\\w+@" + domainEscaped +"$");
+                if(!checker.test(this.data.systemMailAccount)) {
+                    this.page.snackbar.showCustomError("Cannot check account: system mail account is not a valid email address.", "");
+                    return;
+                }
+            }
+            systemActions.checkMailAccountExists(this.data.systemMailAccount)
+                .then(response => {
+                    //account exists
+                    this._enableSyncTokenButton()
+                    if (this.page.snackbar) {
+                        this.page.snackbar.show("Account " + this.data.systemMailAccount + " exists!", {});
+                    }
+
+                })
+                .catch(err => {
+                    //account does not exists
+                    this._enableCreateAccountButton()
+                    if (this.page.snackbar) {
+                        this.page.snackbar.show("No account available for email " + this.data.systemMailAccount);
+
+                    }
+
+                })
+        })
+
+        this._createAccountButton.addEventListener("click", ()=> {
+            if(!this._createAccountButtonEnabled){
+                return;
+            }
+            if (!this.data.systemMailAccount) {
+                if (this.page.snackbar) {
+                    this.page.snackbar.showCustomError("Cannot check account: system mail account is undefined.", "");
+                }
+            }
+            systemActions.createSystemMailAccount(this.data.systemMailAccount)
+                .then(response => {
+                    //account exists
+                    if (this.page.snackbar) {
+                        this.page.snackbar.show("Account created successfully. Email: " + response.body.email, {});
+                    }
+                })
+                .catch(err => {
+                    //account does not exists
+                    if (this.page.snackbar) {
+                        this.page.snackbar.error(err);
+                    }
+
+                })
+        })
+
+        this._syncTokenButton.addEventListener("click", ()=> {
+            if(!this._syncTokenButtonEnabled){
+                return;
+            }
+            if (!this.data.systemMailAccount) {
+                if (this.page.snackbar) {
+                    this.page.snackbar.showCustomError("Cannot check account: system mail account address is undefined.", "");
+                }
+            }
+            systemActions.recreateSystemMailAccountToken()
+                .then(response => {
+                    //account exists
+                    if (this.page.snackbar) {
+                        this.page.snackbar.show("New token obtained successfully: " + response.body.email, {});
+                    }
+                })
+                .catch(err => {
+                    //account does not exists
+                    if (this.page.snackbar) {
+                        this.page.snackbar.error(err);
+                    }
+
+                })
+        })
     }
+
+    _disableCreateAccountButton(){
+        this._createAccountButtonEnabled = false;
+        this._createAccountButton.classList.add("content-link--disabled")
+    }
+
+    _enableCreateAccountButton(){
+        this._createAccountButtonEnabled = true;
+        this._createAccountButton.classList.remove("content-link--disabled")
+    }
+
+    _disableSyncTokenButton(){
+        this._syncTokenButtonEnabled = false;
+        this._syncTokenButton.classList.add("content-link--disabled")
+    }
+    _enableSyncTokenButton(){
+        this._syncTokenButtonEnabled = true;
+        this._syncTokenButton.classList.remove("content-link--disabled")
+    }
+
+
 
     getHtml(){
         return this.html;

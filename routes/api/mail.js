@@ -25,6 +25,9 @@ router.post('/user/recreateAccountToken', recreateAccountToken);
 router.post('/user/:username/sync', syncUserAccount);
 router.put('/user/:email', updateUser);
 router.put('/user/pasword/:email', updateUserPassword);
+router.post("/system/createSystemAccount", createSystemAccount);
+router.post("/system/recreateSystemAccountToken", recreateSystemAccountToken);
+
 
 function getAll(req, res, next){
     mailService.getAll()
@@ -73,6 +76,19 @@ async function syncUserAccount(req, res, next) {
     if(user) {
         res.json(await mailService.syncUserAccount(user));
     }
+}
+
+async function createSystemAccount(req, res, next){
+    const address = req.body.address;
+    mailService.createSystemAccount(address)
+        .then(result => res.json(result.body))
+        .catch(err => next(err));
+}
+
+async function recreateSystemAccountToken(req, res, next){
+    mailService.recreateSystemAccountToken()
+        .then(result => res.json(result.body))
+        .catch(err => next(err));
 }
 
 export default router;

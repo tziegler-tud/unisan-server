@@ -891,6 +891,7 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
         let userId = args.userid;
         let onConfirm = args.callback.onConfirm;
         let requireCurrentPassword = args.requireCurrentPassword;
+        let defaultTitle = "Passwort ändern";
         let corrupted = false;
 
         let res = {};
@@ -901,6 +902,9 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
         });
 
         let action = function(context) {
+
+            context.sidebarTitle = args.sidebarTitle ?? defaultTitle;
+
             $.get('/webpack/sidebar/templates/user/sidebar-updateUserPassword.hbs', function (data) {
 
                 let template = Handlebars.compile(data);

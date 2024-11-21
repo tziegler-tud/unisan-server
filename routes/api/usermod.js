@@ -108,6 +108,7 @@ router.put('/:id', update);
 router.post('/:id/uploadUserImage', upload.single('image'), postUpload);
 router.post('/:id/privacyAgreement', setPrivacyAgreement);
 
+router.post('/updateUsername', updateUsername);
 router.post('/updateCurrentUserPassword', updateCurrentUserPassword);
 router.post('/updateUserPassword', updateUserPassword);
 
@@ -223,11 +224,11 @@ function updateCurrentUserPassword(req, res, next) {
     }
     let password = req.body.currentPassword;
     let newPassword = req.body.newPassword;
-    AuthService.checkUserWriteAccess(req.user, "self", true)
+    AuthService.checkUserWriteAccessCritical(req.user, req.user)
         .then(result => {
-
             userService.getUserHash(req.user)
                 .then(user=> {
+                    if(!user || user.hash === undefined) next()
                     //verify password is correct
                     bcrypt.compare(password, user.hash)
                         .then(result => {
@@ -268,7 +269,7 @@ function updateUserPassword(req, res, next) {
     //get target user
     userService.getById(targetUserId)
         .then(targetUser => {
-            AuthService.checkUserWriteAccess(req.user, targetUser, true)
+            AuthService.checkUserWriteAccessCritical(req.user, targetUser)
                 .then(result => {
                     userService.getUserHash(targetUser)
                         .then(targetWithHash=> {
@@ -308,6 +309,26 @@ function getKey(req, res, next) {
         })
 }
 
+function updateUsername(req, res, next) {
+    if(req.params.id === undefined || req.body.username === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    //auth
+    else {
+        AuthService.checkUserWriteAccessCritical(req.user, req.params.id)
+            .then(result => {
+                userService.updateUsername(req, req.params.id, req.body.username)
+                    .then((result) => res.json({result}))
+                    .catch(err => next(err));
+            })
+            .catch(err =>{
+                next(err);
+            })
+    }
+
+}
+
 function updateKey(req, res, next) {
     if(req.params.id === undefined || req.body.key === undefined || req.body.value === undefined) {
         let err = {name: "ValidationError", message: "Validation failed."}
@@ -315,8 +336,7 @@ function updateKey(req, res, next) {
     }
     //auth
     else {
-        let critical = (req.body.key === "password" || req.body.key === "username");
-        AuthService.checkUserWriteAccess(req.user, req.params.id, critical)
+        AuthService.checkUserWriteAccess(req.user, req.params.id)
             .then(result => {
                 userService.updateKey(req, req.params.id, req.body.key, req.body.value, req.body.args)
                     .then((result) => res.json({result}))
@@ -326,7 +346,6 @@ function updateKey(req, res, next) {
                 next(err);
             })
     }
-
 }
 
 function addQualification(req, res, next) {

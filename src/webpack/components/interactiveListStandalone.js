@@ -8,37 +8,38 @@ import {nanoid} from "nanoid";
 
 /**
  * @typedef ListEntry
- * @property {String} label - list entry label as displayed
- * @property {String|Integer|Boolean} value  - corresponding value. String or Int for Labels, inputs and selects , Boolean for switch
- * @property {String} identifier - should be unique, can be used to identify the entry
- * @property [String] icon - material ui icon font code. If unset, the default icon will be used
+ * @property {string} label - list entry label as displayed
+ * @property {string|Integer|Boolean} value  - corresponding value. String or Int for Labels, inputs and selects , Boolean for switch
+ * @property {string=} identifier - should be unique, can be used to identify the entry
+ * @property [string=] icon - material ui icon font code. If unset, the default icon will be used
  * @property {Boolean=true} interactive - if false, disables hover animations. Default true.
  * @property {Boolean=true} disabled - if true, displays the list as disabled. Default false.
  */
 
 /**
  * @typedef InteractionConfig
- * @property {String} type - one of "label", "switch", "input", "select"
- * @property {String} identifier - Must be unique. Used internally, is added to the interaction dom element as data-identifier
+ * @property {string} type - one of "label", "switch", "input", "select"
+ * @property {string} identifier - Must be unique. Used internally, is added to the interaction dom element as data-identifier
  * @property {Function} valueFunc - function to be parsed to obtain the value. Receives a ListEntry as single argument
  * @property {Object} params - passed as variable "params" to handlebars
  * @property {Boolean=true} interactive - if false, disables hover animations. Default true.
  * @property {Boolean=true} disabled - if true, displays the list as disabled. Default false.
- * @property {String} defaultIcon - default icon to be shown before list entries
- * @property {String | String[]} config.classes - css class names to be added to the interaction
+ * @property {string=} defaultIcon - default icon to be shown before list entries
+ * @property {Object=} config
+ * @property {string | string[]=} config.classes - css class names to be added to the interaction
  *
  */
 
 export default class InteractiveListStandaloneComponent extends StandaloneComponent{
     /**
      *
-     * @param element {HTMLElement} container element
+     * @param element {Element} container element
      * @param config {Object}
      * @param data {Object}
      * @param data.listEntries {ListEntry[]} Array of list entries. Each entry requires a "label" and "value" property
      * @param data.interactions {InteractionConfig[]} Array of Interaction configurations
-     * @param config.order {Integer} order inside componentContainer
-     * @param config.entryLabel {Function} function to obtain label for entries. Receives entry as argument
+     * @param config.order {Integer=} order inside componentContainer
+     * @param config.entryLabel {Function=} function to obtain label for entries. Receives entry as argument
      * @returns {InteractiveListComponent}
      * @constructor
      */
