@@ -20,9 +20,7 @@ mongoose.set('debug', false);
 var opt = {
     user: config.username,
     pass: config.pwd,
-    auth: {
-        authSource: config.authSource
-    },
+    authSource: config.authSource
 };
 
 const optLocalDb = {
