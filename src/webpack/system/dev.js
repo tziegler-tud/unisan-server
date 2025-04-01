@@ -3,7 +3,7 @@ import {Snackbar} from "../helpers/snackbar";
 import PageModule from "../utils/PageModule";
 
 export default new PageModule({
-    title: "system.dev",
+    title: "system.development",
     pageData: {},
     init: async function (args) {
         window.snackbar = new Snackbar();
