@@ -449,8 +449,8 @@ class UserService{
                     if (args.userImg.tmp) {
                         let tmpPath = appRoot + '/src/data/uploads/tmp/' + args.userImg.tmpkey + ".jpg";
                         //check if file exists
-                        checkFileExists(tmpPath)
-                            .then(function(exists){
+                        this.checkFileExists(tmpPath)
+                            .then((exists)=>{
                                 if(exists) {
                                     try {
                                         fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
@@ -867,7 +867,7 @@ class UserService{
         var updatedArray;
         // if array is indexed, we use id to remove the element
         if (arrayElementDbId !== undefined) {
-            let rmObj = removeById(array, arrayElementDbId);
+            let rmObj = this.removeById(array, arrayElementDbId);
             updatedArray = rmObj.array;
             let el = rmObj.object;
             logKey = (el.title === undefined) ? el : el.title;
@@ -875,7 +875,7 @@ class UserService{
         }
         else {
             if (!noIndex) {
-                let rmObj = removeByIndex(array, index);
+                let rmObj = this.removeByIndex(array, index);
                 updatedArray = rmObj.array;
                 let el = rmObj.object;
                 logKey = (el.title === undefined) ? "<complex object>" : el.title;
@@ -1234,7 +1234,7 @@ class UserService{
         // validate
         if (!user) throw new Error('User not found');
 
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject)=> {
 
 
             // validate input
@@ -1248,14 +1248,14 @@ class UserService{
             if (args.isIndex) {
                 //qualificationId is array index
                 let fullKey = logKey + "." + (qualificationId).toString();
-                let rmObj = removeByIndex(array, qualificationId);
+                let rmObj = this.removeByIndex(array, qualificationId);
                 array = rmObj.array;
                 ojVal = rmObj.object.qualification.name;
             }
             else {
                 //qualificationId is id
                 let fullKey = logKey + "/" + (qualificationId).toString();
-                let rmObj = removeById(array, qualificationId);
+                let rmObj = this.removeById(array, qualificationId);
                 array = rmObj.array;
                 ojVal = rmObj.object.qualification.name;
             }
@@ -1361,11 +1361,11 @@ class UserService{
 
         if (groupId === undefined) {
             //fall back to standard filtering
-            return matchAny(matchString, args);
+            return this.matchAny(matchString, args);
         }
         //retrieve filtered userlist
-        return new Promise (function(resolve, reject){
-            matchAny(matchString, args)
+        return new Promise ((resolve, reject)=>{
+            this.matchAny(matchString, args)
                 .then(userlist => {
                     //get user acls
                     let idArray = userlist.map(user => user._id);
@@ -1703,7 +1703,7 @@ class UserService{
         if (!user) throw new Error('User not found');
 
         //all good, lets go
-        return new Promise(function(resolve, reject){
+        return new Promise((resolve, reject)=>{
             //check access
             //TODO: Finish this
             AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.access.REVOKEEVENTCONTROL)
@@ -1722,7 +1722,7 @@ class UserService{
                             })
                             if (index > -1){
                                 //entry found. remove
-                                let result = removeByIndex(userACL.individual.events, index);
+                                let result = this.removeByIndex(userACL.individual.events, index);
                                 let el = result.object;
                                 let removedOperations = (el.allowedOperations !== undefined)? el.allowedOperations.toString() : "";
 
@@ -1955,8 +1955,6 @@ class UserService{
 
                 user.save()
                     .then(user => {
-                        return user;
-
                         let log = new Log({
                             type: "modification",
                             action: {
@@ -1976,6 +1974,7 @@ class UserService{
                             },
                         })
                         LogService.create(log).then().catch();
+                        return user;
                     })
                     .catch(err => {throw err})
             })
