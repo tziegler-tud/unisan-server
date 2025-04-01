@@ -37,11 +37,12 @@ let roles = [
 let operations = {
     user: {
         READ: "readUser", //read all user documents
-        WRITE: "writeUser", //write all user documents
+        WRITE: "writeUser", //write non-critical properties on all user documents
         CREATE: "createUser", //create user
         DELETE: "deleteUser", //delete user
         READSELF: "readUserSelf", //read own user document
-        WRITESELF: "writeUserSelf", //write non-critical properties on own user docuemnt
+        WRITESELF: "writeUserSelf", //write non-critical properties on own user document
+        WRITECRITICAL: "writeUserCritical", // write critical properties on all user documents (passwords)
     },
     events: {
         READ: "readEvent",
@@ -90,6 +91,7 @@ let operations = {
         USER: "manageUserSettings",
         GOUPS: "manageGroupSettings",
         SYSTEM: "manageSystemSettings",
+        MAIL: "manageMailSettings",
         AUTH: "manageAuthenticationSettings",
         DEVELOPMENT: "manageDevelopmentSettings",
     }

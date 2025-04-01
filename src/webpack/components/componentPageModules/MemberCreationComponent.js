@@ -6,19 +6,21 @@ import InteractiveListStandaloneComponent from "../interactiveListStandalone";
 import ComponentObserver from "../ComponentObserver";
 import {systemActions} from "../../actions/systemActions";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param args {Object}
- * @returns {MemberCreationComponent}
- * @constructor
- */
+
 export default class MemberCreationComponent extends Component {
-    constructor({page, componentId, componentType, pageData, data, args}={}) {
-        super({page, componentId, componentType, pageData, data, args});
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection}
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param componentType {ComponentPage.componentTypes} type of the component
+     * @param data {Object}
+     * @param args {Object}
+     * @returns {MemberCreationComponent}
+     * @constructor
+     */
+    constructor({page, section, componentId,  pageData={}, data={}, args={}}={}) {
+        super({page, section, componentId,  pageData, data, args});
         this.templateUrl = "/webpack/components/templates/system/memberCreation.hbs"
     }
 

@@ -55,20 +55,6 @@ block content
                                         #tab-userinfo-general.userinfo-inner
                                             .userinfo-section.userinfo-card.card-full.userwidget-description
                                                 .userinfo-section-inner
-                                                    .userinfo-sectionheader
-                                                        span unisanServer
-                                                    div
-                                                        ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
-                                                            - var combinedKey = "username"
-                                                            - var keyTitle = "Nutzername"
-                                                            - var value = exploreUserDocument.username
-                                                            li.user-entry.username-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
-                                                                a.inner()
-                                                                    .item-property.userkey-entry-title
-                                                                        span= keyTitle
-                                                                    .item-property.userkey-entry-value
-                                                                        span= value
-                                                                    .clear
 
                                                     .userinfo-sectionheader
                                                         span Allgemeine Daten
@@ -105,6 +91,30 @@ block content
                                                                                     span= value
                                                                                 .clear
 
+                                                    .userinfo-sectionheader
+                                                        span unisan-server
+                                                    div
+                                                        ul.userlist.itemlist.itemlist-style-clean.userinfo-itemList
+                                                            - var combinedKey = "username"
+                                                            - var keyTitle = "Nutzername"
+                                                            - var value = exploreUserDocument.username
+                                                            li.user-entry.username-change(id="userkey-" + combinedKey, data-isarray= false, data-key=combinedKey, data-value=value)
+                                                                a.inner()
+                                                                    .item-property.userkey-entry-title
+                                                                        span= keyTitle
+                                                                    .item-property.userkey-entry-value
+                                                                        span= value
+                                                                    .clear
+                                                            - var keyTitle = "Email (intern)"
+                                                            - var value = exploreUserDocument.internalEmail
+                                                            li.user-entry.internalEmail-change(id="userkey-internalEmail", data-isarray= false, data-key="internalEmail", data-value=value)
+                                                                a.inner()
+                                                                    .item-property.userkey-entry-title
+                                                                        span= keyTitle
+                                                                    .item-property.userkey-entry-value
+                                                                        span= value
+                                                                    .clear
+
                                                     .userinfo-item.useredit-item.useredit-addItem
                                                         .useredit-addGeneralItemBtn.btn-addItem.btn-listExt(data-catkey=secKey)
                                                             svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -115,7 +125,16 @@ block content
                                                     .userinfo-sectionheader
                                                         span Kontaktdaten
                                                     div
-                                                        ul.userlist.itemlist.userinfo-itemList
+                                                        ul.userlist.itemlist.userinfo-itemList.usercontact-list
+                                                            if exploreUserDocument.internalEmail
+                                                                - var internalEmail = exploreUserDocument.internalEmail
+                                                                li.user-entry.usercontact-entry.usercontact-entry--disabled(id="userkey-contactData--internal", data-disabled = "true")
+                                                                    a.inner()
+                                                                        .item-property.userkey-entry-title
+                                                                            span Email (intern)
+                                                                        .item-property.userkey-entry-value
+                                                                            span= internalEmail
+                                                                        .clear
                                                             if exploreUserDocument.contactData
                                                                 - var secKey = "contactData"
                                                                 - var secVal = exploreUserDocument.contactData

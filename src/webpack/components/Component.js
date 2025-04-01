@@ -2,21 +2,24 @@ import Handlebars from "handlebars";
 import {userActions} from "../actions/userActions";
 import ComponentPage from "./ComponentPage";
 
-/**
- *
- * @param page {ComponentPage} parent page instance
- * @param componentId {String} component id number, assigend by page on creation
- * @param componentType {ComponentPage.componentTypes} type of the component
- * @param data {Object}
- * @param args {Object}
- * @param args.order {Integer} order inside componentContainer
- * @returns {Component}
- * @constructor
- */
+
 export default class Component {
-    constructor({page, componentId=Date.now(), componentType, pageData, data={}, args}={}) {
+    /**
+     *
+     * @param page {ComponentPage} parent page instance
+     * @param section {ComponentSection} section instance
+     * @param componentId {String} component id number, assigend by page on creation
+     * @param pageData {Object}
+     * @param data {Object}
+     * @param args {Object}
+     * @param args.order {Integer} order inside componentContainer
+     * @returns {Component}
+     * @constructor
+     */
+    constructor({page, section, componentId=Date.now(), pageData, data={}, args}={}) {
         let defaults = {
             allowEdit: true,
+            allowEditCritical: false,
             acl: undefined,
             size: "full",
             classes: "",
@@ -26,12 +29,12 @@ export default class Component {
         args = (args === undefined) ? {} : args;
         this.args = Object.assign(defaults, args);
         this.page = page;
+        this.section = section;
         this.data = data;
         this.pageData = pageData;
         this.user = data.user;
 
         this.componentId = componentId;
-        this.componentType = componentType;
 
         this.container = document.createElement("div");
         this.container.classList.add("componentPage-component-wrapper");
@@ -77,7 +80,7 @@ export default class Component {
             let templateData = await $.get(self.templateUrl)
             let template = Handlebars.compile(templateData);
             self.container.innerHTML = template(self.handleData);
-            let pageRenderResult = await self.page.renderComponentHtml(self.container);
+            let pageRenderResult = self.page.renderComponentHtml(this.section, self.container);
             if(pageRenderResult.error) self.fail(pageRenderResult.error);
             else {
                 self.postRenderInternal();

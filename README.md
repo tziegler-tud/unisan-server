@@ -64,4 +64,5 @@ admin@unisan-dresden.de
 
 #### Development setup
 - in root dir: `npm install`
+- switch to frontend src directory: `cd src`
 - build frontend in dev mode and enable watcher: `npx webpack --config webpack.dev.js`

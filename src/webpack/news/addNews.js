@@ -1,4 +1,4 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions, eventActions, groupActions} from "../actions/actions"
 
@@ -78,7 +78,7 @@ let addNews = {
                 args: {},
             });
             window.componentPage = componentPage;
-            componentPage.addComponent(ComponentPage.componentTypes.NEWS.ADD, {size: "full", order: 1}, {user: user})
+            componentPage.addComponent({componentType: ComponentPage.componentTypes.NEWS.ADD, componentArgs: {size: "full", order: 1}, data: {user: user}})
                 .then()
                 .catch()
         })

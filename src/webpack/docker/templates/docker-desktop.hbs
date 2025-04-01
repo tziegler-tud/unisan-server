@@ -171,6 +171,53 @@
             {{/if}}
         </div>
         {{/if}}
+        <div class="docker-elementContainer collapsing" id="personalSettingsContainer">
+            <div class="docker-element docker-mainElement" id="personalSettings">
+                <a href="/settings">
+                    <svg class="feather feather-users" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span class="docker-element-label">Meine Einstellungen</span>
+                    <div class="clear"></div>
+                </a>
+            </div>
+            <div class="docker-subElementContainer">
+                <div class="docker-element docker-subElement" id="personalSettings_general">
+                    <a href="/settings/general">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        <span class="docker-element-label">Allgemein</span>
+                        <div class="clear"></div>
+                    </a>
+                </div>
+                <div class="docker-element docker-subElement" id="personalSettings_login">
+                    <a href="/settings/login">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-lock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span class="docker-element-label">Login-Einstellungen</span>
+                        <div class="clear"></div>
+                    </a>
+                </div>
+                <div class="docker-element docker-subElement" id="personalSettings_mail"><a href="/settings/mail">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <span class="docker-element-label">Email</span>
+                    <div class="clear"></div>
+                </a></div>
+                <div class="docker-element docker-subElement" id="personalSettings_notifications"><a href="/settings/notifications">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <span class="docker-element-label">Benachrichtigungen</span>
+                    <div class="clear"></div>
+                </a></div>
+                <div class="docker-element docker-subElement" id="personalSettings_privacy"><a href="/settings/privacy">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span class="docker-element-label">Datenschutz</span>
+                    <div class="clear"></div>
+                </a></div>
+            </div>
+        </div>
 <!--        <div class="docker-elementContainer collapsing" id="settingsContainer">-->
 <!--            <div class="docker-element docker-mainElement" id="settings">-->
 <!--                <a href="/unisams/settings">-->

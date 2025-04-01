@@ -71,11 +71,10 @@ var Snackbar = function(options){
  * @param options.actionButton.text {String} action button text
  * @returns {boolean}
  */
-Snackbar.prototype.show = function(message, options) {
+Snackbar.prototype.show = function(message, options={}) {
     let self = this;
     let snackbar = self.snackbar;
     let defaultOptions = self.options;
-    options = (options === undefined) ? {}: options;
     options = Object.assign(defaultOptions, options);
     if (!snackbar) {
         //try to find snackbar
@@ -117,7 +116,7 @@ Snackbar.prototype.show = function(message, options) {
  * @param options.actionButton.text {String} action button text
  * @returns {boolean}
  */
-Snackbar.prototype.showError = function(jqxhr, textstatus, error, options){
+Snackbar.prototype.showError = function(jqxhr, textstatus, error=undefined, options={}){
     let self = this;
     let snackbar = self.snackbar;
     let message = jqxhr.responseJSON.message;
@@ -130,7 +129,6 @@ Snackbar.prototype.showError = function(jqxhr, textstatus, error, options){
             text: "Nagut",
         }
     }
-    options = (options === undefined) ? {}: options;
     options = Object.assign(defaultOptions, options);
     this.show(text, options);
 }
@@ -150,7 +148,7 @@ Snackbar.prototype.showError = function(jqxhr, textstatus, error, options){
  * @param options.actionButton.text {String} action button text
  * @returns {boolean}
  */
-Snackbar.prototype.showCustomError = function(message, textstatus, error, options){
+Snackbar.prototype.showCustomError = function(message, textstatus, error=undefined, options={}){
     let self = this;
     let snackbar = self.snackbar;
     let text = (error ? error: "Error " + textstatus) +": " + message;
@@ -162,7 +160,6 @@ Snackbar.prototype.showCustomError = function(message, textstatus, error, option
             text: "Nagut",
         }
     }
-    options = (options === undefined) ? {}: options;
     options = Object.assign(defaultOptions, options);
     this.show(text, options);
 }

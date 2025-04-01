@@ -1,78 +1,48 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {UserProfile} from "../userprofile/userprofile";
-import {UserPage} from "./userPage";
-
-import {userActions, eventActions, groupActions} from "../actions/actions"
-
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
-
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-
 import {DropdownMenu} from "../helpers/dropdownMenu";
-import {dateFromNow} from "../helpers/helpers";
-import {phone, tablet} from "../helpers/variables";
 import {Snackbar} from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
-import {EventPage} from "../events/eventPage";
-import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import ComponentPage from "../components/ComponentPage";
-
-var actions = window.actions;
-
-
-let settings = {
-    title: "settings",
-    pageData: {},
-    init: function (args) {
-        let self  = this;
-        self.initPromise = new Promise(function(resolve, reject){
-            $(document).ready(function () {
-
-                //debug line, remove before flight
-                console.log("loading js module: user."+self.title);
-
-                self.pageData = {};
-                var lidlRTO = window.lidlRTO;
-                var currentExploredUser;
-                var profile = new UserProfile(window.exploreUserId);
-
-                // create new observer
-                var ob1 = new lidlObserver(function (u) {
-                    currentExploredUser = u;
-                    self.pageData.exploredUser = currentExploredUser;
-                    self.updatePage(self.pageData.exploredUser, args)
-                });
-                window.snackbar = new Snackbar();
-
-                const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
+import PageModule from "../utils/PageModule";
 
 
-                // get user data from user service
-                //subscribe as observer to get notification if user changes on server
-                let userPromise = profile.getUserAndSubscribe(ob1);
+export default new PageModule ({
+        title: "user.settings",
+        pageData: {},
+        init: async function (args) {
+            var lidlRTO = window.lidlRTO;
 
-                userPromise.then(user=> {
-                    self.pageData.exploredUser = user;
-                    self.buildPage(self.pageData.exploredUser, args)
-                        .then(result => {
-                            resolve();
-                        })
-                        .catch(err=> {
-                            reject(err)
-                        })
-                })
-                    .catch(function (reason) {
-                        console.error("Failed to retrieve data:" + reason)
+            var currentUserProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
-                    })
-            })
-        })
+            var targetUserProfile = new UserProfile(window.exploreUserId);
+
+            // create new observer
+            var ob1 = new lidlObserver((u) => {
+                this.pageData.user = u;
+            });
+
+            window.snackbar = new Snackbar();
+
+            const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
+
+
+            // get user data from user service
+            //subscribe as observer to get notification if user changes on server
+            const currentUser = await currentUserProfile.getUserAndSubscribe(ob1);
+            const targetUser = await targetUserProfile.getUserAndSubscribe(ob1);
+
+
+            const data = {
+                user: currentUser,
+                targetUser: targetUser
+            }
+
+            return {args, data}
     },
-    buildPage: function(user, args) {
+    buildPage: async function({args={}, data={}}={}) {
         let self = this;
         var lidlRTO = window.lidlRTO;
 
@@ -81,31 +51,60 @@ let settings = {
         // init event sidebar
         // if(!(phone.matches || tablet.matches)) sidebar.show();
 
+        let pageArgs = {
 
-        return new Promise(function(resolve, reject){
+        };
 
-            if (window.allowedit) {
-                window.DockerElement.addDockerSubPage("userEdit", self.pageData.exploredUser, {}, undefined, {currentUser: {edit: window.allowedit}});
-            }
-            else {
-                window.DockerElement.addDockerSubPage("user", self.pageData.exploredUser, {}, undefined, {currentUser: {edit: window.allowedit}});
-            }
+        try {
+            pageArgs.acl = await $.get("/api/v1/acl/current");
+        }
+        catch(e) {
+            console.error("Failed to get user acl. This might lead to incorrect display")
+        }
 
-            let pageContainer = document.getElementById("userPage-component-container");
-            var userPage = new ComponentPage({
-                container: pageContainer,
-                sidebar: sidebar,
-                data: {user: user},
-                args: {},
-            });
-            window.userPage = userPage;
-            userPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id}, {user: user, targetUser: user.id});
-        })
+        if (window.allowedit) {
+            window.DockerElement.addDockerSubPage("userEdit", data.targetUser, {}, undefined, {currentUser: {edit: window.allowedit}});
+        }
+        else {
+            window.DockerElement.addDockerSubPage("user", data.targetUser, {}, undefined, {currentUser: {edit: window.allowedit}});
+        }
 
+        // let pageContainer = document.getElementById("userPage-component-container");
+        // var userPage = new ComponentPage({
+        //     container: pageContainer,
+        //     sidebar: sidebar,
+        //     data: {user: user},
+        //     args: {},
+        // });
+        // window.userPage = userPage;
+        // userPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id}, {user: user, targetUser: user.id});
+
+        //check if current password is required for password changes
+        // true if the user is NOT an userAdmin
+        // false if the user is an userAdmin
+
+        let pageContainer = document.getElementById("userPage-component-container");
+        var componentPage = new ComponentPage({
+            container: pageContainer,
+            sidebar: sidebar,
+            data: data,
+            args: pageArgs,
+        });
+        window.componentPage = componentPage;
+        componentPage.addSection({sectionIdentifier: "PASSWORD", order: 1, title: "Login & Passwort", displayMode: "show", disableComponentMargins: false})
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, section:"PASSWORD", componentArgs: {allowEdit: true, size: "full"}, data: {user: data.user, targetUser: data.targetUser, requirePassword: false}});
+
+        componentPage.addSection({sectionIdentifier: "MAIL", order: 2, title: "Email-Einstellungen", displayMode: "show", disableComponentMargins: true})
+        let allowSetInternalMail = false;
+        if(pageArgs.acl.docker.system.mail || pageArgs.acl.docker.system.user) {
+            allowSetInternalMail = true;
+        }
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL, section:"MAIL", componentArgs: {allowEdit: true, allowEditCritical: allowSetInternalMail, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
+        if(pageArgs.acl.docker.system.mail || pageArgs.acl.docker.system.user) {
+            await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD,  section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
+        }
+        if(pageArgs.acl.docker.system.mail){
+            await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV, section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
+        }
     },
-    updatePage: function(user, args){
-        this.buildPage(user, args)
-    },
-};
-
-export {settings}
+});

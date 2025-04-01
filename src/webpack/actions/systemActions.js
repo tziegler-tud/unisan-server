@@ -26,15 +26,96 @@ var systemActions = {
         })
     },
 
+    updateMailSettings(data){
+        return $.ajax({
+                url: "/api/v1/system/settings/mail",
+                type: 'PUT',
+                contentType: "application/json; charset=UTF-8",
+                dataType: 'json',
+                data: JSON.stringify(data)
+        })
+    },
+
+    stopMailService(){
+        return $.ajax({
+            url: "/api/v1/system/mail/stop",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+        })
+    },
+
+    restartMailService(){
+        return $.ajax({
+            url: "/api/v1/system/mail/restart",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+        })
+    },
+
+    getMailStatus(){
+        return $.ajax({
+            url: "/api/v1/system/mail/status",
+            type: 'GET',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    checkMailAccountExists(email){
+        return $.ajax({
+            url: "/api/v1/mail/user/"+ email,
+            type: 'GET',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    createUserMailAccount(userid){
+        return $.ajax({
+            url: "/api/v1/mail/user/createUserAccount",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({userid: userid}),
+        })
+    },
+
+    createSystemMailAccount(address){
+        return $.ajax({
+            url: "/api/v1/mail/system/createSystemAccount",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({address: address}),
+        })
+    },
+
+    recreateSystemMailAccountToken(){
+        return $.ajax({
+            url: "/api/v1/mail/system/recreateSystemAccountToken",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    syncUserMailToken(userid){
+        return $.ajax({
+            url: "/api/v1/system/mail/recreateSystemAccountToken",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({userid: userid}),
+        })
+    },
+
     updateAuthSettings(data){
-        return new Promise(function(resolve, reject){
-            $.ajax({
+        return $.ajax({
                 url: "/api/v1/system/settings/auth",
                 type: 'PUT',
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',
                 data: JSON.stringify(data)
-            })
         })
     },
 

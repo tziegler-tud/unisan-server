@@ -13,7 +13,7 @@ import "./userprofile.scss";
 
 import {UserProfile} from "../userprofile/userprofile";
 
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar/sidebar.js";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {ScrollableList} from "../scrollableList/scrollableList";
 import {Searchbar} from "../searchbar/searchbar";
@@ -344,6 +344,9 @@ $(document).ready (function () {
             var key = self.dataset.key;
 
 
+            if(self.dataset.disabled !== undefined) {
+                return;
+            }
             var field = refJSON(currentExploredUser, key);
 
             addDBKey_sidebar.addContent('UserUpdateContactKey', {
@@ -354,6 +357,8 @@ $(document).ready (function () {
                     user: currentExploredUser,
                     type: field.type,
                     default: field.default,
+                    isRemoveable: self.dataset.removeable ?? true,
+                    readonly: self.dataset.readonly ?? false,
                     callback: {
                         onConfirm: function (userid, key, value, args) {
                             profile.updateDBKey(key, value, args, function () {
@@ -478,13 +483,12 @@ $(document).ready (function () {
 
         $(".username-change").off("click").on("click", function (e) {
             e.preventDefault();
-            var self = this;
             addDBKey_sidebar.addContent('UserChangeUsername', {
                     userid: userid,
                     key: "username",
-                    value: self.dataset.value,
+                    value: this.dataset.value,
                     callback: {
-                        onConfirm: function (userid, key, value) {
+                        onConfirm: (userid, key, value) => {
                             var args = {
                                 //isArray: false
                             };
@@ -498,7 +502,7 @@ $(document).ready (function () {
                                 userid: userid,
                                 callback: {
                                     onConfirm: function () {
-                                        userActions.updateDBKey(userid, key, value, args, function () {
+                                        userActions.updateUsername(userid, value, args, function () {
                                             location.replace("/user/edit/" + userid);
                                         });
                                     }

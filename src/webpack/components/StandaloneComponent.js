@@ -3,6 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import "./scss/standaloneComponent.scss";
 
 export default class StandaloneComponent {
+    /**
+     *
+     * @param name {string} component name
+     * @param element {HTMLElement} container element
+     * @param config {Object}
+     * @param data {Object}
+     */
     constructor({name, element, config={}, data={}}){
         this.componentName = name
         this.container = element;

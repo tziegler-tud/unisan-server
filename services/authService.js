@@ -8,7 +8,8 @@ const UserACL = db.UserACL;
 const User = db.User;
 
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
-/** @typedef {import("../schemes/userScheme.js").UserScheme} User */
+/** @typedef {import("../services/userService.js").User} User */
+/** @import { UserObject } from  './services/userService.js' */
 
 
     const rolesMap = authEnums.rolesMap;
@@ -130,6 +131,8 @@ let defaultSysAdmin = {
         operations.user.WRITE,
         operations.user.CREATE,
         operations.user.DELETE,
+        operations.user.WRITECRITICAL,
+
         operations.access.GRANTUSERGROUPS,
         operations.access.REVOKEUSERGROUPS,
 
@@ -168,6 +171,7 @@ let defaultSysAdmin = {
         operations.system.GOUPS,
         operations.system.SYSTEM,
         operations.system.QUALIFICATIONS,
+        operations.system.MAIL,
         operations.system.AUTH,
         operations.system.DEVELOPMENT,
     ]
@@ -231,7 +235,7 @@ class AuthService {
             self.init
                 .then(result => {
                     let id = typeof(requestingUser) === "string" ? requestingUser : requestingUser.id;
-                    aclService.getUserACL(id, {populate: {userGroups: true}})
+                    aclService.getUserACL(id, {populate: {userGroups: true, events: false}})
                         .then(function(userACL){
                             //check if superadmin
                             if (userACL.userRole === self.rolesEnum.SUPERADMIN) {
@@ -302,25 +306,27 @@ class AuthService {
     }
 
     /**
-     * authorizes basic write access on user documents. dont use this for critical properties, e.g. passwords or username
+     * authorizes basic write access on user documents. Don't use this for critical properties, e.g. passwords or username
      *
-     * @param user {User} requesting user
-     * @param target {User} target user
-     * @param critical {Boolean} forwards to critical security check
+     * @param user {UserObject} requesting user
+     * @param target {UserObject} target user
+     * @param critical {Boolean} DEPRECATED: forwards to critical security check
      * @returns {Promise<unknown>}
      */
-    checkUserWriteAccess (user, target, critical) {
+    checkUserWriteAccess (user, target, critical=false) {
         let self = this;
         //validate
-        if (user === undefined) throw new Error("AuthService fail: invalid parameters given");
-        if (target === undefined) target = "other";
-        let targetId = target;
-        if (target.id !== undefined) targetId = target.id;
-        if (critical) return self.checkUserWriteAccessCritical(user, target);
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
+
+        //TODO: Remove deprecated property call
+        if (critical !== undefined) {
+            console.warn("WARNING: Using Deprecated call 'checkUserWriteAccess' using deprecated property 'critical'");
+            if (critical) return self.checkUserWriteAccessCritical(user, target);
+        }
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === targetId.toString()) {
+            if(user.id.toString() === target.id.toString()) {
                 //trying to write self
                 self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
                     .then(result => {
@@ -344,22 +350,26 @@ class AuthService {
     }
 
     /**
-     * authorizes critical write access on user documents. Use this for critical properties, e.g. passwords or username
+     * authorizes critical write access on user documents. Use this for critical user properties, e.g. passwords or username.
+     * Never use this for access-related writing, or else users can escalate their own access rights
      *
-     * @param user {UserScheme} requesting user
-     * @param target {UserScheme} target user
+     *
+     * @param user {UserObject} requesting user
+     * @param target {UserObject} target user
      * @returns {Promise<unknown>}
      */
     checkUserWriteAccessCritical (user, target) {
         let self = this;
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
-        let targetId = target;
-        if (target.id !== undefined) targetId = target.id;
+
+        if(user.id === undefined || target.id === undefined) {
+            throw new Error("AuthService fail: invalid parameters given");
+        }
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === targetId.toString()) {
+            if(user.id.toString() === target.id.toString()) {
                 //trying to write self
                 self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
                     .then(result => {
@@ -371,7 +381,7 @@ class AuthService {
             }
             else {
                 //general user write access is required
-                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
+                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITECRITICAL)
                 let accessLevel = self.checkRoleAccess(user, target);
 
                 Promise.all([writeAccess, accessLevel])
@@ -384,7 +394,6 @@ class AuthService {
                     .catch(err =>{
                         reject(err)
                     })
-
             }
         })
     }
@@ -401,11 +410,18 @@ class AuthService {
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
         let targetId = target;
-        if (target.id !== undefined) targetId = target.id;
+        if (target.id !== undefined) targetId = target.id.toString();
+        let userId = user;
+        if (user.id === undefined) {
+            throw new Error("AuthService fail: Invalid user object given.")
+        }
+        else {
+            userId = user.id.toString();
+        }
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === targetId.toString()) {
+            if(userId === targetId) {
                 //trying to delete self
                 self.checkAllowedGroupOperation(user, operations.user.DELETE)
                     .then(result => {
@@ -863,7 +879,7 @@ class AuthService {
      */
     getRequiredGroupOperation (type, action) {
         if (type === undefined || action === undefined) {
-            throw new Error("Authenrication Serive fail: Invalid parameters given")
+            throw new Error("Authentication Service failed: Invalid parameters given")
         }
         switch (type) {
             case "user":

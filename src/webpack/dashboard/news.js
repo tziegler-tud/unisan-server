@@ -1,4 +1,4 @@
-import {Sidebar} from "../sidebar/sidebar";
+import Sidebar from "../sidebar/Sidebar.js";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {phone, tablet} from "../helpers/variables";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
@@ -78,13 +78,13 @@ let news = {
         });
         window.componentPage = componentPage;
 
-        componentPage.addComponent(ComponentPage.componentTypes.DASHBOARD.NEWS, {size: "full", order: 1});
+        componentPage.addComponent({componentType: ComponentPage.componentTypes.DASHBOARD.NEWS, componentArgs: {size: "full", order: 1}, data: {}});
 
 
         //
-        // componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full", order: 1});
-        // componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", order: 2}, {user: user, targetUser: "current"});
-        // componentPage.addComponent(ComponentPage.componentTypes.SETTINGS.CONNECTEDSERVICES, {allowEdit: true, size: "full", order: 3});
+        // componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.GENERAL, {size: "full", order: 1});
+        // componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", order: 2}, {user: user, targetUser: "current"});
+        // componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.CONNECTEDSERVICES, {allowEdit: true, size: "full", order: 3});
     },
     updatePage: function(user, args){
         this.buildPage(user, args)

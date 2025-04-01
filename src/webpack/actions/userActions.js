@@ -173,12 +173,28 @@ var userActions = {
         });
     },
 
-    updateUserPassword: function (userid, currentPassword, newPassword, args, callback) {
-        callback = (callback == null) ? function () {
-        } : callback;
+    updateUsername: function (userid, username, args, callback=()=>{}) {
         var data = {
             userid: userid,
-            currentPassword: currentPassword,
+            username: username,
+            args: args,
+        };
+        return $.ajax({
+            url: "/api/v1/usermod/updateUsername/",
+            // make put for safety reasons :-)
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                callback(result)
+            }
+        });
+    },
+
+    updateUserPassword: function (userid, newPassword, args, callback=()=>{}) {
+        var data = {
+            userid: userid,
             newPassword: newPassword,
             args: args,
         };
@@ -373,6 +389,24 @@ var userActions = {
         }
         return $.ajax({
             url: "/api/v1/usermod/setUserRole/"+data.userId,
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                window.location.reload();
+            }
+        });
+    },
+
+    updateInternalMail: (data,args,callback) => {
+        let jsonData = {
+            mail: data.mail,
+            userid: data.userId,
+            args: args,
+        }
+        return $.ajax({
+            url: "/api/v1/usermod/updateInternalMail/",
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',

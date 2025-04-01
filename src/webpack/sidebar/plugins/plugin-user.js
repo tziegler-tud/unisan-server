@@ -1,4 +1,7 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
+import SidebarPlugin from "../SidebarPlugin"
+import ContentHandler from "../ContentHandler";
+
+
 import "../sidebar-user.scss";
 
 const Handlebars = require("handlebars");
@@ -11,10 +14,10 @@ let userPlugin = new SidebarPlugin("user");
 
 let showUser = new ContentHandler("user",
     function(sidebar, args, type) {
-        var userid = args.userid;
+        let userid = args.userid;
         getDataFromServer("/api/v1/usermod/"+userid,function(context){
             $.get('/webpack/sidebar/templates/sidebar-user.hbs', function (data) {
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(".sidebar-back-btn");
             });
@@ -22,10 +25,10 @@ let showUser = new ContentHandler("user",
     });
 let addUser = new ContentHandler("addUser", 
     function(sidebar, args, type) {
-        var context = {};
-        var onConfirm = args.callback.onConfirm;
+        let context = {};
+        let onConfirm = args.callback.onConfirm;
         $.get('/webpack/sidebar/templates/sidebar-addUser.hbs', function (data) {
-            var template = Handlebars.compile(data);
+            let template = Handlebars.compile(data);
             sidebar.sidebarHTML.html(template(context));
             sidebar.registerBackButton(".sidebar-back-btn");
             sidebar.registerConfirmButton( ".sidebar-confirm",
@@ -47,23 +50,23 @@ let addUser = new ContentHandler("addUser",
 
 let changeUsername = new ContentHandler("UserChangeUsername",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var key = args.key;
-        var value = args.value;
-        var onConfirm = args.callback.onConfirm;
-        var corrupted = false;
+        let userId = args.userid;
+        let key = args.key;
+        let value = args.value;
+        let onConfirm = args.callback.onConfirm;
+        let corrupted = false;
 
-        var res = {};
+        let res = {};
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             action(res)
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-updateUsername.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
@@ -85,11 +88,11 @@ let changeUsername = new ContentHandler("UserChangeUsername",
 let addDbKey = new ContentHandler("UseraddDBKey",
     function(sidebar, args, type) {
 
-        var userId = args.userid;
-        var onConfirm = args.callback.onConfirm;
-        var opt = false;
+        let userId = args.userid;
+        let onConfirm = args.callback.onConfirm;
+        let opt = false;
 
-        var res = {dataset: {}};
+        let res = {dataset: {}};
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
@@ -105,33 +108,33 @@ let addDbKey = new ContentHandler("UseraddDBKey",
             }
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-addUserKey.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                var catKey = "";
-                var key = "";
+                let catKey = "";
+                let key = "";
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
                 sidebar.registerConfirmButton( ".sidebar-confirm",
                     {
                         customHandler: true,
                         handler: function () {
-                            var r = document.getElementById("userkey-key");
-                            var key = catKey + "." + r.value;
-                            var funcArgs = {
+                            let r = document.getElementById("userkey-key");
+                            let key = catKey + "." + r.value;
+                            let funcArgs = {
                                 isArray: r.options[r.selectedIndex].dataset.isarray
                             };
-                            var val = {
+                            let val = {
                                 value: document.getElementById("userkey-value").value,
                                 title: "TestTitle2",
                             };
                             onConfirm(userId, key, val, funcArgs);
                         }.bind(args)
                     });
-                var q = document.getElementById("userkey-category");
+                let q = document.getElementById("userkey-category");
                 let doc = res.dataset.user.categories;
                 q.addEventListener("change", function(e){
                     populateUserKeys(sidebar, doc, q.options[q.selectedIndex].dataset.datasetid, {
@@ -140,7 +143,7 @@ let addDbKey = new ContentHandler("UseraddDBKey",
                     catKey = q.options[q.selectedIndex].value;
                 });
                 // Apply onchange function initially
-                var event = new Event('change');
+                let event = new Event('change');
                 q.dispatchEvent(event);
             });
         };
@@ -149,13 +152,13 @@ let addDbKey = new ContentHandler("UseraddDBKey",
 
 let addContactData= new ContentHandler("UserAddContactDataKey",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var onConfirm = args.callback.onConfirm;
-        var onDelete = args.callback.onDelete;
-        var catKey = args.catKey;
-        var opt = false;
+        let userId = args.userid;
+        let onConfirm = args.callback.onConfirm;
+        let onDelete = args.callback.onDelete;
+        let catKey = args.catKey;
+        let opt = false;
 
-        var res = {dataset: {}};
+        let res = {dataset: {}};
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
@@ -171,30 +174,30 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
             }
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-addContactDataKey.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                var r = document.getElementById("userkey-key");
-                var q = document.getElementById("userkey-category");
-                var v = document.getElementById("userkey-value");
+                let r = document.getElementById("userkey-key");
+                let q = document.getElementById("userkey-category");
+                let v = document.getElementById("userkey-value");
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
                 sidebar.registerConfirmButton( ".sidebar-confirm",
                     {
                         customHandler: true,
                         handler: function () {
-                            var key = catKey;
-                            var type = r.value;
-                            var title = r.options[r.selectedIndex].dataset.title;
+                            let key = catKey;
+                            let type = r.value;
+                            let title = r.options[r.selectedIndex].dataset.title;
 
-                            var funcArgs = {
+                            let funcArgs = {
                                 isArray: stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                                 noIndex: true
                             };
-                            var val = {
+                            let val = {
                                 value: v.value,
                                 title: r.options[r.selectedIndex].dataset.title,
                                 type: type
@@ -235,11 +238,11 @@ let addContactData= new ContentHandler("UserAddContactDataKey",
 
 let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var onConfirm = args.callback.onConfirm;
-        var opt = false;
+        let userId = args.userid;
+        let onConfirm = args.callback.onConfirm;
+        let opt = false;
 
-        var res = {dataset: {}};
+        let res = {dataset: {}};
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
@@ -255,30 +258,30 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
             }
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-addGeneralDataKey.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                var catKey = args.catKey;
-                var key = "";
+                let catKey = args.catKey;
+                let key = "";
 
-                var r = document.getElementById("userkey-key");
-                var q = document.getElementById("userkey-category");
-                var v = document.getElementById("userkey-value");
+                let r = document.getElementById("userkey-key");
+                let q = document.getElementById("userkey-category");
+                let v = document.getElementById("userkey-value");
                 let doc = res.dataset.user.categories;
                 sidebar.registerBackButton( ".sidebar-back-btn");
                 sidebar.registerConfirmButton( ".sidebar-confirm",
                     {
                         customHandler: true,
                         handler: function () {
-                            var key = catKey + "." + r.value;
-                            var funcArgs = {
+                            let key = catKey + "." + r.value;
+                            let funcArgs = {
                                 isArray: stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                                 noIndex: true
                             };
-                            var val = {
+                            let val = {
                                 value: v.value,
                                 title: r.options[r.selectedIndex].dataset.title
                             };
@@ -317,8 +320,8 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
                 }
 
                 r.addEventListener("change", function(e){
-                    var tmpKey = catKey + "." + r.value;
-                    var val = sidebar.findExistingValues(context.exploreUser,tmpKey);
+                    let tmpKey = catKey + "." + r.value;
+                    let val = sidebar.findExistingValues(context.exploreUser,tmpKey);
                     if (val !== undefined) {
                         v.value = val.value;
                         v.html = val.value;
@@ -335,21 +338,21 @@ let addGeneralKey = new ContentHandler("UserAddGeneralDataKey",
 
 let updateDbKey = new ContentHandler("UserUpdateDBKey",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var keyId = args.keyId;
-        var key = args.key;
-        var catKey = args.catKey;
-        var subKey = args.subKey;
-        var value = args.value;
-        var isCustomEntry = args.isCustomEntry;
-        var isRemoveable = args.isRemoveable;
-        var onConfirm = args.callback.onConfirm;
-        var onDelete = args.callback.onDelete;
+        let userId = args.userid;
+        let keyId = args.keyId;
+        let key = args.key;
+        let catKey = args.catKey;
+        let subKey = args.subKey;
+        let value = args.value;
+        let isCustomEntry = args.isCustomEntry;
+        let isRemoveable = args.isRemoveable;
+        let onConfirm = args.callback.onConfirm;
+        let onDelete = args.callback.onDelete;
 
-        var res = {dataset: {}};
-        var corrupted = false;
+        let res = {dataset: {}};
+        let corrupted = false;
 
-        var ctype = (isCustomEntry) ? args.type : undefined;
+        let ctype = (isCustomEntry) ? args.type : undefined;
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
@@ -365,15 +368,15 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
             }
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-updateUserKey.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                var q = document.getElementById("userkey-category");
-                var r = document.getElementById("userkey-key");
-                var v = document.getElementById("userkey-value");
+                let q = document.getElementById("userkey-category");
+                let r = document.getElementById("userkey-key");
+                let v = document.getElementById("userkey-value");
                 let doc = res.dataset.user.categories;
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
@@ -382,11 +385,11 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                     {
                         customHandler: true,
                         handler: function () {
-                            var funcArgs = {
+                            let funcArgs = {
                                 isArray: stringToBoolean(r.options[r.selectedIndex].dataset.isarray),
                                 noIndex: true
                             };
-                            var val = {
+                            let val = {
                                 id: keyId,
                                 value: v.value,
                                 title: r.options[r.selectedIndex].dataset.title,
@@ -445,7 +448,7 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
                 // set current category
                 setCurrentUserKey(q,catKey);
                 // Apply onchange function initially
-                var event = new Event('change');
+                let event = new Event('change');
                 q.dispatchEvent(event);
             });
         };
@@ -453,22 +456,22 @@ let updateDbKey = new ContentHandler("UserUpdateDBKey",
 
 let updateContactKey = new ContentHandler("UserUpdateContactKey",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var key = args.key;
-        var catKey = args.catKey;
-        var field = args.field;
-        var ctype = args.type;
-        var isDefault = args.default;
-        var onConfirm = args.callback.onConfirm;
-        var onDelete = args.callback.onDelete;
+        let userId = args.userid;
+        let key = args.key;
+        let catKey = args.catKey;
+        let field = args.field;
+        let ctype = args.type;
+        let isDefault = args.default;
+        let onConfirm = args.callback.onConfirm;
+        let onDelete = args.callback.onDelete;
 
-        var res = {dataset: {}};
+        let res = {dataset: {}};
         res.exploreUser = args.user;
         res.contactEntry = field;
-        var corrupted = false;
+        let corrupted = false;
 
-        var isCustomEntry = false;
-        var filterValue = field.title;
+        let isCustomEntry = false;
+        let filterValue = field.title;
         if (ctype === "customData") {
             isCustomEntry = true;
             filterValue = "customData";
@@ -479,16 +482,16 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
             action(res);
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-updateContactDataKey.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
-                var r = document.getElementById("userkey-key");
-                var q = document.getElementById("userkey-category");
-                var v = document.getElementById("userkey-value");
-                var def = document.getElementById("default-checkbox");
+                let r = document.getElementById("userkey-key");
+                let q = document.getElementById("userkey-category");
+                let v = document.getElementById("userkey-value");
+                let def = document.getElementById("default-checkbox");
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
                 sidebar.registerCancelButton(".sidebar-cancel")
@@ -496,15 +499,15 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
                     {
                         customHandler: true,
                         handler: function () {
-                            var key = catKey;
-                            var ctype = r.value;
-                            var title = r.options[r.selectedIndex].dataset.title;
+                            let key = catKey;
+                            let ctype = r.value;
+                            let title = r.options[r.selectedIndex].dataset.title;
 
-                            var funcArgs = {
+                            let funcArgs = {
                                 isArray: true,
                                 noIndex: true,
                             };
-                            var val = {
+                            let val = {
                                 value: v.value,
                                 id: field._id,
                                 title: r.options[r.selectedIndex].dataset.title,
@@ -570,7 +573,7 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
                 // set current category
                 setCurrentUserKey(q,catKey);
                 // Apply onchange function initially
-                var event = new Event('change');
+                let event = new Event('change');
                 q.dispatchEvent(event);
             });
         };
@@ -578,15 +581,15 @@ let updateContactKey = new ContentHandler("UserUpdateContactKey",
 
 let viewDbKey = new ContentHandler("UserViewDBKey",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var keyId = args.keyId;
-        var key = args.key;
-        var catKey = args.catKey;
-        var subKey = args.subKey;
-        var value = args.value;
+        let userId = args.userid;
+        let keyId = args.keyId;
+        let key = args.key;
+        let catKey = args.catKey;
+        let subKey = args.subKey;
+        let value = args.value;
 
-        var res = {dataset: {}};
-        var corrupted = false;
+        let res = {dataset: {}};
+        let corrupted = false;
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
@@ -602,16 +605,16 @@ let viewDbKey = new ContentHandler("UserViewDBKey",
             }
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/sidebar-viewUserKey.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
                 sidebar.registerBackButton( ".sidebar-back-btn");
-                var q = document.getElementById("userkey-category");
-                var r = document.getElementById("userkey-key");
-                var v = document.getElementById("userkey-value");
+                let q = document.getElementById("userkey-category");
+                let r = document.getElementById("userkey-key");
+                let v = document.getElementById("userkey-value");
                 let doc = res.dataset.user.categories;
                 // set current category
                 setCurrentUserKey(q,catKey);
@@ -630,11 +633,11 @@ let viewDbKey = new ContentHandler("UserViewDBKey",
     });
 let addQualification = new ContentHandler("UserAddQualification",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var catKey = args.catKey;
-        var onConfirm = args.callback.onConfirm;
+        let userId = args.userid;
+        let catKey = args.catKey;
+        let onConfirm = args.callback.onConfirm;
 
-        var res = {qualifications: {}};
+        let res = {qualifications: {}};
 
         let userData = new Promise(function(resolve, reject){
             getDataFromServer("/api/v1/usermod/"+userId,function(context){
@@ -656,9 +659,9 @@ let addQualification = new ContentHandler("UserAddQualification",
                 res.qualifications.byType = byTypeArray
                 action(res);
             })
-        var action = function(context){
+        let action = function(context){
             $.get('/webpack/sidebar/templates/sidebar-addUserQualification.hbs', function (data) {
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(".sidebar-back-btn");
                 sidebar.registerCancelButton(".sidebar-cancel")
@@ -667,7 +670,7 @@ let addQualification = new ContentHandler("UserAddQualification",
                         customHandler: true,
                         handler: function () {
                             const id = document.getElementById("qual-name").selectedOptions[0].id;
-                            var key = catKey;
+                            let key = catKey;
                             data = {
                                 qualification: findQualByIdInTypeArray(res.qualifications.byType, id)._id,
                                 acquiredDate: $("#qual-acquiredDate").val(),
@@ -677,10 +680,10 @@ let addQualification = new ContentHandler("UserAddQualification",
                             onConfirm(args.userid, key, data);
                         }.bind(args)
                     });
-                var q = $("#qual-type");
+                let q = $("#qual-type");
                 q.on("change",function(e){
-                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
-                    var qualNameObject = document.getElementById("qual-name");
+                    let typeData = res.qualifications.byType.find(element => element._id === e.target.value);
+                    let qualNameObject = document.getElementById("qual-name");
                     // remove existing options
                     qualNameObject.options.length = 0;
                     //add available options for selected type
@@ -699,12 +702,12 @@ let addQualification = new ContentHandler("UserAddQualification",
     });
 let viewQualification = new ContentHandler("UserViewQualification",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var qualId = args.qualificationId;
+        let userId = args.userid;
+        let qualId = args.qualificationId;
 
-        var res = {qualifications: {}};
+        let res = {qualifications: {}};
 
-        var corrupted = false;
+        let corrupted = false;
 
         getDataFromServer("/api/v1/usermod/"+userId,function(context){
             res.exploreUser = context;
@@ -712,9 +715,9 @@ let viewQualification = new ContentHandler("UserViewQualification",
             action(res)
         });
 
-        var action = function(context){
+        let action = function(context){
             $.get('/webpack/sidebar/templates/sidebar-viewUserQualification.hbs', function (data) {
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(".sidebar-back-btn");
 
@@ -736,16 +739,16 @@ let viewQualification = new ContentHandler("UserViewQualification",
     });
 let updateQualification = new ContentHandler("UserUpdateQualification",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var key = args.key;
-        var keyId = args.keyId;
-        var qualId = args.qualificationId;
-        var onConfirm = args.callback.onConfirm;
-        var onDelete = args.callback.onDelete;
+        let userId = args.userid;
+        let key = args.key;
+        let keyId = args.keyId;
+        let qualId = args.qualificationId;
+        let onConfirm = args.callback.onConfirm;
+        let onDelete = args.callback.onDelete;
 
-        var res = {qualifications: {}};
+        let res = {qualifications: {}};
 
-        var corrupted = false;
+        let corrupted = false;
 
         let userData = new Promise(function(resolve, reject){
             getDataFromServer("/api/v1/usermod/"+userId,function(context){
@@ -769,9 +772,9 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
                 action(res);
             })
 
-        var action = function(context){
+        let action = function(context){
             $.get('/webpack/sidebar/templates/sidebar-updateUserQualification.hbs', function (data) {
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
                 sidebar.registerBackButton(".sidebar-back-btn");
                 sidebar.registerCancelButton(".sidebar-cancel");
@@ -825,10 +828,10 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
 
                 }
                 // listener to update names if type changes
-                var q = document.getElementById("qual-type");
+                let q = document.getElementById("qual-type");
                 $(q).on("change",function(e){
-                    var typeData = res.qualifications.byType.find(element => element._id === e.target.value);
-                    var qualNameObject = document.getElementById("qual-name");
+                    let typeData = res.qualifications.byType.find(element => element._id === e.target.value);
+                    let qualNameObject = document.getElementById("qual-name");
                     // remove existing options
                     qualNameObject.options.length = 0;
                     //add available options for selected type
@@ -848,22 +851,22 @@ let updateQualification = new ContentHandler("UserUpdateQualification",
 
 let changeRole = new ContentHandler("UserChangeRole",
     function(sidebar, args, type) {
-        var userId = args.userid;
-        var key = args.key;
-        var onConfirm = args.callback.onConfirm;
-        var corrupted = false;
+        let userId = args.userid;
+        let key = args.key;
+        let onConfirm = args.callback.onConfirm;
+        let corrupted = false;
 
-        var res = {};
+        let res = {};
 
         getDataFromServer("/api/v1/acl/"+ userId,function(context){
             res.acl = context;
             action(res)
         });
 
-        var action = function(context) {
+        let action = function(context) {
             $.get('/webpack/sidebar/templates/user/sidebar-updateUserRole.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
                 $("#changeUserRole-select").val(context.acl.userRole);
@@ -885,22 +888,26 @@ let changeRole = new ContentHandler("UserChangeRole",
     });
 let changeUserPassword = new ContentHandler("UserChangePassword",
     function(sidebar, args, type, contentHandler) {
-        var userId = args.userid;
-        var onConfirm = args.callback.onConfirm;
-        var requireCurrentPassword = args.requireCurrentPassword;
-        var corrupted = false;
+        let userId = args.userid;
+        let onConfirm = args.callback.onConfirm;
+        let requireCurrentPassword = args.requireCurrentPassword;
+        let defaultTitle = "Passwort ändern";
+        let corrupted = false;
 
-        var res = {};
+        let res = {};
 
         getDataFromServer("/api/v1/usermod/"+ userId,function(context){
             res.exploreUser = context;
             action(res)
         });
 
-        var action = function(context) {
+        let action = function(context) {
+
+            context.sidebarTitle = args.sidebarTitle ?? defaultTitle;
+
             $.get('/webpack/sidebar/templates/user/sidebar-updateUserPassword.hbs', function (data) {
 
-                var template = Handlebars.compile(data);
+                let template = Handlebars.compile(data);
                 sidebar.sidebarHTML.html(template(context));
 
                 const currentPwField = new MDCTextField(document.querySelector('#passwordCurrent'));
@@ -994,6 +1001,36 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
         };
     });
 
+let changeInternalEmail = new ContentHandler("UserSetInternalEmail",
+    function(sidebar, args, type) {
+        let onConfirm = args.callback.onConfirm;
+        let corrupted = false;
+
+        let context = {
+            current: args.data.current,
+            username: args.data.username,
+        };
+
+        $.get('/webpack/sidebar/templates/user/sidebar-updateInternalMail.hbs', function (data) {
+
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+
+            sidebar.registerBackButton( ".sidebar-back-btn");
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        data = {
+                            value: document.getElementById("userkey-value").value
+                        };
+                        onConfirm(data.value);
+                    }.bind(args)
+                });
+
+        });
+    });
+
 userPlugin.addContentHandler(showUser);
 userPlugin.addContentHandler(addUser);
 userPlugin.addContentHandler(changeUsername);
@@ -1008,6 +1045,7 @@ userPlugin.addContentHandler(addQualification);
 userPlugin.addContentHandler(viewQualification);
 userPlugin.addContentHandler(updateQualification);
 userPlugin.addContentHandler(changeUserPassword);
+userPlugin.addContentHandler(changeInternalEmail);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 
@@ -1017,11 +1055,11 @@ userPlugin.addContentHandler(changeUserPassword);
  *
  */
 
-var populateUserKeys = function(sidebar, doc, compareValue, args){
+let populateUserKeys = function(sidebar, doc, compareValue, args){
     if (args === undefined) args = {};
 
     //find selected category
-    var current = doc.find(element => element._id === compareValue);
+    let current = doc.find(element => element._id === compareValue);
     getDataFromServer("/api/v1/dataset/user/getChildren/" + current._id, function (context) {
         let userkeyObject = document.getElementById("userkey-key");
         let uservalueObject = document.getElementById("userkey-value");
@@ -1074,7 +1112,7 @@ var populateUserKeys = function(sidebar, doc, compareValue, args){
                     }
                 });
                 // fire "change" event once to catch case where no other options is present
-                var event = new Event('change');
+                let event = new Event('change');
                 userkeyObject.dispatchEvent(event);
             }
         }
@@ -1095,7 +1133,7 @@ var populateUserKeys = function(sidebar, doc, compareValue, args){
 
         }
         if (args.filter) {
-            var filter = args.filter;
+            let filter = args.filter;
             if (!filter.key) filter.key = "value";
             if (!filter.value) {
                 console.error("Missing required field: filter.value.");
@@ -1116,7 +1154,7 @@ var populateUserKeys = function(sidebar, doc, compareValue, args){
     });
 };
 
-var setCurrentUserKey = function(selectElement, key){
+let setCurrentUserKey = function(selectElement, key){
     $(selectElement).children('option').filter(function (i, e) {
         return e.value === key
     }).attr('selected', true);
@@ -1128,10 +1166,10 @@ var setCurrentUserKey = function(selectElement, key){
 helpers for the updating operations
  */
 
-var findQualByIdInTypeArray = function(byTypeArr, qualId){
-    var localmatch;
+let findQualByIdInTypeArray = function(byTypeArr, qualId){
+    let localmatch;
     byTypeArr.forEach(function(qual){
-        var match = qual.values.find(qualEntry => qualEntry._id === qualId);
+        let match = qual.values.find(qualEntry => qualEntry._id === qualId);
         if (match != null) {
             localmatch = match;
         }
@@ -1139,7 +1177,7 @@ var findQualByIdInTypeArray = function(byTypeArr, qualId){
     return localmatch;
 };
 
-var populateCurrentQualificationDefault = function(sidebar, doc, current, args){
+let populateCurrentQualificationDefault = function(sidebar, doc, current, args){
     if (args === undefined) args = {};
 
     // check if data are valid
@@ -1147,9 +1185,9 @@ var populateCurrentQualificationDefault = function(sidebar, doc, current, args){
         return false;
     }
     else {
-        var typeData = doc.find(element => element._id === current.qualType);
-        var qualNameObject = document.getElementById("qual-name");
-        var q = document.getElementById("qual-type");
+        let typeData = doc.find(element => element._id === current.qualType);
+        let qualNameObject = document.getElementById("qual-name");
+        let q = document.getElementById("qual-type");
         // select current as default
         $(q).children('option').filter(function (i, e) {
             return e.text === current.qualType
@@ -1164,10 +1202,10 @@ var populateCurrentQualificationDefault = function(sidebar, doc, current, args){
             qualNameObject.options[index] = option;
         });
         if (args.addCreateEntry) {
-            var delimiter = sidebar.createSelectDelimiter();
+            let delimiter = sidebar.createSelectDelimiter();
             qualNameObject.append(delimiter);
 
-            var createEntry = document.createElement('option');
+            let createEntry = document.createElement('option');
             createEntry.innerHTML = "Neu anlegen...";
             createEntry.value = "enableOptional_custom-name";
             createEntry.classList.add("option-createNewEntry");
@@ -1184,9 +1222,9 @@ var populateCurrentQualificationDefault = function(sidebar, doc, current, args){
  * @param dataset
  * @returns {Object}
  */
-var checkDataValidity = function(field, dataset){
-    var errorList = [];
-    var status = 0;
+let checkDataValidity = function(field, dataset){
+    let errorList = [];
+    let status = 0;
     for (let [key, value] of Object.entries(dataset)){
         if(typeof(field[key])!==value){
             status = 1;
@@ -1194,7 +1232,7 @@ var checkDataValidity = function(field, dataset){
         }
     }
     if (errorList.length > 0) {
-        var msg = "Failed to read data: " + errorList;
+        let msg = "Failed to read data: " + errorList;
         return [status, msg];
     }
     return [status, ""];
@@ -1205,8 +1243,8 @@ var checkDataValidity = function(field, dataset){
  * applies 'viewBox-disabled' class to the given elements
  * @param elements an HTML Element or an array containing HTML Elements
  */
-var disableViewBox = function(elements) {
-    var func = function(el) {
+let disableViewBox = function(elements) {
+    let func = function(el) {
         el.disabled = true;
         el.classList.add("viewBox-disabled");
     };

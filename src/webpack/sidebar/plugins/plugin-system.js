@@ -1,14 +1,84 @@
-import {Sidebar, SidebarPlugin, ContentHandler} from "../sidebar.js";
+import SidebarPlugin from "../SidebarPlugin"
+import ContentHandler from "../ContentHandler";
+
 import {MDCSwitch} from '@material/switch';
 import "./plugin-system.scss";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getDataFromServer} from "../../helpers/helpers";
+import {systemActions} from "../../actions/systemActions";
 
 let systemPlugin = new SidebarPlugin("system");
 
-let editSettings = new ContentHandler("openIdSettings",
+
+let editMailSettings = new ContentHandler("mailSettings",
+    (sidebar, args, type) => {
+        var onConfirm = args.callback.onConfirm;
+        let context = {
+            url: args.data.url,
+            port: args.data.port,
+            baseUrl: args.data.baseUrl,
+            apiKey: args.data.apiKey,
+            domain: args.data.domain,
+        }
+        $.get('/webpack/sidebar/templates/system/sidebar-mailSettings.hbs', function (data) {
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+
+                        const url = document.getElementById("sidebar-input-mail--url").value;
+                        const port = document.getElementById("sidebar-input-mail--port").value;
+                        const baseUrl = document.getElementById("sidebar-input-mail--baseUrl").value;
+                        const apiKey = document.getElementById("sidebar-input-mail--apikey").value;
+                        const domain = document.getElementById("sidebar-input-mail--domain").value;
+
+                        const data = {
+                            url: url,
+                            port: port,
+                            baseUrl: baseUrl,
+                            apiKey: apiKey,
+                            domain: domain,
+                        };
+                        onConfirm(data, {});
+                    }.bind(args)
+                });
+        });
+    });
+
+
+let editMailSystemAccountSettings = new ContentHandler("mailSystemAccountSettings",
+    (sidebar, args, type) => {
+        var onConfirm = args.callback.onConfirm;
+        let context = {
+            systemMailAccount: args.data.systemMailAccount,
+        }
+        $.get('/webpack/sidebar/templates/system/sidebar-systemMailAccountSettings.hbs', function (data) {
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            sidebar.registerBackButton(".sidebar-back-btn");
+            sidebar.registerCancelButton(".sidebar-cancel");
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+
+                        const systemMailAccount = document.getElementById("sidebar-input-mail--address").value;
+                        const data = {
+                            systemMailAccount: systemMailAccount,
+                        };
+                        onConfirm(data, {});
+                    }.bind(args)
+                });
+        });
+    });
+
+let editOidcSettings = new ContentHandler("openIdSettings",
     function(sidebar, args, type) {
 
         var onConfirm = args.callback.onConfirm;
@@ -41,7 +111,7 @@ let editSettings = new ContentHandler("openIdSettings",
         });
     });
 
-let editSettingsAdvanced = new ContentHandler("openIdSettingsAdvanced",
+let editOidcSettingsAdvanced = new ContentHandler("openIdSettingsAdvanced",
     function(sidebar, args, type) {
 
         var onConfirm = args.callback.onConfirm;
@@ -215,8 +285,10 @@ let setMemberIdAssignment = new ContentHandler("setMemberIdAssignment",
     });
 
 
-systemPlugin.addContentHandler(editSettings);
-systemPlugin.addContentHandler(editSettingsAdvanced);
+systemPlugin.addContentHandler(editMailSettings);
+systemPlugin.addContentHandler(editMailSystemAccountSettings);
+systemPlugin.addContentHandler(editOidcSettings);
+systemPlugin.addContentHandler(editOidcSettingsAdvanced);
 systemPlugin.addContentHandler(updateOidcClient);
 systemPlugin.addContentHandler(addOidcClient);
 systemPlugin.addContentHandler(setMemberIdAssignment);

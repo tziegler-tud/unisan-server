@@ -75,6 +75,7 @@ class SystemService {
             self.load()
                 .then(result=> {
                     self.settings = result;
+                    self.save();
                     resolve(result)
                 })
                 .catch(err=> {
@@ -157,9 +158,15 @@ class SystemService {
         }
     }
 
+    /**
+     * WARNING: Supports only direct properties! Cannot be used for nested keys!
+     * @param key {string}
+     * @param value {Object}
+     * @returns {Promise<*|{}|boolean>}
+     */
     async set({key, value}={}){
         if(!key) return false;
-        let entry = refJSON(this.settings, key);
+        let entry = this.settings[key];
         Object.assign(entry, value);
         await this.save();
         this.settingsObject = this.settings.toJSON();

@@ -11,7 +11,7 @@ block page_includes
         //used to tell the bundled js which modules to load.
         window.jsmodule = {
             module: "system",
-            loaders: ["auth"],
+            loaders: ["system.auth"],
         };
         window.dockerArgs.activeContainer = "systemContainer";
         window.dockerArgs.activeElementId = "systemAuthentication";
@@ -33,7 +33,7 @@ block content
                         #content1-text.sec-content.border-top
                             .subpage-content
                                 .info-container
-                                    #systemPage-component-container.systemPage-component-container.componentPage-component-container
+                                    #systemPage-component-container.systemPage-component-container
 
 
 
