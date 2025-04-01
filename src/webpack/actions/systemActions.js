@@ -101,7 +101,7 @@ var systemActions = {
 
     syncUserMailToken(userid){
         return $.ajax({
-            url: "/api/v1/system/mail/recreateSystemAccountToken",
+            url: "/api/v1/system/user/recreateAccountToken",
             type: 'POST',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
