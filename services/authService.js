@@ -316,9 +316,7 @@ class AuthService {
     checkUserWriteAccess (user, target, critical=false) {
         let self = this;
         //validate
-        if (user === undefined) throw new Error("AuthService fail: invalid parameters given");
-        if (target === undefined) throw new Error("AuthService fail: invalid parameters given");
-
+        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
 
         //TODO: Remove deprecated property call
         if (critical !== undefined) {
@@ -365,6 +363,10 @@ class AuthService {
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
 
+        if(user.id === undefined || target.id === undefined) {
+            throw new Error("AuthService fail: invalid parameters given");
+        }
+
         return new Promise(function(resolve, reject){
 
             if(user.id.toString() === target.id.toString()) {
@@ -408,11 +410,18 @@ class AuthService {
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
         let targetId = target;
-        if (target.id !== undefined) targetId = target.id;
+        if (target.id !== undefined) targetId = target.id.toString();
+        let userId = user;
+        if (user.id === undefined) {
+            throw new Error("AuthService fail: Invalid user object given.")
+        }
+        else {
+            userId = user.id.toString();
+        }
 
         return new Promise(function(resolve, reject){
 
-            if(target === "self" || user.id.toString() === targetId.toString()) {
+            if(userId === targetId) {
                 //trying to delete self
                 self.checkAllowedGroupOperation(user, operations.user.DELETE)
                     .then(result => {

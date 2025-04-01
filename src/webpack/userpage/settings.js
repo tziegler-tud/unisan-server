@@ -24,9 +24,6 @@ export default new PageModule ({
                 this.pageData.user = u;
             });
 
-            var ob2 = new lidlObserver((u) => {
-                this.pageData.targetUser = u;
-            });
             window.snackbar = new Snackbar();
 
             const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
@@ -98,7 +95,11 @@ export default new PageModule ({
         await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, section:"PASSWORD", componentArgs: {allowEdit: true, size: "full"}, data: {user: data.user, targetUser: data.targetUser, requirePassword: false}});
 
         componentPage.addSection({sectionIdentifier: "MAIL", order: 2, title: "Email-Einstellungen", displayMode: "show", disableComponentMargins: true})
-        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL, section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
+        let allowSetInternalMail = false;
+        if(pageArgs.acl.docker.system.mail || pageArgs.acl.docker.system.user) {
+            allowSetInternalMail = true;
+        }
+        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL, section:"MAIL", componentArgs: {allowEdit: true, allowEditCritical: allowSetInternalMail, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
         if(pageArgs.acl.docker.system.mail || pageArgs.acl.docker.system.user) {
             await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD,  section:"MAIL", componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: data.user, targetUser: data.targetUser}});
         }

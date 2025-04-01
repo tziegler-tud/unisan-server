@@ -19,6 +19,7 @@ export default class Component {
     constructor({page, section, componentId=Date.now(), pageData, data={}, args}={}) {
         let defaults = {
             allowEdit: true,
+            allowEditCritical: false,
             acl: undefined,
             size: "full",
             classes: "",

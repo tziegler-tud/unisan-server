@@ -1942,11 +1942,16 @@ class UserService{
             .then(user => {
                 // validate
                 if (!user) throw new Error('User not found');
-                if (!email || typeof email !== "string") throw new Error('invalid email given: ' + email);
+                if (!email || typeof email !== "string" || !isValidMail(email)) throw new Error('invalid email given: ' + email);
                 let key = "internalEmail"
                 let ojValue = user.internalEmail ?? "";
 
                 user.set(key, email);
+
+                function isValidMail(){
+                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    return emailRegex.test(email);
+                }
 
                 user.save()
                     .then(user => {
