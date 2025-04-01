@@ -397,6 +397,24 @@ var userActions = {
                 window.location.reload();
             }
         });
+    },
+
+    updateInternalMail: (data,args,callback) => {
+        let jsonData = {
+            mail: data.mail,
+            userid: data.userId,
+            args: args,
+        }
+        return $.ajax({
+            url: "/api/v1/usermod/updateInternalMail/",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                window.location.reload();
+            }
+        });
     }
 }
 

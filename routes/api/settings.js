@@ -22,7 +22,7 @@ function updateCurrentUserPassword(req, res, next){
         next(err);
     }
     let password = req.body.password;
-    AuthService.checkUserWriteAccess(req.user, "self", true)
+    AuthService.checkUserWriteAccessCritical(req.user, req.user)
         .then(result => {
             mailService.updateUserPassword(req.user.internalEmail, password)
                 .then(result => {
@@ -33,7 +33,7 @@ function updateCurrentUserPassword(req, res, next){
                 })
         })
         .catch(err => {
-
+            next(err)
         })
 }
 export default router;

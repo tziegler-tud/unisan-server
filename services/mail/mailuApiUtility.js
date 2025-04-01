@@ -126,6 +126,16 @@ export default class MailuApiUtility {
     async generateValidEmailAddress({prefix, counter=0, retry=true, retryLimit=5}){
         let delimiter = "@";
         if(counter > 0) {delimiter = counter+delimiter}
+        //sanitize prefix
+        const replacements = {
+            'ä': 'ae',
+            'ö': 'oe',
+            'ü': 'ue',
+            'ß': 'ss',
+        };
+
+        return prefix.normalize('NFC').replace(/[äöüß]/g, match => replacements[match]);
+
         let fullAddress = prefix + delimiter + this.domain;
         try {
             let response = await this.getUser(fullAddress)

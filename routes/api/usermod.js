@@ -112,6 +112,9 @@ router.post('/updateUsername', updateUsername);
 router.post('/updateCurrentUserPassword', updateCurrentUserPassword);
 router.post('/updateUserPassword', updateUserPassword);
 
+router.post('/updateInternalMail', updateInternalMail);
+
+
 router.put('/updateKey/:id', updateKey);
 
 router.post('/qualification/:id', addQualification);
@@ -310,15 +313,17 @@ function getKey(req, res, next) {
 }
 
 function updateUsername(req, res, next) {
-    if(req.params.id === undefined || req.body.username === undefined) {
+    if(req.body.userid === undefined || req.body.username === undefined) {
         let err = {name: "ValidationError", message: "Validation failed."}
         next(err);
     }
     //auth
     else {
-        AuthService.checkUserWriteAccessCritical(req.user, req.params.id)
+        const userId = req.body.userid;
+        const username = req.body.username;
+        AuthService.checkUserWriteAccessCritical(req.user, userId)
             .then(result => {
-                userService.updateUsername(req, req.params.id, req.body.username)
+                userService.updateUsername(req, userId, username)
                     .then((result) => res.json({result}))
                     .catch(err => next(err));
             })
@@ -327,6 +332,28 @@ function updateUsername(req, res, next) {
             })
     }
 
+}
+
+function updateInternalMail(req, res, next) {
+    if(req.body.userid === undefined || req.body.mail === undefined) {
+        let err = {name: "ValidationError", message: "Validation failed."}
+        next(err);
+    }
+    //auth
+    else {
+        const userId = req.body.userid;
+        const mail = req.body.mail;
+        userService.getById(userId)
+            .then(targetUser => {
+                AuthService.checkUserWriteAccessCritical(req.user, targetUser)
+                    .then(result => {
+                        userService.setInternalEmail(userId, mail)
+                            .then((result) => res.json({result}))
+                            .catch(err => next(err));
+                    })
+            })
+            .catch(err => next(err));
+    }
 }
 
 function updateKey(req, res, next) {

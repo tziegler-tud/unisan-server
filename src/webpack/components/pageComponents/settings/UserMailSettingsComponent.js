@@ -1,8 +1,9 @@
 import Handlebars from "handlebars";
-import {userSettingsActions} from "../../../actions/actions";
+import {userActions} from "../../../actions/actions";
 import {ComponentPage} from "../../ComponentPage";
 import Component from "../../Component";
 import InteractiveListStandaloneComponent from "../../interactiveListStandalone";
+import ComponentObserver from "../../ComponentObserver";
 
 
 export default class UserMailSettingsComponent extends Component {
@@ -27,17 +28,34 @@ export default class UserMailSettingsComponent extends Component {
 
     async postRender(){
 
+        const current = this.data.targetUser.internalEmail;
+        const username = this.data.targetUser.username;
+        const userid = this.data.targetUser.id;
+
         const emailViewerContainer = document.getElementById("usermail-emailViewer");
 
-        const emailViewerLabel = {
-            type: "label",
-            identifier: "usermail-emailViewer-label",
+        function createEntries(){
+            return [
+                {
+                    label: "interne Emailadresse:",
+                    value: current ?? "nicht verfügbar"}
+            ]
+        }
+
+        const emailViewerInput = {
+            type: "input",
+            identifier: "usermail-emailViewer-input",
             valueFunc: function(entry){
                 return (entry.value);
             },
             config: {
-                classes: ["usermail-emailViewer--label"],
-            }
+                classes: ["usermail-emailViewer--input"],
+            },
+            params: {
+                disabled: false,
+                readonly: true,
+                required: false,
+            },
         }
 
         let emailViewerList = new InteractiveListStandaloneComponent({
@@ -50,11 +68,36 @@ export default class UserMailSettingsComponent extends Component {
                 interactive: false,
                 },
             data: {
-                listEntries: [{label: "interne Emailadresse:", value: this.data.targetUser.internalEmail ?? "nicht verfügbar"}],
-                interactions: [emailViewerLabel]
+                listEntries: createEntries(),
+                interactions: [emailViewerInput]
             }});
 
         await emailViewerList.render();
+        let settingsObserver = new ComponentObserver((event, data)=>{
+            //handle onclick
+            if(event === "click"){
+                if(!this.args.allowEditCritical) return;
+                if(this.page.sidebar){
+                    this.page.sidebar.addContent("UserSetInternalEmail", {
+                        title: "Interne Mail: " + username,
+                        data: {current: current, username: username},
+                        callback: {
+                            onConfirm: function(data){
+                                userActions.updateInternalMail({
+                                    mail: data,
+                                    userId: userid,
+                                })
+                                .then(result => {
+                                    window.location.reload();
+                                })
+                            }
+                        }
+                    })
+                    this.page.sidebar.show();
+                }
+            }
+        })
+        emailViewerList.addObserver(settingsObserver);
     }
 
     getHtml(){

@@ -1001,6 +1001,36 @@ let changeUserPassword = new ContentHandler("UserChangePassword",
         };
     });
 
+let changeInternalEmail = new ContentHandler("UserSetInternalEmail",
+    function(sidebar, args, type) {
+        let onConfirm = args.callback.onConfirm;
+        let corrupted = false;
+
+        let context = {
+            current: args.data.current,
+            username: args.data.username,
+        };
+
+        $.get('/webpack/sidebar/templates/user/sidebar-updateInternalMail.hbs', function (data) {
+
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+
+            sidebar.registerBackButton( ".sidebar-back-btn");
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        data = {
+                            value: document.getElementById("userkey-value").value
+                        };
+                        onConfirm(data.value);
+                    }.bind(args)
+                });
+
+        });
+    });
+
 userPlugin.addContentHandler(showUser);
 userPlugin.addContentHandler(addUser);
 userPlugin.addContentHandler(changeUsername);
@@ -1015,6 +1045,7 @@ userPlugin.addContentHandler(addQualification);
 userPlugin.addContentHandler(viewQualification);
 userPlugin.addContentHandler(updateQualification);
 userPlugin.addContentHandler(changeUserPassword);
+userPlugin.addContentHandler(changeInternalEmail);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 
