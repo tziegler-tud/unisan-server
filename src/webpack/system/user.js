@@ -8,7 +8,7 @@ import PageModule from "../utils/PageModule";
 export default new PageModule({
     title: "system.user",
     pageData: {},
-    init: async (args={}) => {
+    init: async function (args={}) {
 
         //debug line, remove before flight
         console.log("loading js module: "+this.title);
