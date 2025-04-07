@@ -103,45 +103,43 @@ function getAll(req, res, next) {
         .catch(err => next(err));
 }
 
-function addUser(req, res, next) {
-    AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.CREATE)
-        .then(result => {
+async function addUser(req, res, next) {
+    try {
+        await AuthService.checkAllowedGroupOperation(req.user, AuthService.operations.user.CREATE)
+    }
+    catch(e) {
+        next(e)
+    }
 
-            //get groups and check permission
-            UserGroupService.getAll(["title", "description", "default", "type"])
-                .then(groups => {
+    //get groups and check permission
+    const groups = await UserGroupService.getAll(["title", "description", "default", "type"])
+    const allowed = []
+    const notAllowed = []
+    let promises = [];
 
-                    const allowed = []
-                    const notAllowed = []
-                    let promises = [];
+    groups.forEach(group => {
+        const promise  = AuthService.checkCreateUserWithGroupWriteAccess(req.user,  group, true)
+            .then(result => {
+                allowed.push(group)
+            })
+            .catch(err => {
+                notAllowed.push(group)
+            })
+        promises.push(promise)
+    })
 
-                    groups.forEach(group => {
-                        const promise  = AuthService.checkUserGroupWriteAccess(req.user, "new", group, true)
-                            .then(result => {
-                                allowed.push(group)
-                            })
-                            .catch(err => {
-                                notAllowed.push(group)
-                            })
-                        promises.push(promise)
-                    })
-
-                    Promise.allSettled(promises)
-                        .then(groups => {
-                            res.render("unisams/user/addUser", {
-                                title: "create user - uniSams",
-                                acl: req.acl,
-                                user: req.user._doc,
-                                groups: {
-                                    allowed: allowed,
-                                    notAllowed: notAllowed,
-                                }
-                            })
-                        })
-                })
+    Promise.allSettled(promises)
+        .then(groups => {
+            res.render("unisams/user/addUser", {
+                title: "create user - uniSams",
+                acl: req.acl,
+                user: req.user._doc,
+                groups: {
+                    allowed: allowed,
+                    notAllowed: notAllowed,
+                }
+            })
         })
-        .catch(err =>  next(err))
-
 }
 
 

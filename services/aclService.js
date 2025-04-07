@@ -172,6 +172,11 @@ async function createUserACL (req, userid, data, overwrite) {
 }
 
 
+/**
+ *
+ * @param userid {string}
+ * @returns {Promise<UserRoleObject>}
+ */
 async function getUserRole (userid) {
     let user = await User.findById(userid).select('-hash');
     let userACL = await UserACL.findOne({user: userid});

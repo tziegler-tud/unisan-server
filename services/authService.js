@@ -10,6 +10,7 @@ const User = db.User;
 /** @typedef {{ title: string, allowedOperations: {method: string, url: string}} UserGroup */
 /** @typedef {import("../services/userService.js").User} User */
 /** @import { UserObject } from  './services/userService.js' */
+/** @import { EventObject } from  './services/eventService.js' */
 
 
     const rolesMap = authEnums.rolesMap;
@@ -225,84 +226,77 @@ class AuthService {
 
     /**
      *
-     * @param requestingUser {User} object or id of the requesting user
+     * @param requestingUser {UserObject} requesting user
      * @param operation {String} String representation of requested operation. Use static enum AuthService.operations to obtain string.
-     * @returns {Promise<Object|Error>}
+     * @returns {Promise<{status, message}>}
+     * @throws ApiForbiddenError Throws ForbiddenError if access is not granted
+     * @throws Error if service is not ready
      */
-    checkAllowedGroupOperation(requestingUser, operation) {
-        let self = this;
-        return new Promise(function(resolve, reject){
-            self.init
-                .then(result => {
-                    let id = typeof(requestingUser) === "string" ? requestingUser : requestingUser.id;
-                    aclService.getUserACL(id, {populate: {userGroups: true, events: false}})
-                        .then(function(userACL){
-                            //check if superadmin
-                            if (userACL.userRole === self.rolesEnum.SUPERADMIN) {
-                                console.log("authoprized by role: " + userACL.userRole); //debug TODO: remove once done testing
-                                resolve({status: 200, message: "authorization successful"});
-                            }
-                            //check if a group allows the requested operation
-                            let authGroup;
-                            let allowed  = userACL.userGroups.some(function(group){
-                                let match = group.allowedOperations.includes(operation);
-                                if (match) {
-                                    authGroup = group;
-                                    return group;
-                                }
-                            })
-                            if (allowed) {
-                                console.log("authoritzed by group membership: " + authGroup.title); //debug TODO: remove once done testing
-                                resolve({status: 200, message: "authorization successful"})
-                            }
-                            else {
-                                //no access rights
-                                let err = self.createForbiddenError("authorization failed for operation "+ operation)
-                                reject(err)
-                            }
-                        })
-                        .catch(err => {
-                            let msg = "Error: Unable to get ACL assigned to requesting user. Details: "
-                            throw new Error(msg + err);
-                        })
-                })
-                .catch(err => {
-                    let msg = "Failed to perform operation: Authentication Service has not been initialized";
-                    reject(msg)
-                })
+    async checkAllowedGroupOperation(requestingUser, operation) {
+
+        if (requestingUser === undefined || operation === undefined) throw new Error("AuthService fail: invalid parameters given");
+        try {
+            await this.init;
+        }
+        catch(e) {
+            let msg = "Failed to perform operation: Authentication Service has not been initialized";
+            throw new Error(msg)
+        }
+
+        let id = requestingUser.id;
+        const userACL = await aclService.getUserACL(id, {populate: {userGroups: true, events: false}})
+        //check if superadmin
+        if (userACL.userRole === this.rolesEnum.SUPERADMIN) {
+            console.log("authorized by role: " + userACL.userRole); //debug TODO: remove once done testing
+            return {status: 200, message: "authorization successful"};
+        }
+        //check if a group allows the requested operation
+        let authGroup;
+        let allowed  = userACL.userGroups.some(function(group){
+            let match = group.allowedOperations.includes(operation);
+            if (match) {
+                authGroup = group;
+                return group;
+            }
         })
+        if (allowed) {
+            console.log("authoritzed by group membership: " + authGroup.title); //debug TODO: remove once done testing
+            return {status: 200, message: "authorization successful"}
+        }
+        else {
+            //no access rights
+            throw this.createForbiddenError("authorization failed for operation "+ operation)
+        }
+
     }
 
-    checkRoleAccess (user, target){
+    /**
+     *
+     * @param user {UserObject}
+     * @param target {UserObject}
+     * @returns {Promise<UserRoleObject>}
+     * @throws ApiForbiddenError Throws ForbiddenError if access is not granted
+     */
+    async checkRoleAccess (user, target){
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
         //get user role
-        return new Promise(function(resolve, reject){
-            let userACL = aclService.getUserRole(user);
-            let targetACL = aclService.getUserRole(target);
-            Promise.all([userACL, targetACL])
-                .then(results => {
-                    let userRole = results[0];
-                    let targetRole = results[1];
-                    //superadmin is allowed to perform any operation
-                    if(userRole === rolesEnum.SUPERADMIN) resolve(userRole);
-                    //operations on protected user are only allowed by superadmin
-                    if (targetRole === rolesEnum.PROTECTED) reject("Access denied. Reason: target role: " + rolesEnum.PROTECTED);
-                    //get user access level
-                    let al = rolesMap[userRole];
-                    //compare. must be greater or equal to allow operation
-                    let write = (al >= rolesMap[targetRole]);
+        let userRole = await aclService.getUserRole(user.id.toString());
+        let targetRole = await aclService.getUserRole(target.id.toString());
 
-                    if  (write) {
-                        resolve(userRole)
-                    }
-                    else {
-                        reject("Access denied. Reason: Insufficient access level.");
-                    }
-                })
-                .catch(err => {
-                    throw new Error(err);
-                })
-        })
+        //superadmin is allowed to perform any operation
+        if(userRole === rolesEnum.SUPERADMIN) return userRole;
+        //operations on protected user are only allowed by superadmin
+        if (targetRole === rolesEnum.PROTECTED) throw this.createForbiddenError("Access denied. Reason: target role: " + rolesEnum.PROTECTED);
+        //get user access level
+        let al = this.rolesMap[userRole];
+        //compare. must be greater or equal to allow operation
+        let write = (al >= this.rolesMap[targetRole]);
+        if  (write) {
+            return userRole;
+        }
+        else {
+            throw this.createForbiddenError("Insufficient access rights.")
+        }
     }
 
     /**
@@ -311,9 +305,9 @@ class AuthService {
      * @param user {UserObject} requesting user
      * @param target {UserObject} target user
      * @param critical {Boolean} DEPRECATED: forwards to critical security check
-     * @returns {Promise<unknown>}
+     * @returns {Promise<{status, message}>}
      */
-    checkUserWriteAccess (user, target, critical=false) {
+    async checkUserWriteAccess (user, target, critical=false) {
         let self = this;
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
@@ -324,29 +318,13 @@ class AuthService {
             if (critical) return self.checkUserWriteAccessCritical(user, target);
         }
 
-        return new Promise(function(resolve, reject){
-
-            if(user.id.toString() === target.id.toString()) {
-                //trying to write self
-                self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
-                    .then(result => {
-                        resolve(result)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            }
-            else {
-                //general user write access is required
-                self.checkAllowedGroupOperation(user, operations.user.WRITE)
-                    .then(group => {
-                        resolve(group)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            }
-        })
+        if(user.id.toString() === target.id.toString()) {
+            //trying to write self
+            return await self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
+        }
+        else {
+            return await self.checkAllowedGroupOperation(user, operations.user.WRITE)
+        }
     }
 
     /**
@@ -356,10 +334,9 @@ class AuthService {
      *
      * @param user {UserObject} requesting user
      * @param target {UserObject} target user
-     * @returns {Promise<unknown>}
+     * @returns {Promise<{status, message}>}
      */
-    checkUserWriteAccessCritical (user, target) {
-        let self = this;
+    async checkUserWriteAccessCritical (user, target) {
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
 
@@ -367,157 +344,109 @@ class AuthService {
             throw new Error("AuthService fail: invalid parameters given");
         }
 
-        return new Promise(function(resolve, reject){
 
-            if(user.id.toString() === target.id.toString()) {
-                //trying to write self
-                self.checkAllowedGroupOperation(user, operations.user.WRITESELF)
-                    .then(result => {
-                        resolve(result)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            }
-            else {
+        if(user.id.toString() === target.id.toString()) {
+            //trying to write self
+            return await this.checkAllowedGroupOperation(user, operations.user.WRITESELF)
+        }
+        else {
+            try {
                 //general user write access is required
-                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITECRITICAL)
-                let accessLevel = self.checkRoleAccess(user, target);
-
-                Promise.all([writeAccess, accessLevel])
-                    .then(results => {
-                        let group = results[0];
-                        let accessLevel = results[1];
-                        console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
-                        resolve(results)
-                    })
-                    .catch(err =>{
-                        reject(err)
-                    })
+                let writeAccess = await this.checkAllowedGroupOperation(user, operations.user.WRITECRITICAL)
+                let accessLevel = await this.checkRoleAccess(user, target);
+                console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
+                return {status: 200, message: "Access granted"};
             }
-        })
+            catch(err) {
+                throw new Error("Insufficient permissions.")
+            }
+        }
     }
 
     /**
      * authorizes delete access on user documents.
      *
-     * @param user {UserScheme} requesting user
-     * @param target {UserScheme} target user
+     * @param user {UserObject} requesting user
+     * @param target {UserObject} target user
      * @returns {Promise<unknown>}
      */
-    checkUserDeleteAccess (user, target) {
-        let self = this;
+    async checkUserDeleteAccess (user, target) {
         //validate
         if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
-        let targetId = target;
-        if (target.id !== undefined) targetId = target.id.toString();
-        let userId = user;
         if (user.id === undefined) {
             throw new Error("AuthService fail: Invalid user object given.")
         }
-        else {
-            userId = user.id.toString();
-        }
+        const group = await this.checkAllowedGroupOperation(user, operations.user.DELETE);
+        //general user delete access is required
+        let accessLevel = await this.checkRoleAccess(user, target);
+        console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
+        return user;
 
-        return new Promise(function(resolve, reject){
-
-            if(userId === targetId) {
-                //trying to delete self
-                self.checkAllowedGroupOperation(user, operations.user.DELETE)
-                    .then(result => {
-                        resolve(result)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            }
-            else {
-                //general user delete access is required
-                let writeAccess = self.checkAllowedGroupOperation(user, operations.user.DELETE)
-                let accessLevel = self.checkRoleAccess(user, target);
-
-                Promise.all([writeAccess, accessLevel])
-                    .then(results => {
-                        let group = results[0];
-                        let accessLevel = results[1];
-                        console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
-                        resolve(user);
-                    })
-                    .catch(err =>{
-                        reject(err)
-                    })
-
-            }
-        })
     }
 
     /**
      *
-     * @param user {User} requesting user
-     * @param target {ObjectId | User | String} target user
+     * @param user {UserObject} requesting user
+     * @param target {UserObject} target user
      * @param group {UserGroup} group to be added or revoked
      * @param grant {Boolean} grant = true, revoke = false
      * @returns {Promise<unknown>}
      */
-    checkUserGroupWriteAccess(user, target, group, grant) {
-        let self = this;
-        return new Promise(function(resolve, reject){
+    async checkUserGroupWriteAccess(user, target, group, grant) {
             //validate
             if (user === undefined || target === undefined || group === undefined || group.type === undefined) throw new Error("AuthService fail: invalid parameters given");
-            let targetId = target;
-            if (target.id !== undefined) targetId = target.id;
 
             let granting = (grant === undefined || grant) ? groupActionsEnum.GRANT : groupActionsEnum.REVOKE;
-            let groupOperation = self.getRequiredGroupOperation(group.type, granting);
+            let groupOperation = this.getRequiredGroupOperation(group.type, granting);
 
+            let addGroupPermission = await this.checkAllowedGroupOperation(user, groupOperation)
 
-            if(target === "self" || user.id.toString() === targetId.toString()) {
-                //trying to write self
-                let writeSelf = self.checkAllowedGroupOperation(user, operations.user.WRITESELF);
-
-                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
-
-                Promise.all([writeSelf, addGroup])
-                    .then(result => {
-                        resolve(result)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
+        if(user.id.toString() === target.id.toString()) {
+            //trying to write self
+            try {
+                let writeSelf = await this.checkAllowedGroupOperation(user, operations.user.WRITESELF);
+                return writeSelf && addGroupPermission
             }
-            if(target === "new") {
-                //trying to create new user with groups
-                let writeSelf = self.checkAllowedGroupOperation(user, operations.user.CREATE);
-                let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
-
-                Promise.all([writeSelf, addGroup])
-                    .then(result => {
-                        resolve(result)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
+            catch (e) {
+                throw new Error("Inappropriate access rights to modify own permissions. Error: " + e);
             }
+        }
+        else {
             //general user write access is required
-            let writeAccess = self.checkAllowedGroupOperation(user, operations.user.WRITE)
-            let addGroup = self.checkAllowedGroupOperation(user, groupOperation)
-
-            Promise.all([writeAccess, addGroup])
-                .then(result => {
-                    resolve(result)
-                })
-                .catch(err => {
-                    reject(err)
-                })
-        })
-
+            try {
+                let writeAccess = await this.checkAllowedGroupOperation(user, operations.user.WRITE)
+                return writeAccess && addGroupPermission
+            }
+            catch (e){
+                throw new Error("Inappropriate access rights to modify user groups. Error: " + e);
+            }
+        }
     }
 
-    /**
+    async checkCreateUserWithGroupWriteAccess(user, group, grant) {
+        //validate
+        if (user === undefined || group === undefined || group.type === undefined) throw new Error("AuthService fail: invalid parameters given");
+
+        let granting = (grant === undefined || grant) ? groupActionsEnum.GRANT : groupActionsEnum.REVOKE;
+        let groupOperation = this.getRequiredGroupOperation(group.type, granting);
+
+        //trying to create new user with groups
+        try {
+            let writeSelf = await this.checkAllowedGroupOperation(user, operations.user.CREATE);
+            let addGroup = await this.checkAllowedGroupOperation(user, groupOperation)
+            return writeSelf && addGroup
+        }
+        catch (e) {
+            throw new Error("Inappropriate access rights to create user with permissions. Error: " + e);
+        }
+    }
+
+
+        /**
      * authorizes basic write access on target document. dont use this for critical properties, e.g. passwords or username
      *
-     * @param user {UserScheme} requesting user
-     * @param target {UserScheme} target user
+     * @param user {UserObject} requesting user
+     * @param target {UserObject | EventObject} target user
      * @param targetType {String} target type identifier
      * @param critical {Boolean} forwards to critical security check
      * @returns {Promise<unknown>}
@@ -542,158 +471,90 @@ class AuthService {
 
     /**
      *
-     * @param user {User} requesting user
-     * @param target {ObjectId | User} target user
+     * @param user {UserObject} requesting user
+     * @param target {UserObject} target user
      * @param role {UserGroup} new target role
      * @returns {Promise<unknown>}
      */
-    checkUserRoleWriteAccess(user, target, role) {
-        let self = this;
+    async checkUserRoleWriteAccess(user, target, role) {
         //validate
         if (user === undefined || target === undefined || role === undefined) throw new Error("AuthService fail: invalid parameters given");
-        let targetId = target;
-        if (target.id !== undefined) targetId = target.id;
+        const userACL = await aclService.getUserACL(user.id, {populate: {userGroups: true, events: false}});
 
-        return new Promise(function(resolve, reject){
-            if(target === "self" || user.id.toString() === targetId.toString()) {
-                //trying to write self
-                aclService.getUserACL(user.id, {populate: {userGroups: true}})
-                    .then(userACL => {
-                        //role write access is required
-                        let writeRoles = self.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE);
-                        let grantSelfIncrease;
-                        //can't increase own level unless systemadmin operations are allowed
-                        if (rolesMap[userACL.userRole] < rolesMap[role]){
-                            //trying to increase level
-                            grantSelfIncrease = self.checkAllowedGroupOperation(user, operations.access.GRANTUSERADMINRIGHTS);
-                        }
-                        else {
-                            grantSelfIncrease = new Promise(function(resolveInner, rejectInner){
-                                resolveInner(true);
-                            })
-                        }
+        await this.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE)
 
-
-                        Promise.all([writeRoles, grantSelfIncrease])
-                            .then(result => {
-                                resolve(result)
-                            })
-                            .catch(err => {
-                                let fe = self.createForbiddenError("Insufficient access rights")
-                                reject(fe)
-                            })
-                    })
-                    .catch(err => reject(err))
-
+        if(user.id.toString() === target.id.toString()) {
+            //trying to write self
+            //role write access is required
+            //can't increase own level unless systemadmin operations are allowed
+            if (this.rolesMap[userACL.userRole] < this.rolesMap[role]){
+                //trying to increase level
+                await this.checkAllowedGroupOperation(user, operations.access.GRANTUSERADMINRIGHTS);
             }
-            else {
-                let userACL = aclService.getUserACL(user.id, {populate: {userGroups: true}});
-                let targetACL = aclService.getUserACL(targetId, {populate: {userGroups: true}});
-                Promise.all([userACL, targetACL])
-                    .then(results => {
-                        userACL = results[0];
-                        targetACL = results[1];
-                        //role write access is required
-                        self.checkAllowedGroupOperation(user, operations.access.WRITEUSERROLE)
-                                .then(result => {
-                                    //can't increase above own level
-                                    if (rolesMap[userACL.userRole] < rolesMap[role]){
-                                        let err = self.createForbiddenError("Cant increase target role to a higher access level than yourself.")
-                                        reject(err)
-                                    }
-                                    else resolve(result);
-                                })
-                                .catch(err =>{
-                                    reject(err)
-                                })
-                    })
+            return true;
+        }
+        else {
+            //role write access is required
+            //can't increase above own level
+            if (this.rolesMap[userACL.userRole] < this.rolesMap[role]){
+                throw this.createForbiddenError("Cant increase target role to a higher access level than yourself.")
             }
-        })
+            else return true;
+        }
     }
 
     /**
      * authorizes basic write access on event documents.
      *
-     * @param user {UserScheme} requesting user
-     * @param target {EventScheme} target event
-     * @param critical {Boolean} forwards to critical security check
+     * @param user {UserObject} requesting user
+     * @param event {EventObject} target event
      * @returns {Promise<unknown>}
      */
-    checkEventWriteAccess (user, target, critical) {
-        let self = this;
+    async checkEventWriteAccess (user, event) {
         //validate
-        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
-        // if (critical) return self.checkEventWriteAccessCritical(user, target);
+        if (user === undefined || event === undefined) throw new Error("AuthService fail: invalid parameters given");
 
-        return new Promise(function(resolve, reject){
-            //general user write access is required
-            self.checkAllowedGroupOperation(user, operations.events.WRITE)
-                .then(group => {
-                    resolve(group)
-                })
-                .catch(err => {
-                    //try individual rights
-                    self.checkIndividualAccess(user, target, operations.events.WRITE)
-                        .then(result => {
-                            resolve(result);
-                        })
-                        .catch(err => {
-                            reject(err)
-                        })
-                })
-        })
+        //general user write access is required
+        try {
+            const group = await this.checkAllowedGroupOperation(user, operations.events.WRITE)
+            return group;
+        }
+        catch(e){
+            return this.checkIndividualEventAccess(user, event, operations.events.WRITE)
+        }
     }
 
     /**
-     * authorizes basic write access on user documents. dont use this for critical properties, e.g. passwords or username
      *
-     * @param user {UserScheme} requesting user
-     * @param target {ObjectId} event id
+     * @param user {UserObject} requesting user
+     * @param event {EventObject} event id
      * @param operation {String} String representation of requested operation. Use static enum AuthService.operations to obtain string.
-     * @returns {Promise<unknown>}
+     * @returns {Promise<{status, message}>}
      */
-    checkIndividualAccess (user, target, operation) {
-        let self = this;
+    async checkIndividualEventAccess (user, event, operation) {
         //validate
-        if (user === undefined || target === undefined) throw new Error("AuthService fail: invalid parameters given");
-        let targetId;
-        if (!Mongoose.isObjectIdOrHexString(target)) {
-            //try if object was given
-            if (Mongoose.isObjectIdOrHexString(target.id)) {
-                targetId = target.id;
-            }
+        if (user === undefined || event === undefined) throw new Error("AuthService fail: invalid parameters given");
+
+        const userACL = await aclService.getUserACL(user)
+
+        //try to find target in individuals
+        let targetRights = userACL.individual.events.find(object => {
+            return object.target.toString() === event.id.toString()
+        })
+        if (targetRights === undefined){
+            //no entry for target
+            throw this.createForbiddenError("Event not modifiable by user.");
         }
         else {
-            targetId = target;
+            //check operation
+            let match = targetRights.allowedOperations.includes(operation);
+            if (match) {
+                return {status: 200, message: "Access granted."};
+            }
+            else {
+                throw this.createForbiddenError();
+            }
         }
-        return new Promise(function(resolve, reject){
-            aclService.getUserACL(user)
-                .then(userACL => {
-                    //try to find target in individuals
-                    let targetRights = userACL.individual.events.find(object => {
-                        return object.target.toString() === targetId.toString()
-                    })
-                    if (targetRights === undefined){
-                        //no entry for target
-                        let err = self.createForbiddenError();
-                        reject(err)
-                    }
-                    else {
-                        //check operation
-                        let match = targetRights.allowedOperations.includes(operation);
-                        if (match) {
-                            resolve({status: 200, message: "Access granted."})
-                        }
-                        else {
-                            let err = self.createForbiddenError();
-                            reject(err)
-                        }
-                    }
-                })
-                .catch(err => {
-
-                })
-        })
     }
 
 
@@ -904,7 +765,7 @@ class AuthService {
         if (optMessage !== undefined && typeof(optMessage) === "string") {
             console.log("403: " + optMessage);
         }
-        return {name : "ForbiddenError", status: 403, message : "Access denied"};
+        return ApiForbiddenError(optMessage)
     }
 
 
