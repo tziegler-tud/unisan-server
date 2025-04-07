@@ -117,8 +117,13 @@ async function create(log) {
     //validation
 
     //save log
-    let dbLogObj = new dbLog(log.toJson());
-    await dbLogObj.save();
+    try {
+        let dbLogObj = new dbLog(log.toJson());
+        await dbLogObj.save();
+    }
+    catch(err){
+        console.error("Failed to create log entry: " + err);
+    }
 }
 
 /**
