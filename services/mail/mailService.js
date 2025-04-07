@@ -59,7 +59,8 @@ class MailService extends AbstractService {
                     else {
                         this.log("Starting " + this.serviceName + "...\n");
                         const mailSettings = this.settings.mail;
-                        if(mailSettings === undefined || !mailSettings.url || !mailSettings.domain|| !mailSettings.apiKey){
+                        const apiKey = SystemService.getSecret("mail.apiKey");
+                        if(mailSettings === undefined || !mailSettings.url || !mailSettings.domain || !apiKey) {
                             const msg = "Failed to start " + this.serviceName + ": Invalid settings found for 'mail'";
                             this.error(msg);
                             reject(new Error(msg))
@@ -68,7 +69,7 @@ class MailService extends AbstractService {
                         this.api = new MailuApiUtility({
                             url: mailSettings.url,
                             port: mailSettings.port,
-                            apiKey: mailSettings.apiKey,
+                            apiKey: apiKey,
                             baseUrl: mailSettings.baseUrl,
                             domain: mailSettings.domain,
                         })
