@@ -556,8 +556,11 @@ var setupEventHandlers = function(self){
         self.adjustList();
     });
     if(self.args.enableSorting) {
-        $(".scrollableList-header-column").on("click", function(e){
-            sortByColumn(self, e.currentTarget);
+        const clickable = self.container.querySelectorAll(".scrollableList-header-column")
+        clickable.forEach(element => {
+            element.addEventListener("click", (e)=>{
+                sortByColumn(self, e.currentTarget);
+            })
         })
     }
     if(self.callback){

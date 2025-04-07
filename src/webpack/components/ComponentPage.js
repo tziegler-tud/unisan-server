@@ -12,6 +12,7 @@ import UserMailPasswordComponent from "./pageComponents/settings/UserMailPasswor
 import UserMailDevComponent from "./pageComponents/settings/UserMailDevComponent";
 import MailSettingsComponent from "./pageComponents/system/MailSettingsComponent";
 import ComponentSection from "./ComponentSection";
+import UserEventsComponent from "./pageComponents/user/UserEventsComponent";
 
 export default class ComponentPage {
 
@@ -40,6 +41,9 @@ export default class ComponentPage {
             MEMBER_CREATION:    MemberCreationComponent,
             MAIL:               MailSettingsComponent,
         },
+        USER: {
+            EVENTS: UserEventsComponent,
+        }
     };
 
     /**
