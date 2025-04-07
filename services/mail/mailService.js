@@ -48,115 +48,106 @@ class MailService extends AbstractService {
         })
     }
 
-    start(){
+    async start(){
         let self = this;
-        this.starting = new Promise((resolve, reject) => {
-            this.init()
-                .then(()=>{
-                    if(this.state === self.states.RUNNING) {
-                        resolve(this);
-                    }
-                    else {
-                        this.log("Starting " + this.serviceName + "...\n");
-                        const mailSettings = this.settings.mail;
-                        const apiKey = SystemService.getSecret("mail.apiKey");
-                        if(mailSettings === undefined || !mailSettings.url || !mailSettings.domain || !apiKey) {
-                            const msg = "Failed to start " + this.serviceName + ": Invalid settings found for 'mail'";
-                            this.error(msg);
-                            reject(new Error(msg))
-                        }
-                        this.mailDomain = mailSettings.domain;
-                        this.api = new MailuApiUtility({
-                            url: mailSettings.url,
-                            port: mailSettings.port,
-                            apiKey: apiKey,
-                            baseUrl: mailSettings.baseUrl,
-                            domain: mailSettings.domain,
-                        })
+        await this.init();
+        if(this.state === self.states.RUNNING) {
+            return this;
+        }
 
-                        if(mailSettings.createAccountOnUserCreation){
-                            //register userService hooks
-                            //create user middleware to set internal email address
-                            UserService.addUserCreateMiddlewareAsync(async (args)=> {
-                                if(!args.user) return {result: 0, data: {}};
-                                //generate email address for firstname.lastname
-                                const prefix = args.user.generalData.firstName.value + "." + args.user.generalData.lastName.value;
-                                try {
-                                    const address = await this.api.generateValidEmailAddress({prefix: prefix})
-                                    args.user.internalEmail = address;
-                                    return {result: 1, data: args.user};
-                                }
-                                catch(err) {
-                                    return  {result: 0, data: {}};
-                                }
-                            }, {})
-
-                            UserService.addPostUserCreationHookAsync(async (args)=> {
-                                if(!args.user) return {result: 0, data: {}};
-
-                                //create mail account via api
-                                let user;
-                                try {
-                                    const response = await this.api.createUser({
-                                        email: args.user.internalEmail,
-                                        raw_password: this.generateMailPassword(),
-                                        comment: "unisan-server ID: " + args.user._id + ", unisan-server username: " + args.user.username,
-                                        displayed_name: args.user.generalData.firstName.value + " " + args.user.generalData.lastName.value,
-                                    })
-                                    if(response.ok) {
-                                        //generate user token
-                                        const emailUser = JSON.parse(response.body);
-                                    }
-                                    else throw new Error("Failed to create user.")
-                                }
-                                catch(err){
-                                    throw new Error("Failed to create user: " + err);
-                                }
-
-                                try {
-                                    const tokenResponse = await this.api.createUserToken(args.user.internalEmail)
-                                    if(tokenResponse.ok){
-                                        //try to parse response
-                                        const token = JSON.parse(tokenResponse.body).token ?? undefined;
-                                        if(token !== undefined) {
-                                            await userService.setEmailToken(args.user._id, token)
-                                        }
-                                        else return {result: 0, data: {}}
-                                    }
-                                    return {result: 1, data: {}};
-                                }
-                                catch(err){
-                                    return {result: 0, data: {}}
-                                }
-
-                            }, {})
-                        }
-
-                        if(mailSettings.deleteAccountOnUserDeletion){
-                            UserService.addPostUserDeleteHookAsync(async (args)=> {
-                                if(!args.user || !args.user.internalEmail) return {result: 0, data: {}};
-                                try {
-                                    const deleteResponse = await this.api.deleteUser(args.user)
-                                    if(deleteResponse.ok){
-                                        return {result: 1, data: args.user};
-                                    }
-                                    else return {result: 0, data: {}};
-                                }
-                                catch(err) {
-                                    return  {result: 0, data: {}};
-                                }
-                            }, {})
-                        }
-
-                        this.setStarted();
-                        resolve(this)
-                    }
-                })
-                .catch(err=>{
-                    reject(err);
-                })
+        this.log("Starting " + this.serviceName + "...\n");
+        const mailSettings = this.settings.mail;
+        const apiKeySecret = await SystemService.getSecret("mail.apiKey");
+        const apiKey = apiKeySecret.value;
+        if(mailSettings === undefined || !mailSettings.url || !mailSettings.domain || !apiKey) {
+            const msg = "Failed to start " + this.serviceName + ": Invalid settings found for 'mail'";
+            this.error(msg);
+            throw new Error(msg);
+        }
+        this.mailDomain = mailSettings.domain;
+        this.api = new MailuApiUtility({
+            url: mailSettings.url,
+            port: mailSettings.port,
+            apiKey: apiKey,
+            baseUrl: mailSettings.baseUrl,
+            domain: mailSettings.domain,
         })
-        return this.starting;
+
+        if(mailSettings.createAccountOnUserCreation){
+            //register userService hooks
+            //create user middleware to set internal email address
+            UserService.addUserCreateMiddlewareAsync(async (args)=> {
+                if(!args.user) return {result: 0, data: {}};
+                //generate email address for firstname.lastname
+                const prefix = args.user.generalData.firstName.value + "." + args.user.generalData.lastName.value;
+                try {
+                    const address = await this.api.generateValidEmailAddress({prefix: prefix})
+                    args.user.internalEmail = address;
+                    return {result: 1, data: args.user};
+                }
+                catch(err) {
+                    return  {result: 0, data: {}};
+                }
+            }, {})
+
+            UserService.addPostUserCreationHookAsync(async (args)=> {
+                if(!args.user) return {result: 0, data: {}};
+
+                //create mail account via api
+                let user;
+                try {
+                    const response = await this.api.createUser({
+                        email: args.user.internalEmail,
+                        raw_password: this.generateMailPassword(),
+                        comment: "unisan-server ID: " + args.user._id + ", unisan-server username: " + args.user.username,
+                        displayed_name: args.user.generalData.firstName.value + " " + args.user.generalData.lastName.value,
+                    })
+                    if(response.ok) {
+                        //generate user token
+                        const emailUser = JSON.parse(response.body);
+                    }
+                    else throw new Error("Failed to create user.")
+                }
+                catch(err){
+                    throw new Error("Failed to create user: " + err);
+                }
+
+                try {
+                    const tokenResponse = await this.api.createUserToken(args.user.internalEmail)
+                    if(tokenResponse.ok){
+                        //try to parse response
+                        const token = JSON.parse(tokenResponse.body).token ?? undefined;
+                        if(token !== undefined) {
+                            await userService.setEmailToken(args.user._id, token)
+                        }
+                        else return {result: 0, data: {}}
+                    }
+                    return {result: 1, data: {}};
+                }
+                catch(err){
+                    return {result: 0, data: {}}
+                }
+
+            }, {})
+        }
+
+        if(mailSettings.deleteAccountOnUserDeletion){
+            UserService.addPostUserDeleteHookAsync(async (args)=> {
+                if(!args.user || !args.user.internalEmail) return {result: 0, data: {}};
+                try {
+                    const deleteResponse = await this.api.deleteUser(args.user)
+                    if(deleteResponse.ok){
+                        return {result: 1, data: args.user};
+                    }
+                    else return {result: 0, data: {}};
+                }
+                catch(err) {
+                    return  {result: 0, data: {}};
+                }
+            }, {})
+        }
+        this.setStarted();
+        return this;
     }
 
     /**
