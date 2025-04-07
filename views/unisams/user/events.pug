@@ -5,15 +5,13 @@ block page_includes
     script.
         window.jsmodule = {
             module: "user",
-            loaders: ["events"],
+            loaders: ["user.events"],
         };
         window.exploreUserId = "#{exploreUser.id}";
         window.dockerArgs.activeContainer = "userprofileContainer";
         window.dockerArgs.activeElementId = "userprofileEvents";
         window.allowedit = #{allowedit};
 
-    script(src = "/lib/fineUploader/fine-uploader.js")
-    link(rel = 'stylesheet', href = '/lib/fineUploader/fine-uploader-new.css')
     script(src="/dist/user.js")
 
 block content
@@ -52,23 +50,27 @@ block content
                                                     span.mdc-deprecated-list-item__text Nutzer löschen
                                     .clear
                                 .clear
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .userinfo-container
+                                    #userPage-component-container.userPage-component-container.componentPage-component-container
 
-                        #sec-content2.subpage-container
-                            .subpage-topbar
-                                .topbar-heading
-                                    h3 Angemeldet
-                                .subpage-options.topbar-element
-                                #eventsearch--upcoming.searchbar-container.topbar-element
-                            #content2-text.sec-content
-                                .subpage-content
-                                    #eventlist-container--upcoming.eventlist-container
-
-                        #sec-content3.subpage-container
-                            .subpage-topbar
-                                .topbar-heading
-                                    h3 Kürzlich Teilgenommen
-                                .subpage-options.topbar-element
-                                #eventsearch--past.searchbar-container.topbar-element
-                            #content3-text.sec-content
-                                .subpage-content
-                                    #eventlist-container--past.eventlist-container
+                        //#sec-content2.subpage-container
+                        //    .subpage-topbar
+                        //        .topbar-heading
+                        //            h3 Angemeldet
+                        //        .subpage-options.topbar-element
+                        //        #eventsearch--upcoming.searchbar-container.topbar-element
+                        //    #content2-text.sec-content
+                        //        .subpage-content
+                        //            #eventlist-container--upcoming.eventlist-container
+                        //
+                        //#sec-content3.subpage-container
+                        //    .subpage-topbar
+                        //        .topbar-heading
+                        //            h3 Kürzlich Teilgenommen
+                        //        .subpage-options.topbar-element
+                        //        #eventsearch--past.searchbar-container.topbar-element
+                        //    #content3-text.sec-content
+                        //        .subpage-content
+                        //            #eventlist-container--past.eventlist-container

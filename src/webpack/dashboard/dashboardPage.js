@@ -192,6 +192,7 @@ var getNextEvents = function (userid){
     let data = {
         userid: userid,
         sort: "date.startDate",
+        startDate: Date.now(),
         amount: 2,
     }
     //get user list from server

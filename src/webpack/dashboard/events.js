@@ -5,122 +5,67 @@ import {Searchbar} from "../searchbar/searchbar";
 import {dateFromNow} from "../helpers/helpers";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
+import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 
 import "/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
+import ComponentPage from "../components/ComponentPage";
+import {UserProfile} from "../userprofile/userprofile";
 
 let events = {
     title: "events",
     data: {},
-    init: function () {
+    init: async function () {
         let self = this;
-        self.initPromise = new Promise(function(resolve, reject){
-            $(document).ready(function () {
+        var currentUserProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
+        var ob1 = new lidlObserver((u) => {
+            this.pageData.user = u;
+        });
+        //debug line, remove before flight
+        console.log("loading js module: dashboard."+self.title);
 
-                //debug line, remove before flight
-                console.log("loading js module: dashboard."+self.title);
+        self.view = "both";
+        self.sort = "date.startDate";
+        self.calendar = null;
+        self.upcomingList = null;
+        self.pastList = null;
+        self.data = {all: [], upcoming: [], past: []};
+        self.calendarContainer = document.getElementById('eventcalendar-container');
 
-                self.view = "both";
-                self.sort = "date.startDate";
-                self.calendar = null;
-                self.upcomingList = null;
-                self.pastList = null;
-                self.data = {all: [], upcoming: [], past: []};
-                self.upcomingListContainer = document.getElementById('eventlist-container--upcoming');
-                self.pastListContainer = document.getElementById('eventlist-container--past');
-                self.calendarContainer = document.getElementById('eventcalendar-container');
+        const currentUser = await currentUserProfile.getUserAndSubscribe(ob1);
 
-                //setup searchbar
-                let searchbarUpcoming = document.getElementById("eventsearch-upcoming");
-                self.searchbarUpcoming = new Searchbar(searchbarUpcoming, {
-                    onInput: {
-                        enabled: true,
-                        callback: function(inputValue){
-                            self.getData(window.userId, inputValue, {selector: "gte"}, self.sort)
-                                .then(data => {
-                                    self.data.upcoming = data;
-                                    self.showUpcoming();
-                                    resolve(self)
-                                })
-                                .catch(err => {
-                                    reject(err)
-                                })
-                        },
-                    },
-                });
-                let searchbarPast = document.getElementById("eventsearch-past");
-                let filterDate = dateFromNow({weeks: -4});
-                self.searchbarUpcoming = new Searchbar(searchbarPast, {
-                    onInput: {
-                        enabled: true,
-                        callback: function(inputValue){
-                            self.getData(window.userId, inputValue, {selector: "range", minDate: filterDate}, self.sort)
-                                .then(data => {
-                                    self.data.past = data;
-                                    self.showPast();
-                                    resolve(self)
-                                })
-                                .catch(err => {
-                                    reject(err)
-                                })
-                        },
-                    },
-                });
+        const data = {
+            user: currentUser,
+            targetUser: currentUser,
+        }
 
-                let all = self.getData(window.userId, "", self.sort);
-                let upcoming = self.getData(window.userId, "", {selector: "gte"}, self.sort);
-                let past = self.getData(window.userId, "", {selector: "range", minDate: filterDate}, self.sort);
+        let pageContainer = document.getElementById("userPage-component-container");
+        var componentPage = new ComponentPage({
+            container: pageContainer,
+            sidebar: undefined,
+            data: data,
+            args: {},
+        });
+        window.componentPage = componentPage;
+        await componentPage.addComponent({
+            componentType: ComponentPage.componentTypes.USER.EVENTS,
+            componentArgs: {allowEdit: true, size: "full"},
+            data: {user: data.user, targetUser: data.targetUser}
+        })
 
-                Promise.all([all, upcoming, past])
-                    .then(dataArray => {
-                        self.data.all = dataArray[0];
-                        self.data.upcoming = dataArray[1];
-                        self.data.past = dataArray[2];
-                        self.showCalendar();
-                        self.showUpcoming();
-                        self.showPast();
-                        resolve(self)
-                    })
-
-                    .catch(err => {
-                        reject(err)
-                    })
+        self.getData(window.userId, "", self.sort)
+            .then(all => {
+                self.data.all = all;
+                self.showCalendar();
             })
-        })
-
-    },
-    showUpcoming: function(){
-        let self = this;
-        this.initPromise.then(init => {
-            let events = self.data.all;
-            let upcoming = self.data.upcoming;
-            self.upcomingList = displayEventList(upcoming, self.upcomingList, self.upcomingListContainer, self.sort);
-            // self.searchbarUpcoming.show();
-        })
             .catch(err => {
-                console.error("Failed to show events: Module not initialized: " + err)
+                throw err
             })
     },
-    showPast: function(){
-        let self = this;
-        this.initPromise.then(init => {
-            let events = self.data.all;
-            let past = self.data.past;
-            self.pastList = displayEventList(past, self.pastList, self.pastListContainer, self.sort);
-            // self.searchbarUpcoming.show();
-        })
-            .catch(err => {
-                console.error("Failed to show events: Module not initialized: " + err)
-            })
-    },
+
     showCalendar: function(){
         let self = this;
-        this.initPromise.then(init => {
-            let events = self.data.all;
-            self.calendar = displayCalendar(events, self.calendar, self.calendarContainer);
-        })
-            .catch(err => {
-                console.error("Failed to show events: Module not initialized: " + err)
-            })
+        let events = self.data.all;
+        self.calendar = displayCalendar(events, self.calendar, self.calendarContainer);
     },
     getData: function (userid, filter, dateFilter, sort){
         let self = this;
@@ -158,30 +103,6 @@ let events = {
     }
 };
 
-
-
-function displayEventList(events, list, container, sort){
-    let args = {
-        height: "fixed",
-        fixedHeight: "500px",
-        sorting: {
-            property: sort,
-            direction: 1,
-        }
-    }
-    let callback = {
-        listItem: {
-            onClick: function(e){
-                let self = e.currentTarget;
-                e.preventDefault();
-                window.location = "/events/view/"+self.dataset.id;
-
-            }
-        }
-    }
-
-    return new ScrollableList(container, "event", events, args, callback)
-}
 
 function displayCalendar(events, calendar, container){
     let typeMap = {

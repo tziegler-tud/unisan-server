@@ -295,19 +295,22 @@ function userEvents(req, res, next) {
 }
 
 function userEventsAdvanced(req, res, next) {
-    var userid;
-    if (req.body.userid === undefined) {
-        userid = req.user.id;
+    const userId = req.body.userid;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const matchString = req.body.matchString ? req.body.matchString : "";
+    const sort = req.body.sort;
+    const amount = req.body.amount ? req.body.amount : undefined;
+
+    if(userId === undefined) {
+        next(new ApiValidationError("Invalid arguments received for parameter: userid"))
     }
-    else userid = req.body.userid;
 
     if (req.body.args === undefined) req.body.args = {};
-    req.body = Object.assign(req.body.args, req.body);
-    let matchString = req.body.matchString ? req.body.matchString : "";
 
     let userFilter = {
         filter: "participants.user",
-        value: userid,
+        value: userId,
     }
 
     let dateFilter = {
@@ -315,19 +318,26 @@ function userEventsAdvanced(req, res, next) {
         date: Date.now(),
     };
 
-    let filterArray = [];
-    let filter = req.body.filter;
-    if (!Array.isArray(filterArray)){
-        filterArray = [filter, userFilter]
+    if(startDate !== undefined) {
+        dateFilter.date = startDate
     }
-    else filterArray.push(userFilter);
+    if(endDate !== undefined) {
+        dateFilter.selector = "lte"
+        dateFilter.date = endDate
+    }
+    if(startDate !== undefined && endDate !== undefined) {
+        dateFilter.selector = "range";
+        dateFilter.minDate = startDate;
+        dateFilter.maxDate = endDate;
+    }
+
+    let filterArray = [userFilter];
 
     let args = {
         filter: filterArray,
-        sort: req.body.sort,
+        sort: sort,
         dateFilter: dateFilter,
     }
-    let amount = (req.body.amount !== undefined) ? req.body.amount : undefined;
     eventService.matchAny(matchString, args)
         .then(event => {
             if(event) {
