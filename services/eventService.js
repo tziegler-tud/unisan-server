@@ -224,7 +224,7 @@ async function matchAny(matchString, args){
     if (matchString.length !== 0) {
         //filter user by given string, using title and type
 
-        eventlist = eventlist.and([dateFilter, {'title.value': { $regex: matchString, $options: "-i" }}]); //dont filter for type
+        eventlist = eventlist.and([{'title.value': { $regex: matchString, $options: "i" }}]); //dont filter for type
     }
 
     if(universalFilterArray.length > 0)
