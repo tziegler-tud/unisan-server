@@ -23,7 +23,6 @@ export default new PageModule ({
             var ob1 = new lidlObserver((u) => {
                 this.pageData.user = u;
             });
-
             window.snackbar = new Snackbar();
 
             const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
@@ -39,7 +38,6 @@ export default new PageModule ({
                 user: currentUser,
                 targetUser: targetUser
             }
-
             return {args, data}
     },
     buildPage: async function({args={}, data={}}={}) {
@@ -68,20 +66,6 @@ export default new PageModule ({
         else {
             window.DockerElement.addDockerSubPage("user", data.targetUser, {}, undefined, {currentUser: {edit: window.allowedit}});
         }
-
-        // let pageContainer = document.getElementById("userPage-component-container");
-        // var userPage = new ComponentPage({
-        //     container: pageContainer,
-        //     sidebar: sidebar,
-        //     data: {user: user},
-        //     args: {},
-        // });
-        // window.userPage = userPage;
-        // userPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, {allowEdit: true, size: "full", targetUser: user.id}, {user: user, targetUser: user.id});
-
-        //check if current password is required for password changes
-        // true if the user is NOT an userAdmin
-        // false if the user is an userAdmin
 
         let pageContainer = document.getElementById("userPage-component-container");
         var componentPage = new ComponentPage({
