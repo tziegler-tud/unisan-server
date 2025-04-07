@@ -338,7 +338,7 @@ async function updateInternalMail(req, res, next) {
         try  {
             const target = await UserService.getById(userId)
             await AuthService.checkUserWriteAccessCritical(req.user, target)
-            const result = await UserService.setInternalEmail(userId, mail)
+            const result = await UserService.setInternalEmail(userId, mail, req.user)
             res.json({result})
         }
         catch (e) {
