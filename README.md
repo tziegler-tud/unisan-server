@@ -1,22 +1,10 @@
 # unisanServer -  A web-based personnel and resource management application for medical service groups
-### Author: Tom Ziegler
-#### Contributers: 
-github.com/SoulKa
 
-### front-end docs
-https://tziegler-tud.github.io/unisan-server/
+### Description
+#### Version history:
+- 0.6.0 (released 07.04.2025)
 
-
-### Purpose
-Extension of the publicly available website [unisan-dresden.de](https://www.unisan-dresden.de) with backbone api and frontend for a sophisticated web-based management application. Specific aims will be determinded along the way - let's see where this is going.
-
-Planned features include a user management, event mangement, an eLearning area and CMS for the public website.
-#### Current state (03.08.2022):
-- user management and event management implemented with most features
-- new planned feature: resource and inventory management
-- working on dashboard
-
-#### Planned:
+#### Overview of features:
 - user management (implemented)
 - calendar and event management (implemented)
 - web-based CMS for public website (discontinued)
@@ -33,25 +21,13 @@ Planned features include a user management, event mangement, an eLearning area a
 Our project uses [SASS](https://sass-lang.com/) and webpack.
 
 ##### Backend
-Node >= 16
-ES2017
-
+Node 20
 check package.json for npm dependencies
 
 ##### Frontend
 
 located in ./src, requires npm install and webpack build
 check package.json for details
-
-### Todos
-
- A lot...
- 
-### Contact
-
-For any communication concerning this project, contact us under the following adress:
-admin@unisan-dresden.de
- 
 
 ## Usage
 
