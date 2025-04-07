@@ -15,16 +15,17 @@ export default new PageModule({
         window.snackbar = new Snackbar();
 
         const settings = await systemActions.getSystemSettings()
+        const mailApiKey = await systemActions.getMailApiKey();
         let data = {
             enabled: settings.mail.enabled,
             createAccountOnUserCreation: settings.mail.createAccountOnUserCreation,
             deleteAccountOnUserDeletion: settings.mail.deleteAccountOnUserDeletion,
             systemMailAccount: settings.mail.systemMailAccount,
-            systemMailAccountToken: settings.mail.systemMailAccountToken,
+            systemMailAccountToken:  settings.mail.systemMailAccountToken,
             url: settings.mail.url,
             port: settings.mail.port,
             baseUrl: settings.mail.baseUrl,
-            apiKey: settings.mail.apiKey,
+            apiKey: mailApiKey.apiKey,
             domain: settings.mail.domain,
         }
         return {args, data};

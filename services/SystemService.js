@@ -1,5 +1,6 @@
 import db from '../schemes/mongo.js';
 const Settings = db.SystemSettings;
+const Secrets = db.Secrets;
 import dotenv from 'dotenv'
 
 import {refJSON} from "../helpers/helpers.js"
@@ -126,7 +127,8 @@ class SystemService {
                     }
                     self.settings = settings;
                     self.settingsObject = settings.toJSON();
-                    resolve(settings);
+                    resolve(settings)
+
                 })
                 .catch(err => {
                     reject(err)
@@ -134,12 +136,37 @@ class SystemService {
         })
     }
 
+
     getSettings() {
         if(!this.status === this.statusEnum.RUNNING){
             throw new Error("Failed to get Settings: SystemService not available.");
         }
         else {
             return this.settingsObject;
+        }
+    }
+
+    getPublicSettings(){
+        return {
+
+        }
+    }
+
+    getMailSettings(){
+        if(!this.status === this.statusEnum.RUNNING){
+            throw new Error("Failed to get Settings: SystemService not available.");
+        }
+        else {
+            return this.settingsObject.mail;
+        }
+    }
+
+    getAuthSettings(){
+        if(!this.status === this.statusEnum.RUNNING){
+            throw new Error("Failed to get Settings: SystemService not available.");
+        }
+        else {
+            return this.settingsObject.auth;
         }
     }
 
@@ -193,6 +220,28 @@ class SystemService {
         await this.save();
         this.settingsObject = this.settings.toJSON();
         return this.settingsObject;
+    }
+
+
+    async setSecret(key, value){
+        /**
+         * @type Secrets
+         */
+        const found = await Secrets.findOne({key: key});
+        if(found){
+            found.value = value;
+            return found.save();
+        }
+        else {
+            const sec = new Secrets({key, value});
+            return await sec.save();
+        }
+    }
+
+    async getSecret(key){
+        const sec = Secrets.findOne({key: key});
+        if (!sec) return undefined;
+        else return sec;
     }
 
     statusEnum = {
