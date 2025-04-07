@@ -19,6 +19,7 @@ import fs from 'fs-extra';
 import UserGroupService from "./userGroupService.js";
 import ServiceMiddleware from "./utility/ServiceMiddleware.js";
 import AsyncServiceMiddleware from "./utility/AsyncServiceMiddleware.js";
+import FileUtility from "../utils/FileUtility.js";
 
 /** @typedef {import("../schemes/userScheme.js").UserScheme} UserScheme */
 
@@ -339,7 +340,6 @@ class UserService{
      * @param args {Object} further args for user creation. args = {userImg: {tmp: <boolean>, tmpKey: <integer>}}
      */
     async create(req, userParam, args) {
-        const systemSettings = SystemService.getSettings();
         if (args === undefined) args = {};
         // validate
         if(userParam.generalData === undefined || userParam.username === undefined) throw new Error("Failed to create user: invalid data given");
@@ -355,43 +355,18 @@ class UserService{
                 throw new Error(`MemberId ` + userParam.generalData.memberId.value + ` is already taken`);
         }
         else {
-            //check settings on how to auto-assign memberId
-            if(systemSettings.members.memberId) {
-                let offset = systemSettings.members.memberId.offset ?? 0;
-                switch(systemSettings.members.memberId.mode) {
-                    case 'auto':
-                        //assign next number and increment offset
-                        memberId = offset+1;
-                        await SystemService.set({key: "members.memberId.offset", value: memberId});
-                        break;
-                    case 'auto-free':
-                        //find lowest untaken number after offset
-                        const presentMemberIdsOffset = await User.distinct('generalData.memberId.value', { "generalData.memberId.value": { $gte: offset} });
-                        memberId = lowestMissing(presentMemberIdsOffset, offset);
-                        break;
-                    case 'free':
-                        const presentMemberIds = await User.distinct('generalData.memberId.value');
-                        memberId = lowestMissing(presentMemberIds, 0);
-                        break;
-                    default:
-                    case 'unset':
-                    case 'off':
-                        //dont generate ID
-                        memberId = undefined;
-
-                }
-                if (await User.findOne({ "generalData.memberId.value": memberId })) {
-                    memberId = undefined;
-                }
-                userParam.generalData.memberId.value = memberId;
-            }
+            userParam.generalData.memberId.value = await this.createMemberIdForNewUser();
         }
 
+        try {
+            let updatedUserParams = this.executeUserCreateMiddlewares(userParam, true)
+            updatedUserParams = await this.executeUserCreateAsyncMiddlewares(updatedUserParams, true)
+            userParam = updatedUserParams;
+        }
+        catch(e){
+            console.error("UserService: Some middlewares failed to run while creating a new user.");
+        }
 
-
-        let updatedUserParams = this.executeUserCreateMiddlewares(userParam, true)
-        updatedUserParams = await this.executeUserCreateAsyncMiddlewares(updatedUserParams, true)
-        userParam = updatedUserParams;
         const user = new User(userParam);
         // @louis: password is not mentioned in the userScheme. Is this correct? @Tom: yes, we only store hashes in the db
         // hash password
@@ -431,88 +406,104 @@ class UserService{
         if(await user.save()){
             //create fresh acl document and assign user to it
             const userACL = new UserACL({user: user.id})
-            userACL.save();
+            await userACL.save();
             //update log
-            LogService.create(log)
+            await LogService.create(log)
                 .then(
                 )
                 .catch(
 
                 );
             //create user dir
-            fs.ensureDir(appRoot + '/src/data/uploads/user_images/' + user._id.toString(), { recursive: true }, (err) => {
-                if (err) {
-                    console.error("Failed to create directory: " + '/src/data/uploads/user_images/' + user._id.toString());
-                }
-                else {
-                    //check if tmp image exists
-                    if (args.userImg.tmp) {
-                        let tmpPath = appRoot + '/src/data/uploads/tmp/' + args.userImg.tmpkey + ".jpg";
-                        //check if file exists
-                        this.checkFileExists(tmpPath)
-                            .then((exists)=>{
-                                if(exists) {
-                                    try {
-                                        fs.copyFile(tmpPath, appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
-                                            if (err) throw err;
-                                        });
-                                    }
-                                    catch (err){
-                                        let msg = "file system error: " + err;
-                                        console.error(msg)
-                                        console.warn("Failed to get uploaded file. Trying to remove file from storage...");
-                                        fs.unlink(tmpPath)
-                                            .then(function(){
-                                                console.log("temporary file removed successfully.");
-                                            })
-                                            .catch(err => {
-                                                console.error("Failed to remove temporary file: " + err);
-                                            })
-                                    }
-                                }
-                                else {
-                                    console.warn("invalid temporary image file path. Copying dummy user image instead...")
-                                    // copy dummy user image to user directory
-                                    copyDummyImage();
-                                }
-                            })
-                            .catch(err => console.error(err))
-                    }
-                    else {
-                        // copy dummy user image to user directory
-                        copyDummyImage();
-                    }
-
-                    function copyDummyImage(){
-                        // copies the dummy user image to user directory
-                        fs.copyFile(appRoot + '/src/data/user_images/dummy.jpg', appRoot + '/src/data/uploads/user_images/'+ user._id + '/' + user._id + '.jpg', (err) => {
-                            if (err) {
-                                console.warn("Failed to copy dummy user image: '/src/data/user_images/dummy.jpg': File not found.")
-                            }
-                        });
-                    }
-                }
-            });
+            try {
+                await this.initUserDir(user.id.toString(), {tmp: args.userImg.tmp, tmpkey: args.userImg.tmpkey});
+            }
+            catch(e){
+                console.error("Failed to create user dir.")
+            }
             let {hash: _, ...userNoHash} = user._doc;
             userNoHash.id = userNoHash._id;
 
-            // execute post creation hooks
-            this.executePostUserCreateMiddlewares(userNoHash)
-            await this.executePostUserCreateMiddlewaresAsync(userNoHash)
-
+            try{
+                // execute post creation hooks
+                this.executePostUserCreateMiddlewares(userNoHash)
+                await this.executePostUserCreateMiddlewaresAsync(userNoHash)
+            }
+            catch(e){
+                console.error("UserService: PostUserCreateMiddlewares: Some middlewares failed to run.")
+            }
             return userNoHash;
         }
+    }
 
-        function lowestMissing(array, offset){
-            const seen = new Map();
-            for (let i = 0; i < array.length; i++) {
-                seen.set(array[i]);
+    /**
+     *
+     * @param userId {string}
+     * @param userImageConfig {Object}
+     * @param userImageConfig.tmp {Boolean} true if a tmp image was provided
+     * @param userImageConfig.tmpkey {string} path of the temp image file
+     * @returns {Promise<void>}
+     */
+    async initUserDir(userId, userImageConfig){
+        const fileUtility = new FileUtility();
+        const dummyPath = appRoot + '/src/data/user_images/dummy.jpg';
+
+        //create user dir
+        await fileUtility.ensureDirExists(appRoot + '/src/data/uploads/user_images/' + userId)
+
+        //check if tmp image exists
+        if (userImageConfig.tmp) {
+            let tmpPath = appRoot + '/src/data/uploads/tmp/' + userImageConfig.tmpkey + ".jpg";
+            //check if file exists+
+            let tmpImageExists = false;
+            try {
+                await fileUtility.checkFileExists(tmpPath)
+                tmpImageExists = true;
+
             }
-            const max = Math.max(...array);
-            for (let i = offset; i <= max ; i++) {
-                if (!seen.has(i)) return i;
+            catch(e){
+                console.error("Failed to access tmp user image at location: " + tmpPath + ". Using dummy image instead.")
+                tmpImageExists = false;
+
             }
-            return max+1;
+            if(tmpImageExists) {
+                try {
+                    const dest = appRoot + '/src/data/uploads/user_images/'+ userId + '/' + userId + '.jpg'
+                    await fileUtility.copyFile(tmpPath, dest);
+                }
+                catch (err){
+                    let msg = "file system error: " + err;
+                    console.error(msg)
+                    console.warn("Failed to get uploaded file. Trying to remove file from storage...");
+                    try {
+                        await fileUtility.delete(tmpPath)
+                        console.log("temporary file removed successfully.");
+                    }
+                    catch(e){
+                        console.error("Failed to remove temporary file: " + err);
+                    }
+                }
+            }
+            else {
+                console.warn("invalid temporary image file path. Copying dummy user image instead...")
+                // copy dummy user image to user directory
+                await copyDummyImage();
+            }
+        }
+        else {
+            // copy dummy user image to user directory
+            await copyDummyImage();
+        }
+
+        async function copyDummyImage(){
+            // copies the dummy user image to user directory
+            try {
+                await fileUtility.checkFileExists(dummyPath)
+                await fileUtility.copyFile(dummyPath, appRoot + '/src/data/uploads/user_images/'+ userId + '/' + userId + '.jpg')
+            }
+            catch(e){
+                console.error("Failed to copy dummy file.")
+            }
         }
     }
 
@@ -635,8 +626,8 @@ class UserService{
     /**
      * Updates an existing user
      * @param req {Object} express request
-     * @param {number} id The id of the existing user
-     * @param {String} password Plaintext password. The password is hashed before beeing stored.
+     * @param {String} id The id of the existing user
+     * @param {String} password Plaintext password. The password is hashed before being stored.
      */
     async updatePassword(req, id, password) {
 
@@ -1877,20 +1868,6 @@ class UserService{
         }
     }
 
-    /**
-     * savely checks if a file exists
-     * returns a promise that resolves to true if the file exists, or false if it does not exist
-     * @returns Promise<Boolean>
-     */
-
-    checkFileExists(path) {
-        return new Promise(function(resolve, reject){
-            fs.access(path, fs.constants.F_OK, error => {
-                resolve(!error);
-            })
-        })
-    }
-
 
     clearDocuments(){
         //remove usergroup and userrole
@@ -2080,6 +2057,62 @@ class UserService{
                         reject(err)
                     })
             })
+        }
+    }
+
+    /**
+     * Tries to assign a memberId for a new user based on the system settings assignment mode.
+     * @returns {Promise<Number>}
+     */
+    async createMemberIdForNewUser(){
+        //check settings on how to auto-assign memberId
+        const systemSettings = SystemService.getSettings();
+        if(!systemSettings.members.memberId) {
+            console.error("Failed to obtain memberId assignment mode from settings: Invalid system settings detected.")
+            return undefined;
+        }
+        let memberId = undefined;
+        let mode = systemSettings.members.memberId.mode;
+        let offset = systemSettings.members.memberId.offset ?? 0;
+
+        switch(mode) {
+            case 'auto':
+                //assign next number and increment offset
+                memberId = offset+1;
+                await SystemService.set({key: "members.memberId.offset", value: memberId});
+                break;
+            case 'auto-free':
+                //find lowest untaken number after offset
+                const presentMemberIdsOffset = await User.distinct('generalData.memberId.value', { "generalData.memberId.value": { $gte: offset} });
+                memberId = lowestMissing(presentMemberIdsOffset, offset);
+                break;
+            case 'free':
+                const presentMemberIds = await User.distinct('generalData.memberId.value');
+                memberId = lowestMissing(presentMemberIds, 0);
+                break;
+            default:
+            case 'unset':
+            case 'off':
+                //dont generate ID
+                memberId = undefined;
+
+        }
+        if (await User.findOne({ "generalData.memberId.value": memberId })) {
+            console.error("Failed to auto-assign memberId: Assigned value was already taken.")
+            memberId = undefined;
+        }
+        return memberId
+
+        function lowestMissing(array, offset){
+            const seen = new Map();
+            for (let i = 0; i < array.length; i++) {
+                seen.set(array[i]);
+            }
+            const max = Math.max(...array);
+            for (let i = offset; i <= max ; i++) {
+                if (!seen.has(i)) return i;
+            }
+            return max+1;
         }
     }
 }
