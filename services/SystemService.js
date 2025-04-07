@@ -200,6 +200,28 @@ class SystemService {
         return this.settingsObject;
     }
 
+    async setMailSettings(data={}){
+        const settings = {
+            enabled: data.enabled,
+            createAccountOnUserCreation: data.createAccountOnUserCreation,
+            deleteAccountOnUserDeletion: data.deleteAccountOnUserDeletion,
+            systemMailAccount: data.systemMailAccount,
+            systemMailAccountToken: data.systemMailAccountToken,
+            url: data.url,
+            port: data.port,
+            baseUrl: data.baseUrl,
+            imap_url: data.imap_url,
+            smtp_url: data.smtp_url,
+            domain: data.domain,
+        }
+
+        const updatedSettings = this.applyKeysIfPresent(this.settings.mail, settings)
+        this.settings.mail = updatedSettings;
+        await this.save();
+        this.settingsObject = this.settings.toJSON();
+        return this.settingsObject;
+    }
+
     async setMemberIdSettings({mode, offset}){
         const allowedValues = ["auto", "auto-free", "free", "off"];
         if(!allowedValues.includes(mode)){
@@ -242,6 +264,15 @@ class SystemService {
         const sec = Secrets.findOne({key: key});
         if (!sec) return undefined;
         else return sec;
+    }
+
+    applyKeysIfPresent(sourceObject, updateObject){
+        Object.keys(updateObject).forEach((key) => {
+            if (updateObject[key] !== undefined){
+                sourceObject[key] = updateObject[key];
+            }
+        })
+        return sourceObject;
     }
 
     statusEnum = {

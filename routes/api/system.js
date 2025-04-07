@@ -396,40 +396,32 @@ function deleteJwkKey(req, res, next){
 
 
 async function updateMailSettings(req, res, next){
-    AuthService.auth(req.user, AuthService.operations.system.MAIL)
-        .then(async result => {
-            let key = "mail";
-            let body = req.body;
+    let key = "mail";
+    let body = req.body;
 
-            if(body.systemMailAccountToken) await SystemService.setSecret("mail.systemMailAccountToken", body.systemMailAccountToken);
-            if(body.apiKey) await SystemService.setSecret("mail.apiKey", body.apiKey);
+    try  {
+        await AuthService.auth(req.user, AuthService.operations.system.MAIL)
 
+        if(body.systemMailAccountToken) await SystemService.setSecret("mail.systemMailAccountToken", body.systemMailAccountToken);
+        if(body.apiKey) await SystemService.setSecret("mail.apiKey", body.apiKey);
 
-            SystemService.set({
-                key: key,
-                value: {
-                    enabled: body.enabled,
-                    createAccountOnUserCreation: body.createAccountOnUserCreation,
-                    deleteAccountOnUserDeletion: body.deleteAccountOnUserDeletion,
-                    systemMailAccount: body.systemMailAccount,
-                    url: body.url,
-                    port: body.port,
-                    baseUrl: body.baseUrl,
-                    imap_url: body.imap_url,
-                    smtp_url: body.smtp_url,
-                    domain: body.domain
-                }})
-                .then(result => {
-
-                    res.json(result);
-                })
-                .catch(err => {
-                    next(err);
-                })
-        })
-        .catch(err => {
-            next(err);
-        })
+        const result = await SystemService.setMailSettings({
+            enabled: body.enabled,
+            createAccountOnUserCreation: body.createAccountOnUserCreation,
+            deleteAccountOnUserDeletion: body.deleteAccountOnUserDeletion,
+            systemMailAccount: body.systemMailAccount,
+            url: body.url,
+            port: body.port,
+            baseUrl: body.baseUrl,
+            imap_url: body.imap_url,
+            smtp_url: body.smtp_url,
+            domain: body.domain
+        });
+        res.json(result);
+    }
+    catch(e){
+        next(e)
+    }
 }
 
 async function stopMailService(req, res, next){
