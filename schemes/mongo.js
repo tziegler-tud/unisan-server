@@ -14,6 +14,7 @@ import OidcAccount from './oidcAccountScheme.js'
 import OidcClient from './oidcClientScheme.js'
 import SystemSettings from './systemSettingsScheme.js'
 import News from './newsScheme.js'
+import Secrets from './secretsScheme.js'
 
 mongoose.set('debug', false);
 
@@ -45,5 +46,6 @@ export default {
     OidcAccount: OidcAccount,
     OidcClient: OidcClient,
     SystemSettings: SystemSettings,
+    Secrets: Secrets,
     News: News,
 };

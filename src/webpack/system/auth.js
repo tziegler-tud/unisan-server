@@ -16,11 +16,12 @@ export default new PageModule({
 
         const settings = await systemActions.getSystemSettings()
         const clients = await systemActions.getOidcClients()
+        const cookieSecrets = await systemActions.getOidcCookieSecrets();
         let data = {
             enabled: settings.auth.openid.enabled,
             issuer: settings.auth.openid.issuer,
             port: settings.auth.openid.port,
-            cookieSecrets: settings.auth.openid.cookieSecrets,
+            cookieSecrets: cookieSecrets.cookieSecrets,
             clients: clients,
         }
         return {args: {}, data: data};

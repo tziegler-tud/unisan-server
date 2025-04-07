@@ -25,9 +25,6 @@ var SystemSettingsScheme = new Schema({
             port: {
 
             },
-            cookieSecrets: [{
-                type: String
-            }],
         }
     },
     mail: {
@@ -46,9 +43,6 @@ var SystemSettingsScheme = new Schema({
         systemMailAccount: {
             type: String,
         },
-        systemMailAccountPassword: {
-            type: String,
-        },
         systemMailAccountToken: {
             type: String,
         },
@@ -65,9 +59,6 @@ var SystemSettingsScheme = new Schema({
             type: String,
         },
         smtp_url: {
-            type: String,
-        },
-        apiKey: {
             type: String,
         },
         domain: {

@@ -229,7 +229,7 @@ export default class OpenIdSettingsComponent extends Component {
         let advancedData = {
             listEntries: [ {
                 label: "Cookie secrets",
-                value: self.data.cookieSecrets,
+                value: self.data.cookieSecrets.toString(),
                 },
             ],
             interactions: [advancedInput]
@@ -251,7 +251,7 @@ export default class OpenIdSettingsComponent extends Component {
                         data: {cookieSecrets: self.data.cookieSecrets},
                         callback: {
                             onConfirm: function(data, args){
-                                systemActions.updateOidcSettingsAdvanced({cookieSecrets: data.cookieSecrets})
+                                systemActions.setOidcCookieSecrets(data.cookieSecrets)
                                     .then(result => {
                                         //restart service
                                         systemActions.restartOidcService()
