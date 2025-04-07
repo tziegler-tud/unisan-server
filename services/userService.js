@@ -1914,48 +1914,44 @@ class UserService{
         }
     }
 
-    async setInternalEmail(userid, email){
-        User.findById(userid)
-            .then(user => {
-                // validate
-                if (!user) throw new Error('User not found');
-                if (!email || typeof email !== "string" || !isValidMail(email)) throw new Error('invalid email given: ' + email);
-                let key = "internalEmail"
-                let ojValue = user.internalEmail ?? "";
+    async setInternalEmail(userid, email, authorizedUser){
+        const user = await User.findById(userid)
+        // validate
+        if (!user) throw new Error('User not found');
+        if (!email || typeof email !== "string" || !isValidMail(email)) throw new Error('invalid email given: ' + email);
+        let key = "internalEmail"
+        let ojValue = user.internalEmail ?? "";
 
-                user.set(key, email);
+        user.set(key, email);
 
-                function isValidMail(){
-                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                    return emailRegex.test(email);
-                }
+        function isValidMail(){
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailRegex.test(email);
+        }
 
-                user.save()
-                    .then(user => {
-                        let log = new Log({
-                            type: "modification",
-                            action: {
-                                objectType: "user",
-                                actionType: "modify",
-                                actionDetail: "userModify",
-                                key: key,
-                                fullKey: key,
-                                originalValue: ojValue,
-                                value: email,
-                            },
-                            target: {
-                                targetType: "user",
-                                targetObject: user._id,
-                                targetObjectId: user._id,
-                                targetModel: "User",
-                            },
-                        })
-                        LogService.create(log).then().catch();
-                        return user;
-                    })
-                    .catch(err => {throw err})
-            })
-            .catch(err => {throw err})
+        await user.save()
+
+        let log = new Log({
+            type: "modification",
+            action: {
+                objectType: "user",
+                actionType: "modify",
+                actionDetail: "userModify",
+                key: key,
+                fullKey: key,
+                originalValue: ojValue,
+                value: email,
+            },
+            authorizedUser: authorizedUser,
+            target: {
+                targetType: "user",
+                targetObject: user._id,
+                targetObjectId: user._id,
+                targetModel: "User",
+            },
+        })
+        await LogService.create(log)
+        return user;
     }
 
     async setEmailToken(userid, token){
