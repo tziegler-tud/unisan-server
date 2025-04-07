@@ -17,6 +17,8 @@ var systemActions = {
         })
     },
 
+
+
     getSettingsByKey: function(key){
         return $.ajax({
             url: "/api/v1/system/settings/"+key,
@@ -193,18 +195,6 @@ var systemActions = {
             data: JSON.stringify(payload),
         })
     },
-    updateOidcSettingsAdvanced({cookieSecrets}){
-        const payload = {
-            cookieSecrets,
-        }
-        return $.ajax({
-            url: "/api/v1/system/settings/oidc",
-            type: 'PUT',
-            contentType: "application/json; charset=UTF-8",
-            dataType: 'json',
-            data: JSON.stringify(payload),
-        })
-    },
     stopOidcService(){
         return $.ajax({
             url: "/api/v1/system/oidc/stop",
@@ -226,6 +216,33 @@ var systemActions = {
             type: 'GET',
             contentType: "application/json; charset=UTF-8",
             dataType: 'json',
+        })
+    },
+
+    getOidcCookieSecrets: function(){
+        return $.ajax({
+            url: "/api/v1/system/oidc/cookies/secrets",
+            type: 'GET',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    /**
+     *
+     * @param secrets {String[]}
+     * @returns {*}
+     */
+    setOidcCookieSecrets: function(secrets){
+        const payload = {
+            cookieSecrets: secrets,
+        }
+        return $.ajax({
+            url: "/api/v1/system/oidc/cookies/secrets",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify(payload),
         })
     },
 
@@ -275,6 +292,34 @@ var systemActions = {
                 mode: mode,
                 offset: offset
             })
+        })
+    },
+
+    getMailApiKey(){
+        return $.ajax({
+            url: "/api/v1/system/mail/apiKey",
+            type: 'GET',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    getSystemMailAccountToken(){
+        return $.ajax({
+            url: "/api/v1/system/mail/systemAccountToken",
+            type: 'GET',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+        })
+    },
+
+    setMailApiKey(key){
+        return $.ajax({
+            url: "/api/v1/system/mail/apiKey",
+            type: 'POST',
+            contentType: "application/json; charset=UTF-8",
+            dataType: 'json',
+            data: JSON.stringify({apiKey: key})
         })
     }
 }

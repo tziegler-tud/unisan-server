@@ -40,10 +40,14 @@ router.get("/oidc/secrets/:id", getOidcClientSecret);
 router.post("/oidc/clients", addOidcClient);
 router.put("/oidc/clients/:id", updateOidcClient);
 router.delete("/oidc/clients/:id", removeOidcClient);
+router.get("/oidc/cookies/secrets", getOidcCookieSecrets)
+router.post("/oidc/cookies/secrets", setOidcCookieSecrets)
 
 router.post("/mail/restart", restartMailService);
 router.post("/mail/stop", stopMailService);
 router.get("/mail/status", getMailServiceStatus);
+router.get("/mail/apiKey", getMailApiKey);
+router.post("/mail/apiKey", setMailApiKey);
 
 router.post("/oidc/jwk/add", addJwkKey);
 router.post("/oidc/jwk/move", moveJwkKey);
@@ -146,6 +150,8 @@ function updateOidcSettings(req, res, next){
         .then(result => {
             let key = "auth.openid";
             let body = req.body;
+            if(body.cookieSecrets) SystemService.setSecret("cookieSecrets", body.cookieSecrets)
+
             SystemService.set({key: key, value: body})
                 .then(result => {
                     res.json(result);
@@ -311,6 +317,33 @@ function getOidcServiceStatus(req, res, next){
         })
 }
 
+async function getOidcCookieSecrets(req, res, next){
+    AuthService.auth(req.user, AuthService.operations.system.AUTH)
+        .then(async result => {
+            const secret = await SystemService.getSecret("oidc.cookieSecrets");
+            const val = secret?.value ?? []
+            res.json({cookieSecrets: val});
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+async function setOidcCookieSecrets(req, res, next){
+    if(req.body?.cookieSecrets === undefined) {
+        next();
+    }
+    const secret = req.body.cookieSecrets;
+    AuthService.auth(req.user, AuthService.operations.system.AUTH)
+        .then(async result => {
+            const r = await SystemService.setSecret("oidc.cookieSecrets", secret)
+            res.json(r);
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
 
 function addJwkKey(req, res, next){
     AuthService.auth(req.user, AuthService.operations.system.AUTH)
@@ -362,13 +395,32 @@ function deleteJwkKey(req, res, next){
 }
 
 
-function updateMailSettings(req, res, next){
+async function updateMailSettings(req, res, next){
     AuthService.auth(req.user, AuthService.operations.system.MAIL)
-        .then(result => {
+        .then(async result => {
             let key = "mail";
             let body = req.body;
-            SystemService.set({key: key, value: body})
+
+            if(body.systemMailAccountToken) await SystemService.setSecret("mail.systemMailAccountToken", body.systemMailAccountToken);
+            if(body.apiKey) await SystemService.setSecret("mail.apiKey", body.apiKey);
+
+
+            SystemService.set({
+                key: key,
+                value: {
+                    enabled: body.enabled,
+                    createAccountOnUserCreation: body.createAccountOnUserCreation,
+                    deleteAccountOnUserDeletion: body.deleteAccountOnUserDeletion,
+                    systemMailAccount: body.systemMailAccount,
+                    url: body.url,
+                    port: body.port,
+                    baseUrl: body.baseUrl,
+                    imap_url: body.imap_url,
+                    smtp_url: body.smtp_url,
+                    domain: body.domain
+                }})
                 .then(result => {
+
                     res.json(result);
                 })
                 .catch(err => {
@@ -409,6 +461,33 @@ function getMailServiceStatus(req, res, next){
         .then(result => {
             const status = MailService.getState();
             res.json({status: status});
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+async function getMailApiKey(req, res, next){
+    AuthService.auth(req.user, AuthService.operations.system.AUTH)
+        .then(async result => {
+            const secret = await SystemService.getSecret("mail.apiKey");
+            const val = secret?.value ?? "";
+            res.json({apiKey: val});
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+async function setMailApiKey(req, res, next){
+    if(req.body?.apiKey === undefined) {
+        next();
+    }
+    const secret = req.body.apiKey;
+    AuthService.auth(req.user, AuthService.operations.system.AUTH)
+        .then(async result => {
+            const r = await SystemService.setSecret("mail.apiKey", secret)
+            res.json(r);
         })
         .catch(err => {
             next(err);
