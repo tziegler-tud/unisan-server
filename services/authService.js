@@ -352,9 +352,9 @@ class AuthService {
         else {
             try {
                 //general user write access is required
-                let writeAccess = await this.checkAllowedGroupOperation(user, operations.user.WRITECRITICAL)
+                let group = await this.checkAllowedGroupOperation(user, operations.user.WRITECRITICAL)
                 let accessLevel = await this.checkRoleAccess(user, target);
-                console.log("critical user write access granted by group: " + group.title + "and access level: " + accessLevel);
+                console.log("critical user write access granted by group membership and access level: " + accessLevel);
                 return {status: 200, message: "Access granted"};
             }
             catch(err) {
