@@ -1,4 +1,4 @@
-// import "./scss/componentPage.scss";
+import "./scss/componentPage.scss";
 import PasswordComponent from "./PasswordComponent";
 import GeneralSettingsComponent from "./GeneralSettingsComponent";
 import ConnectedServicesComponent from "./ConnectedServicesComponent";
