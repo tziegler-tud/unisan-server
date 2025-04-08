@@ -61,9 +61,13 @@ module.exports = {
 
         user: "./webpack/userpage/user.js",
     },
+    // output: {
+    //     path: path.join(__dirname, "./dist"),
+    //     filename: "[name].js"
+    // },
     output: {
-        path: path.join(__dirname, "./dist"),
-        filename: "[name].js"
+        filename: '[name].js',
+        path: path.resolve(__dirname, 'dist'),
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -74,6 +78,11 @@ module.exports = {
     ],
     module: {
         rules: [
+            {
+                test: /\.ts$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
             {
                 test: /\.s[ac]ss$/i,
                 use: [
@@ -129,5 +138,6 @@ module.exports = {
         alias: {
             handlebars: 'handlebars/dist/handlebars.min.js',
         },
-    }
+        extensions: ['.ts', '.js', '.json']
+    },
 };
