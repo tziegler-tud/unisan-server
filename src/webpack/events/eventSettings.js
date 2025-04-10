@@ -9,10 +9,10 @@ import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 import EditableInputField from "../helpers/editableInputField";
 
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {eventActions} from "../actions/actions";
+import eventActions from "../actions/eventActions";
 
 import {EventRequest} from "./eventRequest";
 

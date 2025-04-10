@@ -1,5 +1,5 @@
-import {systemActions, userSettingsActions} from "../../../actions/actions";
-import {ComponentPage} from "../../ComponentPage";
+import {systemActions} from "../../../actions/systemActions";
+import ComponentPage from "../../ComponentPage";
 import Component from "../../Component";
 import InteractiveListStandaloneComponent from "../../interactiveListStandalone";
 

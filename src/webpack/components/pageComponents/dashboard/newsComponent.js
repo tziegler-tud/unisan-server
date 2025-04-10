@@ -1,9 +1,9 @@
 import Component from "../../Component";
-const {ScrollableList} = require("../../../scrollableList/scrollableList");
 import {Dialog as LidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 import "../../scss/newsComponent.scss";
-import {newsActions} from "../../../actions/actions";
+import {newsActions} from "../../../actions/newsActions";
 import {dateFromNow, transformDateTimeString} from "../../../helpers/helpers";
+import ScrollableList from "../../../scrollableList/ScrollableList";
 
 
 export default class NewsComponent extends Component {

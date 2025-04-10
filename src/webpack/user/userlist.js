@@ -1,8 +1,8 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 
-import {ScrollableList} from "../scrollableList/scrollableList";
+import ScrollableList from "../scrollableList/ScrollableList";
 import {Searchbar} from "../searchbar/searchbar";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");

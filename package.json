@@ -10,10 +10,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@fullcalendar/core": "^5.11.0",
-    "@fullcalendar/daygrid": "^5.11.0",
-    "@fullcalendar/list": "^5.11.0",
-    "@fullcalendar/timegrid": "^5.11.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.5",

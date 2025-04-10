@@ -1,5 +1,5 @@
 import {groupActions} from "../actions/groupActions";
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 import {userActions} from "../actions/userActions";
 import {Userlist} from "../helpers/userlist";

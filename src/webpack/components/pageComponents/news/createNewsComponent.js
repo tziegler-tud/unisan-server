@@ -5,7 +5,7 @@ import Component from "../../Component";
 import {EditableTextField} from "../../../helpers/editableTextField";
 
 import "../../scss/news/createNewsComponent.scss";
-import {newsActions} from "../../../actions/actions";
+import {newsActions} from "../../../actions/newsActions";
 import EditableInputField from "../../../helpers/editableInputField";
 
 

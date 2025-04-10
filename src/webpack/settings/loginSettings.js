@@ -1,4 +1,4 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Snackbar} from "../helpers/snackbar";

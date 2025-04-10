@@ -37,7 +37,7 @@ let eventPlugin = new SidebarPlugin("event");
 
 
 let eventDetails = new ContentHandler("eventDetails",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let event = args.event;
         let context = {
             event: event,
@@ -58,7 +58,7 @@ let eventDetails = new ContentHandler("eventDetails",
     });
 
 let showEventParticipants = new ContentHandler("eventParticipants",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let event = args.event;
         let context = {
             event: event,
@@ -95,7 +95,7 @@ let showEventParticipants = new ContentHandler("eventParticipants",
     });
 
 let addEventParticipant = new ContentHandler("addEventParticipant",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let event = args.event;
         let onConfirm = args.callback.onConfirm;
         let selectedUser = {role: "participant"};
@@ -230,7 +230,7 @@ let addEventParticipant = new ContentHandler("addEventParticipant",
     })
 
 let assignUserSubpage = new ContentHandler("assignUserSubpage",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let event = args.event;
         let postingId = args.postingId;
         let onConfirm = args.callback.onConfirm;
@@ -427,7 +427,7 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
 
 
 let showUpdateEventDateContent = new ContentHandler("editEventDate",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let onConfirm = args.callback.onConfirm;
         let onDelete = args.callback.onDelete;
 
@@ -489,7 +489,7 @@ let showUpdateEventDateContent = new ContentHandler("editEventDate",
 
 
 let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let onConfirm = args.callback.onConfirm;
 
         let context = {};
@@ -526,7 +526,7 @@ let showUpdateEventLocationContent = new ContentHandler("editEventLocation",
     })
 
 let showPostings = new ContentHandler("eventPostings",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let onConfirm = args.callback.onConfirm;
 
         let context = {};
@@ -561,7 +561,7 @@ let showPostings = new ContentHandler("eventPostings",
     })
 
 let addPosting = new ContentHandler("addEventPosting",
-    function(sidebar, args, type){
+    async function(sidebar, args, type){
         let onConfirm = args.callback.onConfirm;
 
         let context = {};
@@ -645,231 +645,228 @@ let addPosting = new ContentHandler("addEventPosting",
     })
 
 let showPostingDetails = new ContentHandler("showPostingDetails",
-    function(sidebar, args, type){
-        return new Promise(function(resolve, reject){
-            let onDelete = args.callback.onDelete;
-            let onConfirm = args.callback.onConfirm;
-            let onAssign = args.callback.onAssign;
-            let onUnassign = args.callback.onUnassign;
+    async function(sidebar, args, type){
+        let onDelete = args.callback.onDelete;
+        let onConfirm = args.callback.onConfirm;
+        let onAssign = args.callback.onAssign;
+        let onUnassign = args.callback.onUnassign;
 
-            let context = {};
-            if(args.allowEdit === undefined) args.allowEdit = {};
-            context.user = args.user;
-            context.augmentedPosting = args.augmentedPosting;
-            context.postingId = args.postingId;
-            context.event = args.event;
-            context.allowEdit = args.allowEdit;
-            context.args = args;
-            context.isAssignedToSelf = false;
-            context.assignedUser = undefined;
-            let corrupted = false;
-            let hasChanges = false;
+        let context = {};
+        if(args.allowEdit === undefined) args.allowEdit = {};
+        context.user = args.user;
+        context.augmentedPosting = args.augmentedPosting;
+        context.postingId = args.postingId;
+        context.event = args.event;
+        context.allowEdit = args.allowEdit;
+        context.args = args;
+        context.isAssignedToSelf = false;
+        context.assignedUser = undefined;
+        let corrupted = false;
+        let hasChanges = false;
 
-            context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
+        context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
 
-            let posting = context.augmentedPosting;
-            if (context.augmentedPosting === undefined) {
-                //find posting
-                posting = context.event.postings.find(el => {
-                    return el._id.toString() === context.postingId;
-                })
-                if(posting === undefined) {
-                    posting = {
-                        requiredQualifications: [],
-                    };
+        let posting = context.augmentedPosting;
+        if (context.augmentedPosting === undefined) {
+            //find posting
+            posting = context.event.postings.find(el => {
+                return el._id.toString() === context.postingId;
+            })
+            if(posting === undefined) {
+                posting = {
+                    requiredQualifications: [],
+                };
+                corrupted = true;
+            }
+        }
+
+        if (posting.assigned.isAssigned) {
+            context.assignedUser = posting.assigned.user;
+            //check if self is assigned
+            if (posting.assigned.user.id.toString() === context.user.id.toString()) {
+                context.isAssignedToSelf = true;
+            }
+        }
+
+
+        context.posting = posting;
+
+        let matchingQualifications = getMatchingQualifications(user, posting);
+        context.userIsAllowed = (matchingQualifications.length > 0);
+
+
+
+
+
+        $.get('/webpack/sidebar/templates/events/sidebar-showPostingDetails.hbs', function (data) {
+
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            //create tooltips
+            let tooltipSetup = [
+                {   id: "button--blockedGlobally",
+                    content: "Anmeldung nicht möglich: Du bist zur gleichen Zeit für ein anderes Event gemeldet."},
+                {   id: "button--blockedLocally",
+                    content: "Anmeldung nicht möglich: Du bist zur gleichen Zeit für dieses Event bereits gemeldet"},
+                {   id: "button--blockedRequirement",
+                    content: "Anmeldung nicht möglich: Du hast nicht die erforderliche Qualifikation."},
+            ]
+            tooltipSetup.forEach(tt => {
+                let element = document.getElementById(tt.id);
+                if (!(element === undefined || element === null)){
+                    let tooltip = new SidebarTooltip({
+                        anchor: element,
+                        content: tt.content,
+                    });
+                }
+            })
+            let t1;
+            let t2;
+            if(args.allowEdit){
+                let currentStartDate = new Date(posting.date.startDate);
+                let currentEndDate = new Date(posting.date.endDate);
+                if (isNaN(currentStartDate.getFullYear()) || isNaN(currentEndDate.getFullYear())) {
+                    currentStartDate = new Date();
+                    currentEndDate = new Date();
                     corrupted = true;
                 }
-            }
-
-            if (posting.assigned.isAssigned) {
-                context.assignedUser = posting.assigned.user;
-                //check if self is assigned
-                if (posting.assigned.user.id.toString() === context.user.id.toString()) {
-                    context.isAssignedToSelf = true;
-                }
-            }
-
-
-            context.posting = posting;
-
-            let matchingQualifications = getMatchingQualifications(user, posting);
-            context.userIsAllowed = (matchingQualifications.length > 0);
-
-
-
-
-
-            $.get('/webpack/sidebar/templates/events/sidebar-showPostingDetails.hbs', function (data) {
-
-                let template = Handlebars.compile(data);
-                sidebar.sidebarHTML.html(template(context));
-                //create tooltips
-                let tooltipSetup = [
-                    {   id: "button--blockedGlobally",
-                        content: "Anmeldung nicht möglich: Du bist zur gleichen Zeit für ein anderes Event gemeldet."},
-                    {   id: "button--blockedLocally",
-                        content: "Anmeldung nicht möglich: Du bist zur gleichen Zeit für dieses Event bereits gemeldet"},
-                    {   id: "button--blockedRequirement",
-                        content: "Anmeldung nicht möglich: Du hast nicht die erforderliche Qualifikation."},
-                ]
-                tooltipSetup.forEach(tt => {
-                    let element = document.getElementById(tt.id);
-                    if (!(element === undefined || element === null)){
-                        let tooltip = new SidebarTooltip({
-                            anchor: element,
-                            content: tt.content,
-                        });
-                    }
-                })
-                let t1;
-                let t2;
-                if(args.allowEdit){
-                    let currentStartDate = new Date(posting.date.startDate);
-                    let currentEndDate = new Date(posting.date.endDate);
-                    if (isNaN(currentStartDate.getFullYear()) || isNaN(currentEndDate.getFullYear())) {
-                        currentStartDate = new Date();
-                        currentEndDate = new Date();
-                        corrupted = true;
-                    }
-                    else {
-                        t1 = document.getElementById("eventinp-timeStart");
-                        t2 = document.getElementById("eventinp-timeEnd");
-                        $(t1).val(currentStartDate.toTimeInputValue())
-                        $(t2).val(currentEndDate.toTimeInputValue())
-                    }
-
-                    if(!posting.assigned.isAssigned) {
-
-                    }
-                }
-
-                if(corrupted) {
-                    sidebar.addErrorMessage("Corrupted data detected: Failed to find selected posting.", function(html){
-                        //find .sidebar-inner
-                        document.getElementById("sidebar-inner").prepend(html);
-                    })
-                    return false;
-                }
-
-                sidebar.registerBackButton(".sidebar-back-btn");
-                let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
-
-                if(posting.assigned.isAssigned){
-                    if (args.allowEdit || context.isAssignedToSelf) {
-                        let unassignButton = sidebar.registerButton(".sidebar-unassign",
-                            {
-                                type: "delete",
-                                customHandler: true,
-                                handler: function(){
-                                    let data = {
-                                        event: context.event,
-                                        userId: context.assignedUser.id.toString(),
-                                        postingId: context.postingId
-                                    }
-                                    onUnassign(data);
-                                },
-                                enabled: true,
-                            }
-                        )
-                    }
-
-                }
                 else {
-                    let assignSelfButton = sidebar.registerButton(".sidebar-assignSelf",
+                    t1 = document.getElementById("eventinp-timeStart");
+                    t2 = document.getElementById("eventinp-timeEnd");
+                    $(t1).val(currentStartDate.toTimeInputValue())
+                    $(t2).val(currentEndDate.toTimeInputValue())
+                }
+
+                if(!posting.assigned.isAssigned) {
+
+                }
+            }
+
+            if(corrupted) {
+                sidebar.addErrorMessage("Corrupted data detected: Failed to find selected posting.", function(html){
+                    //find .sidebar-inner
+                    document.getElementById("sidebar-inner").prepend(html);
+                })
+                return false;
+            }
+
+            sidebar.registerBackButton(".sidebar-back-btn");
+            let cancelBtn = sidebar.registerCancelButton(".sidebar-cancel");
+
+            if(posting.assigned.isAssigned){
+                if (args.allowEdit || context.isAssignedToSelf) {
+                    let unassignButton = sidebar.registerButton(".sidebar-unassign",
                         {
-                            type: "allowed",
+                            type: "delete",
                             customHandler: true,
                             handler: function(){
                                 let data = {
                                     event: context.event,
-                                    userId: context.user.id,
+                                    userId: context.assignedUser.id.toString(),
                                     postingId: context.postingId
                                 }
-                                onAssign(data);
+                                onUnassign(data);
                             },
-                        }
-                    )
-                    let assignButton = sidebar.registerButton(".sidebar-assign",
-                        {
-                            type: "custom",
-                            customHandler: true,
-                            handler: function(){
-                                //save current sidebar content
-                                let currentContent = sidebar.saveContent();
-                                //show assign user sidebar
-                                sidebar.addContent("assignUserSubpage", {
-                                    event: context.event,
-                                    postingId: context.postingId,
-                                    callback: {
-                                        onConfirm: function(result){
-                                            let userId = result.userid;
-                                            let checkResult = result.check;
-                                            //restore sidebar content
-                                            sidebar.loadContent(currentContent)
-                                            //assign user to post
-                                            let data = {
-                                                event: context.event,
-                                                userId: userId,
-                                                postingId: context.postingId
-                                            }
-                                            onAssign(data);
-                                        },
-                                        onCancel: function(){
-                                            //restore sidebar content
-                                            sidebar.loadContent(currentContent)
-                                        }
-                                    }
-                                })
-                            },
+                            enabled: true,
                         }
                     )
                 }
 
-                args.date = posting.date.startDate;
-
-                let confirmButton = sidebar.registerConfirmButton( ".sidebar-confirm",
+            }
+            else {
+                let assignSelfButton = sidebar.registerButton(".sidebar-assignSelf",
                     {
+                        type: "allowed",
                         customHandler: true,
-                        enabled: (context.allowEdit && !corrupted && hasChanges),
-                        handler: function () {
-                            const optional = document.getElementById("isOptional-checkbox").checked;
-                            const enabled = true;
-                            const allowHigher = document.getElementById("allowHigher-checkbox").checked;
-                            const data = {
-                                id: context.postingId,
-                                description: $("#posting-description").val(), //string
-                                optional: optional,
-                                enabled: enabled,
-                                allowHigher: allowHigher,
-                            };
-                            const args = {
-                                date: context.event.date.startDate,
-                                startTime: t1.value,
-                                endTime: t2.value,
-                            }
-                            onConfirm(data, args);
-                        }.bind(args)
-                    });
-
-                let deleteBtn = sidebar.registerDeleteButton(".sidebar-delete",
-                    {
-                        customHandler: true,
-                        enabled: context.allowEdit,
                         handler: function(){
                             let data = {
-                                id: context.postingId,
+                                event: context.event,
+                                userId: context.user.id,
+                                postingId: context.postingId
                             }
-                            onDelete(data);
+                            onAssign(data);
                         },
-                    });
+                    }
+                )
+                let assignButton = sidebar.registerButton(".sidebar-assign",
+                    {
+                        type: "custom",
+                        customHandler: true,
+                        handler: function(){
+                            //save current sidebar content
+                            let currentContent = sidebar.saveContent();
+                            //show assign user sidebar
+                            sidebar.addContent("assignUserSubpage", {
+                                event: context.event,
+                                postingId: context.postingId,
+                                callback: {
+                                    onConfirm: function(result){
+                                        let userId = result.userid;
+                                        let checkResult = result.check;
+                                        //restore sidebar content
+                                        sidebar.loadContent(currentContent)
+                                        //assign user to post
+                                        let data = {
+                                            event: context.event,
+                                            userId: userId,
+                                            postingId: context.postingId
+                                        }
+                                        onAssign(data);
+                                    },
+                                    onCancel: function(){
+                                        //restore sidebar content
+                                        sidebar.loadContent(currentContent)
+                                    }
+                                }
+                            })
+                        },
+                    }
+                )
+            }
 
-                $(sidebar.sidebarHTML).find("input").each((index, el) => {
-                    el.addEventListener("input", function(e){
-                        hasChanges = true;
-                        confirmButton.enable(context.allowEdit && !corrupted);
-                    })
+            args.date = posting.date.startDate;
+
+            let confirmButton = sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    enabled: (context.allowEdit && !corrupted && hasChanges),
+                    handler: function () {
+                        const optional = document.getElementById("isOptional-checkbox").checked;
+                        const enabled = true;
+                        const allowHigher = document.getElementById("allowHigher-checkbox").checked;
+                        const data = {
+                            id: context.postingId,
+                            description: $("#posting-description").val(), //string
+                            optional: optional,
+                            enabled: enabled,
+                            allowHigher: allowHigher,
+                        };
+                        const args = {
+                            date: context.event.date.startDate,
+                            startTime: t1.value,
+                            endTime: t2.value,
+                        }
+                        onConfirm(data, args);
+                    }.bind(args)
+                });
+
+            let deleteBtn = sidebar.registerDeleteButton(".sidebar-delete",
+                {
+                    customHandler: true,
+                    enabled: context.allowEdit,
+                    handler: function(){
+                        let data = {
+                            id: context.postingId,
+                        }
+                        onDelete(data);
+                    },
+                });
+
+            $(sidebar.sidebarHTML).find("input").each((index, el) => {
+                el.addEventListener("input", function(e){
+                    hasChanges = true;
+                    confirmButton.enable(context.allowEdit && !corrupted);
                 })
-                resolve();
             })
         })
     },

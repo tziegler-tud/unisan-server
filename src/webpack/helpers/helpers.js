@@ -24,7 +24,7 @@ moment().format();
  * @param format
  * @returns {{dateTime: string, date: string, dateExtended: string, dateTimeExtended: string, monthYear: string, time: ((function(*): (string|string))|*)}}
  */
-var transformDateTimeString = function(dateString, format="text") {
+export var transformDateTimeString = function(dateString, format="text") {
     format = (typeof(format) !== "string") ? "text" : format;
     let weekDays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",  "Freitag", "Samstag"];
     let months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -61,7 +61,7 @@ var transformDateTimeString = function(dateString, format="text") {
     };
 }
 
-var dateRangeString = function(startDateString, endDateString){
+export var dateRangeString = function(startDateString, endDateString){
     var dateString;
     var dateTimeString;
     var timeString;
@@ -93,7 +93,7 @@ var dateRangeString = function(startDateString, endDateString){
     }
 }
 
-function wrapTime(timeString){
+export function wrapTime(timeString){
     if(parseInt(timeString) < 10){
         return "0" + timeString;
     }
@@ -106,7 +106,7 @@ function wrapTime(timeString){
  * @returns {Counter}
  * @constructor
  */
-let Counter = function(args) {
+export let Counter = function(args) {
     let defaultArgs = {
         start: 0,
         min: null,
@@ -205,14 +205,13 @@ let Counter = function(args) {
  * returns a js date object that matches the given year, month, and days, relative to current date. Use to get a date e.g. 2 weeks from now.
  *
  * @param args {Object}
- * @param args.years years to add/sbustract
- * @param args.months months to add/substract.
- * @param args.weeks weeks to add/substract.
- * @param args.days days to add/substract.
- * @param date optional date to use as starting point instead of current date.
- * @constructor
+ * @param [args.years] years to add/sbustract
+ * @param [args.months] months to add/substract.
+ * @param [args.weeks] weeks to add/substract.
+ * @param [args.days] days to add/substract.
+ * @param [date] optional date to use as starting point instead of current date.
  */
-var dateFromNow = function(args, date= new Date()) {
+export var dateFromNow = function(args, date= new Date()) {
     let defaults = {
         years: 0,
         months: 0,
@@ -227,7 +226,7 @@ var dateFromNow = function(args, date= new Date()) {
     return m.toDate();
 }
 
-var getDataFromServer  = function(url, callback){
+export var getDataFromServer  = function(url, callback){
     if (callback === undefined) callback = function(){};
     // get qualification data from server
     return $.ajax({
@@ -247,7 +246,7 @@ var getDataFromServer  = function(url, callback){
  * @param posting {Posting} posting object
  * @returns {Qualification[]}
  */
-var getMatchingQualifications = function(user, posting) {
+export var getMatchingQualifications = function(user, posting) {
     //determine if user is allowed to assign himself to this post
     let userIsAllowed = false;
     let matchingQualifications = [];
@@ -264,15 +263,15 @@ var getMatchingQualifications = function(user, posting) {
    return matchingQualifications;
 }
 
-var escapeSelector = function(selector){
+export var escapeSelector = function(selector){
     return selector.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
 };
 //find key in json by string in dot-notation
-var refJSON = function (obj, str) {
+export var refJSON = function (obj, str) {
     return str.split(".").reduce(function(o, x) { return o[x] }, obj);
 };
 
-var stringToBoolean = function (string){
+export var stringToBoolean = function (string){
     var bool = undefined;
     var msg;
     try {
@@ -297,10 +296,10 @@ var stringToBoolean = function (string){
     return bool;
 };
 
-var common = {
+export var common = {
     escapeSelector: escapeSelector,
     refJSON: refJSON,
-    strinToBoolean: stringToBoolean,
+    stringToBoolean: stringToBoolean,
 }
 
 Date.prototype.toDateInputValue = (function() {
@@ -324,13 +323,11 @@ Date.prototype.toTimeInputValue = (function() {
  * @param timezoneString timezone identifier e.g. Europe/Berlin
  * @returns {String}
  */
-var transformToLocalizedDateString = function(date, region="de-DE", timezoneString="Europe/Berlin") {
+export var transformToLocalizedDateString = function(date, region="de-DE", timezoneString="Europe/Berlin") {
     const d = (typeof date === "string" ? new Date(date) : date);
     return d.toLocaleString(region, {timeZone: timezoneString});
 }
 
-var escapeRegExp = function(string) {
+export var escapeRegExp = function(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
-
-export {transformDateTimeString, dateRangeString, Counter, dateFromNow, getDataFromServer, getMatchingQualifications, escapeSelector, refJSON, stringToBoolean, transformToLocalizedDateString, escapeRegExp, common}

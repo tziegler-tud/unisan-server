@@ -1,9 +1,8 @@
-import {ComponentPage} from "../../ComponentPage";
 import ComponentObserver from "../../ComponentObserver.js";
 import Component from "../../Component";
 import InteractiveListStandaloneComponent from "../../interactiveListStandalone";
-import {systemActions} from "../../../actions/actions";
-import {ScrollableList} from "../../../scrollableList/scrollableList";
+import {systemActions} from "../../../actions/systemActions";
+import ScrollableList from "../../../scrollableList/ScrollableList";
 import {Dialog as lidlDialog} from "../../../../lib/lidl-modules/dialog/lidl-dialog";
 import {systemPlugin} from "../../../sidebar/plugins/plugin-system";
 

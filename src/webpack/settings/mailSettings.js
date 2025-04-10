@@ -1,4 +1,4 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Snackbar} from "../helpers/snackbar";
@@ -60,13 +60,27 @@ export default new PageModule ({
             data: pageData,
             args: pageArgs,
         });
-        window.componentPage = componentPage;
-        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: user, targetUser: user}});
-        await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: user, targetUser: user}});
+        componentPage.addSection({identifier: "MAIL", order: 0, title: "Email-Einstellungen", displayMode: "false", disableMargins: false, disableComponentMargins: false})
+        await componentPage.addComponent({
+            section: "MAIL",
+            componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL,
+            componentArgs: {allowEdit: true, size: "full", order: 1},
+            data: {user: user, targetUser: user}
+        });
+        await componentPage.addComponent({
+            section: "MAIL",
+            componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_PASSWORD,
+            componentArgs: {allowEdit: true, size: "full", order: 2, delimiter: true},
+            data: {user: user, targetUser: user}
+        });
         if(pageArgs.acl.docker.system.mail){
-            await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV, componentArgs: {allowEdit: true, size: "full", order: 1}, data: {user: user, targetUser: user}});
+            await componentPage.addComponent({
+                section: "MAIL",
+                componentType: ComponentPage.componentTypes.SETTINGS.USER_MAIL_DEV,
+                componentArgs: {allowEdit: true, size: "full", order: 3, delimiter: true},
+                data: {user: user, targetUser: user}
+            });
         }
-
     },
 });
 

@@ -3,9 +3,9 @@ import PageModule from "../utils/PageModule";
 var lidlRTO = window.lidlRTO;
 
 import {Preloader} from "../helpers/preloader"
-import {ScrollableList} from "../scrollableList/scrollableList";
+import ScrollableList from "../scrollableList/ScrollableList";
 
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {logPlugin} from "../sidebar/plugins/plugin-logs";
 
 
