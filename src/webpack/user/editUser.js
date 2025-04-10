@@ -13,10 +13,9 @@ import "./userprofile.scss";
 
 import {UserProfile} from "../userprofile/userprofile";
 
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
+import ScrollableList from "../scrollableList/ScrollableList";
 import {DropdownMenu} from "../helpers/dropdownMenu";
 
 import {escapeSelector, refJSON} from "../helpers/helpers";

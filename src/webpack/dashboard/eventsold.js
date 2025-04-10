@@ -1,9 +1,4 @@
 import "./events.scss";
-
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-import {dateFromNow} from "../helpers/helpers";
-
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 

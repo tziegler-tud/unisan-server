@@ -1,9 +1,4 @@
 import "./events.scss";
-
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-import {dateFromNow} from "../helpers/helpers";
-
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 
@@ -46,25 +41,21 @@ let events = {
             args: {},
         });
         window.componentPage = componentPage;
+        componentPage.addSection({identifier: "CALENDAR", order: 1, title: "Kalender", displayMode: "hidden", disableMargins: true, disableComponentMargins: true})
         await componentPage.addComponent({
             componentType: ComponentPage.componentTypes.EVENTS.CALENDAR,
-            componentArgs: {allowEdit: true, size: "full"},
-            data: {user: data.user, targetUser: data.targetUser}
-        })
-        await componentPage.addComponent({
-            componentType: ComponentPage.componentTypes.USER.EVENTS,
+            section:"CALENDAR",
             componentArgs: {allowEdit: true, size: "full"},
             data: {user: data.user, targetUser: data.targetUser}
         })
 
-        self.getData(window.userId, "", self.sort)
-            .then(all => {
-                self.data.all = all;
-                self.showCalendar();
-            })
-            .catch(err => {
-                throw err
-            })
+        componentPage.addSection({identifier: "EVENTS", order: 2, title: "Meine Events", displayMode: "hidden", disableMargins: true, disableComponentMargins: true})
+        await componentPage.addComponent({
+            componentType: ComponentPage.componentTypes.USER.EVENTS,
+            section:"EVENTS",
+            componentArgs: {allowEdit: true, size: "full"},
+            data: {user: data.user, targetUser: data.targetUser}
+        })
     },
 }
 

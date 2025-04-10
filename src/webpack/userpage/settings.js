@@ -1,4 +1,4 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {UserProfile} from "../userprofile/userprofile";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
@@ -75,10 +75,10 @@ export default new PageModule ({
             args: pageArgs,
         });
         window.componentPage = componentPage;
-        componentPage.addSection({sectionIdentifier: "PASSWORD", order: 1, title: "Login & Passwort", displayMode: "show", disableComponentMargins: false})
+        componentPage.addSection({identifier: "PASSWORD", order: 1, title: "Login & Passwort", displayMode: "show", disableComponentMargins: false})
         await componentPage.addComponent({componentType: ComponentPage.componentTypes.SETTINGS.PASSWORD, section:"PASSWORD", componentArgs: {allowEdit: true, size: "full"}, data: {user: data.user, targetUser: data.targetUser, requirePassword: false}});
 
-        componentPage.addSection({sectionIdentifier: "MAIL", order: 2, title: "Email-Einstellungen", displayMode: "show", disableComponentMargins: true})
+        componentPage.addSection({identifier: "MAIL", order: 2, title: "Email-Einstellungen", displayMode: "show", disableComponentMargins: true})
         let allowSetInternalMail = false;
         if(pageArgs.acl.docker.system.mail || pageArgs.acl.docker.system.user) {
             allowSetInternalMail = true;

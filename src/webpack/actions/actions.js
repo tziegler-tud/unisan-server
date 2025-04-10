@@ -1,12 +1,3 @@
-
-import {groupActions} from "./groupActions"
-import {userActions} from "./userActions"
-import {userSettingsActions} from "./userSettingsActions"
-import {eventActions} from "./eventActions"
-import qualificationActions from "./qualificationActions"
-import {systemActions} from "./systemActions.js"
-import {newsActions} from "./newsActions.js"
-
 var actions = {
     getLogs: function(targetId, logType, callback) {
         callback = (callback == null) ? function(){} : callback;
@@ -41,4 +32,4 @@ var actions = {
     },
 }
 
-export {actions, groupActions, userActions, eventActions, qualificationActions, systemActions, newsActions, userSettingsActions}
+export {actions}

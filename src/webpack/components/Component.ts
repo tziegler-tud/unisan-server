@@ -8,8 +8,13 @@ export interface ComponentOptions {
     section: any;
     componentId?: string;
     pageData?: any;
-    data?: any;
+    data?: ComponentOptionData;
     args?: ComponentOptionArgs
+}
+
+export interface ComponentOptionData {
+    user?: Object;
+    targetUser?: Object;
 }
 
 export interface ComponentOptionArgs {
@@ -20,6 +25,7 @@ export interface ComponentOptionArgs {
     size?: "full" | "half";
     classes?: string;
     handlers?: any[];
+    delimiter: boolean;
 }
 
 interface Observer {
@@ -60,6 +66,7 @@ export default class Component {
             classes: "",
             order: Date.now(),
             handlers: [],
+            delimiter: false,
         };
 
         const args = options.args ? options.args : {};
@@ -73,6 +80,11 @@ export default class Component {
 
         this.container = document.createElement("div");
         this.container.classList.add("componentPage-component-wrapper");
+
+        if(this.args.delimiter) {
+            this.container.classList.add("componentPage-component-wrapper--delimiter");
+
+        }
 
         switch (this.args.size) {
             case "full":
@@ -104,12 +116,6 @@ export default class Component {
         error: any;
         component: Component;
     }> {
-        const result = {
-            html: undefined,
-            error: undefined,
-            component: this,
-        };
-
         try {
             if (pre) await this.preRender();
 
@@ -127,11 +133,18 @@ export default class Component {
                 }
             }
 
-            return result;
+            return {
+                html: undefined,
+                error: undefined,
+                component: this,
+            };
         } catch (err) {
             this.fail(err);
-            result.error = err;
-            return result;
+            return {
+                html: undefined,
+                error: err,
+                component: this,
+            };
         }
     }
 

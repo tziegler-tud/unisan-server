@@ -1,37 +1,45 @@
 import Component from "./Component";
 import ComponentPage from "./ComponentPage"
 
+export interface ComponentSectionOptions {
+    identifier: string;
+    order?: number;
+    title?: string;
+    displayMode?: string;
+    disableMargins?: boolean;
+    disableComponentMargins?: boolean;
+}
+
+
 export default class ComponentSection {
     public identifier: string;
     public order: number;
     public title: string;
     private readonly displayMode: string;
     private readonly disableComponentMargins: boolean;
+    private readonly disableMargins: boolean;
     public components: Component[];
     private container: HTMLElement;
     private componentPage: ComponentPage;
     componentContainer: HTMLElement;
 
-    constructor({
-                    componentPage,
-                    identifier,
-                    order = 0,
-                    title = undefined,
-                    displayMode = "hidden",
-                    disableComponentMargins = false,
-                }: {
-        componentPage: ComponentPage;
-        identifier: string;
-        order?: number;
-        title?: string;
-        displayMode?: string;
-        disableComponentMargins?: boolean;
-    }) {
+    constructor(
+                    componentPage: ComponentPage,
+                    {
+                        identifier,
+                        order = 0,
+                        title = undefined,
+                        displayMode = "hidden",
+                        disableComponentMargins = false,
+                        disableMargins = false
+                    }: ComponentSectionOptions
+    ) {
         this.identifier = identifier;
         this.order = order;
         this.title = title ?? identifier;
         this.displayMode = displayMode;
         this.disableComponentMargins = disableComponentMargins;
+        this.disableMargins = disableMargins;
         this.components = [];
         this.container = this.buildHtml();
         this.componentPage = componentPage;
@@ -47,6 +55,9 @@ export default class ComponentSection {
         container.classList.add("componentPage-section");
 
         if (this.disableComponentMargins) {
+            container.classList.add("componentPage-section__disableComponentMargins");
+        }
+        if (this.disableMargins) {
             container.classList.add("componentPage-section__disableMargins");
         }
 

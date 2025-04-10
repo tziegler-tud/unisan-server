@@ -1,26 +1,22 @@
 import "./eventParticipants.scss";
 
-
-var lidlRTO = window.lidlRTO;
-
 import {UserProfile} from "../userprofile/userprofile";
 import {Preloader} from "../helpers/preloader";
 
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
+import ScrollableList from "../scrollableList/ScrollableList";
+import Searchbar from "../searchbar/SearchBar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 import EditableInputField from "../helpers/editableInputField";
 
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {eventActions} from "../actions/actions";
+import eventActions from "../actions/eventActions";
 
 import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
@@ -335,14 +331,33 @@ let eventParticipants = {
                 onInput: {
                     enabled: true,
                     callback: function(inputValue){
-                        let filteredList = self.dataList.filter(function(participant){
-                            return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
-                        })
+                        let filteredList = [];
+                        if(!inputValue) filteredList = self.dataList;
+                        else {
+                            filteredList = filterPostingsList(self.dataList, inputValue);
+                        }
                         displayPostingsList(filteredList);
 
                     },
                 },
             });
+
+            function filterPostingsList(postingsList, inputValue) {
+                return postingsList.filter(function(posting){
+                    let matchUser = false;
+                    if(posting.assigned.user) {
+                        const user = posting.assigned.user;
+                        matchUser =  user.username.includes(inputValue) ||
+                            user.generalData.firstName.value.includes(inputValue) ||
+                            user.generalData.lastName.value.includes(inputValue) ||
+                            posting.description.includes(inputValue);
+                    }
+                    let matchQualification = posting.requiredQualifications.some(qual => {
+                        return qual.name.includes(inputValue) || qual.short.includes(inputValue)
+                    })
+                    return matchUser || matchQualification;
+                })
+            }
 
             $('.add-participant-button').each(function(){
                 $(this).on("click", function(e){
@@ -564,7 +579,7 @@ let eventParticipants = {
             }
 
             let sortedList = augmentPostingsList(dataList, localUserPostings, globalUserPostings)
-            self.dataList = sortedList;
+            // self.dataList = sortedList;
 
             let dropdownMenus = function(){
                 $('.participant-menu-container').each(function(){

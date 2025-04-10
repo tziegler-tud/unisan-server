@@ -3,7 +3,7 @@ import {MDCSnackbar} from '@material/snackbar';
 
 /**
  * Snackbar
- * @param options
+ * @param [options]
  * @param options.timeout {Number} timeout in ms
  * @param options.closeOnEscape {Boolean} true to close sidebar if action button is clicked
  * @param options.actionButton {Object}

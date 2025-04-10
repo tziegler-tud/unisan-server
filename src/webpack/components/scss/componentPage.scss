@@ -10,14 +10,21 @@
     .componentPage-section {
 
       &.componentPage-section__disableMargins {
+        .componentPage-component-container {
+          @media #{$desktop, $tablet-landscape} {
+            margin: 1em 0;
+          }
+        }
+      }
+
+      &.componentPage-section__disableComponentMargins {
         .componentPage-component-container{
           .componentPage-component-wrapper {
+            margin: 0;
             .componentPage-component {
               .componentPage-component-inner {
-                margin: 0 0;
-                @media #{$desktop, $tablet-landscape} {
-                  margin: 0;
-                }
+                width: 100%;
+                padding: 0 0;
               }
             }
           }
@@ -25,12 +32,15 @@
       }
 
       .componentPage-component-container {
-        padding: 0;
+        background-color: $page-bg-color;
+        box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
+        padding: 10px 10px;
+        margin: 1em 10px;
         display: flex;
         flex-flow: column nowrap;
 
         @media #{$desktop, $tablet-landscape} {
-          padding: 1em;
+          padding: 0 10px 0 0;
           flex-flow: row wrap;
         }
 
@@ -38,7 +48,13 @@
           display: flex;
           flex-flow: column wrap;
           flex: 1 1 auto;
-          margin-bottom: 0;
+          //margin-bottom: 0;
+          margin: 1em 1em;
+
+          &--delimiter {
+            border-top: 1px solid $component-delimiter-color
+          }
+
 
           &.componentPage-component-wrapper--full {
             flex: 0 0 100%;
@@ -60,18 +76,10 @@
             width: 100%;
 
             .componentPage-component-inner {
-
-              margin: 10px 0;
-              background-color: $page-bg-color;
-              box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
-              width: 100%;
-              padding: 10px 0;
-              @media #{$desktop, $tablet-landscape} {
-                margin: 10px;
-                width: calc(100% - 20px);
-                padding: 10px 12px;
-
-              }
+              width: calc(100% - 20px);
+              padding: 10px 10px;;
+              //background-color: $page-bg-color;
+              //box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);
 
               &.transparent {
                 background-color: transparent;

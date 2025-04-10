@@ -120,10 +120,11 @@ async function getById(id) {
 /**
  *
  * @param matchString {String} String to match title
- * @param args
- * @param args.sort {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
- * @param args.filter {Object} universal mongodb filter object to be applied to query
- * @param args.dateFilter {Object} Object to set date filtering
+ * @param [args] {Object}
+ * @param [args.sort] {Object} mongoose sort object - can be a simple string to sort for a property, or an object according to docs
+ * @param [args.amount] {Number} Maximum amount of entries retrieved. Not implemented
+ * @param [args.filter] {Object} universal mongodb filter object to be applied to query
+ * @param [args.dateFilter] {Object} Object to set date filtering
  * @param args.dateFilter.date {Date} start of Date range to filter for. Default to current Date
  * @param args.dateFilter.minDate {Date} start of Date range to filter for. Defaults to current Date
  * @param args.dateFilter.maxDate {Date} end of Date range to filter for. Defaults to current Date
@@ -223,7 +224,6 @@ async function matchAny(matchString, args){
     }
     if (matchString.length !== 0) {
         //filter user by given string, using title and type
-
         eventlist = eventlist.and([{'title.value': { $regex: matchString, $options: "i" }}]); //dont filter for type
     }
 

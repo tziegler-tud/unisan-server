@@ -11,11 +11,14 @@ import UserMailSettingsComponent from "./pageComponents/settings/UserMailSetting
 import UserMailPasswordComponent from "./pageComponents/settings/UserMailPasswordComponent";
 import UserMailDevComponent from "./pageComponents/settings/UserMailDevComponent";
 import MailSettingsComponent from "./pageComponents/system/MailSettingsComponent";
-import ComponentSection from "./ComponentSection";
+import ComponentSection, {ComponentSectionOptions} from "./ComponentSection";
 import UserEventsComponent from "./pageComponents/user/UserEventsComponent";
 import CalendarComponent from "./pageComponents/events/CalendarComponent";
 
-import Component from "./Component";
+import {Snackbar} from "../helpers/snackbar"
+
+import Component, {ComponentOptionArgs} from "./Component";
+import Sidebar from "../sidebar/Sidebar";
 
 interface ComponentPageOptions {
     container?: HTMLElement;
@@ -28,16 +31,8 @@ interface ComponentPageOptions {
 interface AddComponentOptions {
     componentType: typeof Component;
     section?: string;
-    componentArgs?: any;
+    componentArgs?: ComponentOptionArgs
     data?: any;
-}
-
-interface AddSectionOptions {
-    identifier: string;
-    order?: number;
-    title?: string;
-    displayMode?: string;
-    disableComponentMargins?: boolean;
 }
 
 export default class ComponentPage {
@@ -72,8 +67,8 @@ export default class ComponentPage {
 
     private data: any;
     private container: HTMLElement;
-    private sidebar: any;
-    private snackbar: any;
+    sidebar: Sidebar;
+    snackbar: any;
     private sections: ComponentSection[];
     private components: Component[];
     private sectionContainer: HTMLElement;
@@ -87,7 +82,7 @@ export default class ComponentPage {
         this.container = options.container;
 
         this.sidebar = options.sidebar;
-        this.snackbar = options.snackbar;
+        this.snackbar = options.snackbar ? options.snackbar : new Snackbar();
 
         this.sections = [];
         this.components = [];
@@ -125,7 +120,9 @@ export default class ComponentPage {
         let section = this.findSection(options.section || this.defaultSectionIdentifier);
 
         if (!section) {
-            section = this.createSection({ identifier: options.section || this.defaultSectionIdentifier });
+            section = this.createSection({
+                identifier: options.section || this.defaultSectionIdentifier
+            });
         }
 
         const component = new options.componentType({
@@ -145,12 +142,12 @@ export default class ComponentPage {
         await component.renderComponent();
     }
 
-    addSection(options: AddSectionOptions): ComponentSection {
+    addSection(options: ComponentSectionOptions): ComponentSection {
         return this.createSection(options);
     }
 
-    createSection(options: AddSectionOptions): ComponentSection {
-        const section = new ComponentSection({ ...options, componentPage: this });
+    createSection(options: ComponentSectionOptions): ComponentSection {
+        const section = new ComponentSection(this, { ...options });
         this.sections.push(section);
         section.render();
         return section;

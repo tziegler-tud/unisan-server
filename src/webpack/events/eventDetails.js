@@ -6,18 +6,14 @@ import {UserProfile} from "../userprofile/userprofile";
 
 import {Snackbar} from "../helpers/snackbar";
 import {DropdownMenu} from "../helpers/dropdownMenu";
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
 
-import Sidebar from "../sidebar/Sidebar.js";
-import {userPlugin} from "../sidebar/plugins/plugin-user";
+import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {actions, eventActions} from "../actions/actions";
+import eventActions from "../actions/eventActions";
 
 import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
