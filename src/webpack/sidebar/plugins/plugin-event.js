@@ -36,6 +36,37 @@ import {EditableTextField} from "../../helpers/editableTextField";
 let eventPlugin = new SidebarPlugin("event");
 
 
+let viewEvent = new ContentHandler("viewEvent",
+    async function(sidebar, args, type){
+        let event = args.event;
+        let context = {
+            event: event,
+            args: args,
+        }
+
+        $.get('/webpack/sidebar/templates/events/sidebar-viewEvent.hbs', function (data) {
+            let template = Handlebars.compile(data);
+            sidebar.sidebarHTML.html(template(context));
+            sidebar.registerBackButton( ".sidebar-back-btn");
+
+            let titleInputContainer = document.getElementById("sidebar-eventDetails--titleRenderer");
+            new EditableInputField(titleInputContainer, event.title.delta, "text", {}, {readOnly: true});
+
+            let descContainer = document.getElementById("sidebar-eventDetails--descRenderer");
+            new EditableTextField(descContainer, event.description.longDesc.delta, event.description.longDesc.html, {}, {readOnly: true});
+
+            sidebar.registerConfirmButton( ".sidebar-confirm",
+                {
+                    customHandler: true,
+                    handler: function () {
+                        window.location.href= "/events/"+event.id;
+                    }.bind(args)
+                });
+
+        });
+    });
+
+
 let eventDetails = new ContentHandler("eventDetails",
     async function(sidebar, args, type){
         let event = args.event;
@@ -882,6 +913,7 @@ eventPlugin.addContentHandler(showPostings);
 eventPlugin.addContentHandler(addPosting);
 eventPlugin.addContentHandler(showPostingDetails);
 eventPlugin.addContentHandler(assignUserSubpage);
+eventPlugin.addContentHandler(viewEvent);
 
 //TODO: make Sidebar a singleton and add static function to access runtime object
 

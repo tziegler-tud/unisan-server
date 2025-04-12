@@ -12,7 +12,7 @@ import {Searchbar} from "../searchbar/searchbar";
 import {DropdownMenu} from "../helpers/dropdownMenu";
 import {dateFromNow} from "../helpers/helpers";
 import {phone, tablet} from "../helpers/variables";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import ComponentPage from "../components/ComponentPage";
 import {UserProfile} from "../userprofile/userprofile";

@@ -1,0 +1,32 @@
+extends ../layout
+
+block page_includes
+    script(src="/dist/event.js")
+
+
+    script.
+        window.dateFilter = "#{dateFilter}";
+        window.jsmodule = {
+            module: "event",
+            loaders: ["eventOverview"],
+            args: {
+                allowEdit: #{allowedit},
+                edit: true
+            }
+        };
+        window.dockerArgs.activeContainer = "eventContainer";
+        window.dockerArgs.activeElementId = "eventsAll";
+
+block content
+    #wrapper
+        #page-container.page-container.page-container-dimmed
+            #page-container-inner.page-container-inner.full-width
+                section#sec1
+                    #sec-content1.subpage-container
+                        #content1-text
+                            .subpage-content
+                                .userinfo-container
+                                    #userPage-component-container.userPage-component-container.componentPage-component-container
+
+
+

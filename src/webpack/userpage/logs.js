@@ -5,7 +5,7 @@ import ScrollableList from "../scrollableList/ScrollableList"
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {DropdownMenu} from "../helpers/dropdownMenu";
 import PageModule from "../utils/PageModule";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 
 
 export default new PageModule ({

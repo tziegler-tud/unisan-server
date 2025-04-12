@@ -269,4 +269,8 @@ export default class Sidebar {
     async resetCurrentPage(): Promise<void> {
         await this.addContent(this.currentPage!.type, this.currentPage!.args);
     }
+
+    setHTMLContent(html: string) {
+        this.sidebarHTML.html(html);
+    }
 }

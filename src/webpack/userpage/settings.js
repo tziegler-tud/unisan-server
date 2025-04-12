@@ -3,7 +3,7 @@ import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {UserProfile} from "../userprofile/userprofile";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {DropdownMenu} from "../helpers/dropdownMenu";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import ComponentPage from "../components/ComponentPage";
 import PageModule from "../utils/PageModule";

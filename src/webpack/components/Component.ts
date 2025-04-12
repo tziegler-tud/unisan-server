@@ -25,7 +25,7 @@ export interface ComponentOptionArgs {
     size?: "full" | "half";
     classes?: string;
     handlers?: any[];
-    delimiter: boolean;
+    delimiter?: boolean;
 }
 
 interface Observer {
