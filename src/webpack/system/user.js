@@ -1,6 +1,6 @@
 import Sidebar from "../sidebar/Sidebar";
 import {systemActions} from "../actions/systemActions";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import {systemPlugin} from "../sidebar/plugins/plugin-system";
 import ComponentPage from "../components/ComponentPage";
 import PageModule from "../utils/PageModule";

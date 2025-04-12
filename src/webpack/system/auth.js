@@ -1,5 +1,5 @@
 import {UserProfile} from "../userprofile/userprofile";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import Sidebar from "../sidebar/Sidebar";
 import {systemPlugin} from "../sidebar/plugins/plugin-system";
 import ComponentPage from "../components/ComponentPage";

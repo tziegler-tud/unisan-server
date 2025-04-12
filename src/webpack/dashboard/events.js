@@ -5,6 +5,7 @@ import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer
 import "/lib/evo-calendar/evo-calendar/js/evo-calendar.js";
 import ComponentPage from "../components/ComponentPage";
 import {UserProfile} from "../userprofile/userprofile";
+import aclActions from "../actions/aclActions";
 
 let events = {
     title: "events",
@@ -28,6 +29,16 @@ let events = {
 
         const currentUser = await currentUserProfile.getUserAndSubscribe(ob1);
 
+        let dockerACL = undefined;
+        let allowCreateEvent = false;
+        try {
+            dockerACL = await aclActions.getCurrentUserDockerAcl();
+            allowCreateEvent = dockerACL.events.create;
+        }
+        catch(e) {
+            console.error("Failed to get user acl. This might lead to incorrect display")
+        }
+
         const data = {
             user: currentUser,
             targetUser: currentUser,
@@ -45,8 +56,8 @@ let events = {
         await componentPage.addComponent({
             componentType: ComponentPage.componentTypes.EVENTS.CALENDAR,
             section:"CALENDAR",
-            componentArgs: {allowEdit: true, size: "full"},
-            data: {user: data.user, targetUser: data.targetUser}
+            componentArgs: {allowEdit: true, size: "full", acl: dockerACL},
+            data: {user: data.user, allowCreateEvent: allowCreateEvent}
         })
 
         componentPage.addSection({identifier: "EVENTS", order: 2, title: "Meine Events", displayMode: "hidden", disableMargins: true, disableComponentMargins: true})

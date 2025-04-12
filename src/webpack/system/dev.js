@@ -1,5 +1,5 @@
 import {systemActions} from "../actions/systemActions";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import PageModule from "../utils/PageModule";
 
 export default new PageModule({

@@ -15,12 +15,12 @@ import ComponentSection, {ComponentSectionOptions} from "./ComponentSection";
 import UserEventsComponent from "./pageComponents/user/UserEventsComponent";
 import CalendarComponent from "./pageComponents/events/CalendarComponent";
 
-import {Snackbar} from "../helpers/snackbar"
+import Snackbar from "../helpers/snackbar"
 
 import Component, {ComponentOptionArgs} from "./Component";
 import Sidebar from "../sidebar/Sidebar";
 
-interface ComponentPageOptions {
+export interface ComponentPageOptions {
     container?: HTMLElement;
     data?: any;
     sidebar?: any;
@@ -28,7 +28,7 @@ interface ComponentPageOptions {
     args?: any;
 }
 
-interface AddComponentOptions {
+export interface AddComponentOptions {
     componentType: typeof Component;
     section?: string;
     componentArgs?: ComponentOptionArgs
@@ -68,7 +68,7 @@ export default class ComponentPage {
     private data: any;
     private container: HTMLElement;
     sidebar: Sidebar;
-    snackbar: any;
+    snackbar: Snackbar;
     private sections: ComponentSection[];
     private components: Component[];
     private sectionContainer: HTMLElement;
@@ -81,7 +81,7 @@ export default class ComponentPage {
         this.data = options.data || {};
         this.container = options.container;
 
-        this.sidebar = options.sidebar;
+        this.sidebar = options.sidebar ? options.sidebar : new Sidebar('wrapper');
         this.snackbar = options.snackbar ? options.snackbar : new Snackbar();
 
         this.sections = [];

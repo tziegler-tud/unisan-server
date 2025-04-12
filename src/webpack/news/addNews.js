@@ -2,7 +2,7 @@ import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import ComponentPage from "../components/ComponentPage";
 import {UserProfile} from "../userprofile/userprofile";
