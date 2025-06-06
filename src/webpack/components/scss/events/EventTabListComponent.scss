@@ -1,0 +1,20 @@
+@use "@material/theme" with (
+  $primary: #225169,
+  $secondary: #c31d34,
+  $on-primary: #fff,
+  $on-secondary: #f5f5f5,
+);
+
+@use "@material/tab-bar/mdc-tab-bar";
+@use "@material/tab-scroller/mdc-tab-scroller";
+@use "@material/tab-indicator/mdc-tab-indicator";
+@use "@material/tab/mdc-tab";
+
+
+
+.eventTabComponent-container {
+  display: none;
+  &--active {
+    display: block;
+  }
+}

@@ -8,14 +8,14 @@ block page_includes
         window.dateFilter = "#{dateFilter}";
         window.jsmodule = {
             module: "events",
-            loaders: ["events.overview"],
+            loaders: ["events.blueprints"],
             args: {
                 allowEdit: #{allowedit},
                 edit: true
             }
         };
         window.dockerArgs.activeContainer = "eventContainer";
-        window.dockerArgs.activeElementId = "eventsOverview";
+        window.dockerArgs.activeElementId = "eventBlueprints";
 
 block content
     #wrapper

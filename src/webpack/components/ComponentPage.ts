@@ -19,6 +19,8 @@ import Snackbar from "../helpers/snackbar"
 
 import Component, {ComponentOptionArgs} from "./Component";
 import Sidebar from "../sidebar/Sidebar";
+import EventListComponent from "./pageComponents/events/EventListComponent";
+import EventTabListComponent from "./pageComponents/events/EventTabListComponent";
 
 export interface ComponentPageOptions {
     container?: HTMLElement;
@@ -62,6 +64,8 @@ export default class ComponentPage {
         },
         EVENTS: {
             CALENDAR: CalendarComponent,
+            LIST: EventListComponent,
+            TABLIST: EventTabListComponent,
         },
     };
 

@@ -37,14 +37,11 @@ interface LidlObserver {
 }
 
 export default new PageModule({
-    title: "user.events",
+    title: "events.overview",
     pageData: {},
     init: async function (args: InitArgs): Promise<{ args: InitArgs; data: PageData }> {
         // @ts-ignore
         const currentUserProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
-        // @ts-ignore
-        const targetUserProfile = new UserProfile(window.exploreUserId);
-
         // create new observer
         const ob1: LidlObserver = (u) => {
             this.pageData.user = u;
@@ -57,11 +54,9 @@ export default new PageModule({
         // get user data from user service
         //subscribe as observer to get notification if user changes on server
         const currentUser = await currentUserProfile.getUserAndSubscribe(ob1);
-        const targetUser = await targetUserProfile.getUserAndSubscribe(ob1);
 
         const data: PageData = {
             user: currentUser,
-            targetUser: targetUser,
         };
         return { args, data };
     },
@@ -89,9 +84,20 @@ export default new PageModule({
             data: data,
             args: {},
         });
+
+        componentPage.addSection({ identifier: "CALENDAR", order: 1, title: "Kalender", displayMode: "hidden", disableMargins: true, disableComponentMargins: true });
+        componentPage.addSection({ identifier: "LIST", order: 2, title: "Liste", displayMode: "hidden", disableMargins: true, disableComponentMargins: true });
+
         await componentPage.addComponent({
             componentType: ComponentPage.componentTypes.EVENTS.CALENDAR,
             componentArgs: { allowEdit: true, size: "full" },
+            section: "CALENDAR",
+            data: { user: data.user, allowCreateEvent},
+        });
+        await componentPage.addComponent({
+            componentType: ComponentPage.componentTypes.EVENTS.TABLIST,
+            componentArgs: { allowEdit: true, size: "full" },
+            section: "LIST",
             data: { user: data.user, allowCreateEvent},
         });
     },
