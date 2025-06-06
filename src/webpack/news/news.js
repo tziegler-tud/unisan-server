@@ -1,7 +1,6 @@
 import "../user/userprofile.scss";
 import "./news.scss";
 
-import {userActions, eventActions, groupActions} from "../actions/actions"
 import {addNews} from "./addNews.js";
 import {editNews} from "./editNews.js";
 

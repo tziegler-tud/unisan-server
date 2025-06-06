@@ -1,107 +1,89 @@
 import "./eventParticipants.scss";
 
-
-var lidlRTO = window.lidlRTO;
-
 import {UserProfile} from "../userprofile/userprofile";
 import {Preloader} from "../helpers/preloader";
 
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
+import ScrollableList from "../scrollableList/ScrollableList";
+import Searchbar from "../searchbar/SearchBar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 import EditableInputField from "../helpers/editableInputField";
 
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {eventActions} from "../actions/actions";
+import eventActions from "../actions/eventActions";
 
 import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import {getMatchingQualifications, getDataFromServer} from "../helpers/helpers";
+import PageModule from "../utils/PageModule";
 
 
 
-let eventParticipants = {
-    title: "eventParticipants",
+export default new PageModule ({
+    title: "events.participants",
     pageData: {},
     pageArgs: {},
-    init: function (args) {
+    init: async function (args) {
         let self = this;
-        $(document).ready(function () {
-            let plr = new Preloader();
-            plr.show();
-            //debug line, remove before flight
-            console.log("loading js module: " + self.title);
+        let plr = new Preloader();
+        plr.show();
+        //debug line, remove before flight
+        console.log("loading js module: " + self.title);
+        self.pageArgs = args;
+        self.pageData = {};
 
-            self.pageArgs = args;
+        var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
+        // create new observer
+        var ob1 = new lidlObserver(function (u) {
+            self.pageData.user = user;
+        });
+        window.snackbar = new Snackbar();
 
-            self.pageData = {};
-            var lidlRTO = window.lidlRTO;
-            var user;
-            var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
-            // create new observer
-            var ob1 = new lidlObserver(function (u) {
-                user = u;
-                self.pageData.user = user;
-                self.updatePage(self.pageData.user, self.pageData.event, args)
-            });
-            window.snackbar = new Snackbar();
+        const user = await userProfile.getUserAndSubscribe(ob1)
 
-            // get user data from user service
-            //subscribe as observer to get notification if user changes on server
-            let userPromise = userProfile.getUserAndSubscribe(ob1)
 
-            var currentExploredEvent;
-            var eventProfile = new EventRequest(window.exploreEventId, {
-                populateParticipants: true,
-            });
+        // create new observer
+        var ob2 = new lidlObserver(function (event) {
+            self.pageData.event = event;
+        });
+        var eventProfile = new EventRequest(window.exploreEventId, {
+            populateParticipants: true,
+        });
+        const event = await eventProfile.getEventAndSubscribe(ob2)
+        this.pageData.eventProfile = eventProfile;
 
-            // create new observer
-            var ob2 = new lidlObserver(function (event) {
-                currentExploredEvent = event;
-                self.pageData.event = event;
-                self.updatePage(self.pageData.user, self.pageData.event, args)
-            });
+        let userPostings = await getDataFromServer("/api/v1/eventmod/userPostings/");
 
-            window.eventProfile = eventProfile;
-            window.userProfile = userProfile;
+        const data = {
+            event: event,
+            user: user,
+            userPostings: userPostings,
+        }
+        plr.hide();
 
-            // get user data from user service
-            //subscribe as observer to get notification if user changes on server
-            let eventPromise = eventProfile.getEventAndSubscribe(ob2);
+        args.edit = window.allowedit;
 
-            let userPostings = getDataFromServer("/api/v1/eventmod/userPostings/");
 
-            Promise.all([eventPromise, userPromise, userPostings])
-                .then(results => {
-                    let event = results[0];
-                    let user = results[1];
-                    let userPostings =results[2];
-                    self.pageData = {
-                        event: event,
-                        user: user,
-                        userPostings: userPostings,
-                    };
-                    self.buildPage(self.pageData.user, self.pageData.event, args)
-                    plr.hide();
-                })
-                .catch(function (reason) {
-                    console.error("Failed to retrieve data:" + reason)
-                })
-        })
+        return {args, data}
     },
-    buildPage: function(user, event, args){
+    // buildPage: function(user, event, args){
+    buildPage: async function({args={}, data={}}={}) {
+        const user = data.user;
+        const event = data.event;
+        const eventProfile = this.pageData.eventProfile;
+        this.pageData.event = event;
+        this.pageData.user = user;
+
         let self = this;
         self.view = "cards";
         self.scrollableList;
@@ -135,12 +117,12 @@ let eventParticipants = {
         // window.DockerElement = new docker.Docker(window.dockerArgs);
         window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
 
-        var sidebar = new Sidebar('wrapper', {title: "Test"});
+        var sidebar = new Sidebar('wrapper');
         sidebar.addPlugin(eventPlugin);
 
-        let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+        let userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
         // init event sidebar
-        sidebar.addContent("eventDetails", {
+        await sidebar.addContent("eventDetails", {
             event: self.pageData.event,
             user: self.pageData.user,
             isParticipant: userIsParticipant,
@@ -228,19 +210,19 @@ let eventParticipants = {
                 },
             });
             $('.add-participant-button').each(function(){
-                $(this).on("click", function(e){
+                $(this).on("click", (e) => {
                     e.preventDefault();
                     sidebar.addContent("addEventParticipant", {
                         event: self.pageData.event,
                         user: user,
                         isParticipant: userIsParticipant,
                         callback: {
-                            onConfirm: function(data){
-                                eventActions.addParticipant(event.id, data.userid, function(event){
-                                    window.eventProfile.refreshEvent()
+                            onConfirm: (data)=>{
+                                eventActions.addParticipant(event.id, data.userid, (event)=>{
+                                    eventProfile.refreshEvent()
                                         .then(event => {
                                             self.pageData.event = event;
-                                            userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                            userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
                                             sidebar.update({event: event, isParticipant: userIsParticipant});
                                             self.dataList =self.pageData.event.participants;
                                             displayParticipantsList(self.dataList);
@@ -248,7 +230,7 @@ let eventParticipants = {
                                         })
                                         .catch(err => {
                                         })
-                                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                                }).fail((jqxhr, textstatus, error) => self.snackbar.showError(jqxhr, textstatus, error));
                             },
                         },
                     })
@@ -335,14 +317,33 @@ let eventParticipants = {
                 onInput: {
                     enabled: true,
                     callback: function(inputValue){
-                        let filteredList = self.dataList.filter(function(participant){
-                            return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
-                        })
+                        let filteredList = [];
+                        if(!inputValue) filteredList = self.dataList;
+                        else {
+                            filteredList = filterPostingsList(self.dataList, inputValue);
+                        }
                         displayPostingsList(filteredList);
 
                     },
                 },
             });
+
+            function filterPostingsList(postingsList, inputValue) {
+                return postingsList.filter(function(posting){
+                    let matchUser = false;
+                    if(posting.assigned.user) {
+                        const user = posting.assigned.user;
+                        matchUser =  user.username.includes(inputValue) ||
+                            user.generalData.firstName.value.includes(inputValue) ||
+                            user.generalData.lastName.value.includes(inputValue) ||
+                            posting.description.includes(inputValue);
+                    }
+                    let matchQualification = posting.requiredQualifications.some(qual => {
+                        return qual.name.includes(inputValue) || qual.short.includes(inputValue)
+                    })
+                    return matchUser || matchQualification;
+                })
+            }
 
             $('.add-participant-button').each(function(){
                 $(this).on("click", function(e){
@@ -423,10 +424,10 @@ let eventParticipants = {
                         e.preventDefault();
                         let userId = e.currentTarget.dataset.userid;
                         eventActions.removeParticipant(event.id, userId, function(){
-                            window.eventProfile.refreshEvent()
+                            eventProfile.refreshEvent()
                                 .then(event => {
                                     self.pageData.event = event;
-                                    userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                    userIsParticipant = eventProfile.checkIfUserIsRegistered(user);
                                     sidebar.update({event: event, isParticipant: userIsParticipant});
                                     self.dataList =self.pageData.event.participants;
                                     displayParticipantsList(self.dataList);
@@ -564,7 +565,7 @@ let eventParticipants = {
             }
 
             let sortedList = augmentPostingsList(dataList, localUserPostings, globalUserPostings)
-            self.dataList = sortedList;
+            // self.dataList = sortedList;
 
             let dropdownMenus = function(){
                 $('.participant-menu-container').each(function(){
@@ -777,10 +778,14 @@ let eventParticipants = {
         }
 
     },
-    updatePage: function(user, event, args) {
-        this.buildPage(user, event, args)
+    updatePage: async function(user, event, args) {
+        const data ={
+            event: event,
+            user: user
+        }
+        return this.buildPage({args, data})
     }
-};
+});
 
 let qualTypesMap = {
     SAN: "Sanitätsdienst",
@@ -788,5 +793,3 @@ let qualTypesMap = {
     NACHWEIS: "Nachweis",
     AUSBILDUNG: "Ausbildung",
 }
-
-export {eventParticipants}

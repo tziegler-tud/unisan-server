@@ -1,8 +1,6 @@
 import Handlebars from "handlebars";
-import {userActions} from "../actions/userActions";
-import {ComponentPage} from "./ComponentPage";
 import Component from "./Component";
-import {systemActions} from "../actions/actions";
+import {systemActions} from "../actions/systemActions";
 import "./scss/connectedServices.scss";
 import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog";
 

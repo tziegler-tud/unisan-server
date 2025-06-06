@@ -1,9 +1,18 @@
 @use "animations";
+
+@use "@material/theme" with (
+  $primary: #00293c,
+  $secondary: #c31d34,
+  $on-primary: #fff,
+  $on-secondary: #f5f5f5,
+);
+
 @import "color-rules";
 @import "variables";
 @import "fonts";
 
 @import "./form.scss";
+
 
 
 $textHoverColor: $col2;
@@ -417,6 +426,9 @@ a {
     }
     .subpage-content {
       padding: 0 0 5em 0;
+      &.no-padding {
+        padding: 0 0 0 0;
+      }
     }
   }
   .subpage-searchbar {
@@ -1507,6 +1519,16 @@ common btn styling
 
   &.highlight {
     color: $allowed-color;
+  }
+
+  &.add-smt-button--fixed {
+    width: auto;
+    margin-right: 2em;
+    position: sticky;
+    bottom: 2em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
   }
 }
 

@@ -1,15 +1,10 @@
 import "./userprofile.scss";
 
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
-import {userActions} from "../actions/userActions";
 import {UserProfile} from "../userprofile/userprofile";
-
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
+import ScrollableList from "../scrollableList/ScrollableList";
 import {DropdownMenu} from "../helpers/dropdownMenu";
-
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 

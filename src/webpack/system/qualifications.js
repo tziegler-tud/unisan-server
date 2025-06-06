@@ -1,10 +1,9 @@
-import {ScrollableList} from "../scrollableList/scrollableList";
-import Sidebar from "../sidebar/Sidebar.js";
+import ScrollableList from "../scrollableList/ScrollableList";
+import Sidebar from "../sidebar/Sidebar";
 import {qualificationPlugin} from "../sidebar/plugins/plugin-qualifications.js";
 import {escapeSelector} from "../helpers/helpers";
 import {Preloader} from "../helpers/preloader"
-import {actions, qualificationActions} from "../actions/actions";
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
+import qualificationActions from "../actions/qualificationActions";
 import {Dialog as LidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 import PageModule from "../utils/PageModule";
 

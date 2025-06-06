@@ -1,0 +1,37 @@
+extends ../layout
+
+block page_includes
+    script(src="/dist/event.js")
+
+
+    script.
+        window.dateFilter = "#{dateFilter}";
+        window.jsmodule = {
+            module: "events",
+            loaders: ["events.blueprints"],
+            args: {
+                allowEdit: #{allowedit},
+                edit: true
+            }
+        };
+        window.dockerArgs.activeContainer = "eventContainer";
+        window.dockerArgs.activeElementId = "eventBlueprints";
+
+block content
+    #wrapper
+        #page-container.page-container.page-container-dimmed
+            #page-container-inner.page-container-inner.full-width
+                section#sec1
+                    #sec-content1.subpage-container
+                        #content1-text
+                            .subpage-content.no-padding
+                                .userinfo-container
+                                    #userPage-component-container.userPage-component-container.componentPage-component-container
+                                    .add-smt-button.add-smt-button--fixed
+                                        if acl.events.create
+                                            a.add-smt-button-inner(href="/events/addEvent")
+                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+
+
+
+

@@ -4,101 +4,74 @@ var lidlRTO = window.lidlRTO;
 
 import {UserProfile} from "../userprofile/userprofile";
 
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import {DropdownMenu} from "../helpers/dropdownMenu";
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-
-import Sidebar from "../sidebar/Sidebar.js";
-import {userPlugin} from "../sidebar/plugins/plugin-user";
+import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 
-import {actions, eventActions} from "../actions/actions";
+import eventActions from "../actions/eventActions";
 
 import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
-import {EditableTextField} from "../helpers/editableTextField";
 import EditableInputField from "../helpers/editableInputField";
+import PageModule from "../utils/PageModule";
+import aclActions from "../actions/aclActions";
 
-import * as FilePond from "filepond";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import FilePondPluginGetFile from "filepond-plugin-get-file";
-
-import {MDCList} from "@material/list";
-import {MDCRipple} from "@material/ripple";
-import {MDCMenu} from "@material/menu";
-
-let eventDetails = {
-    title: "eventDetails",
+export default new PageModule ({
+    title: "events.details",
     pageData: {},
-    init: function (args) {
-        let self = this;
-        $(document).ready(function () {
-            //debug line, remove before flight
-            console.log("loading js module: " + self.title);
+    init: async function (args) {
+        var currentUserProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
 
-            self.pageData = {};
-            var lidlRTO = window.lidlRTO;
-            var user;
-            var userProfile = (window.currentUserProfile !== undefined) ? window.currentUserProfile : new UserProfile(window.userId);
+        // create new observer
+        var ob1 = new lidlObserver((u) => {
+            this.pageData.user = u;
+        });
+        window.snackbar = new Snackbar();
 
-            // create new observer
-            var ob1 = new lidlObserver(function (u) {
-                user = u;
-                self.pageData.user = user;
-                self.updatePage(self.pageData.user, self.pageData.event, args)
-            });
-            window.snackbar = new Snackbar();
+        // get user data from user service
+        //subscribe as observer to get notification if user changes on server
+        const user = await currentUserProfile.getUserAndSubscribe(ob1)
 
-            // get user data from user service
-            //subscribe as observer to get notification if user changes on server
-            let userPromise = userProfile.getUserAndSubscribe(ob1)
+        let eventProfile = new EventRequest(window.exploreEventId, {
+            populateParticipants: true,
+        });
 
-            var currentExploredEvent;
-            var eventProfile = new EventRequest(window.exploreEventId, {
-                populateParticipants: true,
-            });
+        // create new observer
+        let ob2 = new lidlObserver((event)=> {
+            this.pageData.event = event;
+        });
 
-            // create new observer
-            var ob2 = new lidlObserver(function (event) {
-                currentExploredEvent = event;
-                self.pageData.event = event;
-                self.updatePage(self.pageData.user, self.pageData.event, args)
-            });
+        // get user data from user service
+        //subscribe as observer to get notification if user changes on server
+        let event = await eventProfile.getEventAndSubscribe(ob2);
+        this.pageData.eventProfile = eventProfile;
 
-            window.eventProfile = eventProfile;
-            window.userProfile = userProfile;
 
-            // get user data from user service
-            //subscribe as observer to get notification if user changes on server
-            let eventPromise = eventProfile.getEventAndSubscribe(ob2);
+        const data = {
+            event: event,
+            user: user,
+        };
 
-            Promise.all([eventPromise, userPromise])
-                .then(results => {
-                    let event = results[0];
-                    let user = results[1];
-                    self.pageData = {
-                        event: event,
-                        user: user,
-                    };
+        args.edit = window.allowedit;
 
-                    self.buildPage(self.pageData.user, self.pageData.event, args);
-                })
-                .catch(function (reason) {
-                    console.error("Failed to retrieve data:" + reason)
-                })
-        })
+        return {args, data}
+
     },
-    buildPage: function(user, event, args){
+    // buildPage: function(user, event, args){
+    buildPage: async function({args={}, data={}}={}) {
+        const user = data.user;
+        const event = data.event;
         let self = this;
+        self.eventProfile = this.pageData.eventProfile;
+
         var lidlRTO = window.lidlRTO;
-        var sidebar = new Sidebar('wrapper', {title: "Test"});
+        var sidebar = new Sidebar('wrapper');
         sidebar.addPlugin(eventPlugin);
 
         let pageContainer = document.getElementById("eventPage-component-container");
@@ -110,11 +83,11 @@ let eventDetails = {
         });
         window.eventPage = eventPage;
 
-        buildPageCommon(self.pageData.user, self.pageData.event, args);
+        buildPageCommon(user, event, args);
         if (args.edit) {
-            buildPageEdit(self.pageData.user, self.pageData.event, args)
+            buildPageEdit(user, event, args)
         }
-        else buildPageView(self.pageData.user, self.pageData.event, args)
+        else buildPageView(user, event, args)
 
         function buildPageCommon(user, event, args) {
             // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
@@ -154,7 +127,7 @@ let eventDetails = {
 
                 // init event sidebar
                 //find if current user is already registered
-                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                let userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                 sidebar.addContent("eventParticipants", {
                     event: event,
                     user: user,
@@ -162,9 +135,9 @@ let eventDetails = {
                     callback: {
                         onConfirm: function(){
                             eventActions.addParticipant(event.id, user.id, function(event) {
-                                window.eventProfile.refreshEvent()
+                                self.eventProfile.refreshEvent()
                                     .then(event => {
-                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                                         sidebar.update({event: event, isParticipant: userIsParticipant})
                                     })
                                     .catch(err => {
@@ -173,9 +146,9 @@ let eventDetails = {
                         },
                         onDelete: function(){
                             eventActions.removeParticipant(event.id, user.id, function(){
-                                window.eventProfile.refreshEvent()
+                                self.eventProfile.refreshEvent()
                                     .then(event => {
-                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                                         sidebar.update({event: event, isParticipant: userIsParticipant})
                                     })
                                     .catch(err => {
@@ -194,7 +167,7 @@ let eventDetails = {
 
                 // init event sidebar
                 //find if current user is already registered
-                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                let userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                 sidebar.addContent("eventPostings", {
                     event: event,
                     user: user,
@@ -213,7 +186,7 @@ let eventDetails = {
 
                 // init event sidebar
                 //find if current user is already registered
-                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                let userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                 sidebar.addContent("eventPostings", {
                     event: event,
                     user: user,
@@ -259,7 +232,7 @@ let eventDetails = {
                         onSuccess: function(result){
                             editableInputField = editableInputField.reset(titleInputContainer, result.title.delta, "text", cb, {})
                             //update docker nav
-                            window.eventProfile.refreshEvent()
+                            self.eventProfile.refreshEvent()
                                 .then(function(ev){
                                     event = ev;
                                     window.DockerElement.subpageHandler.update(self.pageData.eventSubpageId, "event", event)
@@ -345,7 +318,7 @@ let eventDetails = {
 
                 // init event sidebar
                 //find if current user is already registered
-                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                let userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                 sidebar.addContent("eventParticipants", {
                     event: event,
                     user: user,
@@ -353,9 +326,9 @@ let eventDetails = {
                     callback: {
                         onConfirm: function(){
                             eventActions.addParticipant(event.id, user.id, function(event) {
-                                window.eventProfile.refreshEvent()
+                                self.eventProfile.refreshEvent()
                                     .then(event => {
-                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                                         sidebar.update({event: event, isParticipant: userIsParticipant})
                                     })
                                     .catch(err => {
@@ -364,9 +337,9 @@ let eventDetails = {
                         },
                         onDelete: function(){
                             eventActions.removeParticipant(event.id, user.id, function(){
-                                window.eventProfile.refreshEvent()
+                                self.eventProfile.refreshEvent()
                                     .then(event => {
-                                        userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                                        userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                                         sidebar.update({event: event, isParticipant: userIsParticipant})
                                     })
                                     .catch(err => {
@@ -384,7 +357,7 @@ let eventDetails = {
 
                 // init event sidebar
                 //find if current user is already registered
-                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                let userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                 sidebar.addContent("eventPostings", {
                     event: event,
                     user: user,
@@ -400,7 +373,7 @@ let eventDetails = {
 
                 // init event sidebar
                 //find if current user is already registered
-                let userIsParticipant = window.eventProfile.checkIfUserIsRegistered(user);
+                let userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);
                 sidebar.addContent("eventPostings", {
                     event: event,
                     user: user,
@@ -414,6 +387,4 @@ let eventDetails = {
     updatePage: function(user, event, args){
         this.buildPage(user, event, args)
     }
-};
-
-export {eventDetails}
+});

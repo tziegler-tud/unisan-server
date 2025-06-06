@@ -1,0 +1,28 @@
+<div id="sidebar" class="sidebar sidebar-event sidebar-eventDetails">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span class="quill-renderer limitCharacters">{{transformDateString startDate}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner sidebar-eventDetails-inner">
+        <div class="sidebar-content">
+            <div class="eventDetails-top">
+                <div class="eventDetails-top-inner">
+                    <div class="eventDetails-eventTitle">
+                        <div id="sidebar-eventDetails--titleRenderer" class="eventDetails-eventTitle--text event-title quill-renderer limitCharacters">
+                            {{transformDateString startDate}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section">
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <a class="sidebar-confirm content-link">Event anlegen</a>
+        </div>
+    </div>
+</div>

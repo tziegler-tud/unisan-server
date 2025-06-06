@@ -1,11 +1,7 @@
-import {ComponentPage} from "../../ComponentPage";
 import ComponentObserver from "../../ComponentObserver.js";
 import Component from "../../Component";
 import InteractiveListStandaloneComponent from "../../interactiveListStandalone";
-import {systemActions} from "../../../actions/actions";
-import {ScrollableList} from "../../../scrollableList/scrollableList";
-import {Dialog as lidlDialog} from "../../../../lib/lidl-modules/dialog/lidl-dialog";
-import Sidebar from "../../../sidebar/Sidebar"
+import {systemActions} from "../../../actions/systemActions";
 import {systemPlugin} from "../../../sidebar/plugins/plugin-system"
 import {escapeRegExp} from "../../../helpers/helpers";
 

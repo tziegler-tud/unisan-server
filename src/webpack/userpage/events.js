@@ -1,12 +1,8 @@
 import {UserProfile} from "../userprofile/userprofile";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-
 import {DropdownMenu} from "../helpers/dropdownMenu";
 import {dateFromNow} from "../helpers/helpers";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import PageModule from "../utils/PageModule";
 import Sidebar from "../sidebar/Sidebar";

@@ -168,6 +168,7 @@ router.post('/:id/uploadImage', checkEventEditRights, upload.single('image'), fu
 //viewing. needs general url access
 router.get("/*", checkEventReadRights);
 router.get('/', getAll);
+router.post('/', filterEventsAdvanced);
 router.get('/:id/populateParticipants', populateParticipants);
 router.get('/:id/files/:filename', eventFileDownloader);
 router.post('/filter', matchAny);
@@ -296,15 +297,19 @@ function userEvents(req, res, next) {
 
 function userEventsAdvanced(req, res, next) {
     const userId = req.body.userid;
+    if(userId === undefined) {
+        next(new ApiValidationError("Invalid arguments received for parameter: userid"))
+    }
+    filterEventsAdvanced(req, res, next);
+}
+
+function filterEventsAdvanced(req, res, next) {
+    const userId = req.body.userid;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const matchString = req.body.matchString ? req.body.matchString : "";
     const sort = req.body.sort;
     const amount = req.body.amount ? req.body.amount : undefined;
-
-    if(userId === undefined) {
-        next(new ApiValidationError("Invalid arguments received for parameter: userid"))
-    }
 
     if (req.body.args === undefined) req.body.args = {};
 
@@ -331,7 +336,11 @@ function userEventsAdvanced(req, res, next) {
         dateFilter.maxDate = endDate;
     }
 
-    let filterArray = [userFilter];
+    let filterArray = [];
+
+    if(userId) {
+        filterArray.push(userFilter);
+    }
 
     let args = {
         filter: filterArray,

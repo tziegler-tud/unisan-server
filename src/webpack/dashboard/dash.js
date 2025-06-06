@@ -1,11 +1,11 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {phone, tablet} from "../helpers/variables";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import {DashPage} from "./dashboardPage";
 import {UserProfile} from "../userprofile/userprofile";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import {EventRequest} from "../events/eventRequest";
 import "../helpers/handlebarsHelpers";
 

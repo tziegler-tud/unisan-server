@@ -1,18 +1,9 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {userPlugin} from "../sidebar/plugins/plugin-user";
-import {userActions, eventActions, groupActions} from "../actions/actions"
 
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
-import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
-import {ScrollableList} from "../scrollableList/scrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-
-import {DropdownMenu} from "../helpers/dropdownMenu";
-import {dateFromNow} from "../helpers/helpers";
-import {phone, tablet} from "../helpers/variables";
-import {Snackbar} from "../helpers/snackbar";
+import Snackbar from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import ComponentPage from "../components/ComponentPage";
 import {UserProfile} from "../userprofile/userprofile";

@@ -1,6 +1,5 @@
 import {MDCTextField} from '@material/textfield';
 import {Preloader} from "./helpers/preloader.js";
-import {actions} from "./actions/actions";
 
 import "./common.scss";
 import "./pushhandler";

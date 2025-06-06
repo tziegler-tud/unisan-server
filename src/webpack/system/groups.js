@@ -1,8 +1,7 @@
-import Sidebar from "../sidebar/Sidebar.js";
+import Sidebar from "../sidebar/Sidebar";
 import {rolesPlugin} from "../sidebar/plugins/plugin-roles";
 
-import {groupActions} from "../actions/actions";
-import {Preloader} from "../helpers/preloader"
+import {groupActions} from "../actions/groupActions";
 import PageModule from "../utils/PageModule";
 
 

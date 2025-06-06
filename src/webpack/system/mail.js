@@ -1,8 +1,8 @@
-import {Snackbar} from "../helpers/snackbar";
-import Sidebar from "../sidebar/Sidebar.js";
+import Snackbar from "../helpers/snackbar";
+import Sidebar from "../sidebar/Sidebar";
 import {systemPlugin} from "../sidebar/plugins/plugin-system";
 import ComponentPage from "../components/ComponentPage";
-import {systemActions} from "../actions/actions";
+import {systemActions} from "../actions/systemActions";
 import PageModule from "../utils/PageModule";
 
 export default new PageModule({

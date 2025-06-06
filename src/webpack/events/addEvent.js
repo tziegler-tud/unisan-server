@@ -1,21 +1,10 @@
 import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
-
-import Sidebar from "../sidebar/Sidebar.js";
-import {eventPlugin} from "../sidebar/plugins/plugin-event";
-
 import {EditableTextField} from "../helpers/editableTextField";
-import EditableInputField from "../helpers/editableInputField";
-
-import {lidl} from "/lib/lidl-modules/core/lidlModular-0.2"
-import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer"
-import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog"
 import PageSlider from "../../lib/lidl-modules/pageSlider/pageSlider";
-
 const Handlebars = require("handlebars");
-
-import {eventActions} from "../actions/eventActions";
+import eventActions from "../actions/eventActions";
 
 
 $(document).ready (function () {
