@@ -11,7 +11,7 @@ import uuid from 'uuid';
 import 'dotenv/config'
 import favicon from "serve-favicon";
 
-import config from "./config/config.json" assert {type: "json"};
+import config from "./config/config.json" with {type: "json"};
 
 import oidcService from "./services/oidc/oidcService.js";
 import SystemService from "./services/SystemService.js";
@@ -46,6 +46,7 @@ import accessRightsRouter from './routes/api/accessrights.js';
 import userGroupRouter from './routes/api/userGroup.js';
 import userApiRouter from './routes/api/usermod.js';
 import eventApiRouter from './routes/api/eventmod.js';
+import eventFactoryApiRouter from './routes/api/eventFactory.js';
 import qualificationApiRouter from './routes/api/qualification.js';
 import userDatasetApiRouter from './routes/api/userDataset.js';
 import logsRouter from './routes/api/logs.js';
@@ -145,6 +146,7 @@ server.use('/api/v1/groups', userGroupRouter);
 server.use('/api/v1/access', accessRightsRouter);
 server.use('/api/v1/usermod', userApiRouter);
 server.use('/api/v1/eventmod', eventApiRouter);
+server.use('/api/v1/eventfactory', eventFactoryApiRouter);
 server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
 server.use('/api/v1/logs', logsRouter);
