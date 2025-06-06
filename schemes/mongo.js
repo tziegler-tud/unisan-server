@@ -1,4 +1,4 @@
-import config from '../config/db.json' assert {type: "json"};
+import config from '../config/db.json' with {type: "json"};
 import mongoose from "mongoose";
 import autoIncrement from "mongoose-plugin-autoinc-fix";
 
@@ -15,6 +15,7 @@ import OidcClient from './oidcClientScheme.js'
 import SystemSettings from './systemSettingsScheme.js'
 import News from './newsScheme.js'
 import Secrets from './secretsScheme.js'
+import EventBlueprint from './eventBlueprintScheme.js'
 
 mongoose.set('debug', false);
 
@@ -48,4 +49,5 @@ export default {
     SystemSettings: SystemSettings,
     Secrets: Secrets,
     News: News,
+    EventBlueprint: EventBlueprint
 };
