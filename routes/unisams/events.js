@@ -151,11 +151,13 @@ const baseUrl = "/events";
 // router.use('/*', auth);
 router.use('/*', getDockerArguments);
 // routes
-router.get('/', checkEventReadRights, getAll);
+router.get('/', checkEventReadRights, eventOverview);
+router.get('/all', checkEventReadRights, getAll);
 router.get('/upcoming', checkEventReadRights, getUpcoming);
 router.get('/past', checkEventReadRights, getPast);
 
 router.get('/addEvent', allowCreateEvent, addEvent);
+router.get('/blueprints', allowCreateEvent, blueprints);
 
 router.get('/*', checkEventReadRights)
 router.get('/:id/logs', checkEventEditRights, eventLogs);
@@ -194,6 +196,26 @@ function legacyRedirect(req, res, next){
 }
 
 /* GET home page. */
+function eventOverview(req, res, next) {
+    var eventList = {};
+    eventService.getAll()
+        .then(events => {
+            eventList = events;
+            res.render("unisams/events/eventOverview", {title: "Events - uniSams",
+                user: req.user._doc,
+                pageHeader: "Alle Events",
+                eventList: eventList,
+                acl: req.acl,
+                allowedit: false,
+                dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsAll"}
+
+            })
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
 function getAll(req, res, next) {
     var eventList = {};
     eventService.getAll()
@@ -204,6 +226,7 @@ function getAll(req, res, next) {
                 pageHeader: "Alle Events",
                 eventList: eventList,
                 acl: req.acl,
+                allowedit: false,
                 dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsAll"}
 
             })
@@ -389,7 +412,6 @@ function eventSettings(req, res, next) {
         .catch(err => next(err));
 }
 
-
 function eventLogs(req, res, next) {
     eventService.getById(req.params.id)
         .then(ev => {
@@ -406,6 +428,14 @@ function eventLogs(req, res, next) {
         })
         .catch(err => next(err));
 
+}
+
+function blueprints(req, res, next) {
+    res.render("unisams/events/eventBlueprints", {
+        user: req.user._doc,
+        acl: req.acl,
+        allowedit: true
+    })
 }
 
 function eventFileDownloader(req, res, next){
