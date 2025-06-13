@@ -21,6 +21,7 @@ import Component, {ComponentOptionArgs} from "./Component";
 import Sidebar from "../sidebar/Sidebar";
 import EventListComponent from "./pageComponents/events/EventListComponent";
 import EventTabListComponent from "./pageComponents/events/EventTabListComponent";
+import EventBlueprintListComponent from "./pageComponents/eventFactory/EventBlueprintListComponent";
 
 export interface ComponentPageOptions {
     container?: HTMLElement;
@@ -67,6 +68,9 @@ export default class ComponentPage {
             LIST: EventListComponent,
             TABLIST: EventTabListComponent,
         },
+        EVENTFACOTRY: {
+            LIST: EventBlueprintListComponent,
+        }
     };
 
     private data: any;

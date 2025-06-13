@@ -13,10 +13,6 @@ const Schema = mongoose.Schema;
 // create instance of Schema
 var EventBlueprintSchema = new Schema({
     title: {
-        title: {
-            type: String,
-            required: true,
-        },
         value: {
             type: String,
             required: true,
@@ -82,12 +78,8 @@ var EventBlueprintSchema = new Schema({
 
     },
     location: {
-        title: {
-            type: String,
-            default: "Adresse",
-        },
         value: {
-            type: String,
+            type: String
         },
     },
     hasPostings: {
@@ -100,6 +92,10 @@ var EventBlueprintSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'Qualifications',
             }],
+            title: {
+                type: String,
+                default: "",
+            },
             description: {
                 type: String,
             },
@@ -108,13 +104,13 @@ var EventBlueprintSchema = new Schema({
                 default: true,
             },
             date: {
-                startDate: {
+                startTime: {
                     type: Date,
                     default: function(){
                         return this.parent().date.startDate;
                     }
                 },
-                endDate: {
+                endTime: {
                     type: Date,
                     default: function(){
                         return this.parent().date.endDate;
@@ -211,12 +207,14 @@ EventBlueprintSchema.pre('save', function(next) {
         return d;
     }
 
-    this.title.html = convertDelta(this.title.delta);
+    this.title.html = convertDelta(this.title.delta, this.title.value);
     this.description.shortDesc.html = convertDelta(this.description.shortDesc.delta);
     this.description.longDesc.html = convertDelta(this.description.longDesc.delta);
 
-    function convertDelta(delta) {
-        if (delta === undefined || delta.ops === undefined) return "";
+    function convertDelta(delta,value) {
+        if (delta === undefined || delta.ops === undefined) {
+            return value ?? "";
+        }
         var converter = new QuillDeltaToHtmlConverter(delta.ops, {});
         return converter.convert();
     }

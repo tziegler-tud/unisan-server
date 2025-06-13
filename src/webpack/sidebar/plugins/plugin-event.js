@@ -29,7 +29,7 @@ import {Searchbar} from "../../searchbar/searchbar.js";
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getMatchingQualifications} from "../../helpers/helpers";
-import EditableInputField from "../../helpers/editableInputField";
+import EditableInputField from "../../helpers/EditableInputField";
 import {EditableTextField} from "../../helpers/editableTextField";
 
 

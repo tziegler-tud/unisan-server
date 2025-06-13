@@ -5,13 +5,7 @@ import { refJSON } from "../helpers/helpers";
 import SidebarPlugin from "./SidebarPlugin";
 import SidebarButton from "./SidebarButton";
 import ContentHandler from "./ContentHandler";
-
-export interface HandlerFunctionError {
-    message: string;
-}
-export interface HandlerFunctionResult {
-    errors?: HandlerFunctionError[];
-}
+import HandlerFunctionResult from "./HandlerFunctionResult";
 
 class StorageObject {
     handler: ContentHandler;
