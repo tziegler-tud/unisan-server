@@ -6,9 +6,9 @@ import "./dropdownMenu.scss"
  * Dropdown menu constructor.
  *
  *
- * @param {String} container Container element housing the mdc domtree. This should be a wrapper of the actual mdc menu
+ * @param {String|HTMLElement} container Container element housing the mdc domtree. This should be a wrapper of the actual mdc menu
  * @param {String} [eventType = "click"] type of event to attach to the trigger. Jquery event types valid, e.g. "click", "hover", etc...
- * @param {String} [triggerSelector= targetSelector] jquery selector for element(s) to register the event handler on.
+ * @param {String|HTMLElement} [triggerSelector= targetSelector] jquery selector for element(s) to register the event handler on.
  * @param {Object} [args] JSON containing strings to pass as optional args. valid keys are: "classes" - addtionial classes to add to the target when triggered, whitespace seperated.
  * @returns {DropdownMenu}
  * @constructor

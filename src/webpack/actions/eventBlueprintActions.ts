@@ -20,7 +20,7 @@ interface EventBlueprintActions {
     }): JQuery.jqXHR;
     deleteEventBlueprint(id: string|number, callback?: (result: any) => void): JQuery.jqXHR;
     addPosting(id: string|number, postingData: any, callback?: (result: any) => void, args?: {startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
-    updatePosting(id: string|number, postingData: any, callback?: (result: any) => void, args?: { date: string; startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
+    updatePosting(id: string|number, postingData: any, callback?: (result: any) => void, args?: {startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
     removePosting(id: string|number, postingId: string, callback?: (result: any) => void): JQuery.jqXHR;
     saveTitle(id: string|number, data: { delta: any; value: string }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define delta type
     saveDescription(id: string|number, data: { longDesc: any; shortDesc: any }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define desc types
