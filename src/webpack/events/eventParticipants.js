@@ -11,7 +11,7 @@ var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import ScrollableList from "../scrollableList/ScrollableList";
 import Searchbar from "../searchbar/SearchBar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
-import EditableInputField from "../helpers/editableInputField";
+import EditableInputField from "../helpers/EditableInputField";
 
 import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
@@ -81,8 +81,11 @@ export default new PageModule ({
         const user = data.user;
         const event = data.event;
         const eventProfile = this.pageData.eventProfile;
+        const userPostings = data.userPostings;
         this.pageData.event = event;
         this.pageData.user = user;
+        this.pageData.userPostings = userPostings;
+
 
         let self = this;
         self.view = "cards";

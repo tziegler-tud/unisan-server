@@ -34,6 +34,7 @@ import mainRouter from './routes/unisams/index.js';
 import dashboardRouter from './routes/unisams/dashboard.js';
 import userManagementRouter from './routes/unisams/user.js';
 import eventManagementRouter from './routes/unisams/events.js';
+import eventFactoryRouter from './routes/unisams/eventFactory.js';
 import systemRouter from './routes/unisams/system.js';
 import settingsRouter from './routes/unisams/settings.js';
 import protocolRouter from './routes/unisams/protocol.js';
@@ -212,6 +213,7 @@ function loadPublicRoutes(){
     server.use('/dashboard', dashboardRouter);
     server.use('/user', userManagementRouter);
     server.use('/events', eventManagementRouter);
+    server.use('/eventfactory', eventFactoryRouter);
     server.use('/system', systemRouter);
     server.use('/settings', settingsRouter);
 

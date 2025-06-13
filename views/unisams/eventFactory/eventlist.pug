@@ -1,0 +1,45 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/events.css')
+    script(src="/dist/eventlist.js")
+
+
+    script.
+        // window.dateFilter = !{JSON.stringify(dateFilter)};
+        window.dateFilter = "#{dateFilter}";
+
+
+block content
+    #wrapper
+        #page-container.page-container.page-container-dimmed
+            #page-container-inner.page-container-inner.full-width
+                section#sec1
+                    #sec-content.subpage-container.no-margin
+                        #content1-heading.subpage-topbar
+                            .topbar-heading
+                                    h3=pageHeader
+                            .subpage-options.topbar-element
+                                .radiogroup.toggleButtonGroup
+                                    label.toggleButton.toggleButton-first(for="eventlist01")
+                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list") <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg>
+                                        //span Liste
+                                    input#eventlist01.radio-item(type="radio", name="eventlist-radio" value="list" checked)
+                                    label(for="eventlist02")
+                                        svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid") <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                        //span Gallerie
+                                    input#eventlist02.radio-item.toggleButton(type="radio", name="eventlist-radio" value="cards")
+                            #usersearch.subpage-searchbar.topbar-element
+                        #content1-text.sec-content
+
+                            .subpage-content
+                                #eventlist-container
+                                .add-smt-button
+                                    if acl.events.create
+                                        a.add-smt-button-inner(href="/events/addEvent")
+                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+
+
+
+
+

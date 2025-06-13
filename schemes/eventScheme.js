@@ -111,6 +111,10 @@ var EventSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'Qualifications',
             }],
+            title: {
+                type: String,
+                default: "",
+            },
             description: {
                 type: String,
             },

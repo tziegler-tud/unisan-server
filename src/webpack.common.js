@@ -45,6 +45,9 @@ module.exports = {
         event: "./webpack/events/event.js",
         event_style: "./webpack/events/event.scss",
 
+        eventFactory: "./webpack/eventFactory/eventFactory.js",
+        eventFactory_style: "./webpack/eventFactory/eventFactory.scss",
+
         system: "./webpack/system/system.js",
 
         settings: "./webpack/settings/settings.js",

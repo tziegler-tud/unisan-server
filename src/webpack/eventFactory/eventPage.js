@@ -1,0 +1,189 @@
+// factory for building html elements related to event pages
+import {EditableTextField} from "../helpers/editableTextField";
+import Handlebars from "handlebars";
+import * as FilePond from "filepond";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginGetFile from "filepond-plugin-get-file";
+import {MDCList} from "@material/list";
+import {MDCRipple} from "@material/ripple";
+import {MDCMenu} from "@material/menu";
+import {transformToLocalizedDateString} from "../helpers/helpers";
+import eventBlueprintActions from "../actions/eventBlueprintActions";
+
+var EventPage = function(args){
+    let defaults = {
+        container: null,
+        data: null,
+        sidebar: null,
+        args: {
+
+        }
+    }
+    args = (args === undefined) ? {}: args;
+    args = Object.assign(defaults, args);
+
+    this.data = args.data;
+    this.container = args.container;
+    this.sidebar = args.sidebar;
+    if(args.data.event === undefined) this.data.event = {}
+    this.event = this.data.event;
+    this.components = [];
+    this.componentContainer = this.container;
+    //constructor
+    return this;
+};
+
+EventPage.prototype.componentCounter = {
+    current: 0,
+    next: function(){
+        this.current++
+        return this.current;
+    }
+}
+
+EventPage.prototype.addComponent = function(componentType, args){
+    let self = this;
+    let componentId = this.componentCounter.next();
+    let component = new Component(componentId, componentType, self.data, args);
+    this.components.push(component);
+    this.componentContainer.append(component.getHtml());
+};
+
+var Component = function(componentId, componentType, data, args){
+    let self = this;
+    let defaults = {
+        allowEdit: true,
+        size: "full",
+        classes: "",
+        order: componentId,
+        handlers: [],
+
+    }
+    args = (args === undefined) ? {}: args;
+    this.args = Object.assign(defaults, args);
+    let event = data.event;
+    this.componentId = componentId;
+    this.container = document.createElement("div");
+    this.container.classList.add("eventPage-component-wrapper");
+    switch (this.args.size) {
+        case "full":
+            this.container.classList.add("eventPage-component-wrapper--full")
+            break;
+        case "half":
+            this.container.classList.add("eventPage-component-wrapper--half");
+            break;
+    }
+    this.container.style.order = args.order;
+    this.html = this.container;
+
+    this.init = new Promise(function(resolve, reject){
+        var templateUrl ="";
+        var template;
+        let handleData = data;
+        handleData.args = {
+            allowEdit: self.args.allowEdit,
+            displayLocalizedDate: false,
+        };
+        handleData.userAgent = {
+            locale: Intl.DateTimeFormat().resolvedOptions(),
+        }
+
+        switch(componentType) {
+            case (EventPage.componentTypes.DESCRIPTION):
+                //build description module
+                templateUrl = "/webpack/events/pageModules/eventDescription.hbs";
+                $.get(templateUrl, function (templateData) {
+                    template = Handlebars.compile(templateData);
+                    self.container.innerHTML = template(handleData);
+
+                    if (self.args.allowEdit) {
+
+                    }
+                    let callback = {
+                        onConfirm: function(editableTextField){
+                            let data = {
+                                shortDesc: {},
+                                longDesc: {
+                                    value: editableTextField.getQuill().getText(),
+                                    delta: editableTextField.getQuill().getContents(),
+                                }
+                            }
+                            eventBlueprintActions.saveDescription(event.id, data, {
+                                onSuccess: function(result){
+                                    editableTextField = editableTextField.reset(editableTextFieldContainer, result.description.longDesc.delta, result.description.longDesc.html, callback, {})
+                                }
+                            })
+                        }
+                    };
+                    let editableTextFieldContainer = self.container.querySelector(".eventDescriptionEditor");
+                    let editableTextField = new EditableTextField(editableTextFieldContainer, event.description.longDesc.delta, event.description.longDesc.html, callback, {readOnly: !args.allowEdit});
+
+                    //custom handlers
+                    self.args.handlers.forEach(function(handler){
+                        handler(self);
+                    })
+                });
+                break;
+            case (EventPage.componentTypes.DATE):
+                //build date and location module
+                const localLangIdentifier = "de-DE"
+                const localTimeZone = "Europe/Berlin"
+                let displayLocalizedDate = false;
+                templateUrl = "/webpack/events/pageModules/eventDate.hbs";
+                if(handleData.userAgent.locale.timeZone) {
+                    if(handleData.userAgent.locale.timeZone !== localTimeZone){
+                        displayLocalizedDate = true;
+                        handleData.localizedDate= {
+                            timezone: localTimeZone,
+                            startDate: transformToLocalizedDateString(event.date.startDate, localLangIdentifier, localTimeZone),
+                            endDate: transformToLocalizedDateString(event.date.endDate, localLangIdentifier, localTimeZone),
+                        }
+                    }
+                }
+
+                $.get(templateUrl, function (templateData) {
+                    template = Handlebars.compile(templateData);
+                    handleData.args.displayLocalizedDate = displayLocalizedDate;
+                    self.container.innerHTML = template(handleData);
+
+                    self.args.handlers.forEach(function(handler){
+                        handler(self);
+                    })
+
+                });
+                break;
+            case (EventPage.componentTypes.LOCATION):
+                break;
+            case (EventPage.componentTypes.GENERIC):
+                //Create empty module
+                break;
+        }
+        resolve();
+    })
+    return self;
+};
+
+Component.prototype.getHtml = function(){
+    return this.html;
+}
+
+
+
+EventPage.eventTypes = {
+    eventTraining: "1",
+    eventSeminar:  "2",
+    eventSan:      "3",
+    other:         "0",
+};
+
+EventPage.componentTypes = {
+    DESCRIPTION:   "1",
+    DATE:          "2",
+    LOCATION:      "3",
+    FILES:         "4",
+    PARTICIPANTS:  "5",
+    POSTINGS:      "6",
+    GENERIC:       "0",
+};
+
+export{EventPage}

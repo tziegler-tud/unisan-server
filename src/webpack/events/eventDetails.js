@@ -18,7 +18,7 @@ import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
-import EditableInputField from "../helpers/editableInputField";
+import EditableInputField from "../helpers/EditableInputField";
 import PageModule from "../utils/PageModule";
 import aclActions from "../actions/aclActions";
 

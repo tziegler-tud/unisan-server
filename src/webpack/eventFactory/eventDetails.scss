@@ -1,0 +1,52 @@
+@use "@material/list";
+@use "@material/menu-surface/mdc-menu-surface";
+@use "@material/menu/mdc-menu";
+@use "@material/icon-button";
+@use "@material/icon-button/styles";
+
+@import "~material-icons-font/material-icons-font.css";
+
+
+
+@import 'filepond/dist/filepond.min.css';
+@import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
+@import 'filepond-plugin-get-file/dist/filepond-plugin-get-file.min.css';
+
+@include list.deprecated-core-styles;
+
+.mdc-deprecated-list-item__graphic {
+  //ui fix to make thumbnails display correctly
+  img {
+    width: 100%;
+  }
+}
+
+.mdc-deprecated-list {
+  position: relative;
+}
+
+.mdc-deprecated-list-item-wrapper {
+  position: relative;
+  overflow: initial;
+
+  .mdc-dropdown-menu {
+    position: absolute;
+    top: 1em !important;
+    left: unset !important;
+    right: 3em !important;
+
+    .mdc-deprecated-list-item {
+      height: 36px;
+
+      .mdc-deprecated-list-item__text {
+        align-self: initial;
+      }
+
+
+      .mdc-deprecated-list-item__graphic {
+        height: 18px;
+        width: 18px;
+      }
+    }
+  }
+}

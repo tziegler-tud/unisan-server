@@ -1,0 +1,62 @@
+extends ../layout
+
+block page_includes
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
+
+    script(src="/dist/event.js")
+    script(src="/dist/event_style.js")
+    script.
+        window.jsmodule = {
+            module: "events",
+            loaders: ["events.settings"],
+            args: {
+                allowEdit: #{allowedit}
+            }
+        };
+        window.user = !{JSON.stringify(user)};
+        window.exploreEventId = "#{exploreEvent.id}";
+        window.dockerArgs.activeContainer = "eventDetailContainer";
+        window.dockerArgs.activeElementId = "eventSettings";
+        window.allowedit =#{allowedit};
+
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container.no-margin
+                        #content1-heading.sec-heading.subpage-heading
+                            .sec-heading-label.eventprofile-heading
+                                .eventprofile-heading-container
+                                    .eventprofile-heading-text
+                                        .eventprofile-heading-type
+                                            span.type=exploreEvent.type.value
+                                        .eventprofile-heading-title
+                                            #eventtitle-input.title.event-title
+                                        .eventprofile-heading-date
+                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                    .clear
+                            .clear
+                        #content1-text.sec-content.border-top
+                            .subpage-content
+                                .eventinfo-container
+                                    .eventinfo-inner
+                                        .eventinfo-section.eventinfo-card.card-full.eventwidget-settings
+                                            .eventinfo-section-inner
+                                                .eventinfo-sectionheader
+                                                    span Allgemeine Einstellung
+                                                #eventSettingsGeneral.eventinfo-item
+                                        .eventinfo-section.eventinfo-card.card-full.eventwidget-settings
+                                            .eventinfo-section-inner
+                                                .eventinfo-sectionheader
+                                                    span Teilnahme
+                                                #eventSettingsParticipants.eventinfo-item
+                                        .eventinfo-section.eventinfo-card.card-full.eventwidget-settings
+                                            .eventinfo-section-inner
+                                                .eventinfo-sectionheader
+                                                    span Interaktionen
+                                                .eventinfo-item
+                                                    a#deleteEventButton.content-link.eventDelete Event löschen
+
+

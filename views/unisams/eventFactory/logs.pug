@@ -1,0 +1,43 @@
+extends ../layout
+
+block page_includes
+
+    script.
+        window.jsmodule = {
+            module: "events",
+            loaders: ["events.logs"],
+            args: {
+                allowEdit: #{allowedit}
+            }
+        };
+        window.exploreEventId = "#{exploreEvent.id}";
+        window.dockerArgs.activeContainer = "eventDetailContainer";
+        window.dockerArgs.activeElementId = "eventLogs";
+        window.allowedit =#{allowedit};
+
+    script(src="/dist/event.js")
+    script(src="/dist/event_style.js")
+    link(rel='stylesheet', href='/static/unisams/stylesheets/lssc_loader_event.css')
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-width.full-height
+                section#sec1
+                    #sec-content.subpage-container
+                        #content1-heading.sec-heading.subpage-heading
+                            .sec-heading-label.eventprofile-heading
+                                .eventprofile-heading-container
+                                    .eventprofile-heading-text
+                                        .eventprofile-heading-type
+                                            span.type=exploreEvent.type.value
+                                        .eventprofile-heading-title
+                                            h3.title=exploreEvent.title.value
+                                        .eventprofile-heading-date
+                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                    .clear
+                            .clear
+                        #content1-text.sec-content.border-top.userlogs-container.logs-container
+                            .subpage-content
+                                .itemlist-content-container
+                                    #loglist-container.loglist-container
