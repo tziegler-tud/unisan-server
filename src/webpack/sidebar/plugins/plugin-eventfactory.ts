@@ -715,3 +715,11 @@ export interface AddPostingOnConfirmArgs {
     startTime: string
     endTime: string
 }
+
+export interface ShowPostingConfirmPayload {
+    id: string|number,
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+}
