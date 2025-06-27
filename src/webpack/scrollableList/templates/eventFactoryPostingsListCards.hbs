@@ -1,0 +1,83 @@
+{{#arrayNotEmpty listdata}}
+<div class="postingslist-cards-container">
+    <ul class="common-list postingslist scrollableItemList postingslist-cards" id="documentlist-top">
+        {{#each listdata}}
+            <li class="scrollableList-item cards-item postingscards-item" id='postingId{{this._id}}' data-postingId="{{this._id}}" data-userisallowed="{{this.userIsAllowed}}">
+                <div class="inner postingscards-inner">
+                    <div class="postingscards-label">
+                        <div class="postingscards-header-item postingscards--qualificationLabel"><span>{{#each this.requiredQualifications}}{{this.short}}{{#unless @last}}, {{/unless}}{{/each}}</span></div>
+                    </div>
+                    <div class="postingscards-body">
+                        <div class="postingscards-body-item postingscards-user">
+                            <div class="postingscards--assignSelf">
+                                {{#if this.userIsAllowed}}
+                                    <button class="mdc-button mdc-button--icon-leading mdc-button--outlined allowed posting-assignCurrentUser" data-postingId="{{this._id}}">
+                                        <span class="mdc-button__ripple"></span>
+                                        <i class="material-icons mdc-button__icon" aria-hidden="true">add_task</i>
+                                        <span class="mdc-button__label">Du bist für diesen Posten geeignet.</span>
+                                    </button>
+                                {{else}}
+                                    <button class="mdc-button mdc-button--outlined mdc-button--icon-leading not-allowed">
+                                        <span class="mdc-button__ripple"></span>
+                                        <i class="material-icons mdc-button__icon" aria-hidden="true">do_not_disturb_on</i>
+                                        <span class="mdc-button__label">Anmeldung nicht&nbsp;möglich</span>
+                                    </button>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="postingscards-body-item postingscards-content">
+                            <div class="postingscards-content-item postingscards--date">
+                                <span class="postingscards-text">Dienstzeit:</span>
+                                <span class="postingscards-value">{{timeRangeString this.date.startTime this.date.endTime}}</span>
+                            </div>
+                            <div class="postingscards-content-item postingscards--description">
+                                <span class="postingscards-text">Bemerkungen:</span>
+                                <span class="postingscards-value">{{this.description}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-item-actions">
+                        <div class="participant-menu-container mdc-menu-surface--anchor">
+                            <button class="participant-menu-button mdc-icon-button material-icons">
+                                <div class="mdc-icon-button__ripple"></div>
+                                more_vert
+                            </button>
+                            <div class="postingscards-menu mdc-menu mdc-dropdown-menu mdc-menu-surface">
+                                <ul class="mdc-deprecated-list mdc-deprecated-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                    <li class="mdc-deprecated-list-item posting-edit" role="menuitem" data-postingId="{{this._id}}">
+                                        <span class="mdc-deprecated-list-item__graphic material-icons">
+                                            edit
+                                        </span>
+                                        <span class="mdc-deprecated-list-item__text">Posten bearbeiten</span>
+                                    </li>
+                                    <li class="mdc-deprecated-list-item posting-delete" role="menuitem" data-postingId="{{this._id}}">
+                                        <span class="mdc-deprecated-list-item__graphic material-icons">
+                                            person_remove
+                                        </span>
+                                        <span class="mdc-deprecated-list-item__text">Posten entfernen</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+{{else}}
+    <div class="itemlist-content-container scrollableList-content">
+        <ul class="common-list eventlist scrollableItemList list-view border no-entries noSelect">
+            <li class="event-entry noSelect" id=''>
+                <a class="inner">
+                    <div class="item-property item-container noEntries-container">
+                        <!--                    <div class=" eventlist-img item-container-element"><img src="/data/uploads/event_images/{{this.id}}/{{this.id}}.jpg"/></div>-->
+                        <span class=" item-container-element">Keine Einträge vorhanden</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+{{/arrayNotEmpty}}
+
+

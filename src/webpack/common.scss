@@ -416,6 +416,16 @@ a {
         margin-right: 1em;
 
       }
+
+      .topbar-buttonContainer {
+        display: flex;
+        flex-flow: row nowrap;
+        margin-right: 1em;
+        .topbar-button {
+          flex: 1 1 250px;
+          margin-right: .5em;
+        }
+      }
     }
     .subpage-menu {
 

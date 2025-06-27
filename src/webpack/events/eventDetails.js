@@ -18,7 +18,7 @@ import {EventRequest} from "./eventRequest";
 import {EventPage} from "./eventPage";
 
 import {phone, tablet} from "../helpers/variables";
-import EditableInputField from "../helpers/editableInputField";
+import EditableInputField from "../helpers/EditableInputField";
 import PageModule from "../utils/PageModule";
 import aclActions from "../actions/aclActions";
 
@@ -91,7 +91,7 @@ export default new PageModule ({
 
         function buildPageCommon(user, event, args) {
             // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
-            self.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
+            self.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.edit}});
         }
 
         function buildPageView(user, event, args) {

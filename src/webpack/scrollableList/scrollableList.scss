@@ -834,6 +834,25 @@ posting cards
     //width: 90%;
   }
 
+  .postingslist-cards-group {
+    .postingslist-cards-group--header {
+      &:before {
+        content: "";
+        display: block;
+        width: 2px;
+        height: 1em;
+        background-color: $col4;
+        margin: 0 1em 0 0;
+        float: left;
+      }
+      display: block;
+      font-size: 200%;
+      color: $col1;
+      margin: .5em 0;
+    }
+
+  }
+
 
   ul.postingslist-cards {
     padding: 0;

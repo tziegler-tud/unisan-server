@@ -1,0 +1,74 @@
+@use "@material/button/styles";
+
+@import "../../../color-rules";
+
+.calendarEvent {
+  background-color: $col4_light;
+  border: 1px solid $col4;
+
+  &.calendarEvent--posting {
+    cursor: pointer;
+  }
+
+  &.calendarEvent--style1 {
+    background-color: $col1_light;
+  }
+  &.calendarEvent--style2 {
+    background-color: $text-hover-color-light;
+  }
+  &.calendarEvent--style3 {
+    background-color: $col3_light;
+  }
+
+  &.calendarEvent--selected {
+    outline: 1px solid #2f1e2e;
+    background-color: $col4;
+
+    &.calendarEvent--style1 {
+      background-color: $col1;
+    }
+    &.calendarEvent--style2 {
+      background-color: $text-hover-color;
+    }
+    &.calendarEvent--style3 {
+      background-color: $col3;
+    }
+  }
+
+
+  .calendarEvent--descriptionContainer {
+    height: 3.5em;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    padding: .25em .25em;
+    font-size: 140%;
+
+    .userDisplay {
+      .userDisplay-avatar {
+
+      }
+      .userDisplay-label {
+        .userDisplay-label--name {
+          color: $text-color-heading--light
+        }
+      }
+      .userDisplay-label--text{
+        color: $text-color-heading--light
+
+      }
+    }
+  }
+
+  &.calendarEvent-timeGrid {
+    .calendarEvent--descriptionContainer {
+      padding: .25em 1em;
+    }
+  }
+}
+
+.eventTimeBackgroundEvent {
+  background: $background-highlight-color !important;
+}
+
+

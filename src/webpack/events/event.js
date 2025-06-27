@@ -6,6 +6,7 @@ import eventParticipants from "./eventParticipants.js";
 import eventLogs from "./eventLogs.js";
 import eventSettings from "./eventSettings.js";
 import eventOverview from "./eventOverview";
+import eventPostings from "./eventPostings";
 
 import PageModuleLoader from "../utils/PageModuleLoader";
 
@@ -13,6 +14,6 @@ $(document).ready(function () {
     const moduleName = "events";
 
     const loader = new PageModuleLoader(moduleName);
-    loader.addModules([eventLogs, eventSettings, eventOverview, eventDetails, eventParticipants]);
+    loader.addModules([eventLogs, eventSettings, eventOverview, eventDetails, eventParticipants, eventPostings]);
     loader.execute();
 });

@@ -1,0 +1,41 @@
+<form class="form form-paged">
+    <div class="form-page">
+        <div class="form-section">
+            <div class="form-sectionheader has-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>Datum und Uhrzeit ({{userAgent.locale.timeZone}})</span>
+            </div>
+            <div class="form-item useredit-item" id="eventitem-date"><label class="form-item-label form-attribute-name nofloat" for="eventinp-date">Datum:</label>
+                <input class="mdc-text-field__input pageslider-page-dataElement form-inp" id="eventinp-date" name="date" type="date" />
+                <div class="clear"></div>
+            </div>
+            <div class="form-float">
+                <div class="form-item useredit-item form-griditem" id="eventitem-timeStart"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeStart">von:</label>
+                    <input class="mdc-text-field__input pageslider-page-dataElement form-inp timepicker" id="eventinp-timeStart" name="timeStart" type="time" value="19:00" />
+                    <div class="clear"></div>
+                </div>
+                <div class="form-item useredit-item form-griditem" id="eventitem-timeEnd"><label class="form-item-label form-attribute-name nofloat" for="eventinp-timeEnd">bis:</label>
+                    <input class="mdc-text-field__input pageslider-page-dataElement form-inp timepicker" id="eventinp-timeEnd" name="timeEnd" type="time" value="21:00" />
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="form-section">
+            <div class="form-item useredit-item" id="eventitem-location">
+                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon mdc-text-field--with-trailing-icon">
+                    <span class="mdc-notched-outline">
+                        <span class="mdc-notched-outline__leading"></span>
+                        <span class="mdc-notched-outline__notch">
+                            <span class="mdc-floating-label" id="label1">Location</span></span>
+                        <span class="mdc-notched-outline__trailing"></span>
+                    </span>
+                    <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">
+                        place
+                    </i>
+                    <input class="mdc-text-field__input pageslider-page-dataElement form-inp" id="eventinp-location" name="location" type="text"  aria-labelledby="label1" required="required"/>
+                </label>
+            </div>
+        </div>
+    </div>
+</form>

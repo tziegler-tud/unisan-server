@@ -479,7 +479,7 @@ LogSchema.virtual('description').get(function() {
                 shortDescription.de = authorizedUser + " hat Event '" + target + "' angelegt";
 
                 actionDescription.en = "created event: " + target;
-                actionDescription.de = authorizedUser + "angelegt";
+                actionDescription.de = target + "angelegt";
 
                 minDescription = this.action.value;
                 logType = "Event angelegt";
@@ -497,7 +497,7 @@ LogSchema.virtual('description').get(function() {
                 shortDescription.de = authorizedUser + " hat Event '" + target + "' entfernt";
 
                 actionDescription.en = "removed event: " + target;
-                actionDescription.de = authorizedUser + "entfernt";
+                actionDescription.de = target + "entfernt";
 
                 minDescription = this.action.value;
                 logType = "Event entfernt";
@@ -513,7 +513,7 @@ LogSchema.virtual('description').get(function() {
                 shortDescription.de = authorizedUser + " hat '" + target + "' geändert";
 
                 actionDescription.en = "changed event: " + target;
-                actionDescription.de = authorizedUser + "geändert";
+                actionDescription.de = target + "geändert";
 
                 minDescription = target;
                 logType = "Event geändert";
@@ -777,6 +777,78 @@ LogSchema.virtual('description').get(function() {
 
                 minDescription = target;
                 logType = "Event: Datei entfernt";
+                break;
+        }
+    }
+
+    if (this.target.targetModel === "EventBlueprint"){
+        //validate
+        let deleted = false;
+        if (this.target.targetObject === undefined || this.target.targetObject === null || this.target.targetState === "DELETED") {
+            let str = "<DELETED>";
+            deleted = true;
+            this.target.targetObject = {id: str + this.target.targetObjectId, title: {value: this.action.value ? this.action.value : str +this.target.targetObjectId}};
+        }
+        let target = this.populated("target.targetObject")|| deleted ? this.target.targetObject.title.value : this.target.targetObject;
+        let targetUser;
+
+        variables.target = {
+            type: variableTypes.EVENTBLUEPRINT,
+            value: target,
+            ref: this.target.targetObjectId
+        }
+
+
+        switch(this.action.actionDetail) {
+            case "eventBlueprintCreate":
+
+                fullDescription.template.de = "$authorizedUser hat eine neue Event-Vorlage erstellt: $target";
+                fullDescription.en = authorizedUser + " created new event blueprint: " + target;
+                fullDescription.de = authorizedUser + " hat eine neue Event-Vorlage erstellt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Event-Vorlage $target angelegt";
+                shortDescription.en = authorizedUser + " created Event blueprint: " + target;
+                shortDescription.de = authorizedUser + " hat Event-Vorlage '" + target + "' angelegt";
+
+                actionDescription.en = "created event: " + target;
+                actionDescription.de = authorizedUser + "angelegt";
+
+                minDescription = this.action.value;
+                logType = "Event-Vorlage angelegt";
+                break;
+            case "eventBlueprintDelete":
+
+                variables.target.ref = undefined;
+
+                fullDescription.template.de = "$authorizedUser hat eine Event-Vorlage entfernt: $target";
+                fullDescription.en = authorizedUser + " removed event blueprint: " + target;
+                fullDescription.de = authorizedUser + " hat eine Event-Vorlage entfernt: " + target;
+
+                shortDescription.template.de = "$authorizedUser hat Event-Vorlage $target entfernt";
+                shortDescription.en = authorizedUser + " removed event blueprint: " + target;
+                shortDescription.de = authorizedUser + " hat Event-Vorlage '" + target + "' entfernt";
+
+                actionDescription.en = "removed event: " + target;
+                actionDescription.de = authorizedUser + "entfernt";
+
+                minDescription = this.action.value;
+                logType = "Event-Vorlage entfernt";
+                break;
+            case "eventBlueprintModify":
+
+                fullDescription.template.de = "$authorizedUser hat Event-Vorlage $target geändert";
+                fullDescription.en = authorizedUser + " changed event blueprint '" + target + "'";
+                fullDescription.de = authorizedUser + " hat Event-Vorlage '" + target + "' geändert";
+
+                shortDescription.template.de = "$authorizedUser hat $target geändert";
+                shortDescription.en = authorizedUser + " changed '" + target + "'";
+                shortDescription.de = authorizedUser + " hat '" + target + "' geändert";
+
+                actionDescription.en = "changed event: " + target;
+                actionDescription.de = target + "geändert";
+
+                minDescription = target;
+                logType = "Event-Vorlage geändert";
                 break;
         }
     }
@@ -1089,4 +1161,5 @@ const variableTypes = {
     TEXT: "TEXT",
     VALUE: "VALUE",
     NEWS: "NEWS",
+    EVENTBLUEPRINT: "EVENTBLUEPRINT",
 }

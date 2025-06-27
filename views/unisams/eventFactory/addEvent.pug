@@ -1,0 +1,49 @@
+extends ../layout
+
+block page_includes
+    //link(rel='stylesheet', href='/static/unisams/stylesheets/events/addEvent.css')
+
+    link(rel='stylesheet', href='/lib/wickedpicker/stylesheets/wickedpicker.css')
+
+    script(src="/lib/wickedpicker/src/wickedpicker.js")
+
+    script(src='/dist/addEvent.js')
+    script(src='/dist/addEvent_style.js')
+    link(rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons")
+
+
+    //// Main Quill library
+    //script(src='//cdn.quilljs.com/1.3.6/quill.js')
+    // Theme included stylesheets
+    link(href='/lib/quill/quill.snow-custom.css' rel='stylesheet')
+    link(href='/lib/quill/quill.bubble-custom.css' rel='stylesheet')
+    //link(href='/lib/quill/quill.core.css' rel='stylesheet')
+
+    script(type="module" src='/lib/quill/quill.js')
+
+    script(src="/lib/fineUploader/fine-uploader.js")
+    link(rel='stylesheet', href='/lib/fineUploader/fine-uploader-new.css')
+
+    script(type="text/template" id="qq-template-manual-trigger")
+
+    script.
+        window.dockerArgs.activeContainer =  "eventContainer";
+        window.dockerArgs.activeElementId =  "eventadd";
+
+block content
+    #wrapper
+        #page-container.page-container
+            #page-container-inner.page-container-inner.full-height
+                section#sec1
+                    #sec-content.subpage-container.center-in-container
+                        #content1-heading.sec-heading.subpage-heading.center
+                            h3 Neues Event anlegen
+                        #content1-text.sec-content
+                            .subpage-content.userinfo-container
+                                    #pageslider-container-01.userinfo-inner
+
+
+
+
+
+

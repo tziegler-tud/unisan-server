@@ -306,7 +306,7 @@ export default class Docker{
 
     /**
      * adds a subpage to docker
-     * @param {String} type - type of subpage. this value determines which template is used
+     * @param {string} type - type of subpage. this value determines which template is used. ["user", "userEdit", "event", "eventBlueprint", "eventEdit", "system", "userSettings", "role"]
      * @param {Object} data - JSON containing data for template rendering
      * @param {Object} options - overwrite [bool]: replace existing subpages if id matches, position: {place: ["fixed", "auto", "first", "last", "beforeMain"], group: <Number>}
      * @param {Number} [id] - (Optional) set id for the new subpage. Fails if id exists without the overwrite option
@@ -371,6 +371,13 @@ export default class Docker{
                 break;
             case "event":
                 url = '/webpack/docker/templates/subpage-event.hbs';
+                context = {
+                    id: id,
+                    exploredEvent: data,
+                };
+                break;
+            case "eventBlueprint":
+                url = '/webpack/docker/templates/subpage-eventBlueprint.hbs';
                 context = {
                     id: id,
                     exploredEvent: data,

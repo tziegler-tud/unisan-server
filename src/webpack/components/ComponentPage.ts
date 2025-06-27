@@ -21,6 +21,11 @@ import Component, {ComponentOptionArgs} from "./Component";
 import Sidebar from "../sidebar/Sidebar";
 import EventListComponent from "./pageComponents/events/EventListComponent";
 import EventTabListComponent from "./pageComponents/events/EventTabListComponent";
+import EventBlueprintListComponent from "./pageComponents/eventFactory/EventBlueprintListComponent";
+import EventFactoryPostingsComponent from "./pageComponents/eventFactory/EventFactoryPostingsComponent";
+import EventPostingsComponent from "./pageComponents/events/EventPostingsComponent";
+import {getCompilerOptions} from "ts-loader/dist/compilerSetup";
+
 
 export interface ComponentPageOptions {
     container?: HTMLElement;
@@ -66,7 +71,12 @@ export default class ComponentPage {
             CALENDAR: CalendarComponent,
             LIST: EventListComponent,
             TABLIST: EventTabListComponent,
+            POSTINGS: EventPostingsComponent,       
         },
+        EVENTFACOTRY: {
+            LIST: EventBlueprintListComponent,
+            POSTINGS: EventFactoryPostingsComponent,
+        }
     };
 
     private data: any;
@@ -116,6 +126,21 @@ export default class ComponentPage {
     renderComponentHtml(section: ComponentSection, html: HTMLElement): { error: false } {
         section.componentContainer.appendChild(html);
         return { error: false };
+    }
+
+    async reload(){
+        const promiseArray: Promise<any>[] = [];
+        this.sections.forEach((section) => {
+            promiseArray.push(section.reload());
+        })
+        Promise.all(promiseArray)
+            .then(() => {
+            return true;
+        })
+            .catch(err => {
+            throw err
+            }
+        )
     }
 
     async addComponent(options: AddComponentOptions): Promise<void> {

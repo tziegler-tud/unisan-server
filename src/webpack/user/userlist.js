@@ -3,8 +3,7 @@ import {userPlugin} from "../sidebar/plugins/plugin-user";
 import {userActions} from "../actions/userActions";
 
 import ScrollableList from "../scrollableList/ScrollableList";
-import {Searchbar} from "../searchbar/searchbar";
-
+import Searchbar from "../widgets/searchbar/SearchBar";
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
 $(document).ready (function () {

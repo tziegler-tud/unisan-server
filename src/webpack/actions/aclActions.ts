@@ -1,4 +1,4 @@
-import {Event} from "./eventActions";
+import {IEvent} from "../types/Event";
 
 interface UserACL {
     user: any,
@@ -13,7 +13,7 @@ interface UserACL {
     docker: UserDockerACL,
 }
 
-interface UserDockerACL {
+export interface UserDockerACL {
     user: {
         read: boolean,
         write: boolean,
