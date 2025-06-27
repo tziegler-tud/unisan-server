@@ -47,7 +47,7 @@ export default new PageModule ({
         const event = data.event;
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
+        window.DockerElement.addDockerSubPage("eventBlueprint", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
 
         // const menu = new DropdownMenu("#mdc-dropdown", "click", "#mdc-dropdown-trigger", {});
 

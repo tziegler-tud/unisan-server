@@ -21,6 +21,81 @@ var FileReference = new Schema({
 
 });
 
+var Position = new Schema({
+    title: {
+        type: String,
+    },
+    description: {
+        type: String,
+    },
+    createdDate: {
+        type: Date,
+        default: Date.now,
+    }
+})
+
+var Posting = new Schema(
+    {
+        requiredQualifications: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Qualifications',
+        }],
+        title: {
+            type: String,
+            default: "",
+        },
+        description: {
+            type: String,
+        },
+        allowHigher: {
+            type: Boolean,
+            default: true,
+        },
+        date: {
+            startDate: {
+                type: Date,
+                default: function(){
+                    return this.parent().date.startDate;
+                }
+            },
+            endDate: {
+                type: Date,
+                default: function(){
+                    return this.parent().date.endDate;
+                }
+            }
+        },
+        enabled: {
+            type: Boolean,
+            default: true,
+        },
+        optional: {
+            type: Boolean,
+            default: false,
+        },
+        position: {
+            type: Schema.Types.ObjectId,
+            ref: 'Position',
+            default: undefined,
+        },
+        assigned: {
+            isAssigned: {
+                type: Boolean,
+                default: false,
+            },
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+                default: undefined,
+            },
+            date: {
+                type: Date,
+                default: Date.now,
+            }
+        },
+    }
+)
+
 // create instance of Schema
 var EventSchema = new Schema({
     title: {
@@ -105,62 +180,8 @@ var EventSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    postings: [
-        {
-            requiredQualifications: [{
-                type: Schema.Types.ObjectId,
-                ref: 'Qualifications',
-            }],
-            title: {
-                type: String,
-                default: "",
-            },
-            description: {
-                type: String,
-            },
-            allowHigher: {
-                type: Boolean,
-                default: true,
-            },
-            date: {
-                startDate: {
-                    type: Date,
-                    default: function(){
-                        return this.parent().date.startDate;
-                    }
-                },
-                endDate: {
-                    type: Date,
-                    default: function(){
-                        return this.parent().date.endDate;
-                    }
-                }
-            },
-            enabled: {
-                type: Boolean,
-                default: true,
-            },
-            optional: {
-                type: Boolean,
-                default: false,
-            },
-            assigned: {
-                isAssigned: {
-                    type: Boolean,
-                    default: false,
-                },
-                user: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'User',
-                    default: undefined,
-                },
-                date: {
-                    type: Date,
-                    default: Date.now,
-                }
-            },
-        }
-    ],
+    postings: [Posting],
+    positions: [Position],
     participants: [
         {
             user: {

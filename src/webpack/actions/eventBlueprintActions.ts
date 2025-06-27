@@ -1,6 +1,56 @@
-import {type IEventBlueprint} from "../types/EventBlueprint";
+import {type IEventBlueprint, IBlueprintPosting} from "../types/EventBlueprint";
+import {type ShowPostingConfirmPayload} from "../sidebar/plugins/plugin-eventfactory";
 
 const baseUrl =  "/api/v1/eventfactory/"
+
+
+interface AddBlueprintPostingActionPayload {
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    startTime: string,
+    endTime: string,
+    date?: Date,
+    requiredQualifications: number[]
+}
+
+interface UpdateBlueprintPostingActionPayload {
+    id: number|string,
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    startTime: string,
+    endTime: string,
+    date?: Date,
+    requiredQualifications: number[]
+}
+
+interface AddBlueprintPostingApiPayload {
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    date: {
+        startTime: number,
+        endTime: number,
+    }
+    requiredQualifications: number[]
+}
+
+interface UpdateBlueprintPostingApiPayload {
+    id: number|string,
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    date: {
+        startTime: number,
+        endTime: number,
+    },
+    requiredQualifications: number[]
+}
 
 interface EventBlueprintActions {
     getEventBlueprints(params: {
@@ -19,9 +69,9 @@ interface EventBlueprintActions {
         endTime: string;
     }): JQuery.jqXHR;
     deleteEventBlueprint(id: string|number, callback?: (result: any) => void): JQuery.jqXHR;
-    addPosting(id: string|number, postingData: any, callback?: (result: any) => void, args?: {startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
-    updatePosting(id: string|number, postingData: any, callback?: (result: any) => void, args?: {startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
-    removePosting(id: string|number, postingId: string, callback?: (result: any) => void): JQuery.jqXHR;
+    addPosting(id: string|number, postingData: AddBlueprintPostingActionPayload, callback?: (result: any) => void, args?: {}): JQuery.jqXHR; // Define postingData type
+    updatePosting(id: string|number, postingData: UpdateBlueprintPostingActionPayload, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+    removePosting(id: string|number, postingId: string, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR;
     saveTitle(id: string|number, data: { delta: any; value: string }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define delta type
     saveDescription(id: string|number, data: { longDesc: any; shortDesc: any }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define desc types
     saveLocation(id: string|number, data: {value: string}, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void  }): JQuery.jqXHR; // Define desc types
@@ -103,17 +153,24 @@ const eventBlueprintActions: EventBlueprintActions = {
     addPosting(id, postingData, callback, args) {
         callback = callback == null ? function() { } : callback;
 
-        const startDate = parseHTMLInputDate(args.startTime).getTime();
-        const endDate = parseHTMLInputDate(args.endTime).getTime();
+        const startDate = parseHTMLInputDate(postingData.startTime).getTime();
+        const endDate = parseHTMLInputDate(postingData.endTime).getTime();
 
-        postingData.date = {
-            startDate: startDate,
-            endDate: endDate,
-        };
+        let posting: AddBlueprintPostingApiPayload = {
+            description: postingData.description,
+            allowHigher: postingData.allowHigher,
+            optional: postingData.optional,
+            enabled: postingData.enabled,
+            requiredQualifications: postingData.requiredQualifications,
+            date: {
+                startTime: startDate,
+                endTime: endDate,
+            }
+        }
 
         const data = {
             id: id,
-            posting: postingData,
+            posting: posting,
             args: {},
         };
         return $.ajax({
@@ -128,19 +185,28 @@ const eventBlueprintActions: EventBlueprintActions = {
         });
     },
 
-    updatePosting(id, postingData, callback, args) {
-        callback = callback == null ? function() { } : callback;
+    updatePosting(id, postingData, callback) {
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
 
-        const startDate = parseHTMLInputDate(args.startTime).getTime();
-        const endDate = parseHTMLInputDate(args.endTime).getTime();
+        const startDate = parseHTMLInputDate(postingData.startTime).getTime();
+        const endDate = parseHTMLInputDate(postingData.endTime).getTime();
 
-        postingData.date = {
-            startDate: startDate,
-            endDate: endDate,
-        };
+        let posting: UpdateBlueprintPostingApiPayload = {
+            id: postingData.id,
+            description: postingData.description,
+            allowHigher: postingData.allowHigher,
+            optional: postingData.optional,
+            enabled: postingData.enabled,
+            requiredQualifications: postingData.requiredQualifications,
+            date: {
+                startTime: startDate,
+                endTime: endDate,
+            }
+        }
         const data = {
             id: id,
-            posting: postingData,
+            posting: posting,
             args: {},
         };
 
@@ -150,14 +216,18 @@ const eventBlueprintActions: EventBlueprintActions = {
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
             data: JSON.stringify(data),
-            success: (result: any) => {
-                callback(result);
+            success: function(result: any) {
+                callback.onSuccess(result);
             },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
         });
     },
 
     removePosting(id, postingId, callback) {
-        callback = callback == null ? function() { } : callback;
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
         const data = {
             id: id,
             postingId: postingId,
@@ -170,7 +240,7 @@ const eventBlueprintActions: EventBlueprintActions = {
             dataType: "json",
             data: JSON.stringify(data),
             success: (result: any) => {
-                callback(result);
+                callback.onSuccess(result);
             },
         });
     },

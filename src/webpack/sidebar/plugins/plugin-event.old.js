@@ -24,7 +24,7 @@ import ContentHandler from "../ContentHandler";
 import SidebarButton from "../SidebarButton";
 import SidebarTooltip from "../SidebarTooltip";
 
-import {Searchbar} from "../../searchbar/searchbar.js";
+import Searchbar from "../../widgets/searchbar/SearchBar";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";

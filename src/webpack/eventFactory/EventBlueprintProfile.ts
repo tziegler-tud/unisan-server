@@ -18,7 +18,7 @@ export default class EventBlueprintProfile
     }
 
     _getEventFromServer(): Promise<IEventBlueprint> {
-        let url = "/api/v1/eventfactory/" + this.eventId;
+        let url = "/api/v1/eventfactory/" + this.eventId + "/populate";
         return new Promise((resolve, reject) => {
             $.ajax(url, {
                 type: 'GET',

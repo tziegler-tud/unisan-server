@@ -50,6 +50,7 @@ function allowCreateEvent(req, res, next) {
 
 router.get('/', checkEventReadRights, getAll);
 router.get('/:id', checkEventReadRights, getById)
+router.get('/:id/populate', checkEventReadRights, getPopulated)
 router.post('/filter', checkEventReadRights, filter)
 router.post('/createBlueprint', allowCreateEvent, createBlueprint);
 router.delete('/:id', checkEventEditRights, _delete);
@@ -72,6 +73,11 @@ function getAll(req, res, next) {
 
 function getById(req, res, next) {
     EventFactoryService.getById(req.params.id)
+        .then(event => event ? res.json(event) : res.sendStatus(404))
+}
+
+function getPopulated(req, res, next) {
+    EventFactoryService.getById(req.params.id, true)
         .then(event => event ? res.json(event) : res.sendStatus(404))
 }
 

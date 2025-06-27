@@ -2,8 +2,8 @@ import Delta from "quill-delta";
 import {IQualification} from "./Qualification";
 import {IParticipant} from "./Event";
 
-export interface IPosting {
-    id: number|string,
+export interface IBlueprintPosting {
+    _id: number|string,
     requiredQualifications: IQualification[],
     title: string,
     description: string,
@@ -47,7 +47,7 @@ export interface IEventBlueprint {
         startDate: Date,
         endDate: Date,
     }
-    postings: IPosting[],
+    postings: IBlueprintPosting[],
     participants: IParticipant[],
     createdDate: Date,
     hasPostings: boolean,

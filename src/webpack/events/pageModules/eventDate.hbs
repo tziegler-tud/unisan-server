@@ -7,7 +7,11 @@
                     {{event.date.startDateString}}
                 </div>
                 <div class="eventinfo-date-time">
-                    {{event.date.timeString}}
+                    {{#if event.date.timeString}}
+                        {{event.date.timeString}}
+                    {{else}}
+                        Keine Uhrzeit angegeben
+                    {{/if}}
                 </div>
                 {{#if args.displayLocalizedDate}}
                     <div class="eventinfo-date-time--small">

@@ -133,6 +133,12 @@ router.put('/addPost', checkEventEditRights, addPost);
 router.post('/updatePost', checkEventEditRights, updatePost);
 router.delete('/removePost', checkParticipantAccess, removePost);
 
+//positions
+//NOTE: Positions are not Postings!
+router.put('/:id/addPosition', checkEventEditRights, addPosition);
+router.post('/:id/updatePosition', checkEventEditRights, updatePosition);
+router.delete('/:id/removePosition', checkEventEditRights, removePosition);
+router.post('/:id/assignPosition', checkEventEditRights, assignPosition);
 
 //modification. need general or individual editing rights
 router.put('/:id', checkEventEditRights, update);
@@ -457,6 +463,63 @@ function removeParticipant(req, res, next) {
     };
     eventService.removeParticipant(req, req.body.id, req.body.userId, args)
         .then(() => res.json(req.body))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function addPosition(req, res, next) {
+    const position = req.body.position;
+    if(!position) next(new ApiValidationError("Invalid arguments received for parameter: position"));
+    let positionData = {
+        title: position.title,
+        description: position.description,
+    }
+    const eventId = req.params.id;
+
+    eventService.addPosition(req, eventId, positionData)
+        .then(event => res.json({}))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function updatePosition(req, res, next) {
+    const position = req.body.position;
+    if(!position) next(new ApiValidationError("Invalid arguments received for parameter: position"));
+    let positionData = {
+        title: position.title,
+        description: position.description,
+    }
+    const positionId = req.body.id;
+    const eventId = req.params.id;
+
+    eventService.updatePosition(req, eventId, positionId, positionData)
+        .then(event => res.json({}))
+        .catch(err => {
+            next(err);
+        })
+}
+
+
+function removePosition(req, res, next) {
+    const positionId = req.body.id;
+    const eventId = req.params.id;
+
+    eventService.removePosition(req, eventId, positionId)
+        .then(event => res.json({}))
+        .catch(err => {
+            next(err);
+        })
+}
+
+function assignPosition(req, res, next) {
+    const positionId = req.body.position;
+    const postingId = req.body.posting;
+    const eventId = req.params.id;
+
+    eventService.assignPosition(req, eventId, postingId, positionId )
+        .then(event => res.json({}))
         .catch(err => {
             next(err);
         })

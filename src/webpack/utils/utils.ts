@@ -5,8 +5,8 @@ export async function getTemplate(templateUrl: string): Promise<string> {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        const json = await response.json();
-        return response.json();
+        const text = await response.text();
+        return text
     } catch (error) {
         console.error(error.message);
     }

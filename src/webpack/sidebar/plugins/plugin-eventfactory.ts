@@ -2,7 +2,7 @@
 import "../sidebar-events.scss";
 import "../sidebar-addParticipant.scss";
 
-import {type IEventBlueprint, IPosting} from "../../types/EventBlueprint"
+import {type IEventBlueprint, IBlueprintPosting} from "../../types/EventBlueprint"
 import {type IQualification} from "../../types/Qualification";
 
 // Imports for classes and utilities
@@ -10,8 +10,7 @@ import SidebarPlugin from "../SidebarPlugin";
 import ContentHandler from "../ContentHandler";
 import SidebarButton from "../SidebarButton";
 import SidebarTooltip from "../SidebarTooltip";
-import { Searchbar } from "../../searchbar/searchbar";
-
+import Searchbar from "../../widgets/searchbar/SearchBar";
 // Import Handlebars (CommonJS module)
 import Handlebars from "handlebars";
 import "../../helpers/handlebarsHelpers"; // Assuming this handles Date prototype extensions too
@@ -21,13 +20,34 @@ import { EditableTextField } from "../../helpers/editableTextField";
 import Sidebar from "../Sidebar";
 import HandlerFunctionResult from "../HandlerFunctionResult";
 import HandlerFunctionError from "../HandlerFunctionError";
-import {fetchData, getTemplate} from "../utils";
+import {fetchData, getTemplate} from "../../utils/utils";
 import eventBlueprintActions from "../../actions/eventBlueprintActions";
 import qualificationActions from "../../actions/qualificationActions";
 
 // ---
 // Interfaces for Type Safety
 // ---
+
+export interface AddPostingOnConfirmPayload {
+    qualifications: number[],
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    startTime: string,
+    endTime: string,
+}
+
+export interface ShowPostingConfirmPayload {
+    id: string|number,
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    startTime: string,
+    endTime: string,
+    qualifications: number[],
+}
 
 
 /**
@@ -57,7 +77,7 @@ interface SidebarArgs {
     postingId?: string;
     allowEdit?: boolean;
     user?: UserData;
-    augmentedPosting?: IPosting;
+    augmentedPosting?: IBlueprintPosting;
     qualTypes?: string[];
 }
 
@@ -68,13 +88,13 @@ interface HandlebarContext {
     event?: IEventBlueprint;
     args?: SidebarArgs;
     user?: UserData;
-    augmentedPosting?: IPosting;
+    augmentedPosting?: IBlueprintPosting;
     postingId?: string;
     allowEdit?: boolean;
     isAssignedToSelf?: boolean;
     assignedUser?: UserData;
     sidebar?: { title: string };
-    posting?: IPosting;
+    posting?: IBlueprintPosting;
     qualifications?: {
         byType?: QualificationGroup[];
     };
@@ -126,7 +146,7 @@ const eventFactoryPlugin = new SidebarPlugin("eventFactory");
  * Handles displaying the details of an event in read-only mode.
  */
 const viewEvent = new ContentHandler(
-    "viewEvent",
+    "viewEventBlueprint",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const event = args.event;
         const context: HandlebarContext = {
@@ -156,7 +176,7 @@ const viewEvent = new ContentHandler(
                 handler: function() {
                     // Using 'this' context from bind(args) in original JS.
                     // In TypeScript, consider passing 'event' directly or using arrow function if 'this' is not needed.
-                    window.location.href = `/events/${event.id}`;
+                    window.location.href = `/eventfactory/${event.id}`;
                 }.bind(args)
             });
         } catch (error) {
@@ -177,7 +197,7 @@ const viewEvent = new ContentHandler(
  * Handles displaying editable event details.
  */
 const eventDetails = new ContentHandler(
-    "eventDetails",
+    "eventBlueprintDetails",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const event = args.event;
         const context: HandlebarContext = {
@@ -223,7 +243,7 @@ const eventDetails = new ContentHandler(
  * Displays and allows updating of an event's date and time.
  */
 const showUpdateEventDateContent = new ContentHandler(
-    "editEventDate",
+    "editEventBlueprintDate",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const onConfirm = args.callback?.onConfirm;
 
@@ -238,7 +258,7 @@ const showUpdateEventDateContent = new ContentHandler(
 
 
         try {
-            const data = await getTemplate('/webpack/sidebar/templates/events/sidebar-updateEventDate.hbs');
+            const data = await getTemplate('/webpack/sidebar/templates/eventFactory/sidebar-updateEventDate.hbs');
             const template = Handlebars.compile(data);
             sidebar.setHTMLContent(template(context));
 
@@ -254,12 +274,10 @@ const showUpdateEventDateContent = new ContentHandler(
                 }, false, true);
             }
 
-            const d1 = document.getElementById("eventinp-date") as HTMLInputElement;
             const t1 = document.getElementById("eventinp-timeStart") as HTMLInputElement;
             const t2 = document.getElementById("eventinp-timeEnd") as HTMLInputElement;
             const l = document.getElementById("eventinp-location") as HTMLInputElement; // Check if location is truly part of this form
 
-            if (d1) $(d1).val(currentStartDate.toDateInputValue());
             if (t1) $(t1).val(currentStartDate.toTimeInputValue());
             if (t2) $(t2).val(currentEndDate.toTimeInputValue());
             if (l && context.event?.location) $(l).val(context.event.location.value); // Pre-fill location if available and input exists
@@ -269,13 +287,11 @@ const showUpdateEventDateContent = new ContentHandler(
             sidebar.registerConfirmButton(".sidebar-confirm", {
                 customHandler: true,
                 handler: () => {
-                    const date = d1?.value;
                     const startTime = t1?.value;
                     const endTime = t2?.value;
                     const location = l?.value; // Still including location if it's part of this form
 
                     const updateData = {
-                        date: date,
                         startTime: startTime,
                         endTime: endTime,
                         location: location,
@@ -305,7 +321,7 @@ const showUpdateEventDateContent = new ContentHandler(
  * Displays and allows updating of an event's location.
  */
 const showUpdateEventLocationContent = new ContentHandler(
-    "editEventLocation",
+    "editEventBlueprintLocation",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const onConfirm = args.callback?.onConfirm;
 
@@ -370,7 +386,7 @@ const showUpdateEventLocationContent = new ContentHandler(
  * Displays a list of postings associated with an event.
  */
 const showPostings = new ContentHandler(
-    "eventPostings",
+    "eventBlueprintPostings",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const onConfirm = args.callback?.onConfirm;
 
@@ -427,7 +443,7 @@ const showPostings = new ContentHandler(
  * Provides a form to add a new posting to an event, including qualification selection.
  */
 const addPosting = new ContentHandler(
-    "addEventPosting",
+    "addEventBlueprintPosting",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const onConfirm = args.callback?.onConfirm;
 
@@ -490,13 +506,11 @@ const addPosting = new ContentHandler(
                         allowHigher: allowHigher,
                         optional: optional,
                         enabled: enabled,
-                    };
-                    const postingArgs = {
-                        startTime: timeStartInput?.value,
-                        endTime: timeEndInput?.value,
+                        startTime: timeStartInput.value,
+                        endTime: timeEndInput.value,
                     };
                     if (onConfirm) {
-                        onConfirm(postingData, postingArgs);
+                        onConfirm(postingData, {});
                     }
                 }
             });
@@ -514,8 +528,8 @@ const addPosting = new ContentHandler(
                 if (typeData && qualNameSelect) {
                     typeData.values.forEach((el, index) => {
                         const option = document.createElement('option');
-                        option.id = el.id.toString();
-                        option.dataset.qualid = el.id.toString();
+                        option.id = el._id.toString();
+                        option.dataset.qualid = el._id.toString();
                         option.value = el.name;
                         option.innerHTML = el.name;
                         qualNameSelect.options[index] = option;
@@ -559,7 +573,7 @@ const addPosting = new ContentHandler(
  * including options for editing, deleting, assigning, and unassigning users.
  */
 const showPostingDetails = new ContentHandler(
-    "showPostingDetails",
+    "showBlueprintPostingDetails",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string, handler: ContentHandler): Promise<HandlerFunctionResult> {
         const onDelete = args.callback?.onDelete;
         const onConfirm = args.callback?.onConfirm;
@@ -587,12 +601,12 @@ const showPostingDetails = new ContentHandler(
         let posting = context.augmentedPosting;
 
         if (!posting && context.event?.postings && context.postingId) {
-            posting = context.event.postings.find(el => el.id.toString() === context.postingId);
+            posting = context.event.postings.find(el => el._id.toString() === context.postingId);
             if (!posting) {
                 console.warn("Posting not found or corrupted. Initializing with default values.");
                 // Provide minimal default values to prevent crashes if posting is not found
                 posting = {
-                    id: '', // Use postingId if available
+                    _id: '', // Use postingId if available
                     requiredQualifications: [],
                     title: "",
                     description: "",
@@ -606,11 +620,73 @@ const showPostingDetails = new ContentHandler(
         }
         context.posting = posting;
 
+        const res: { qualifications: { byType?: QualificationGroup[] } } = { qualifications: {} };
 
         try {
-            const templateData = await getTemplate('/webpack/sidebar/templates/events/sidebar-showPostingDetails.hbs');
+            const fetchedQuals: QualificationGroup[] = await qualificationActions.getGrouped();
+
+            const qualTypeFilters = args.qualTypes;
+            if (Array.isArray(qualTypeFilters) && qualTypeFilters.length > 0) {
+                res.qualifications.byType = fetchedQuals.filter((qualGroup: QualificationGroup) =>
+                    qualTypeFilters.includes(qualGroup._id)
+                );
+            } else {
+                res.qualifications.byType = fetchedQuals;
+            }
+
+            const templateData = await getTemplate('/webpack/sidebar/templates/eventFactory/sidebar-showPostingDetails.hbs');
             const template = Handlebars.compile(templateData);
+
+            context.qualifications = res.qualifications;
+
             sidebar.setHTMLContent(template(context));
+
+            const currentQualType = posting.requiredQualifications[0].qualType
+            const currentQualName = posting.requiredQualifications[0].name
+
+            //select current qualification
+            const levelObject = document.getElementById("qual-level") as HTMLInputElement;
+            const qualTypeSelect: HTMLSelectElement = document.getElementById("qual-type") as HTMLSelectElement;
+            const qualNameSelect: HTMLSelectElement = document.getElementById("qual-name") as HTMLSelectElement;
+
+            $(qualTypeSelect).on("change", (e: JQuery.ChangeEvent) => {
+                const targetValue = (e.target as HTMLSelectElement).value;
+                const typeData = res.qualifications.byType?.find(element => element._id === targetValue);
+
+                if (qualNameSelect) qualNameSelect.options.length = 0; // Clear existing options
+
+                if (typeData && qualNameSelect) {
+                    typeData.values.forEach((el, index) => {
+                        const option = document.createElement('option');
+                        option.id = el._id.toString();
+                        option.dataset.qualid = el._id.toString();
+                        option.value = el.name;
+                        option.innerHTML = el.name;
+                        qualNameSelect.options[index] = option;
+                    });
+                }
+            });
+
+            $(qualNameSelect).on("change", (e: JQuery.ChangeEvent) => {
+                const selectedOption = (e.target as HTMLSelectElement).selectedOptions[0];
+                const targetValue = (e.target as HTMLSelectElement).value;
+                const qualId = selectedOption?.dataset.qualid;
+
+                if (qualId && res.qualifications.byType && levelObject) {
+                    const qual = sidebar.findQualByIdInTypeArray(res.qualifications.byType, qualId);
+                    if (qual) {
+                        levelObject.value = qual.level;
+                    }
+                }
+            });
+            qualTypeSelect.value = currentQualType
+            $(qualTypeSelect).trigger("change"); // Trigger change on name select after updating
+
+            qualNameSelect.value = currentQualName
+            $(qualNameSelect).trigger("change"); // Initial trigger to populate name and level
+
+
+
             sidebar.registerBackButton(".sidebar-back-btn");
             // Handle edit mode for posting details
             if (posting) {
@@ -636,25 +712,35 @@ const showPostingDetails = new ContentHandler(
                 let confirmButton = sidebar.registerConfirmButton( ".sidebar-confirm",
                     {
                         customHandler: true,
-                        enabled: (!corrupted && hasChanges),
+                        enabled: (!corrupted),
                         handler: function () {
                             const optionalCheckbox = document.getElementById("isOptional-checkbox") as HTMLInputElement
                             const optional = optionalCheckbox.checked;
                             const enabled = true;
                             const allowHigherCheckbox = document.getElementById("allowHigher-checkbox") as HTMLInputElement
                             const allowHigher = allowHigherCheckbox.checked;
+
+                            const qualId = qualNameSelect?.selectedOptions[0]?.id;
+
+                            if (!qualId) {
+                                console.error("Missing qualification ID for new posting.");
+                                sidebar.addErrorMessage("Please select a qualification.", (errorHTML: HTMLElement) => {
+                                    $("#sidebar-inner").before(errorHTML);
+                                }, false, true);
+                                return;
+                            }
+
                             const data = {
                                 id: context.postingId,
                                 description: $("#posting-description").val(), //string
                                 optional: optional,
                                 enabled: enabled,
                                 allowHigher: allowHigher,
-                            };
-                            const args = {
                                 startTime: timeStartInput.value,
                                 endTime: timeEndInput.value,
-                            }
-                            onConfirm(data, args);
+                                qualifications: [qualId],
+                            };
+                            onConfirm(data, {});
                         }.bind(args)
                     });
 
@@ -665,17 +751,10 @@ const showPostingDetails = new ContentHandler(
                 if (deleteButton) {
                     deleteButton.addEventListener("click", () => {
                         if (onDelete && posting) {
-                            onDelete(posting.id);
+                            onDelete(posting._id);
                         }
                     });
                 }
-
-                $(sidebar).find("input").each((index, el) => {
-                    el.addEventListener("input", function(e){
-                        hasChanges = true;
-                        confirmButton.enable(!corrupted);
-                    })
-                })
             }
 
 
@@ -695,6 +774,9 @@ const showPostingDetails = new ContentHandler(
     }
 );
 
+
+eventFactoryPlugin.addContentHandler(viewEvent)
+eventFactoryPlugin.addContentHandler(eventDetails)
 eventFactoryPlugin.addContentHandler(showUpdateEventDateContent);
 eventFactoryPlugin.addContentHandler(showUpdateEventLocationContent);
 eventFactoryPlugin.addContentHandler(showPostings);
@@ -703,23 +785,3 @@ eventFactoryPlugin.addContentHandler(showPostingDetails);
 
 export default eventFactoryPlugin;
 
-export interface AddPostingOnConfirmPayload {
-    qualifications: number[],
-    description: string,
-    allowHigher: boolean,
-    optional: boolean,
-    enabled: boolean,
-}
-
-export interface AddPostingOnConfirmArgs {
-    startTime: string
-    endTime: string
-}
-
-export interface ShowPostingConfirmPayload {
-    id: string|number,
-    description: string,
-    allowHigher: boolean,
-    optional: boolean,
-    enabled: boolean,
-}
