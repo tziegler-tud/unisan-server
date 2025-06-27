@@ -17,8 +17,8 @@ block page_includes
         };
 
         window.exploreEventId = "#{exploreEvent.id}";
-        window.dockerArgs.activeContainer = "eventDetailContainer";
-        window.dockerArgs.activeElementId = "eventDetail";
+        window.dockerArgs.activeContainer = "eventBlueprintDetailContainer";
+        window.dockerArgs.activeElementId = "eventBlueprintDetail";
         window.allowedit =#{allowedit};
 
 block content
@@ -32,11 +32,11 @@ block content
                                 .eventprofile-heading-container
                                     .eventprofile-heading-text
                                         .eventprofile-heading-type
-                                            span.type=exploreEvent.type.value
+                                            span.type=exploreEvent.type.value + ' (Vorlage)'
                                         .eventprofile-heading-title
                                             #eventtitle-input.title.event-title
                                         .eventprofile-heading-date
-                                            span.date.before-icon.icon-calendar=exploreEvent.dateRangeString
+                                            span.date.before-icon.icon-calendar=exploreEvent.date.timeString
                                     #mdc-dropdown.eventprofile-dropdown.dropdown-menu.mdc-menu-surface--anchor
                                         dropdown-btn
                                             button.material-icons.mdc-icon-button(id="mdc-dropdown-trigger" aria-label="Options") more_vert
@@ -53,3 +53,8 @@ block content
                             .subpage-content
                                 .eventinfo-container
                                     #eventPage-component-container.eventPage-component-container
+
+                        #content2-text.sec-content.border-top
+                            .subpage-content
+                                .eventinfo-container
+                                    #componentPage-component-container.componentPage-component-container

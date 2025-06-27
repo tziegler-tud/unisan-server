@@ -91,7 +91,7 @@ export default new PageModule ({
 
         function buildPageCommon(user, event, args) {
             // window.DockerElement = new docker.Docker(window.dockerArgs); //done in init
-            self.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
+            self.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.edit}});
         }
 
         function buildPageView(user, event, args) {

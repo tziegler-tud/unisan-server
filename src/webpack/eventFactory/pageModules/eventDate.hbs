@@ -1,0 +1,33 @@
+<div class="eventPage-component eventwidget-location">
+    <div class="eventPage-component-inner">
+        <div class="eventPage-component-header"><span>Uhrzeit</span></div>
+        <div class="eventPage-component-item eventinfo-item-date eventinfo-item-editable {{#if args.allowEdit}}enabled{{/if}}" id="eventDateEditor">
+            <div class="eventinfo-item-inner">
+                <div class="eventinfo-date-time">
+                    {{#if event.date.timeString}}
+                        {{event.date.timeString}}
+                    {{else}}
+                        Keine Uhrzeit angegeben
+                    {{/if}}
+                </div>
+                {{#if args.displayLocalizedDate}}
+                    <div class="eventinfo-date-time--small">
+                        <div>In {{localizedDate.timezone}}:</div>
+                        <div>{{localizedDate.startDate}} - {{localizedDate.endDate}}</div>
+                    </div>
+                {{/if}}
+
+                <div class="eventinfo-item-spacer"></div>
+            </div>
+        </div>
+        <div class="eventPage-component-header"><span>Veranstaltungsort</span></div>
+        <div class="eventPage-component-item eventinfo-item-date eventinfo-item-editable {{#if args.allowEdit}}enabled{{/if}}" id="eventLocationEditor">
+            <div class="eventinfo-item-inner">
+                <div class="eventinfo-date-location before-icon icon-location">
+                    {{event.location.value}}
+                </div>
+            </div>
+            <div class="eventinfo-item-spacer"></div>
+        </div>
+    </div>
+</div>

@@ -9,7 +9,7 @@ block page_includes
     script.
         window.jsmodule = {
             module: "events",
-            loaders: ["events.participants"],
+            loaders: ["events.postings"],
             args: {
                 allowEdit: #{allowedit}
             }
@@ -49,31 +49,15 @@ block content
                                                     span.mdc-deprecated-list-item__text Event löschen
                                     .clear
                             .clear
-                        //#content1-text.sec-content.border-top
-                        //    .subpage-content
-                        //        .eventinfo-container
-                        //            #eventPage-component-container.eventPage-component-container
-                        #content3-text.sec-content.border-top
-                            .subpage-topbar.scrollableList--spacer
-                                .topbar-heading
-                                    h3 Teilnehmende
-                                .subpage-options.topbar-element
-                                    .subpage-options.topbar-element
-                                        .radiogroup.toggleButtonGroup
-                                            label.toggleButton.toggleButton-first(for="eventlist01")
-                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list") <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg>
-                                                //span Liste
-                                            input#eventlist01.radio-item(type="radio", name="eventlist-radio" value="list")
-                                            label(for="eventlist02")
-                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid") <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                                                //span Gallerie
-                                            input#eventlist02.radio-item.toggleButton(type="radio", name="eventlist-radio" value="cards" checked)
-                                #usersearch-participants.searchbar-container.topbar-element
+                        #content1-text.sec-content.border-top
                             .subpage-content
-                                #userlist-container--participants.userlist-container
-                                if allowedit
-                                    .add-smt-button.add-participant-button
-                                        a.add-smt-button-inner
-                                            svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                .eventinfo-container
+                                    #componentPage-component-container.componentPage-component-container
+                                    if allowedit
+                                        .add-smt-button.add-smt-button--fixed.add-participant-button
+                                            a.add-smt-button-inner
+                                                svg(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus") <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+
+
 
 

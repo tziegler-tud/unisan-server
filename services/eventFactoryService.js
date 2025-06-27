@@ -146,9 +146,15 @@ async function getAllFiltered(matchString = ""){
 /**
  * Gets an event by its id
  * @param {number} id id of the event
+ * @param {boolean} populate set true to populate qualification array. Default: false
  */
-async function getById(id) {
-    return EventBlueprint.findById(id);
+async function getById(id, populate=false) {
+    if(populate) {
+        return EventBlueprint.findById(id).populate({
+            path: 'postings.requiredQualifications',
+        })
+    }
+    else return EventBlueprint.findById(id);
 }
 
 
@@ -448,36 +454,33 @@ async function updateTime(req, id, startTime, endTime){
 
     const newValue = extractTimeRangeString(event.date.startDate, event.date.endDate)
 
-    event.save()
-        .then(event => {
-            // create log
-            resolve(event);
-            let log = new Log({
-                type: "modification",
-                action: {
-                    objectType: "eventBlueprint",
-                    actionType: "modify",
-                    actionDetail: "eventBlueprintModify",
-                    key: "date",
-                    fullKey: "date",
-                    originalValue: ojValue,
-                    value:  newValue,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "eventBlueprint",
-                    targetObject: event._id,
-                    targetObjectId: event._id,
-                    targetModel: "EventBlueprint",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
-            })
-            LogService.create(log).then().catch();
-        })
-        .catch(err => reject(err));
+    await event.save()
+
+    let log = new Log({
+        type: "modification",
+        action: {
+            objectType: "eventBlueprint",
+            actionType: "modify",
+            actionDetail: "eventBlueprintModify",
+            key: "date",
+            fullKey: "date",
+            originalValue: ojValue,
+            value:  newValue,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "eventBlueprint",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "EventBlueprint",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return event;
 
 }
 
@@ -714,33 +717,29 @@ async function addPosting (req, eventId, posting, args) {
 
     event.postings = sortPostings(event.postings);
 
-    event.save()
-        .then(result => {
-            let log = new Log({
-                type: "activity",
-                action: {
-                    objectType: "eventBlueprint",
-                    actionType: "modify",
-                    actionDetail: "eventBlueprintAddPost",
-                    key: logQualName,
-                },
-                authorizedUser: req.user,
-                target: {
-                    targetType: "eventBlueprint",
-                    targetObject: event._id,
-                    targetObjectId: event._id,
-                    targetModel: "EventBlueprint",
-                },
-                httpRequest: {
-                    method: req.method,
-                    url: req.originalUrl,
-                }
-            })
-            LogService.create(log).then().catch();
-        })
-        .catch(err => {
-            reject(err);
-        })
+    await event.save()
+    let log = new Log({
+        type: "activity",
+        action: {
+            objectType: "eventBlueprint",
+            actionType: "modify",
+            actionDetail: "eventBlueprintAddPost",
+            key: logQualName,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "eventBlueprint",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "EventBlueprint",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return event;
 }
 
 
@@ -761,7 +760,7 @@ async function addPosting (req, eventId, posting, args) {
 async function updatePosting (req, eventId, postingData, args) {
 
     const errMsg = "Failed to update Posting: "
-    const event = await Event.findById(eventId).populate("postings.requiredQualifications");
+    const event = await EventBlueprint.findById(eventId).populate("postings.requiredQualifications");
     if (!event) throw new Error(errMsg + 'Event not found');
 
     if(postingData === undefined) throw new Error(errMsg + "invalid arguments received");
@@ -810,7 +809,7 @@ async function updatePosting (req, eventId, postingData, args) {
             event.postings = sortPostings(event.postings);
             event.save()
                 .then(result => {
-                    resolve();
+                    resolve(event);
                     let log = new Log({
                         type: "activity",
                         action: {
@@ -843,7 +842,7 @@ async function updatePosting (req, eventId, postingData, args) {
 
 async function removePosting (req, eventId, postingId) {
     let errMsg = "Failed to remove posting: ";
-    const event = await Event.findById(eventId);
+    const event = await EventBlueprint.findById(eventId);
     if (!event) throw new Error('Event not found');
 
     //find posting
@@ -913,7 +912,7 @@ async function removePosting (req, eventId, postingId) {
 }
 
 async function devUpdateDocuments() {
-    let events = await Event.find();
+    let events = await EventBlueprint.find();
     for (let event of events) {
         await event.save();
     }

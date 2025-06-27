@@ -45,7 +45,7 @@ export default new PageModule ({
         const event = data.event;
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
+        window.DockerElement.addDockerSubPage("eventBlueprint", event, {}, undefined, {currentEvent: {edit: window.allowedit}});
 
         var sidebar = new Sidebar('wrapper', {title: "Test"});
         sidebar.addPlugin(eventPlugin);

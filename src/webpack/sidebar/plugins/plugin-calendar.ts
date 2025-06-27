@@ -1,12 +1,8 @@
 import "../sidebar-events.scss";
 
-import {HandlerFunctionResult} from "../Sidebar"
+import HandlerFunctionResult from "../HandlerFunctionResult";
 import SidebarPlugin from "../SidebarPlugin"
 import ContentHandler from "../ContentHandler";
-import SidebarButton from "../SidebarButton";
-import SidebarTooltip from "../SidebarTooltip";
-
-import {Searchbar} from "../../searchbar/searchbar.js";
 
 import Handlebars from "handlebars";
 import "../../helpers/handlebarsHelpers";
@@ -47,9 +43,7 @@ let viewDate = new ContentHandler("viewDate",
 
         });
 
-        return {
-            errors: []
-        }
+        return new HandlerFunctionResult();
     });
 
 plugin.addContentHandler(viewDate);

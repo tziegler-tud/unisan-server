@@ -5,6 +5,7 @@ import eventService from "../../services/eventService.js";
 import AuthService from "../../services/authService.js";
 import AclService from "../../services/aclService.js";
 import EventFactoryService from "../../services/eventFactoryService.js";
+import eventFactoryService from "../../services/eventFactoryService.js";
 
 var app = express();
 
@@ -99,7 +100,7 @@ router.get('/*', checkEventReadRights)
 router.get('/:id/logs', checkEventEditRights, eventLogs);
 
 router.get('/:id', eventDetails);
-router.get('/:id/participants', eventParticipants);
+router.get('/:id/participants', eventPostings);
 router.get('/:id/postings', eventPostings);
 router.get('/:id/settings', eventSettings);
 
@@ -114,50 +115,6 @@ function eventOverview(req, res, next) {
         acl: req.acl,
         allowedit: false,
         dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsOverview"}
-
-    })
-}
-
-function getAll(req, res, next) {
-    var eventList = {};
-    eventService.getAll()
-        .then(events => {
-            eventList = events;
-            res.render("unisams/events/eventlist", {title: "Events - uniSams",
-                user: req.user._doc,
-                pageHeader: "Alle Events",
-                eventList: eventList,
-                acl: req.acl,
-                allowedit: false,
-                dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsAll"}
-
-            })
-        })
-        .catch(err => {
-            next(err);
-        })
-}
-
-function getUpcoming(req, res, next) {
-
-    res.render("unisams/events/eventlist", {title: "Events - uniSams",
-        user: req.user._doc,
-        dateFilter: "upcoming",
-        pageHeader: "Bevorstehende Events",
-        dockerSection: "eventsUpcoming",
-        acl: req.acl,
-        dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsUpcoming"}
-    })
-}
-
-function getPast(req, res, next) {
-    res.render("unisams/events/eventlist", {title: "Events - uniSams",
-        user: req.user._doc,
-        dateFilter: "past",
-        pageHeader: "Vergangene Events",
-        dockerSection: "eventsPast",
-        acl: req.acl,
-        dockerArgs: {activeContainer: "eventContainer", activeElementId: "eventsPast"}
 
     })
 }
@@ -194,7 +151,7 @@ function eventDetails(req, res, next) {
 }
 
 function editEvent(req, res, next) {
-    eventService.getById(req.params.id)
+    EventService.getById(req.params.id)
         .then(event => {
             if (event) {
                 res.render("unisams/events/editEvent", {
@@ -210,46 +167,12 @@ function editEvent(req, res, next) {
         .catch(err => next(err));
 }
 
-function eventParticipants(req, res, next) {
-    eventService.getById(req.params.id)
-        .then(ev => {
-            if (ev) {
-                //check if editing this user is allowed
-                let url = "unisams/events/participants";
-                checkEventEditRightsPromise(req, res, next)
-                    .then(result => {
-                        url = "unisams/events/participants";
-                        res.render(url, {
-                            user: req.user.toJSON(),
-                            acl: req.acl,
-                            title: ev.title.value,
-                            exploreEvent: ev,
-                            exploreEventDocument: ev._doc,
-                            allowedit: true,
-                        })
-                    })
-                    .catch(err => {
-                        let url = "unisams/events/participants";
-                        res.render(url, {
-                            user: req.user.toJSON(),
-                            acl: req.acl,
-                            title: ev.title.value,
-                            exploreEvent: ev,
-                            exploreEventDocument: ev._doc,
-                            allowedit: false,
-                        })
-                    })
-            }
-        })
-        .catch(err => next(err));
-}
-
 function eventPostings(req, res, next) {
-    eventService.getById(req.params.id)
+    EventFactoryService.getById(req.params.id)
         .then(ev => {
             if (ev) {
                 //check if editing this user is allowed
-                let url = "unisams/events/participants";
+                let url = "unisams/eventFactory/postings";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
                         res.render(url, {
@@ -281,7 +204,7 @@ function eventSettings(req, res, next) {
         .then(ev => {
             if (ev) {
                 //check if editing this user is allowed
-                let url = "unisams/events/settings";
+                let url = "unisams/eventfactory/settings";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
                         res.render(url, {
@@ -305,7 +228,7 @@ function eventLogs(req, res, next) {
     eventService.getById(req.params.id)
         .then(ev => {
             if (ev) {
-                res.render("unisams/events/logs", {
+                res.render("unisams/eventfactory/logs", {
                     user: req.user._doc,
                     acl: req.acl,
                     title: ev.title.value,
@@ -317,17 +240,5 @@ function eventLogs(req, res, next) {
         })
         .catch(err => next(err));
 
-}
-
-function blueprints(req, res, next) {
-    res.render("unisams/events/eventBlueprints", {
-        user: req.user._doc,
-        acl: req.acl,
-        allowedit: true
-    })
-}
-
-function eventFileDownloader(req, res, next){
-    res.redirect('/api/v1/eventmod' + req.params.id + "/files/" + req.filename);
 }
 

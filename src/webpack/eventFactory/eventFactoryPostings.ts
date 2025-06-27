@@ -1,34 +1,31 @@
 import "./eventParticipants.scss";
 import { UserProfile } from "../userprofile/userprofile";
 import { DropdownMenu } from "../helpers/dropdownMenu";
-import { dateFromNow } from "../helpers/helpers";
 import Snackbar from "../helpers/snackbar";
 import "../helpers/handlebarsHelpers";
 import PageModule from "../utils/PageModule";
 import Sidebar from "../sidebar/Sidebar";
-import ComponentPage, { ComponentPageOptions } from "../components/ComponentPage";
 
 import {Observer as lidlObserver} from "../../lib/lidl-modules/observer/lidl-observer.js";
 import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog.js";
 
 import eventFactoryPlugin, {
-    AddPostingOnConfirmArgs, AddPostingOnConfirmPayload, ShowPostingConfirmPayload
+    AddPostingOnConfirmPayload, ShowPostingConfirmPayload
 } from "../sidebar/plugins/plugin-eventfactory";
-import pluginCalendar from "../sidebar/plugins/plugin-calendar";
-import aclActions from "../actions/aclActions";
+
 import EventBlueprintProfile from "./EventBlueprintProfile";
 
-import {type IEventBlueprint, IPosting} from "../types/EventBlueprint"
+import {type IEventBlueprint, IBlueprintPosting} from "../types/EventBlueprint"
 import eventBlueprintActions from "../actions/eventBlueprintActions";
 import EditableInputField from "../helpers/EditableInputField";
 import {phone, tablet} from "../helpers/variables";
-import {EventPage} from "./eventPage";
-import Searchbar from "../searchbar/SearchBar";
+import EventBlueprintPage from "./EventBlueprintPage";
+import Searchbar from "../widgets/searchbar/SearchBar";
 import { IParticipant } from "../types/Event";
 import ScrollableList, {ScrollableListArgs} from "../scrollableList/ScrollableList";
-import ClickEvent = JQuery.ClickEvent;
-import Scroll from "quill/blots/scroll";
+
 import {IUser} from "../types/User";
+import {Corner} from "@material/menu";
 
 
 interface PageData {
@@ -101,17 +98,11 @@ export default new PageModule ({
         this.pageData.user = user;
 
         let self = this;
+        let dataList: IBlueprintPosting[] = []
 
         self.view = "cards";
         self.scrollableList;
-        // @ts-ignore
-        $('.radio-item').checkboxradio({
-            icon: false,
-            classes: {
-                "ui-checkboxradio-label": "toggleButton",
-                "ui-checkboxradio-checked": "toggleButton-checked"
-            }
-        });
+
         let checked= $('input[name=eventlist-radio]:checked');
         let listRadio = $("#eventlist01");
         let cardsRadio = $("#eventlist02");
@@ -134,7 +125,7 @@ export default new PageModule ({
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
         //@ts-ignore
-        window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
+        window.DockerElement.addDockerSubPage("eventBlueprint", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
 
         var sidebar = new Sidebar('wrapper');
         sidebar.addPlugin(eventFactoryPlugin);
@@ -142,7 +133,7 @@ export default new PageModule ({
         const snackbar = new Snackbar()
 
         // init event sidebar
-        await sidebar.addContent("eventDetails", {
+        await sidebar.addContent("eventBlueprintDetails", {
             event: self.pageData.event,
             user: self.pageData.user,
             callback: {
@@ -152,7 +143,7 @@ export default new PageModule ({
         sidebar.setCurrentDefault();
 
         let pageContainer = document.getElementById("eventPage-component-container");
-        var eventPage = new EventPage({
+        var eventPage = new EventBlueprintPage({
             container: pageContainer,
             sidebar: sidebar,
             data: {user: user, event: event},
@@ -185,6 +176,31 @@ export default new PageModule ({
         // @ts-ignore
         window.lidlRTO.objectManager.addObject(dialogDeleteEvent, token);
 
+        //setup searchbar
+        let searchbar = document.getElementById("usersearch-participants");
+        self.searchbar = new Searchbar(searchbar, {
+            onInput: {
+                enabled: true,
+                callback: function(inputValue){
+                    let filteredList = [];
+                    if(!inputValue) filteredList = dataList;
+                    else {
+                        filteredList = filterPostingsList(dataList, inputValue);
+                    }
+                    displayPostingsList(filteredList);
+
+                },
+            },
+        });
+
+        function filterPostingsList(postingsList: IBlueprintPosting[], inputValue: string) {
+            return postingsList.filter(function(posting){
+                return posting.requiredQualifications.some(qual => {
+                    return qual.name.includes(inputValue) || qual.short.includes(inputValue)
+                })
+            })
+        }
+
         switch(event.type.index){
             case 1:
                 buildTrainingPage();
@@ -215,32 +231,19 @@ export default new PageModule ({
             let qualTypes = [qualTypesMap.AUSBILDUNG, qualTypesMap.NACHWEIS];
 
             //display all users initially
-            self.dataList =self.pageData.event.postings;
-            self.scrollableList = displayPostingsList(self.dataList);
+            dataList =self.pageData.event.postings;
+            self.scrollableList = displayPostingsList(dataList);
 
-            //setup searchbar
-            let searchbar = document.getElementById("usersearch-participants");
-            self.searchbar = new Searchbar(searchbar, {
-                onInput: {
-                    enabled: true,
-                    callback: function(inputValue){
-                        let filteredList = self.dataList.filter((participant: IParticipant)=> {
-                            return participant.user.username.includes(inputValue) || participant.user.generalData.firstName.value.includes(inputValue) || participant.user.generalData.lastName.value.includes(inputValue);
-                        })
-                        displayPostingsList(filteredList);
 
-                    },
-                },
-            });
-            $('.add-participant-button').each(()=> {
-                $(this).on("click", (e) => {
+            document.querySelectorAll(".add-participant-button").forEach((element) => {
+                element.addEventListener("click", (e) => {
                     e.preventDefault();
-                    sidebar.addContent("addEventPosting", {
+                    sidebar.addContent("addEventBlueprintPosting", {
                         event: self.pageData.event,
                         user: self.pageData.user,
                         qualTypes: qualTypes,
                         callback: {
-                            onConfirm: (data: AddPostingOnConfirmPayload, args: AddPostingOnConfirmArgs) =>{
+                            onConfirm: (data: AddPostingOnConfirmPayload, args: {}) =>{
                                 let posting = {
                                     requiredQualifications: data.qualifications,
                                     description: data.description,
@@ -249,7 +252,9 @@ export default new PageModule ({
                                     enabled: data.enabled,
                                     assigned: {
                                         isAssigned: false,
-                                    }
+                                    },
+                                    startTime: data.startTime,
+                                    endTime: data.endTime,
                                 }
                                 eventBlueprintActions.addPosting(event.id, posting, (event) =>{
                                     eventProfile.refreshEvent()
@@ -268,8 +273,7 @@ export default new PageModule ({
                     });
                     sidebar.show();
                 })
-            });
-
+            })
         }
 
         function buildSanPage() {
@@ -277,43 +281,18 @@ export default new PageModule ({
             let qualTypes = [qualTypesMap.SAN, qualTypesMap.FUEHRUNG];
 
             //display all users initially
-            self.dataList =self.pageData.event.postings;
+            dataList =self.pageData.event.postings;
             self.scrollableList = displayPostingsList(self.dataList);
 
-            //setup searchbar
-            let searchbar = document.getElementById("usersearch-participants");
-            self.searchbar = new Searchbar(searchbar, {
-                onInput: {
-                    enabled: true,
-                    callback: function(inputValue){
-                        let filteredList = [];
-                        if(!inputValue) filteredList = self.dataList;
-                        else {
-                            filteredList = filterPostingsList(self.dataList, inputValue);
-                        }
-                        displayPostingsList(filteredList);
-
-                    },
-                },
-            });
-
-            function filterPostingsList(postingsList: IPosting[], inputValue: string) {
-                return postingsList.filter(function(posting){
-                    return posting.requiredQualifications.some(qual => {
-                        return qual.name.includes(inputValue) || qual.short.includes(inputValue)
-                    })
-                })
-            }
-
-            $('.add-participant-button').each(function(){
-                $(this).on("click", function(e){
+            document.querySelectorAll(".add-participant-button").forEach((element) => {
+                element.addEventListener("click", (e) => {
                     e.preventDefault();
-                    sidebar.addContent("addEventPosting", {
+                    sidebar.addContent("addEventBlueprintPosting", {
                         event: self.pageData.event,
                         user: user,
                         qualTypes: qualTypes,
                         callback: {
-                            onConfirm: function(data: AddPostingOnConfirmPayload, args: AddPostingOnConfirmArgs){
+                            onConfirm: function(data: AddPostingOnConfirmPayload, args: {}){
                                 let posting = {
                                     requiredQualifications: data.qualifications,
                                     description: data.description,
@@ -322,7 +301,9 @@ export default new PageModule ({
                                     enabled: data.enabled,
                                     assigned: {
                                         isAssigned: false,
-                                    }
+                                    },
+                                    startTime: data.startTime,
+                                    endTime: data.endTime,
                                 }
                                 eventBlueprintActions.addPosting(event.id, posting, (event)=> {
                                     eventProfile.refreshEvent()
@@ -335,7 +316,7 @@ export default new PageModule ({
                                         })
                                         .catch((err: Error) => {
                                         })
-                                }, args).fail((jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string) => snackbar.showError(jqXHR, textStatus));
+                                }, {}).fail((jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string) => snackbar.showError(jqXHR, textStatus));
                             },
                         },
                     });
@@ -344,15 +325,14 @@ export default new PageModule ({
             });
         }
 
-        function displayPostingsList(dataList: IPosting[]) {
+        function displayPostingsList(dataList: IBlueprintPosting[]) {
 
             let sortedList = dataList;
             // self.dataList = sortedList;
 
             let dropdownMenus = function(){
                 $('.participant-menu-container').each(function(){
-                    let trigger = $(this).find(".participant-menu-button").first();
-                    //@ts-ignore
+                    let trigger = $(this).find(".participant-menu-button").first().get(0);
                     let m = new DropdownMenu(this, "click", trigger, {anchorCorner: Corner.BOTTOM_LEFT, fixed: true})
                 });
             }
@@ -407,14 +387,14 @@ export default new PageModule ({
 
 
             let listContainer = document.getElementById("userlist-container--participants")
-            let scrollableList = new ScrollableList(listContainer, "postings", sortedList, scrollArgs, callback)
+            let scrollableList = new ScrollableList(listContainer, "factoryPostings", sortedList, scrollArgs, callback)
 
             return scrollableList;
 
             function showDetailsSidebar(postingId: string, element: HTMLElement) {
-                let augmentedPosting = sortedList.find(e => e.id.toString() === postingId);
+                let augmentedPosting = sortedList.find(e => e._id.toString() === postingId);
 
-                sidebar.addContent("showPostingDetails", {
+                sidebar.addContent("showBlueprintPostingDetails", {
                     postingId: postingId,
                     augmentedPosting: augmentedPosting,
                     event: self.pageData.event,
@@ -422,25 +402,43 @@ export default new PageModule ({
                     user: self.pageData.user,
                     userIsAllowed: element.dataset.userisallowed,
                     callback: {
-                        onConfirm: function(data: ShowPostingConfirmPayload, localArgs: AddPostingOnConfirmArgs){
-                            let posting = data;
-                            eventBlueprintActions.updatePosting(event.id, posting, (event)=> {
-                                eventProfile.refreshEvent()
-                                    .then((event: IEventBlueprint) => {
-                                        self.pageData.event = event;
-                                        self.dataList =self.pageData.event.postings;
-                                        displayPostingsList(self.dataList);
-                                        self.searchbar.hide();
-                                        let newPosting = event.postings.find(posting => posting.id.toString() === postingId);
-                                        let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
-                                        sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
-                                    })
-                                    .catch((err: Error) => {
-                                    })
-                            }, {
-                                startTime: localArgs.startTime,
-                                endTime: localArgs.endTime,
-                            }).fail((jqxhr, textstatus, error) => snackbar.showError(jqxhr, textstatus));
+                        onConfirm: function(data: ShowPostingConfirmPayload, localArgs: {}){
+                            let posting = {
+                                id: data.id,
+                                requiredQualifications: data.qualifications,
+                                description: data.description,
+                                allowHigher: data.allowHigher,
+                                optional: data.optional,
+                                enabled: data.enabled,
+                                assigned: {
+                                    isAssigned: false,
+                                },
+                                startTime: data.startTime,
+                                endTime: data.endTime,
+                            }
+
+                            eventBlueprintActions.updatePosting(event.id, posting, {
+                                onSuccess: ()=>{
+                                    eventProfile.refreshEvent()
+                                        .then((event: IEventBlueprint) => {
+                                            self.pageData.event = event;
+                                            self.dataList =self.pageData.event.postings;
+                                            displayPostingsList(self.dataList);
+                                            self.searchbar.hide();
+                                            let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
+                                            let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
+                                            sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
+                                            snackbar.show("Änderungen erfolgreich gespeichert.")
+
+                                        })
+                                        .catch((err: Error) => {
+
+                                        })
+                                },
+                                onError:  (jqxhr, textstatus, error) => {
+                                    snackbar.showError(jqxhr, textstatus)
+                                }
+                            })
                         },
                         onDelete: function(data: {id: number}){
                             let postingId = data.id.toString();
@@ -453,7 +451,8 @@ export default new PageModule ({
             }
 
             function deletePosting(event: IEventBlueprint, postingId: string){
-                eventBlueprintActions.removePosting(event.id, postingId, function(){
+                eventBlueprintActions.removePosting(event.id, postingId, {
+                    onSuccess: ()=>{
                     eventProfile.refreshEvent()
                         .then((event: IEventBlueprint) => {
                             self.pageData.event = event;
@@ -461,10 +460,14 @@ export default new PageModule ({
                             displayPostingsList(self.dataList);
                             self.searchbar.hide();
                             sidebar.showDefault();
+                            snackbar.show("Posten erfolgreich gespeichert.")
                         })
                         .catch((err: Error) => {
                         })
-                }).fail((jqxhr, textstatus, error) => snackbar.showError(jqxhr, textstatus));
+                }
+            }).fail((jqxhr, textstatus, error) => {
+                snackbar.showError(jqxhr, textstatus)
+                });
             }
         }
 

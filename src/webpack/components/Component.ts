@@ -173,4 +173,8 @@ export default class Component {
             observer.inform({ event, data });
         });
     }
+
+    async reload(){
+        await this.renderComponent();
+    }
 }

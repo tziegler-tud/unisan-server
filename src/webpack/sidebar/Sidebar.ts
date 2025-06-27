@@ -51,12 +51,18 @@ export default class Sidebar {
     private defaultPage: { type: string | undefined; args: any } = { type: undefined, args: {} };
     private readonly sidebarHTML: JQuery;
     private currentPage: { type: string; args: any; handler?: ContentHandler } | null = null;
+    readonly container: HTMLElement;
 
     constructor(parentId: string, optionalId?: string) {
         this.parent = $(`#${parentId}`);
         this.domId = optionalId ?? `sidebar${SidebarCounter.next()}`;
         this.sidebarHTML = $("<div/>", { id: this.domId, class: "sidebar-container" });
         this.parent.append(this.sidebarHTML);
+        this.container = this.sidebarHTML.get(0);
+    }
+
+    getHTMLContent(){
+        return this.container;
     }
 
     addContentHandler(contentHandler: ContentHandler): void {

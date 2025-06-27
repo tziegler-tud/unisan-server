@@ -3,7 +3,7 @@ import "./eventlist.scss";
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 import ScrollableList from "../scrollableList/ScrollableList";
 import Sidebar from "../sidebar/Sidebar";
-import {Searchbar} from "../searchbar/searchbar";
+import Searchbar from "../widgets/searchbar/SearchBar";
 import eventActions from "../actions/eventActions";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 

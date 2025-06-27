@@ -359,7 +359,7 @@ function eventPostings(req, res, next) {
         .then(ev => {
             if (ev) {
                 //check if editing this user is allowed
-                let url = "unisams/events/participants";
+                let url = "unisams/events/postings";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
                         res.render(url, {

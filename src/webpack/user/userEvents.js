@@ -10,7 +10,7 @@ import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer
 import {DropdownMenu} from "../helpers/dropdownMenu";
 import ScrollableList from "../scrollableList/ScrollableList";
 import {dateFromNow} from "../helpers/helpers";
-import {Searchbar} from "../searchbar/searchbar";
+import Searchbar from "../widgets/searchbar/SearchBar";
 
 $(document).ready (function () {
 

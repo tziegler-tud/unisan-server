@@ -13,14 +13,15 @@ import {Dialog as lidlDialog} from "../../lib/lidl-modules/dialog/lidl-dialog.js
 
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
 import pluginCalendar from "../sidebar/plugins/plugin-calendar";
-import aclActions from "../actions/aclActions";
+import aclActions, {UserDockerACL} from "../actions/aclActions";
 import EventBlueprintProfile from "./EventBlueprintProfile";
 
 import {type IEventBlueprint} from "../types/EventBlueprint"
 import eventBlueprintActions from "../actions/eventBlueprintActions";
 import EditableInputField from "../helpers/EditableInputField";
 import {phone, tablet} from "../helpers/variables";
-import {EventPage} from "./eventPage";
+import EventBlueprintPage from "./EventBlueprintPage";
+import eventFactoryPlugin from "../sidebar/plugins/plugin-eventfactory";
 
 interface PageData {
     user?: any; // Replace 'any' with the actual type of user data
@@ -91,13 +92,11 @@ export default new PageModule({
         const user = data.user;
         let event = data.event;
         const sidebar = new Sidebar("wrapper");
-        sidebar.addPlugin(eventPlugin);
+        sidebar.addPlugin(eventFactoryPlugin);
 
-        let dockerACL = undefined;
-        let allowCreateEvent = false;
+        let dockerACL: UserDockerACL = undefined;
         try {
             dockerACL = await aclActions.getCurrentUserDockerAcl();
-            allowCreateEvent = dockerACL.events.create;
         }
         catch(e) {
             console.error("Failed to get user acl. This might lead to incorrect display")
@@ -106,14 +105,14 @@ export default new PageModule({
         //@ts-ignore
         if(window.DockerElement !== undefined) {
             //@ts-ignore
-            this.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("event", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
+            this.pageData.eventSubpageId = window.DockerElement.addDockerSubPage("eventBlueprint", event, {}, undefined, {currentEvent: {edit: args.allowEdit}});
         }
 
         //@ts-ignore
         var lidlRTO = window.lidlRTO;
 
         let pageContainer = document.getElementById("eventPage-component-container");
-        var eventPage = new EventPage({
+        var eventPage = new EventBlueprintPage({
             container: pageContainer,
             sidebar: sidebar,
             data: {user: user, event: event},
@@ -160,7 +159,7 @@ export default new PageModule({
                             .then((ev: IEventBlueprint) => {
                                 event = ev;
                                 //@ts-ignore
-                                window.DockerElement.subpageHandler.update(self.pageData.eventSubpageId, "event", event)
+                                window.DockerElement.subpageHandler.update(self.pageData.eventSubpageId, "eventBlueprint", event)
                             })
                             .catch((err: Error) =>{
                                 throw err
@@ -174,7 +173,7 @@ export default new PageModule({
 
         let eventDate = function(){
             $("#eventDateEditor").on("click", function(){
-                sidebar.addContent("editEventDate", {
+                sidebar.addContent("editEventBlueprintDate", {
                     event: event,
                     callback: {
                         onConfirm: function(eventid:number, data: {startTime: string, endTime: string}){
@@ -195,7 +194,7 @@ export default new PageModule({
 
         let eventLocation = function() {
             $("#eventLocationEditor").on("click", function(){
-                sidebar.addContent("editEventLocation", {
+                sidebar.addContent("editEventBlueprintLocation", {
                     event: event,
                     callback: {
                         onConfirm: function(eventid: number, data: {location: string}){
@@ -220,10 +219,10 @@ export default new PageModule({
                 buildTrainingPage();
                 break;
             case 2:
-                buildSeminarPage();
+                await buildSeminarPage();
                 break;
             case 3:
-                buildSanPage();
+                await buildSeminarPage();
                 break;
             case undefined:
             default:
@@ -237,17 +236,45 @@ export default new PageModule({
         }
 
         function buildTrainingPage(){
-            eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
-            eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+            eventPage.addComponent(EventBlueprintPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+            eventPage.addComponent(EventBlueprintPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+
         }
 
-        function buildSeminarPage(){
-            eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
-            eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+        async function buildSeminarPage(){
+            eventPage.addComponent(EventBlueprintPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
+            eventPage.addComponent(EventBlueprintPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
+
+
+            let pageContainer = document.getElementById("componentPage-component-container");
+            var componentPage = new ComponentPage({
+                container: pageContainer,
+                sidebar: sidebar,
+                data: data,
+                args: {},
+            });
+
+            componentPage.addSection({
+                identifier: "POSTINGS",
+                order: 1,
+                title: "Dienstposten",
+                displayMode: "hidden",
+                disableMargins: false,
+                disableComponentMargins: true,
+                styling: {
+                    backgroundColor: 'transparent',
+                }
+            })
+            await componentPage.addComponent({
+                componentType: ComponentPage.componentTypes.EVENTFACOTRY.POSTINGS,
+                section:"POSTINGS",
+                componentArgs: {allowEdit: true, size: "full", acl: dockerACL},
+                data: {user: data.user, event: event}
+            })
 
             // init event sidebar
             //find if current user is already registered
-            sidebar.addContent("eventPostings", {
+            await sidebar.addContent("eventBlueprintPostings", {
                 event: event,
                 user: user,
                 isParticipant: false,
@@ -255,19 +282,6 @@ export default new PageModule({
             });
         }
 
-        function buildSanPage(){
-            eventPage.addComponent(EventPage.componentTypes.DESCRIPTION, {allowEdit: true, size: "full"});
-            eventPage.addComponent(EventPage.componentTypes.DATE, {allowEdit: true, size: "half", handlers: [eventDate, eventLocation]});
 
-            // init event sidebar
-            //find if current user is already registered
-            sidebar.addContent("eventPostings", {
-                event: event,
-                user: user,
-                isParticipant: false,
-                callback: {
-                },
-            });
-        }
     },
 } as PageModuleArgs);

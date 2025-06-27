@@ -9,7 +9,7 @@ import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
 import ScrollableList from "../scrollableList/ScrollableList";
-import Searchbar from "../searchbar/SearchBar";
+import Searchbar from "../widgets/searchbar/SearchBar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
 import EditableInputField from "../helpers/EditableInputField";
 
@@ -118,7 +118,7 @@ export default new PageModule ({
         }
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
+        window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.edit, type: self.pageData.event.type.index}});
 
         var sidebar = new Sidebar('wrapper');
         sidebar.addPlugin(eventPlugin);
@@ -461,7 +461,7 @@ export default new PageModule ({
                     property: "role",
                     direction: 1,
                 },
-                allowEdit: args.allowEdit,
+                allowEdit: args.edit,
             }
             let callback = {
                 customHandlers: [deleteParticipant, roleSelect, dropdownMenus, showParticipant]
@@ -648,7 +648,7 @@ export default new PageModule ({
                     property: "role",
                     direction: 1,
                 },
-                allowEdit: args.allowEdit,
+                allowEdit: args.edit,
                 userIsRegistered: isRegistered,
             }
             let callback = {
@@ -678,7 +678,7 @@ export default new PageModule ({
                     postingId: postingId,
                     augmentedPosting: augmentedPosting,
                     event: self.pageData.event,
-                    allowEdit: args.allowEdit,
+                    allowEdit: args.edit,
                     user: self.pageData.user,
                     userIsAllowed: element.dataset.userisallowed,
                     userIsRegistered: isRegistered,
