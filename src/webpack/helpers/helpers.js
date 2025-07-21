@@ -331,3 +331,27 @@ export var transformToLocalizedDateString = function(date, region="de-DE", timez
 export var escapeRegExp = function(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
+
+export var extractInitials = (firstName, lastName) => {
+    let result = "";
+    if(!firstName) {
+        if(lastName) {
+            if(lastName.length > 1) {
+                result = lastName.charAt(0) + lastName.charAt(1);
+            }
+            else result = lastName.charAt(0)
+        }
+    }
+    else {
+        if(!lastName) {
+            if(firstName.length > 1) {
+                result = firstName.charAt(0) + firstName.charAt(1);
+            }
+            else result = firstName.charAt(0)
+        }
+        else {
+            result = firstName.charAt(0) + lastName.charAt(0);
+        }
+    }
+    return result;
+}

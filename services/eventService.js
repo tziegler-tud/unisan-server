@@ -1519,6 +1519,7 @@ async function addPosting (req, eventId, posting, args) {
  * @param postingData.assigned.user {String} user id of assigned user. requires isAssigned to be set in order to take effect.
  * @param postingData.assigned.qualification {Object} qualification associated with assigned user. requires isAssigned to be set in order to take effect.
  * @param postingData.enabled {Boolean} true if the posting is enabled, i.e. user can register for this post
+ * @param postingData.optional {Boolean} true if the posting is marked as optional
  * @param args {Object} args
  * @returns {Promise <void>}
  */
@@ -1546,17 +1547,25 @@ async function updatePosting (req, eventId, postingData, args) {
     const startDate = postingData.date.startDate
     const endDate = postingData.date.endDate
 
-    const updatedData = {
-        description: postingData.description,
-        assigned: postingData.assigned,
-        date: {
+    const updatedData = {};
+    if(postingData.description !== undefined) {
+        updatedData.description = postingData.description;
+    }
+    if(postingData.assigned !== undefined) {
+        updatedData.assigned = postingData.assigned;
+    }
+    if(postingData.date !== undefined) {
+        updatedData.date = {
             startDate: startDate,
             endDate: endDate,
-        },
-        enabled: postingData.enabled,
-        order: postingData.order,
-    };
-
+        };
+    }
+    if(postingData.enabled !== undefined) {
+        updatedData.enabled = postingData.enabled;
+    }
+    if(postingData.optional !== undefined) {
+        updatedData.optional = postingData.optional;
+    }
 
     //find posting
     let index = event.postings.findIndex(obj => obj._id.toString() === postingId);
