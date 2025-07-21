@@ -103,6 +103,7 @@ export default class EventPostingsComponent extends Component {
     private currentView: "cards" | "calendar" | "resources";
 
     private userDisplayTemplate: HandlebarsTemplateDelegate<any>;
+    private userDisplayTemplateShort: HandlebarsTemplateDelegate<any>;
     private unassignedTemplate: HandlebarsTemplateDelegate<any>;
 
 
@@ -114,7 +115,9 @@ export default class EventPostingsComponent extends Component {
 
 
         const userDisplayTemplateData = await getTemplate("/webpack/components/templates/atoms/userDisplay.hbs")
+        const userDisplayTemplateShortData = await getTemplate("/webpack/components/templates/atoms/userDisplayShort.hbs")
         this.userDisplayTemplate = Handlebars.compile(userDisplayTemplateData)
+        this.userDisplayTemplateShort = Handlebars.compile(userDisplayTemplateShortData)
 
         const unassignedTemplateData = await getTemplate("/webpack/components/templates/atoms/userDisplayUnassigned.hbs")
         this.unassignedTemplate = Handlebars.compile(unassignedTemplateData)
@@ -316,6 +319,8 @@ export default class EventPostingsComponent extends Component {
                     const htmlContent = this.createTitleFromPosting(posting)
                     return {domNodes: [htmlContent]}
                 },
+                resourceAreaHeaderContent: "Qualifikation",
+
             });
             const eventTimeBackgroundEvent = this._getBackgroundEvent(); //background events are used to display the event time
             this.calendar.addEvent(eventTimeBackgroundEvent)
@@ -398,9 +403,10 @@ export default class EventPostingsComponent extends Component {
                         this.page.snackbar.showCustomError("Ein Fehler ist aufgetreten.", "Error")
                     }
                     const posting = this.getPosting(postingId);
-                    const htmlContent = this.createTitleFromPosting(posting)
+                    const htmlContent = this.createTitleFromPosting(posting, true)
                     return {domNodes: [htmlContent]}
                 },
+                resourceAreaHeaderContent: "Qualifikation"
             });
             //add background event
             const eventTimeBackgroundEvent = this._getBackgroundEvent(); //background events are used to display the event time
@@ -646,6 +652,7 @@ export default class EventPostingsComponent extends Component {
                         onSuccess: ()=>{
                             this.refreshEvent()
                                 .then((event: IEvent) => {
+                                    this._resetDisplayList()
                                     this.reloadCurrentView();
                                     this.searchbar.hide();
                                     let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
@@ -663,6 +670,18 @@ export default class EventPostingsComponent extends Component {
                         }
                     })
                 },
+                onAssign: (data: {event: IEvent, postingId: string, userId: string}) => {
+                    let event = data.event;
+                    let postingId = data.postingId;
+                    let userId = data.userId;
+                    this._assignUser(event, postingId, userId);
+                },
+                onUnassign: (data: {event: IEvent, postingId: string, userId: string}) => {
+                    let event = data.event;
+                    let postingId = data.postingId;
+                    let userId = data.userId;
+                    this._unassignUser(event, postingId, userId);
+                },
                 onDelete: (data: {id: number}) =>{
                     let postingId = data.id.toString();
                     //push changes to server
@@ -673,6 +692,30 @@ export default class EventPostingsComponent extends Component {
         this.page.sidebar.show();
     }
 
+    _assignUser(event: IEvent, postingId: string, userId: string){
+        eventActions.assignPost(event.id.toString(), postingId, userId, ()=>{
+            this.refreshEvent()
+                .then((event: IEvent) => {
+                    this._resetDisplayList()
+                    this.reloadCurrentView()
+                    this.showDetailsSidebar(postingId, true);
+                })
+        }).fail((jqxhr, textstatus, error) => {
+            this.page.snackbar.showError(jqxhr, textstatus)
+        });
+    }
+    _unassignUser(event: IEvent, postingId: string, userId: string){
+        eventActions.unassignPost(event.id.toString(), postingId, userId, ()=>{
+            this.refreshEvent()
+                .then((event: IEvent) => {
+                    this._resetDisplayList()
+                    this.reloadCurrentView()
+                    this.showDetailsSidebar(postingId, true);
+                })
+        }).fail((jqxhr, textstatus, error) => {
+            this.page.snackbar.showError(jqxhr, textstatus)
+        });
+    }
     deletePosting(postingId: string){
         eventActions.removePosting(this.event.id, postingId, {
             onSuccess: ()=>{
@@ -741,6 +784,8 @@ export default class EventPostingsComponent extends Component {
             const endDateToday = this._applyTimeFromDateString(posting.date.endDate)
 
             const description =  this.createTitleFromPosting(posting)
+            const isAssigned = posting.assigned.isAssigned;
+            const optional = posting.optional;
 
             return {
                 id: posting._id.toString(),
@@ -748,7 +793,7 @@ export default class EventPostingsComponent extends Component {
                 groupId: posting.requiredQualifications[0]._id.toString(),
                 // description: { domNodes: [description] },
                 typeIndex: posting.requiredQualifications[0]._id,
-                classNames: ["calendarEvent", "calendarEvent--posting"],
+                classNames: ["calendarEvent", "calendarEvent--posting", (optional? "calendarEvent--optional" : ""), (!isAssigned ? "calendarEvent--unassigned" : "")],
                 start: startDateToday,
                 end: endDateToday,
                 resourceId: resourceFunc(posting),
@@ -850,7 +895,7 @@ export default class EventPostingsComponent extends Component {
         return [defaultPosition, ...groups]
     }
 
-    createTitleFromPosting(posting: IPosting) {
+    createTitleFromPosting(posting: IPosting, useShortForm: boolean = false) {
         const container = document.createElement("div");
         container.classList.add("calendarEvent--descriptionContainer");
         let user: IUser;
@@ -862,7 +907,13 @@ export default class EventPostingsComponent extends Component {
                 text: "test"
             }
 
-            const html = this.userDisplayTemplate(context);
+            let html = ""
+            if(useShortForm) {
+                html = this.userDisplayTemplateShort(context)
+            }
+            else {
+                html = this.userDisplayTemplate(context);
+            }
             container.innerHTML = html;
         }
 

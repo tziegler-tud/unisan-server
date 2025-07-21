@@ -68,6 +68,15 @@ $docker-bg-color: #f5f5f5;
 $docker-background-color2: #eaeaea;
 $component-delimiter-color: #eaeaea;
 
+$event: $col4_light;
+$event-selected: $col4;
+$event-light: $col3_light;
+$event-light--selected: $col3;
+$event-unassigned: #532323;
+$event-unassigned--selected: #481e1e;
+$event-unassigned-light: #733e3e;
+$event-unassigned-light--selected: #683838;
+
 //mdc styling
 $mdc-primary: $col1;
 $mdc-secondary: $col2;
