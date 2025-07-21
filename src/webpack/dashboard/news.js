@@ -78,7 +78,14 @@ let news = {
         });
         window.componentPage = componentPage;
 
-        componentPage.addComponent({componentType: ComponentPage.componentTypes.DASHBOARD.NEWS, componentArgs: {size: "full", order: 1}, data: {}});
+        componentPage.addComponent({
+            componentType: ComponentPage.componentTypes.DASHBOARD.NEWS,
+            componentArgs: {
+                size: "full",
+                order: 1,
+                acl: window.dockerAcl
+            },
+            data: {}});
 
 
         //
