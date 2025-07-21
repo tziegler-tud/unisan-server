@@ -21,7 +21,7 @@
 Our project uses [SASS](https://sass-lang.com/) and webpack.
 
 ##### Backend
-Node 20
+Tested for node.js 22.14.0
 check package.json for npm dependencies
 
 ##### Frontend
