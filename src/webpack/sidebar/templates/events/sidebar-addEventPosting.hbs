@@ -68,6 +68,38 @@
                     </div>
                 </div>
             </div>
+            {{#arrayNotEmpty event.positions}}
+                <div class="sidebar-section body-section">
+                    <div class="section-title">
+                        Position / Einsatzabschnitt
+                    </div>
+                    <div class="section-content">
+                    <span class="mdc-evolution-chip-set" role="listbox" aria-orientation="horizontal" aria-multiselectable="false">
+                  <span class="mdc-evolution-chip-set__chips" role="presentation">
+                    <!-- Contains filter chips -->
+                      {{#each event.positions}}
+                          <span class="mdc-evolution-chip" role="presentation" id="{{this._id}}">
+                          <span class="mdc-evolution-chip__action mdc-evolution-chip__action--primary" role="option" aria-selected="false" tabindex="0">
+                            <span class="mdc-evolution-chip__ripple mdc-evolution-chip__ripple--primary"></span>
+                            <span class="mdc-evolution-chip__graphic">
+                              <!--<span class="mdc-evolution-chip__icon mdc-evolution-chip__icon--primary material-icons">favorite</span> -->
+                                <!--                              <span class="mdc-evolution-chip__checkmark">-->
+                                <!--                                <svg class="mdc-evolution-chip__checkmark-svg" viewBox="-2 -3 30 30">-->
+                                <!--                                  <path class="mdc-evolution-chip__checkmark-path"-->
+                                <!--                                        fill="none" stroke="black" d="M1.73,12.91 8.1,19.28 22.79,4.59" />-->
+                                <!--                                </svg>-->
+                                <!--                              </span>-->
+                            </span>
+                            <span class="mdc-evolution-chip__text-label">{{this.title}}</span>
+                          </span>
+                        </span>
+                      {{/each}}
+                  </span>
+                </span>
+                </div>
+            </div>
+            {{/arrayNotEmpty}}
+
             <div class="sidebar-section body-section">
                 <div class="section-title">
                     Weitere Angaben

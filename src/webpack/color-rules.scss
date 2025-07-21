@@ -14,8 +14,11 @@ $col2: #c31d34;
 $col3: #213e54;//#1E656D;
 $col4: #1e3b48;
 
+$col1_light: #012d43;
 $col2_light: #de243d;
 $col3_light: #225169;
+$col4_light: #214351;
+
 
 $link-bg-color: $col2;
 $link-hover-color: $col2_light;
@@ -49,6 +52,8 @@ $delete-color: #84565E;
 $delete-color-light: #ecccd1;
 $blocked-color: #858585;
 
+$background-highlight-color: #bed1ba;
+
 
 
 $text-hover-color: rgba(124, 0, 26, 0.2);
@@ -62,6 +67,15 @@ $menu-border-color: #999;
 $docker-bg-color: #f5f5f5;
 $docker-background-color2: #eaeaea;
 $component-delimiter-color: #eaeaea;
+
+$event: $col4_light;
+$event-selected: $col4;
+$event-light: $col3_light;
+$event-light--selected: $col3;
+$event-unassigned: #532323;
+$event-unassigned--selected: #481e1e;
+$event-unassigned-light: #733e3e;
+$event-unassigned-light--selected: #683838;
 
 //mdc styling
 $mdc-primary: $col1;

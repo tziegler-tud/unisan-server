@@ -36,6 +36,11 @@ export default {
     unassignPost,
     delete: _delete,
 
+    addPosition,
+    updatePosition,
+    removePosition,
+    assignPosition,
+
     getUserEvents,
     getUserPostings,
     addFileReference,
@@ -967,6 +972,199 @@ async function _delete(req, id) {
         .catch()
 }
 
+async function addPosition(req, id, positionData) {
+    const positionObject = {
+        title: positionData.title ? positionData.title : "Neuer Abschnitt",
+        description: positionData.description ? positionData.description : "",
+    }
+    const event = await Event.findById(id);
+    if(!event) throw new Error("Failed to find event.");
+
+    event.positions.push(positionObject);
+    await event.save()
+
+    let log = new Log({
+        type: "activity",
+        action: {
+            objectType: "event",
+            actionType: "modify",
+            actionDetail: "eventAddPosition",
+            key: positionData.title,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "event",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "Event",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return event;
+}
+
+async function updatePosition(req, id, positionId, positionData) {
+    const positionObject = {
+        title: positionData.title,
+        description: positionData.description,
+    }
+
+    let ojVal = "";
+    let newVal = "";
+
+    const event = await Event.findById(id);
+    if(!event) throw new Error("Failed to find event.");
+
+    const index = event.positions.findIndex(p => p._id.toString() === positionId);
+    if(index > -1) {
+        //found it!
+        let position = event.positions[index];
+        ojval = position.title;
+        let updated = Object.assign(posting, positionObject);
+        newVal = position.title;
+        event.postings.splice(index, 1, updated);
+        event.markModified("positions");
+    }
+    else {
+        throw new Error("Failed to find position.");
+    }
+
+    await event.save()
+
+    let log = new Log({
+        type: "activity",
+        action: {
+            objectType: "event",
+            actionType: "modify",
+            actionDetail: "eventUpdatePosition",
+            key: position._id,
+            originalValue: ojVal,
+            value:  newVal,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "event",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "Event",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return event;
+}
+
+async function removePosition(req, id, positionId) {
+    const event = await Event.findById(id);
+    if(!event) throw new Error("Failed to find event.");
+
+    const index = event.positions.findIndex(p => p._id.toString() === positionId);
+    if(index > -1) {
+        let position = event.positions[index];
+        ojval = position.title;
+        event.postings.splice(index, 1);
+        event.markModified("positions");
+    }
+    else {
+        throw new Error("Failed to find position.");
+    }
+    await event.save();
+    let log = new Log({
+        type: "activity",
+        action: {
+            objectType: "event",
+            actionType: "modify",
+            actionDetail: "eventRemovePosition",
+            key: position._id,
+            originalValue: ojVal,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "event",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "Event",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return event;
+}
+
+async function assignPosition(req, id, postingId, positionId) {
+    let ojVal = "";
+    let newVal = "";
+
+    const event = await Event.findById(id);
+    if(!event) throw new Error("Failed to find event.");
+
+    const postingIndex = event.postings.findIndex(p => p._id.toString() === postingId);
+    if(postingIndex === -1) {
+        throw new Error("Failed to find posting.");
+    }
+
+    let posting = event.postings[postingIndex];
+    ojVal = (posting.position) ? posting.position.title : "";
+
+
+    if(positionId == 0 || positionId === undefined || positionId === null) {
+        //unassign position
+        posting.position = null;
+    }
+    else {
+        const positionIndex = event.positions.findIndex(p => p._id.toString() === positionId);
+        if(positionIndex === -1) {
+            throw new Error("Failed to find position.");
+        }
+
+        try {
+            let position = event.positions[positionIndex];
+            posting.position = position;
+        }
+        catch (e) {
+            throw new Error("Failed to find position.");
+        }
+    }
+
+    event.markModified("postings");
+    await event.save();
+    let log = new Log({
+        type: "activity",
+        action: {
+            objectType: "event",
+            actionType: "modify",
+            actionDetail: "eventAssignPosition",
+            key: postingId,
+            originalValue: ojVal,
+            newValue: newVal,
+        },
+        authorizedUser: req.user,
+        target: {
+            targetType: "event",
+            targetObject: event._id,
+            targetObjectId: event._id,
+            targetModel: "Event",
+        },
+        httpRequest: {
+            method: req.method,
+            url: req.originalUrl,
+        }
+    })
+    LogService.create(log).then().catch();
+    return event;
+
+}
+
 /**
  *
  * @param req {Object} request object
@@ -1197,7 +1395,9 @@ async function addPosting (req, eventId, posting, args) {
 
     let defaults = {
         requiredQualifications: [],
-        isAssigned: false,
+        assigned: false,
+        assignedUser: null,
+        assignedQualification: null,
         description: "",
         enabled: true,
         userId: undefined,
@@ -1221,24 +1421,30 @@ async function addPosting (req, eventId, posting, args) {
         else logQualName = logQualName + qual.name + ", "
     })
 
+    const startDate = posting.date.startDate
+    const endDate = posting.date.endDate
+
     let post = {
         requiredQualifications: posting.requiredQualifications,
         description: posting.description,
         assigned: {
             isAssigned: false,
         },
-        date: posting.date,
+        date: {
+            startDate: startDate,
+            endDate: endDate,
+        },
         enabled: posting.enabled,
         order: posting.order,
     };
 
     let userAdded = false;
-    if (posting.assigned.isAssigned) {
-        const user = await User.findById(posting.assigned.user);
+    if (posting.isAssigned) {
+        const user = await User.findById(posting.assignedUser);
         if (user) {
             post.assigned.isAssigned = true;
-            post.assigned.user = posting.assigned.user;
-            post.assigned.qualification = posting.assigned.qualification;
+            post.assigned.user = posting.assignedUser;
+            post.assigned.qualification = posting.assignedQualification;
             userAdded = true;
 
         }
@@ -1306,13 +1512,14 @@ async function addPosting (req, eventId, posting, args) {
  *
  * @param req
  * @param eventId {String} event id
- * @param posting {Object} posting Object
- * @param posting.requiredQualifications {Qualification[]} array of qualification objects
- * @param posting.assigned {Object} holds information on assigned user
- * @param posting.assigned.isAssigned {Boolean} true if the posting has an assigned user
- * @param posting.assigned.user {String} user id of assigned user. requires isAssigned to be set in order to take effect.
- * @param posting.assigned.qualification {Object} qualification associated with assigned user. requires isAssigned to be set in order to take effect.
- * @param posting.enabled {Boolean} true if the posting is enabled, i.e. user can register for this post
+ * @param postingData {Object} posting Object
+ * @param postingData.requiredQualifications {Qualification[]} array of qualification objects
+ * @param postingData.assigned {Object} holds information on assigned user
+ * @param postingData.assigned.isAssigned {Boolean} true if the posting has an assigned user
+ * @param postingData.assigned.user {String} user id of assigned user. requires isAssigned to be set in order to take effect.
+ * @param postingData.assigned.qualification {Object} qualification associated with assigned user. requires isAssigned to be set in order to take effect.
+ * @param postingData.enabled {Boolean} true if the posting is enabled, i.e. user can register for this post
+ * @param postingData.optional {Boolean} true if the posting is marked as optional
  * @param args {Object} args
  * @returns {Promise <void>}
  */
@@ -1330,19 +1537,43 @@ async function updatePosting (req, eventId, postingData, args) {
     var qualificationsModified = false;
     var qualArray = [];
 
-    if(postingData.requiredQualifications){
-        qualificationsModified = true;
-        if(!Array.isArray(postingData.requiredQualifications) || postingData.requiredQualifications.length === 0) {
-            throw new Error("Invalid data received");
-        }
+    // if(postingData.requiredQualifications){
+    //     qualificationsModified = true;
+    //     if(!Array.isArray(postingData.requiredQualifications) || postingData.requiredQualifications.length === 0) {
+    //         throw new Error("Invalid data received");
+    //     }
+    // }
+
+    const startDate = postingData.date.startDate
+    const endDate = postingData.date.endDate
+
+    const updatedData = {};
+    if(postingData.description !== undefined) {
+        updatedData.description = postingData.description;
     }
+    if(postingData.assigned !== undefined) {
+        updatedData.assigned = postingData.assigned;
+    }
+    if(postingData.date !== undefined) {
+        updatedData.date = {
+            startDate: startDate,
+            endDate: endDate,
+        };
+    }
+    if(postingData.enabled !== undefined) {
+        updatedData.enabled = postingData.enabled;
+    }
+    if(postingData.optional !== undefined) {
+        updatedData.optional = postingData.optional;
+    }
+
     //find posting
     let index = event.postings.findIndex(obj => obj._id.toString() === postingId);
     if(index > -1) {
         //found it!
         let posting = event.postings[index];
 
-        let updatedPosting = Object.assign(posting, postingData);
+        let updatedPosting = Object.assign(posting, updatedData);
         event.postings.splice(index, 1, updatedPosting);
 
         var qualPromiseArray = [];

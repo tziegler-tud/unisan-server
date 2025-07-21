@@ -9,9 +9,9 @@ import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 var checkboxradio = require("jquery-ui/ui/widgets/checkboxradio");
 
 import ScrollableList from "../scrollableList/ScrollableList";
-import Searchbar from "../searchbar/SearchBar";
+import Searchbar from "../widgets/searchbar/SearchBar";
 import {DropdownMenu, Corner} from "../helpers/dropdownMenu";
-import EditableInputField from "../helpers/editableInputField";
+import EditableInputField from "../helpers/EditableInputField";
 
 import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";
@@ -81,8 +81,11 @@ export default new PageModule ({
         const user = data.user;
         const event = data.event;
         const eventProfile = this.pageData.eventProfile;
+        const userPostings = data.userPostings;
         this.pageData.event = event;
         this.pageData.user = user;
+        this.pageData.userPostings = userPostings;
+
 
         let self = this;
         self.view = "cards";
@@ -115,7 +118,7 @@ export default new PageModule ({
         }
 
         // window.DockerElement = new docker.Docker(window.dockerArgs);
-        window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.allowEdit, type: self.pageData.event.type.index}});
+        window.DockerElement.addDockerSubPage("event", self.pageData.event, {}, undefined, {currentEvent: {edit: args.edit, type: self.pageData.event.type.index}});
 
         var sidebar = new Sidebar('wrapper');
         sidebar.addPlugin(eventPlugin);
@@ -458,7 +461,7 @@ export default new PageModule ({
                     property: "role",
                     direction: 1,
                 },
-                allowEdit: args.allowEdit,
+                allowEdit: args.edit,
             }
             let callback = {
                 customHandlers: [deleteParticipant, roleSelect, dropdownMenus, showParticipant]
@@ -645,7 +648,7 @@ export default new PageModule ({
                     property: "role",
                     direction: 1,
                 },
-                allowEdit: args.allowEdit,
+                allowEdit: args.edit,
                 userIsRegistered: isRegistered,
             }
             let callback = {
@@ -675,7 +678,7 @@ export default new PageModule ({
                     postingId: postingId,
                     augmentedPosting: augmentedPosting,
                     event: self.pageData.event,
-                    allowEdit: args.allowEdit,
+                    allowEdit: args.edit,
                     user: self.pageData.user,
                     userIsAllowed: element.dataset.userisallowed,
                     userIsRegistered: isRegistered,

@@ -5,7 +5,7 @@ import "../sidebar-addParticipant.scss";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
-import {Searchbar} from "../../searchbar/searchbar";
+import Searchbar from "../../widgets/searchbar/SearchBar";
 import {getDataFromServer} from "../../helpers/helpers";
 
 let rolesPlugin = new SidebarPlugin("roles");

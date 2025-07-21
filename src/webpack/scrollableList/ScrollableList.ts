@@ -32,11 +32,11 @@ export interface ScrollableListArgs {
     grouping?: Grouping;
 }
 
-interface ListItemCallback {
+export interface ListItemCallback {
     onClick?: (event: Event) => void;
 }
 
-interface ScrollableListCallback {
+export interface ScrollableListCallback {
     listItem?: ListItemCallback;
     customHandlers?: ((self: ScrollableList) => void)[];
 }
@@ -203,7 +203,9 @@ export default class ScrollableList {
             case "log": urls.list = "/webpack/scrollableList/templates/logList.hbs"; break;
             case "user": urls.list = "/webpack/scrollableList/templates/userList.hbs"; break;
             case "participants": urls.list = "/webpack/scrollableList/templates/participantsList.hbs"; break;
+            case "factoryPostings": urls = { list: "/webpack/scrollableList/templates/eventFactoryPostingsList.hbs", cards: "/webpack/scrollableList/templates/eventFactoryPostingsListCards.hbs", mobile: "/webpack/scrollableList/templates/postingsListMobile.hbs" }; break;
             case "postings": urls = { list: "/webpack/scrollableList/templates/postingsList.hbs", cards: "/webpack/scrollableList/templates/postingsListCards.hbs", mobile: "/webpack/scrollableList/templates/postingsListMobile.hbs" }; break;
+            case "postingsPositions": urls = { list: "/webpack/scrollableList/templates/postingsList.hbs", cards: "/webpack/scrollableList/templates/postingsListPositionCards.hbs", mobile: "/webpack/scrollableList/templates/postingsListMobile.hbs" }; break;
             case "event": urls = { mobile: "/webpack/scrollableList/templates/eventListMobile.hbs", list: "/webpack/scrollableList/templates/eventList.hbs", cards: "/webpack/scrollableList/templates/eventCards.hbs" }; this.viewUrl = "/events/view/:id"; break;
             case "logDetails": urls.list = "/webpack/scrollableList/templates/logdetailsList.hbs"; break;
             case "news": urls = { mobile: "/webpack/scrollableList/templates/news/newsListMobile.hbs", list: "/webpack/scrollableList/templates/news/newsList.hbs", cards: "/webpack/scrollableList/templates/news/newsCards.hbs" }; break;

@@ -11,7 +11,7 @@ import uuid from 'uuid';
 import 'dotenv/config'
 import favicon from "serve-favicon";
 
-import config from "./config/config.json" assert {type: "json"};
+import config from "./config/config.json" with {type: "json"};
 
 import oidcService from "./services/oidc/oidcService.js";
 import SystemService from "./services/SystemService.js";
@@ -34,6 +34,7 @@ import mainRouter from './routes/unisams/index.js';
 import dashboardRouter from './routes/unisams/dashboard.js';
 import userManagementRouter from './routes/unisams/user.js';
 import eventManagementRouter from './routes/unisams/events.js';
+import eventFactoryRouter from './routes/unisams/eventFactory.js';
 import systemRouter from './routes/unisams/system.js';
 import settingsRouter from './routes/unisams/settings.js';
 import protocolRouter from './routes/unisams/protocol.js';
@@ -46,6 +47,7 @@ import accessRightsRouter from './routes/api/accessrights.js';
 import userGroupRouter from './routes/api/userGroup.js';
 import userApiRouter from './routes/api/usermod.js';
 import eventApiRouter from './routes/api/eventmod.js';
+import eventFactoryApiRouter from './routes/api/eventFactory.js';
 import qualificationApiRouter from './routes/api/qualification.js';
 import userDatasetApiRouter from './routes/api/userDataset.js';
 import logsRouter from './routes/api/logs.js';
@@ -145,6 +147,7 @@ server.use('/api/v1/groups', userGroupRouter);
 server.use('/api/v1/access', accessRightsRouter);
 server.use('/api/v1/usermod', userApiRouter);
 server.use('/api/v1/eventmod', eventApiRouter);
+server.use('/api/v1/eventfactory', eventFactoryApiRouter);
 server.use('/api/v1/qualification', qualificationApiRouter);
 server.use('/api/v1/dataset/user', userDatasetApiRouter);
 server.use('/api/v1/logs', logsRouter);
@@ -210,6 +213,7 @@ function loadPublicRoutes(){
     server.use('/dashboard', dashboardRouter);
     server.use('/user', userManagementRouter);
     server.use('/events', eventManagementRouter);
+    server.use('/eventfactory', eventFactoryRouter);
     server.use('/system', systemRouter);
     server.use('/settings', settingsRouter);
 

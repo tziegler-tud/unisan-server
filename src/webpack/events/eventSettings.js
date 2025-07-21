@@ -3,7 +3,7 @@ import "./eventSettings.scss";
 import {Observer as lidlObserver} from "/lib/lidl-modules/observer/lidl-observer";
 import {Dialog as lidlDialog} from "/lib/lidl-modules/dialog/lidl-dialog";
 
-import EditableInputField from "../helpers/editableInputField";
+import EditableInputField from "../helpers/EditableInputField";
 
 import Sidebar from "../sidebar/Sidebar";
 import {eventPlugin} from "../sidebar/plugins/plugin-event";

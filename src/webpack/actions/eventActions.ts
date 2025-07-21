@@ -1,19 +1,56 @@
-export interface Event {
-    id: string;
-    title: {
-        value: string;
-    };
-    date: {
-        startDate: Date;
-        endDate: Date;
-    };
-    dateRangeString: string;
-    type: {
-        index: number;
-        title: string;
-        value: string;
-    };
+import type {ShowPostingConfirmPayload} from "../sidebar/plugins/plugin-event";
+import {IEvent, IPosition} from "../types/Event";
+
+interface AddPostingActionPayload {
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    startTime: string,
+    endTime: string,
+    date?: Date,
+    requiredQualifications: number[]
 }
+
+interface UpdatePostingActionPayload {
+    id: number|string,
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    startTime: string,
+    endTime: string,
+    date?: Date,
+    requiredQualifications: number[]
+}
+
+interface UpdatePostingApiPayload {
+    id: number|string,
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    date: {
+        startDate: number,
+        endDate: number,
+    },
+    requiredQualifications: number[]
+}
+
+interface AddPostingApiPayload {
+    description: string,
+    allowHigher: boolean,
+    optional: boolean,
+    enabled: boolean,
+    date: {
+        startDate: number,
+        endDate: number,
+    },
+    requiredQualifications: number[]
+
+}
+
+const baseUrl =  "/api/v1/eventmod"
 
 interface EventActions {
     getEvents(params: {
@@ -21,7 +58,7 @@ interface EventActions {
         startDate?: number;
         endDate?: number;
         sort?: string;
-    }): Promise<Event[]>;
+    }): Promise<IEvent[]>;
     getUserEvents(params: {
         userId: string,
         matchString?: string;
@@ -29,7 +66,7 @@ interface EventActions {
         endDate?: number;
         sort?: string;
         amount?: number;
-    }): Promise<Event[]>;
+    }): Promise<IEvent[]>;
     addEvent(args: {
         title: string;
         longDescVal: string;
@@ -47,9 +84,9 @@ interface EventActions {
     addParticipant(eventid: string, userid: string, callback?: (result: any) => void): JQuery.jqXHR;
     changeParticipant(eventid: string, userid: string, role: any, callback?: () => void): JQuery.jqXHR; // Define role type
     removeParticipant(eventid: string, userid: string, callback?: (result: any) => void): JQuery.jqXHR;
-    addPosting(eventId: string, postingData: any, callback?: (result: any) => void, args?: { date: string; startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
-    updatePosting(eventId: string, postingData: any, callback?: (result: any) => void, args?: { date: string; startTime: string; endTime: string }): JQuery.jqXHR; // Define postingData type
-    removePosting(eventId: string, postingId: string, callback?: (result: any) => void): JQuery.jqXHR;
+    addPosting(eventId: string, postingData: AddPostingActionPayload, callback?: (result: any) => void, args?: {}): JQuery.jqXHR; // Define postingData type
+    updatePosting(id: string|number, postingData: UpdatePostingActionPayload, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+    removePosting(id: string|number, postingId: string, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR;
     assignPost(eventId: string, postingId: string, userId: string, callback?: (result: any) => void): JQuery.jqXHR;
     unassignPost(eventId: string, postingId: string, userId: string, callback?: (result: any) => void): JQuery.jqXHR;
     saveTitle(id: string, data: { delta: any; value: string }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define delta type
@@ -59,6 +96,12 @@ interface EventActions {
     updateKey(id: string, key: string, value: any, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR;
     uploadFileToStorage(id: string, filename: string, file: any, callback?: (result: any) => any): JQuery.jqXHR;
     deleteFileFromStorage(id: string, uniqueFileId: string, callback?: { onSuccess?: (result: any) => void }): void;
+
+    addPosition(id: string, positionData: IPosition, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+    updatePosition(id: string, positionData: IPosition, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+    removePosition(id: string, positionId: string, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+
+    assignPostingToPosition(id: string, postingId: string, positionId: string, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): Promise<void>
 }
 
 const eventActions: EventActions = {
@@ -71,7 +114,7 @@ const eventActions: EventActions = {
         startDate?: number;
         endDate?: number;
         sort?: string;
-    }): Promise<Event[]> {
+    }): Promise<IEvent[]> {
         const data = {
             filter: matchString,
             args: {
@@ -87,7 +130,7 @@ const eventActions: EventActions = {
                 contentType: "application/json; charset=UTF-8",
                 dataType: "json",
                 data: JSON.stringify(data),
-                success: (events: Event[]) => resolve(events),
+                success: (events: IEvent[]) => resolve(events),
                 error: (XMLHttpRequest: any, textStatus: string, errorThrown: any) => {
                     console.error(`AJAX error: ${XMLHttpRequest.status} ${XMLHttpRequest.statusText}`);
                     reject(errorThrown);
@@ -110,7 +153,7 @@ const eventActions: EventActions = {
         endDate?: number;
         sort?: string;
         amount?: number;
-    }): Promise<Event[]> {
+    }): Promise<IEvent[]> {
         const data = {
             userid: userId,
             matchString,
@@ -127,7 +170,7 @@ const eventActions: EventActions = {
                 contentType: "application/json; charset=UTF-8",
                 dataType: 'json',
                 data: JSON.stringify(data),
-                success: (events: Event[]) => resolve(events),
+                success: (events: IEvent[]) => resolve(events),
                 error: (XMLHttpRequest, textStatus, errorThrown) => {
                     console.error(`AJAX error: ${XMLHttpRequest.status} ${XMLHttpRequest.statusText}`);
                     reject(errorThrown);
@@ -166,14 +209,14 @@ const eventActions: EventActions = {
         });
     },
 
-    deleteEvent: function(eventid, callback) {
+    deleteEvent: function(eventid, callback?) {
         callback = callback == null ? function() {
             alert("event " + eventid + " deleted.");
-            window.location.replace("/events");
+            window.location.replace("/eventfactory");
         } : callback;
 
         return $.ajax({
-            url: "/api/v1/eventmod/" + eventid,
+            url: `${baseUrl}/${eventid}`,
             type: "DELETE",
             success: function(result: any) {
                 callback(result);
@@ -183,7 +226,7 @@ const eventActions: EventActions = {
 
     uploadImage: function(eventid) {
         return $.ajax({
-            url: "/api/v1/eventmod/" + eventid + "/uploadUserImage",
+            url: `${baseUrl}/${eventid}/uploadUserImage`,
             type: "POST",
             success: function(result: any) {
                 alert("Event " + eventid + " image updated");
@@ -200,7 +243,7 @@ const eventActions: EventActions = {
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/addParticipant",
+            url: `${baseUrl}/${eventid}/addParticipant`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -253,17 +296,25 @@ const eventActions: EventActions = {
     addPosting: function(eventId, postingData, callback, args) {
         callback = callback == null ? function() { } : callback;
 
-        const startDate = parseHTMLInputDate(args.date, args.startTime).getTime();
-        const endDate = parseHTMLInputDate(args.date, args.endTime).getTime();
+        const startDate = parseHTMLInputTime(postingData.startTime, postingData.date).getTime();
+        const endDate = parseHTMLInputTime(postingData.endTime, postingData.date).getTime();
 
-        postingData.date = {
-            startDate: startDate,
-            endDate: endDate,
-        };
+
+        let posting: AddPostingApiPayload = {
+            description: postingData.description,
+            allowHigher: postingData.allowHigher,
+            optional: postingData.optional,
+            enabled: postingData.enabled,
+            requiredQualifications: postingData.requiredQualifications,
+            date: {
+                startDate: startDate,
+                endDate: endDate,
+            }
+        }
 
         const data = {
             id: eventId,
-            posting: postingData,
+            posting: posting,
             args: {},
         };
         return $.ajax({
@@ -278,19 +329,28 @@ const eventActions: EventActions = {
         });
     },
 
-    updatePosting: function(eventId, postingData, callback, args) {
-        callback = callback == null ? function() { } : callback;
+    updatePosting: function(id, postingData, callback) {
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
 
-        const startDate = parseHTMLInputDate(args.date, args.startTime).getTime();
-        const endDate = parseHTMLInputDate(args.date, args.endTime).getTime();
+        const startDate = parseHTMLInputTime(postingData.startTime, postingData.date,).getTime();
+        const endDate = parseHTMLInputTime(postingData.endTime, postingData.date).getTime();
 
-        postingData.date = {
-            startDate: startDate,
-            endDate: endDate,
-        };
+        let posting: UpdatePostingApiPayload = {
+            id: postingData.id,
+            description: postingData.description,
+            allowHigher: postingData.allowHigher,
+            optional: postingData.optional,
+            enabled: postingData.enabled,
+            requiredQualifications: postingData.requiredQualifications,
+            date: {
+                startDate: startDate,
+                endDate: endDate,
+            }
+        }
         const data = {
-            id: eventId,
-            posting: postingData,
+            id: id,
+            posting: posting,
             args: {},
         };
 
@@ -301,15 +361,19 @@ const eventActions: EventActions = {
             dataType: "json",
             data: JSON.stringify(data),
             success: function(result: any) {
-                callback(result);
+                callback.onSuccess(result);
             },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
         });
     },
 
-    removePosting: function(eventId, postingId, callback) {
-        callback = callback == null ? function() { } : callback;
+    removePosting: function(id, postingId, callback) {
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
         const data = {
-            id: eventId,
+            id: id,
             postingId: postingId,
             args: {},
         };
@@ -320,7 +384,7 @@ const eventActions: EventActions = {
             dataType: "json",
             data: JSON.stringify(data),
             success: function(result: any) {
-                callback(result);
+                callback.onSuccess(result);
             },
         });
     },
@@ -488,6 +552,130 @@ const eventActions: EventActions = {
             },
         });
     },
+
+    addPosition: function(id: string, positionData: IPosition, callback?) {
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
+
+        let position: IPosition = {
+            title: positionData.title,
+            description: positionData.description
+        }
+        const data = {
+            position: position,
+            args: {},
+        };
+
+        return $.ajax({
+            url: `${baseUrl}/${id}/addPosition`,
+            type: "PUT",
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function(result: any) {
+                callback.onSuccess(result);
+            },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
+        });
+    },
+
+    updatePosition: function(id: string, positionData: IPosition, callback?) {
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
+
+        const positionId = positionData._id
+        if(!positionId) throw new Error("Invalid arguments received for parameter position.")
+
+        let position: IPosition = {
+            title: positionData.title,
+            description: positionData.description
+        }
+        const data = {
+            id: positionId,
+            position: position,
+            args: {},
+        };
+
+        return $.ajax({
+            url: `${baseUrl}/${id}/updatePosition`,
+            type: "POST",
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function(result: any) {
+                callback.onSuccess(result);
+            },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
+        });
+    },
+
+    removePosition: function(id: string, positionId: string, callback?) {
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
+
+        if(!positionId) throw new Error("Invalid arguments received for parameter position.")
+
+        const data = {
+            id: positionId,
+            args: {},
+        }
+
+        return $.ajax({
+            url: `${baseUrl}/${id}/removePosition`,
+            type: "DELETE",
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function(result: any) {
+                callback.onSuccess(result);
+            },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
+        });
+    },
+
+    assignPostingToPosition: function(id: string, postingId: string, positionId: string, callback?: {
+        onSuccess?: (result: any) => void;
+        onError?: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => void
+    }): Promise<void> {
+
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
+        if (callback.onError === undefined) callback.onError = function() { };
+
+        if(!id) throw new Error("Invalid arguments received for parameter position.")
+        if(!positionId) throw new Error("Invalid arguments received for parameter position.")
+        if(!postingId) throw new Error("Invalid arguments received for parameter position.")
+
+        const data = {
+            posting: postingId,
+            position: positionId,
+            args: {},
+        }
+
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${baseUrl}/${id}/assignPosition`,
+                type: "POST",
+                contentType: "application/json; charset=UTF-8",
+                dataType: "json",
+                data: JSON.stringify(data),
+                success: function(result: any) {
+                    // callback.onSuccess(result);
+                    resolve()
+                },
+                error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                    // callback.onError(jqXHR, textStatus, errorThrown)
+                    reject(new Error(textStatus))
+                }
+            });
+        })
+    }
 };
 
 /**
@@ -514,5 +702,25 @@ function parseHTMLInputDate(date: string, time: string): Date {
     d.setMilliseconds(0);
     return d;
 }
+
+/**
+ *
+ * @param {String} time hh:mm
+ * @param {Date} date optional date
+ * @returns {Date}
+ */
+function parseHTMLInputTime(time: string, date?: Date): Date {
+
+    const timeHours = parseInt(time.substr(0, 2));
+    const timeMinutes = parseInt(time.substr(3, 2));
+
+    const d = date? new Date(date): new Date();
+    d.setHours(timeHours);
+    d.setMinutes(timeMinutes);
+    d.setSeconds(0);
+    d.setMilliseconds(0);
+    return d;
+}
+
 
 export default eventActions;

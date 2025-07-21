@@ -1,0 +1,62 @@
+
+<div id="sidebar" class="sidebar sidebar-event">
+    <div class="sidebar-top">
+        <div class="sidebar-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+        <div class="sidebar-title">
+            <span class="quill-renderer limitCharacters">{{event.title.value}}</span>
+        </div>
+    </div>
+    <div id="sidebar-inner" class="sidebar-inner">
+        <div class="sidebar-content">
+            <div class="sidebar-section top-section">
+
+            </div>
+            <div class="sidebar-section">
+                <div class="section-title content-title">
+                    <span></span>
+                </div>
+                <div class="section-content">
+                    <span class="content-item"></span>
+                </div>
+            </div>
+            <div class="sidebar-section body-section event-participants-container">
+                <div class="form-sectionheader before-icon icon-location">
+                    <span>Bezeichnung</span>
+                </div>
+                <div class="form-item useredit-item form-griditem" id="event-positionTitle"><label class="form-item-label form-attribute-name nofloat" for="eventinp-location"></label>
+                    <input class="common-input" id="eventinp-positionTitle" name="eventinp-positionTitle" type="text" value=""/>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-section body-section event-participants-container">
+                <div class="form-sectionheader before-icon icon-location">
+                    <span>Beschreibung</span>
+                </div>
+                <div class="form-item useredit-item form-griditem" id="event-positionDescription"><label class="form-item-label form-attribute-name nofloat" for="eventinp-location"></label>
+                    <input class="common-input" id="eventinp-positionDescription" name="eventinp-positionDescription" type="text" value=""/>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="sidebar-bottom sidebar-bottom--padding">
+            <a class="sidebar-confirm sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    check
+                </button>
+            </a>
+            <a class="sidebar-cancel sidebar-bottom-element">
+                <button class="mdc-icon-button material-icons">
+                    <div class="mdc-icon-button__ripple"></div>
+                    close
+                </button>
+            </a>
+        </div>
+        </div>
+    </div>
+
+</div>

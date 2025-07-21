@@ -1,0 +1,50 @@
+@use "@material/icon-button";
+@use "@material/icon-button/styles";
+
+
+/*
+ radio group
+ */
+
+.displaySelector-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+
+  .displaySelectorElement {
+
+    background-color: #eaeaea;
+    border-top: 1px solid #AAA !important;
+    border-right: 1px solid #AAA !important;
+    border-bottom: 1px solid #AAA !important;
+    border-left: 0 solid #AAA !important;
+
+    &:first-child {
+      border-left: 1px solid #AAA !important;
+    }
+
+    &.displaySelectorElement--active {
+
+      background-color: #fff;
+
+      .displaySelectorElement__buttonLabel {
+        background-color: #eaeaea !important;
+        color: #333 !important;
+      }
+    }
+    .displaySelectorElement__buttonLabel {
+      background-color: #fff !important;
+      display: block;
+
+      box-shadow: none !important;
+      padding: 8px 8px !important;
+      color: #AAA !important;
+      margin: 0;
+
+    }
+
+    .displaySelectorElement__input {
+      display: none;
+    }
+  }
+}

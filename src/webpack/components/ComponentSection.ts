@@ -5,9 +5,12 @@ export interface ComponentSectionOptions {
     identifier: string;
     order?: number;
     title?: string;
-    displayMode?: string;
+    displayMode?: "hidden"|"show"; /** display section title*/
     disableMargins?: boolean;
     disableComponentMargins?: boolean;
+    styling?: {
+        backgroundColor?: string,
+    }
 }
 
 
@@ -18,6 +21,9 @@ export default class ComponentSection {
     private readonly displayMode: string;
     private readonly disableComponentMargins: boolean;
     private readonly disableMargins: boolean;
+    private readonly styling?: {
+        backgroundColor?: string,
+    }
     public components: Component[];
     private container: HTMLElement;
     private componentPage: ComponentPage;
@@ -31,7 +37,8 @@ export default class ComponentSection {
                         title = undefined,
                         displayMode = "hidden",
                         disableComponentMargins = false,
-                        disableMargins = false
+                        disableMargins = false,
+                        styling = {},
                     }: ComponentSectionOptions
     ) {
         this.identifier = identifier;
@@ -40,9 +47,11 @@ export default class ComponentSection {
         this.displayMode = displayMode;
         this.disableComponentMargins = disableComponentMargins;
         this.disableMargins = disableMargins;
+        this.styling = styling;
         this.components = [];
         this.container = this.buildHtml();
-        this.componentPage = componentPage;
+        this.componentPage = componentPage
+
     }
 
     addComponent(component: Component): void {
@@ -83,6 +92,12 @@ export default class ComponentSection {
                 break;
         }
 
+        if(this.styling) {
+            if(this.styling.backgroundColor) {
+                componentContainer.style.backgroundColor = this.styling.backgroundColor;
+            }
+        }
+
         container.appendChild(componentContainer);
         this.container = container;
         this.componentContainer = componentContainer;
@@ -91,5 +106,11 @@ export default class ComponentSection {
 
     render(): void {
         this.componentPage.renderSectionHtml(this.container);
+    }
+
+    async reload(){
+        this.components.forEach(async component => {
+            await component.reload();
+        })
     }
 }

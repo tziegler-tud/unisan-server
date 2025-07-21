@@ -1,6 +1,6 @@
 import ComponentPage from "../../ComponentPage";
 import Component from "../../Component";
-import Searchbar from "../../../searchbar/SearchBar";
+import Searchbar from "../../../widgets/searchbar/SearchBar";
 import ScrollableList, {ScrollableListArgs} from '../../../scrollableList/ScrollableList';
 
 interface TsEvent {

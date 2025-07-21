@@ -119,7 +119,7 @@ export default class Snackbar {
      * @param options.actionButton.text {String} action button text
      * @returns {boolean}
      */
-    showError(jqxhr: { responseJSON: { message: string }; status: number; responseText: string }, textstatus: string, error?: Error, options: SnackbarOptions = {}): boolean {
+    showError(jqxhr: { responseJSON: { message: string }; status: number; responseText: string }|JQuery.jqXHR, textstatus: string, error?: Error, options: SnackbarOptions = {}): boolean {
         const message = jqxhr.responseJSON?.message;
         const text = (error ? error.message : `Error ${jqxhr.status}`) + `: ${message || jqxhr.responseText}`;
         const defaultOptions: SnackbarOptions = {

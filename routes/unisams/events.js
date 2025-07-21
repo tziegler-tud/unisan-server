@@ -157,7 +157,6 @@ router.get('/upcoming', checkEventReadRights, getUpcoming);
 router.get('/past', checkEventReadRights, getPast);
 
 router.get('/addEvent', allowCreateEvent, addEvent);
-router.get('/blueprints', allowCreateEvent, blueprints);
 
 router.get('/*', checkEventReadRights)
 router.get('/:id/logs', checkEventEditRights, eventLogs);
@@ -360,7 +359,7 @@ function eventPostings(req, res, next) {
         .then(ev => {
             if (ev) {
                 //check if editing this user is allowed
-                let url = "unisams/events/participants";
+                let url = "unisams/events/postings";
                 checkEventEditRightsPromise(req, res, next)
                     .then(result => {
                         res.render(url, {
@@ -428,14 +427,6 @@ function eventLogs(req, res, next) {
         })
         .catch(err => next(err));
 
-}
-
-function blueprints(req, res, next) {
-    res.render("unisams/events/eventBlueprints", {
-        user: req.user._doc,
-        acl: req.acl,
-        allowedit: true
-    })
 }
 
 function eventFileDownloader(req, res, next){

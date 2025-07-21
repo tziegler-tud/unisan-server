@@ -24,12 +24,12 @@ import ContentHandler from "../ContentHandler";
 import SidebarButton from "../SidebarButton";
 import SidebarTooltip from "../SidebarTooltip";
 
-import {Searchbar} from "../../searchbar/searchbar.js";
+import Searchbar from "../../widgets/searchbar/SearchBar";
 
 const Handlebars = require("handlebars");
 import "../../helpers/handlebarsHelpers";
 import {getMatchingQualifications} from "../../helpers/helpers";
-import EditableInputField from "../../helpers/editableInputField";
+import EditableInputField from "../../helpers/EditableInputField";
 import {EditableTextField} from "../../helpers/editableTextField";
 
 

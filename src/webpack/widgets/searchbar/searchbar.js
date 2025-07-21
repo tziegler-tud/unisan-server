@@ -4,7 +4,7 @@ import {MDCTextField} from '@material/textfield';
 import {MDCRipple} from '@material/ripple';
 import {MDCTextFieldIcon} from '@material/textfield/icon';
 const Handlebars = require("handlebars");
-import "../helpers/handlebarsHelpers";
+import "../../helpers/handlebarsHelpers";
 
 let searchbarCounter = {
     counter: 0,

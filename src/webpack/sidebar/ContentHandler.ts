@@ -1,4 +1,5 @@
-import Sidebar, {HandlerFunctionResult} from "./Sidebar";
+import Sidebar from "./Sidebar";
+import HandlerFunctionResult from "./HandlerFunctionResult";
 
 interface ContentHandlerArgs {
     callback?: {

@@ -5,11 +5,12 @@ import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
-import eventActions, {Event} from "../../../actions/eventActions";
+import eventActions from "../../../actions/eventActions";
 import {eventPlugin} from "../../../sidebar/plugins/plugin-event";
 import calendarPlugin from "../../../sidebar/plugins/plugin-calendar";
 
 import "../../scss/events/CalendarComponent.scss"
+import {IEvent} from "../../../types/Event";
 
 interface CalendarComponentOptions {
     page: ComponentPage;
@@ -28,7 +29,7 @@ interface CalendarComponentData {
 export default class CalendarComponent extends Component {
     protected data: CalendarComponentData;
     protected templateUrl: string;
-    private events: Event[]
+    private events: IEvent[]
     private calendar: Calendar | null;
     private selectedElem: HTMLElement | null = null;
     private htmlDayElems: NodeListOf<HTMLElement>;
@@ -61,8 +62,8 @@ export default class CalendarComponent extends Component {
         this.calendar = null;
     }
 
-    private getEventById(id: string): Event | undefined {
-        return this.events.find((event) => event.id === id);
+    private getEventById(id: string): IEvent | undefined {
+        return this.events.find((event) => event.id.toString() === id);
     }
 
     async postRender(): Promise<void> {
@@ -77,13 +78,14 @@ export default class CalendarComponent extends Component {
         }
         let calendarEvents = this.events.map(function(event){
             return {
-                id: event.id,
+                id: event.id.toString(),
                 title: event.title.value,
                 groupId: event.type.index.toString(),
                 // description: event.dateRangeString + "\n " + event.type.value,
                 typeIndex: event.type.index,
                 start: event.date.startDate,
                 end: event.date.endDate,
+                classNames: ["unisan-event", "unisan-event__clickable"]
             }
         })
 

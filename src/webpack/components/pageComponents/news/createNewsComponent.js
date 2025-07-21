@@ -6,7 +6,7 @@ import {EditableTextField} from "../../../helpers/editableTextField";
 
 import "../../scss/news/createNewsComponent.scss";
 import {newsActions} from "../../../actions/newsActions";
-import EditableInputField from "../../../helpers/editableInputField";
+import EditableInputField from "../../../helpers/EditableInputField";
 
 
 export default class CreateNewsComponent extends Component {
