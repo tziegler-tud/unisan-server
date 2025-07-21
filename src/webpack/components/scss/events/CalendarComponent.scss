@@ -1,3 +1,9 @@
 .calendar--selected {
   background-color: #e9f6ff
 }
+
+.unisan-event {
+  &__clickable {
+    cursor: pointer;
+  }
+}

@@ -85,6 +85,7 @@ export default class CalendarComponent extends Component {
                 typeIndex: event.type.index,
                 start: event.date.startDate,
                 end: event.date.endDate,
+                classNames: ["unisan-event", "unisan-event__clickable"]
             }
         })
 
