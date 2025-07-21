@@ -3,11 +3,18 @@
 @import "../../../color-rules";
 
 .calendarEvent {
-  background-color: $col4_light;
+  background-color: $event;
   border: 1px solid $col4;
 
   &.calendarEvent--posting {
     cursor: pointer;
+  }
+
+  &.calendarEvent--optional {
+    background-color: $event-light;
+    &.calendarEvent--unassigned {
+      background-color: $event-unassigned-light;
+    }
   }
 
   &.calendarEvent--style1 {
@@ -19,10 +26,13 @@
   &.calendarEvent--style3 {
     background-color: $col3_light;
   }
+  &.calendarEvent--unassigned {
+    background-color: $event-unassigned;
+  }
 
   &.calendarEvent--selected {
     outline: 1px solid #2f1e2e;
-    background-color: $col4;
+    background-color: $event-selected;
 
     &.calendarEvent--style1 {
       background-color: $col1;
@@ -32,6 +42,15 @@
     }
     &.calendarEvent--style3 {
       background-color: $col3;
+    }
+    &.calendarEvent--unassigned {
+      background-color: $event-unassigned--selected;
+    }
+    &.calendarEvent--optional {
+      background-color: $event-light--selected;
+      &.calendarEvent--unassigned {
+        background-color: $event-unassigned-light--selected;
+      }
     }
   }
 

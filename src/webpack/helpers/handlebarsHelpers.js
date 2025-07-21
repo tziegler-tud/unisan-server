@@ -1,5 +1,5 @@
 const Handlebars = require("handlebars");
-import {transformDateTimeString, dateRangeString} from "./helpers";
+import {transformDateTimeString, dateRangeString, extractInitials} from "./helpers";
 
 Handlebars.registerHelper('hasRole', function(participant, roleString) {
     return participant.role === roleString;
@@ -39,6 +39,12 @@ Handlebars.registerHelper('dateRangeString', function(startDateString, endDateSt
 Handlebars.registerHelper('timeRangeString', function(startDateString, endDateString) {
     return new Handlebars.SafeString(dateRangeString(startDateString, endDateString).timeRange);
 });
+
+Handlebars.registerHelper('getInitials', function(firstName, lastName) {
+    let result = extractInitials(firstName, lastName);
+    return new Handlebars.SafeString(result);
+});
+
 
 Handlebars.registerHelper('checklength', function (v1, v2, options) {
     'use strict';
