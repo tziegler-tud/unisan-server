@@ -1,6 +1,6 @@
 # unisan-server
 
-A **web-based personnel and resource management platform** tailored for medical service organizations.
+A **web-based personnel, event and resource management platform** tailored for volunteer medical service organizations.
 
 ---
 
@@ -8,18 +8,18 @@ A **web-based personnel and resource management platform** tailored for medical 
 
 ### ✅ Feature Overview
 
-| Feature                          | Status        | Notes                                     |
-|----------------------------------|---------------|-------------------------------------------|
-| User Management                  | ✅ Implemented |                                           |
-| Event Calendar                   | ✅ Implemented |                                           |
-| Duty Roster Planner              | ✅ Implemented |                                           |
-| In-System News                   | ✅ Implemented | Internal notifications                    |
-| OAuth2 Provider                  | ✅ Implemented | Built-in authorization server             |
-| Email Integration (Mailu)        | ✅ Implemented | Currently supports Mailu API only         |
-| Public Event Registration        | 🔄 Planned     |                                          |
-| End-User Documentation           | 🔄 Planned     |                                          |
-| Web-based CMS                    | ❌ Discontinued| Moved to separat project                  |
-| eLearning Module                 | ❌ Discontinued| Using Moodle instead                      |
+| Feature                          | Status        | Notes                             |
+|----------------------------------|---------------|-----------------------------------|
+| User Management                  | ✅ Implemented |                                   |
+| Event Calendar                   | ✅ Implemented |                                   |
+| Duty Roster Planner              | ✅ Implemented |                                   |
+| In-System News                   | ✅ Implemented | Internal notifications            |
+| OAuth2 Provider                  | ✅ Implemented | Built-in authorization server     |
+| Email Integration (Mailu)        | ✅ Implemented | Currently supports Mailu API only |
+| Public Event Registration        | 🔄 Planned     |                                   |
+| End-User Documentation           | 🔄 Planned     |                                   |
+| Web-based CMS                    | ❌ Discontinued| Moved to separate project         |
+| eLearning Module                 | ❌ Discontinued|                                   |
 
 ---
 
