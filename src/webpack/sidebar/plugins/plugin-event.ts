@@ -938,7 +938,7 @@ const addPosting = new ContentHandler(
             context.qualifications = res.qualifications;
             sidebar.setHTMLContent(template(context));
 
-            const chipset = new MDCChipSet(document.querySelector('.mdc-evolution-chip-set'));
+            // const chipset = new MDCChipSet(document.querySelector('.mdc-evolution-chip-set'));
 
             sidebar.registerBackButton(".sidebar-back-btn");
             sidebar.registerCancelButton(".sidebar-cancel");
