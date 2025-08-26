@@ -1023,10 +1023,10 @@ async function updatePosition(req, id, positionId, positionData) {
     if(index > -1) {
         //found it!
         let position = event.positions[index];
-        ojval = position.title;
-        let updated = Object.assign(posting, positionObject);
+        ojVal = position.title;
+        let updated = Object.assign(position, positionObject);
         newVal = position.title;
-        event.postings.splice(index, 1, updated);
+        event.positions.splice(index, 1, updated);
         event.markModified("positions");
     }
     else {
@@ -1041,7 +1041,7 @@ async function updatePosition(req, id, positionId, positionData) {
             objectType: "event",
             actionType: "modify",
             actionDetail: "eventUpdatePosition",
-            key: position._id,
+            key: positionId.toString(),
             originalValue: ojVal,
             value:  newVal,
         },
@@ -1062,14 +1062,23 @@ async function updatePosition(req, id, positionId, positionData) {
 }
 
 async function removePosition(req, id, positionId) {
-    const event = await Event.findById(id);
+    const event = await Event.findById(id).populate(["positions","postings"]);
     if(!event) throw new Error("Failed to find event.");
+    let ojVal = "";
 
     const index = event.positions.findIndex(p => p._id.toString() === positionId);
     if(index > -1) {
         let position = event.positions[index];
-        ojval = position.title;
-        event.postings.splice(index, 1);
+
+        //remove position from postings
+        const postingsOnPosition = event.postings.filter(p => p.position && p.position._id.toString() === positionId.toString());
+        postingsOnPosition.forEach(p => {
+            p.position = undefined;
+            p.markModified("position");
+        })
+
+        ojVal = position.title;
+        event.positions.splice(index, 1);
         event.markModified("positions");
     }
     else {
@@ -1082,7 +1091,7 @@ async function removePosition(req, id, positionId) {
             objectType: "event",
             actionType: "modify",
             actionDetail: "eventRemovePosition",
-            key: position._id,
+            key: positionId.toString(),
             originalValue: ojVal,
         },
         authorizedUser: req.user,

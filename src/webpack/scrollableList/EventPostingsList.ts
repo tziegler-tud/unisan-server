@@ -25,6 +25,7 @@ export interface EventPostingsListArgs {
     hasTitle?: boolean;
     title?: string;
     classes?: string;
+    allowEdit?: boolean,
 }
 
 export interface EventPostingsListCallback {
@@ -71,6 +72,7 @@ export default class EventPostingsList {
             hasTitle: false,
             title: "test",
             classes: "",
+            allowEdit: false,
             ...args,
         };
         this.positions = positions
@@ -140,7 +142,6 @@ export default class EventPostingsList {
                 listItem.addEventListener("dragstart", (e: DragEvent) => {
                     const postingId =  listItem.dataset.postingid;
                     e.dataTransfer.setData("text/plain", postingId);
-                    console.log("dragstart!");
                 });
                 listItem.addEventListener("dragend", (e: DragEvent) => {
                     this._endDragEvent();
@@ -164,17 +165,14 @@ export default class EventPostingsList {
         this.groupContainers.forEach((el: HTMLElement) => {
             el.addEventListener("dragover", (e: DragEvent) => {
                 e.preventDefault();
-                console.log("dragover!")
                 el.classList.add("dragover");
             })
             el.addEventListener("dragleave", (e: DragEvent) => {
                 e.preventDefault();
-                console.log("dragleave!")
                 el.classList.remove("dragover");
             })
             el.addEventListener("drop", (e: DragEvent) => {
                 e.preventDefault();
-                console.log("Dropped at " + el.dataset.positionid);
                 const positionId = el.dataset.positionid;
                 const postingId = e.dataTransfer.getData("text/plain");
 

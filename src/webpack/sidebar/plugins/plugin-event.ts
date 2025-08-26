@@ -47,6 +47,10 @@ export interface AddPositionOnConfirmPayload {
     description: string,
 }
 
+export interface AddPositionOnDeletePayload {
+    id: string|number,
+}
+
 
 export interface ShowPostingConfirmPayload {
     id: string|number,
@@ -1287,6 +1291,7 @@ let showEventPositionContent = new ContentHandler("eventPosition",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string): Promise<HandlerFunctionResult> { // Typed parameters and return
 
         let onConfirm = args.callback?.onConfirm; // Optional chaining
+        let onDelete = args.callback?.onDelete;
         let position: IPosition = args.position ? args.position : {title: "", description: ""};
         let context: HandlebarContext = { // Explicitly type context
             event: args.event, // Assign args.event to context.event
@@ -1302,14 +1307,16 @@ let showEventPositionContent = new ContentHandler("eventPosition",
             sidebar.setHTMLContent(template(context)); // Use setHTMLContent
 
             let titleInputElement = document.getElementById("eventinp-positionTitle") as HTMLInputElement; // Type as HTMLInputElement
-            let descriptionInputElement = document.getElementById("eventinp-positionDescription") as HTMLInputElement; // Type as HTMLInputElement
 
             if(position.title) {
                 titleInputElement.value = position.title;
             }
-            if(position.description) {
-                descriptionInputElement.value = position.description;
-            }
+
+
+            // let descriptionInputElement = document.getElementById("eventinp-positionDescription") as HTMLInputElement; // Type as HTMLInputElement
+            // if(position.description) {
+            //     descriptionInputElement.value = position.description;
+            // }
 
             sidebar.registerBackButton(".sidebar-back-btn");
             sidebar.registerCancelButton(".sidebar-cancel");
@@ -1318,7 +1325,8 @@ let showEventPositionContent = new ContentHandler("eventPosition",
                     customHandler: true,
                     handler: function () {
                         let updatedTitle = titleInputElement?.value;
-                        let updateDescription = descriptionInputElement?.value;
+                        // let updateDescription = descriptionInputElement?.value;
+                        let updateDescription = "";
 
                         let updateData = {
                             title: updatedTitle,
@@ -1330,6 +1338,17 @@ let showEventPositionContent = new ContentHandler("eventPosition",
                     }.bind(args)
                 }
             );
+            let deleteBtn = sidebar.registerDeleteButton(".sidebar-delete",
+                {
+                    customHandler: true,
+                    enabled: context.allowEdit,
+                    handler: function(){
+                        let data = {
+                            id: context.postingId,
+                        }
+                        onDelete?.(data); // Optional chaining
+                    },
+                });
         }
         catch (error) {
             const errMsg = "Failed to update event position.";
