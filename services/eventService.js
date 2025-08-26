@@ -2174,7 +2174,7 @@ function findOverlap(userPostings, posting){
                 return true;
             }
         }
-        if (posting.date.startDate === userPosting.date.startDate) { // b starts together with a
+        if (posting.date.startDate.getTime() === userPosting.date.startDate.getTime()) { // b starts together with a
             return true;
         }
         else return false;
