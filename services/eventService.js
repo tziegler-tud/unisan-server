@@ -1787,7 +1787,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
         //check for overlap
         let overLap = findOverlap(userPostings, post);
 
-        if(overLap !== undefined) {
+        if(overLap !== null) {
             //overlapping posting found!
             if (!args.allowMultiple) {
                 console.log("Rejected user "+ user.username + " to be assigned to post: User is already assigned to a different post.")
@@ -2094,7 +2094,7 @@ async function checkUserForAssignment(userId, eventId, postingId, args) {
     let index = event.postings.findIndex(obj => obj.id.toString() === postingId);
 
     let result = {
-        allowed: false,
+        isAllowed: false,
         matchesQualification: false,
         hasOverlap: undefined,
         overlap: undefined,
@@ -2117,19 +2117,19 @@ async function checkUserForAssignment(userId, eventId, postingId, args) {
         //check for overlap
         let overLap = findOverlap(userPostings, post);
 
-        if (overLap !== undefined || !userMatchesRequirement) {
+        if (overLap !== null || !userMatchesRequirement) {
             //user rejected
-            result.allowed = false;
+            result.isAllowed = false;
             result.matchesQualification = userMatchesRequirement;
-            result.hasOverlap = (overLap !== undefined);
+            result.hasOverlap = (overLap !== null);
             result.overlap = overLap;
             return result;
         }
         else {
             //user allowed
-            result.allowed = true;
+            result.isAllowed = true;
             result.matchesQualification = userMatchesRequirement;
-            result.hasOverlap = true;
+            result.hasOverlap = false;
             result.overlap = overLap;
             return result;
         }
@@ -2154,6 +2154,14 @@ async function devUpdateDocuments() {
  * helpers
  */
 
+
+/**
+ * checks if there there is an overlap between the given list of postings (the current postings a user is assigned to) and the given posting.
+ * Returns the posting from the list of userPostings that was responsible for the overlap, or null if none was found.
+ * @param userPostings {Posting[]}
+ * @param posting
+ * @returns {Posting?}
+ */
 function findOverlap(userPostings, posting){
     let overlap = userPostings.find(userPosting => {
         if (userPosting.date.startDate < posting.date.startDate) { // a starts before b
@@ -2171,6 +2179,7 @@ function findOverlap(userPostings, posting){
         }
         else return false;
     })
+    if(!overlap) return null;
     return overlap;
 }
 

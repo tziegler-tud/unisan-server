@@ -730,20 +730,25 @@ export default new PageModule ({
 
             function assignUser(event, postingId, userId){
                 let augmentedPosting = sortedList.find(e => e._id.toString() === postingId);
-                eventActions.assignPost(event.id, postingId, userId, function(){
-                    eventProfile.refreshEvent()
-                        .then(event => {
-                            self.pageData.event = event;
-                            self.dataList = self.pageData.event.postings;
-                            displayPostingsList(self.dataList);
-                            self.searchbar.hide();
-                            let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
-                            let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
-                            sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
-                        })
-                        .catch(err => {
-                        })
-                }).fail((jqxhr, textstatus, error) => window.snackbar.showError(jqxhr, textstatus, error));
+                eventActions.assignPost(event.id, postingId, userId, {
+                    onSuccess: (result) => {
+                        eventProfile.refreshEvent()
+                            .then(event => {
+                                self.pageData.event = event;
+                                self.dataList = self.pageData.event.postings;
+                                displayPostingsList(self.dataList);
+                                self.searchbar.hide();
+                                let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
+                                let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
+                                sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
+                            })
+                            .catch(err => {
+                            })
+                    },
+                    onError:(jqxhr, textstatus, errorThrown) => {
+                        window.snackbar.showError(jqxhr, textstatus, errorThrown);
+                    }
+                })
             }
 
             function unassignUser(event, postingId, userId) {

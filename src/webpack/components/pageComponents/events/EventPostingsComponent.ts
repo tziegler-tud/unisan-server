@@ -15,7 +15,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 
-import {IEvent, IPosition, IPosting} from "../../../types/Event";
+import {IAugmentedPosting, IEvent, IPosition, IPosting, IPostingAllowed} from "../../../types/Event";
 import {IQualification, qualTypesMap} from "../../../types/Qualification";
 import EventProfile from "../../../events/EventProfile";
 import eventActions from "../../../actions/eventActions";
@@ -29,6 +29,7 @@ import "../../scss/events/EventPostingsComponent.scss"
 import {MDCRipple} from "@material/ripple";
 import {AddPostingOnConfirmPayload} from "../../../sidebar/plugins/plugin-eventfactory";
 import EventPostingsList, {
+    AugmentedPositionGroup,
     EventPostingsListArgs, EventPostingsListCallback,
     EventPostingsListItemCallback,
     PositionGroup
@@ -96,6 +97,7 @@ export default class EventPostingsComponent extends Component {
     private searchbar!: Searchbar;
     private dataList: IPosting[] = [];
     private displayList?: IPosting[] = null;
+    private augmentedList: IAugmentedPosting[] = [];
     private eventProfile: EventProfile;
     private allowEdit: boolean;
     private calendar: Calendar;
@@ -263,6 +265,40 @@ export default class EventPostingsComponent extends Component {
 
     }
 
+    async _createAugmentedDataList(dataList: IPosting[]): Promise<IAugmentedPosting[]> {
+        let promises: Promise<IPostingAllowed>[] = []
+        let augmentedDataList: IAugmentedPosting[] = [];
+        for(const posting of dataList) {
+            try{
+                const resultPromise: Promise<IPostingAllowed> = eventActions.checkUserForAssignmentAsync(this.event.id.toString(), this.user.id.toString(), posting._id.toString())
+                promises.push(resultPromise)
+                resultPromise.then((result: IPostingAllowed) => {
+                    augmentedDataList.push({
+                        posting: posting,
+                        allowed: result,
+                    })
+                })
+            }
+            catch(err) {
+                console.error(err)
+            }
+        }
+        await Promise.all(promises)
+        return augmentedDataList
+    }
+
+    augmentDataList(dataList: IPosting[]): IAugmentedPosting[] {
+        return dataList.map((posting: IPosting) => {
+            const augmentedPosting = this.augmentedList.find((augmentedPosting: IAugmentedPosting) => {
+                return augmentedPosting.posting._id.toString() === posting._id.toString()
+            })
+            if(!augmentedPosting) {
+                console.error("Failed to create augmented data list. Posting not found in augmented list.")
+            }
+            else return augmentedPosting;
+        })
+    }
+
     getHtml(): string {
         return this.html;
     }
@@ -311,7 +347,8 @@ export default class EventPostingsComponent extends Component {
                     if(!postingId) {
                         this.page.snackbar.showCustomError("Ein Fehler ist aufgetreten.", "Error")
                     }
-                    this.showDetailsSidebar(postingId, true);
+                    const augmentedPosting = this.getAugmentedPosting(postingId)
+                    this.showDetailsSidebar(augmentedPosting);
                     this.calendarContainer.querySelectorAll(".fc-event").forEach(element => {
                         element.classList.remove("calendarEvent--selected")
                     })
@@ -351,7 +388,9 @@ export default class EventPostingsComponent extends Component {
 
 
         const calendarEvents = this._getCalendarEvents(dataList, (posting)=> posting.position ? posting.position.toString() : "0");
-        const resources = this._getGroupsAsResources(dataList);
+        let augmentedSortedList = this.augmentDataList(dataList)
+
+        const resources = this._getGroupsAsResources(augmentedSortedList);
 
         if (this.calendarContainer) {
             this.calendar = new Calendar(this.calendarContainer, {
@@ -399,7 +438,8 @@ export default class EventPostingsComponent extends Component {
                     if(!postingId) {
                         this.page.snackbar.showCustomError("Ein Fehler ist aufgetreten.", "Error")
                     }
-                    this.showDetailsSidebar(postingId, true);
+                    const augmentedPosting = this.getAugmentedPosting(postingId)
+                    this.showDetailsSidebar(augmentedPosting);
                     this.calendarContainer.querySelectorAll(".fc-event").forEach(element => {
                         element.classList.remove("calendarEvent--selected")
                     })
@@ -434,8 +474,9 @@ export default class EventPostingsComponent extends Component {
         this.calendarContainer.innerHTML = "";
         let sortedList = this.displayList !== null ? this.displayList : this.dataList;
         sortedList = this._sortDataList(sortedList);
+        let augmentedSortedList = this.augmentDataList(sortedList)
 
-        const groupedList = this._groupByPosition(sortedList);
+        const groupedList = this._groupByPosition(augmentedSortedList);
         // self.dataList = sortedList;
 
         let dropdownMenus = ()=> {
@@ -445,25 +486,25 @@ export default class EventPostingsComponent extends Component {
             });
         }
         let deletePost = ()=> {
-            $('.posting-delete').each(()=>{
-                $(this).on("click", (e)=> {
+            document.querySelectorAll('.posting-delete').forEach((el: HTMLElement) => {
+                el.addEventListener("click", (e)=> {
                     //push changes to server
                     e.preventDefault();
                     e.stopPropagation();
-                    let postingId = e.currentTarget.dataset.postingid;
+                    let postingId = el.getAttribute("data-postingid");
                     this.deletePosting(postingId);
                 })
             });
         }
 
         let postDetails = () => {
-            $('.posting-details, .posting-edit').each(() =>{
-                $(this).on("click", (e)=> {
+            document.querySelectorAll('.posting-details, .posting-edit').forEach((el) => {
+                el.addEventListener("click", (e)=> {
                     e.preventDefault();
-                    let element = e.currentTarget;
-                    let postingId = element.dataset.postingid;
-                    const isAllowed = element.dataset.userisallowed === "true";
-                    this.showDetailsSidebar(postingId, isAllowed);
+                    let postingId = el.getAttribute("data-postingid");
+                    const isAllowed = el.getAttribute("data-userisallowed") === "true";
+                    const augmentedPosting = this.getAugmentedPosting(postingId)
+                    this.showDetailsSidebar(augmentedPosting);
                 })
             });
         }
@@ -484,8 +525,21 @@ export default class EventPostingsComponent extends Component {
                     e.preventDefault();
                     //@ts-ignore
                     const postingId = element.dataset.postingid;
-                    const isAllowed = element.dataset.userisallowed === "true";
-                    self.showDetailsSidebar(postingId, isAllowed)
+                    const isAllowed = this.augmentedList.find(augmentedPosting => augmentedPosting.posting._id.toString() === postingId)
+                    const augmentedPosting = this.getAugmentedPosting(postingId)
+                    this.showDetailsSidebar(augmentedPosting);                },
+                onAssign: (postingId: string) => {
+                    //assign current user to posting
+                    const posting = self.event.postings.find(posting => posting._id.toString() === postingId);
+                    if(!posting) return;
+                    this._assignUser(self.event, posting._id.toString(), self.user.id.toString())
+                },
+
+                onUnassign: (postingId: string) => {
+                    //assign current user from posting
+                    const posting = self.event.postings.find(posting => posting._id.toString() === postingId);
+                    if(!posting) return;
+                    this._unassignUser(self.event, posting._id.toString(), self.user.id.toString())
                 },
                 dropOnPosition(postingId: string, positionId: string){
                     if(!self.allowEdit) return;
@@ -663,8 +717,11 @@ export default class EventPostingsComponent extends Component {
         this.page.sidebar.show();
     }
 
-    showDetailsSidebar = (postingId: string, isAllowed: boolean) => {
-        let augmentedPosting = this.dataList.find(e => e._id.toString() === postingId);
+    showDetailsSidebar = (augmentedPosting: IAugmentedPosting) => {
+        const posting = augmentedPosting.posting;
+        const allowed = augmentedPosting.allowed;
+
+        const postingId = posting._id.toString();
 
         this.page.sidebar.addContent("showPostingDetails", {
             postingId: postingId,
@@ -672,7 +729,6 @@ export default class EventPostingsComponent extends Component {
             event: this.event,
             allowEdit: this.allowEdit,
             user: this.user,
-            userIsAllowed: isAllowed,
             callback: {
                 onConfirm: (data: ShowPostingConfirmPayload, localArgs: {})=> {
                     let posting = {
@@ -693,8 +749,8 @@ export default class EventPostingsComponent extends Component {
                                     this._resetDisplayList()
                                     this.reloadCurrentView();
                                     this.searchbar.hide();
-                                    let newPosting = event.postings.find(posting => posting._id.toString() === postingId);
-                                    let newAugmentedPosting = Object.assign(augmentedPosting, newPosting)
+                                    let newPosting = event.postings.find(p => p._id.toString() === postingId);
+                                    let newAugmentedPosting = this.augmentedList.find(p => p.posting._id.toString() === postingId);
                                     this.page.sidebar.update({event: event, augmentedPosting: newAugmentedPosting});
                                     this.page.snackbar.show("Änderungen erfolgreich gespeichert.")
 
@@ -731,28 +787,40 @@ export default class EventPostingsComponent extends Component {
     }
 
     _assignUser(event: IEvent, postingId: string, userId: string){
-        eventActions.assignPost(event.id.toString(), postingId, userId, ()=>{
-            this.refreshEvent()
-                .then((event: IEvent) => {
-                    this._resetDisplayList()
-                    this.reloadCurrentView()
-                    this.showDetailsSidebar(postingId, true);
-                })
-        }).fail((jqxhr, textstatus, error) => {
-            this.page.snackbar.showError(jqxhr, textstatus)
+        eventActions.assignPost(event.id.toString(), postingId, userId, {
+            onSuccess: (result) => {
+                this.refreshEvent()
+                    .then((event: IEvent) => {
+                        this._resetDisplayList()
+                        this.reloadCurrentView()
+                        const augmentedPosting = this.getAugmentedPosting(postingId)
+                        this.showDetailsSidebar(augmentedPosting);
+                        this.page.snackbar.show("Erfolgreich angemeldet.")
+
+                    })
+            },
+            onError: (jqxhr, textstatus, error) => {
+                this.page.snackbar.showError(jqxhr, textstatus)
+            }
         });
     }
     _unassignUser(event: IEvent, postingId: string, userId: string){
-        eventActions.unassignPost(event.id.toString(), postingId, userId, ()=>{
-            this.refreshEvent()
-                .then((event: IEvent) => {
-                    this._resetDisplayList()
-                    this.reloadCurrentView()
-                    this.showDetailsSidebar(postingId, true);
-                })
-        }).fail((jqxhr, textstatus, error) => {
-            this.page.snackbar.showError(jqxhr, textstatus)
-        });
+        eventActions.unassignPost(event.id.toString(), postingId, userId, {
+            onSuccess: (result) => {
+                this.refreshEvent()
+                    .then((event: IEvent) => {
+                        this._resetDisplayList()
+                        this.reloadCurrentView()
+                        const augmentedPosting = this.getAugmentedPosting(postingId)
+                        this.showDetailsSidebar(augmentedPosting);
+                        this.page.snackbar.show("Erfolgreich abgemeldet.")
+
+                    })
+            },
+            onError: (jqxhr, textstatus, error) => {
+                this.page.snackbar.showError(jqxhr, textstatus)
+            }
+        })
     }
     deletePosting(postingId: string){
         eventActions.removePosting(this.event.id, postingId, {
@@ -763,7 +831,7 @@ export default class EventPostingsComponent extends Component {
                         this.reloadCurrentView()
                         this.searchbar.hide();
                         this.page.sidebar.showDefault();
-                        this.page.snackbar.show("Posten erfolgreich gespeichert.")
+                        this.page.snackbar.show("Posten erfolgreich entfernt.")
                     })
             }
         }).fail((jqxhr, textstatus, error) => {
@@ -773,6 +841,10 @@ export default class EventPostingsComponent extends Component {
 
     getPosting(postingId: string): IPosting {
         return this.event.postings.find(e => e._id.toString() === postingId);
+    }
+
+    getAugmentedPosting(postingId: string): IAugmentedPosting {
+        return this.augmentedList.find(e => e.posting._id.toString() === postingId);
     }
 
     _setDisplayList(list: IPosting[]){
@@ -788,6 +860,7 @@ export default class EventPostingsComponent extends Component {
             const event = await this.eventProfile.refreshEvent()
             this.event = event;
             this.dataList = event.postings;
+            this.augmentedList = await this._createAugmentedDataList(this.dataList)
             return event;
         }
         catch(e) {
@@ -852,7 +925,7 @@ export default class EventPostingsComponent extends Component {
         return resources;
     }
 
-    _getGroupsAsResources(dataList: IPosting[]) {
+    _getGroupsAsResources(dataList: IAugmentedPosting[]) {
         const groups = this._groupByPosition(dataList);
         return groups.map((group, index) => {
             return {
@@ -892,10 +965,10 @@ export default class EventPostingsComponent extends Component {
         }
     }
 
-    _groupByPosition(list: IPosting[]) {
+    _groupByPosition(list: IAugmentedPosting[]): AugmentedPositionGroup[] {
 
-        const groups: PositionGroup[] = [];
-        const defaultPosition: PositionGroup = {
+        const groups: AugmentedPositionGroup[] = [];
+        const defaultPosition: AugmentedPositionGroup = {
             id: 0,
             title: "Andere",
             description: "",
@@ -913,19 +986,20 @@ export default class EventPostingsComponent extends Component {
                 assigned: 0,
             })
         })
-        list.forEach(posting => {
-            const pos = posting.position
+        list.forEach(augmentedPosting => {
+            const posting = augmentedPosting.posting
+            const pos = posting.position;
             if(pos) {
                 //find position
                 const position = groups.find(p => p.id.toString() === pos.toString())
                 if(position) {
-                    position.postings.push(posting)
+                    position.postings.push(augmentedPosting)
                     position.total = position.postings.length;
                     position.assigned = posting.assigned.isAssigned ? position.assigned + 1 : position.assigned;
                 }
             }
             else {
-                defaultPosition.postings.push(posting)
+                defaultPosition.postings.push(augmentedPosting)
                 defaultPosition.total = defaultPosition.postings.length;
                 defaultPosition.assigned = posting.assigned.isAssigned ? defaultPosition.assigned + 1 : defaultPosition.assigned;
             }
