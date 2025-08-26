@@ -11,25 +11,24 @@
                     <div class="eventPostingsComponent--displaySelector"></div>
                     <div id="eventPostingsComponent--searchbar" class="searchbar-container topbar-element"></div>
                     <div class="topbar-element topbar-buttonContainer eventPostingsComponent--topBarButtons">
-                        <div class="topbar-button" id="eventPostingsComponent--addPositionButton">
-                            <button class="mdc-button mdc-button--raised mdc-button--leading">
-                                <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon" aria-hidden="true">
-                                    bookmark</i>
-                                <span class="mdc-button__label">Abschnitt/Ort hinzufügen</span>
-                            </button>
-                        </div>
-                        <div class="topbar-button" id="eventPostingsComponent--addPostingButton" >
-                            <button class="mdc-button mdc-button--raised mdc-button--leading">
-                                <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon" aria-hidden="true">
-                                    bookmark</i>
-                                <span class="mdc-button__label">Dienstposten hinzufügen</span>
-                            </button>
-                        </div>
-
-
-
+                        {{#if args.allowEdit}}
+                            <div class="topbar-button" id="eventPostingsComponent--addPositionButton">
+                                <button class="mdc-button mdc-button--raised mdc-button--leading">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon" aria-hidden="true">
+                                        bookmark</i>
+                                    <span class="mdc-button__label">Abschnitt/Ort hinzufügen</span>
+                                </button>
+                            </div>
+                            <div class="topbar-button" id="eventPostingsComponent--addPostingButton" >
+                                <button class="mdc-button mdc-button--raised mdc-button--leading">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon" aria-hidden="true">
+                                        bookmark</i>
+                                    <span class="mdc-button__label">Dienstposten hinzufügen</span>
+                                </button>
+                            </div>
+                        {{/if}}
                     </div>
                 </div>
                 <div class="subpage-content">

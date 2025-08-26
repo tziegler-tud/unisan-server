@@ -85,7 +85,7 @@ export default new PageModule({
     },
     buildPage: async function ({ args = {}, data = {} }: BuildPageArgs = {}): Promise<void> {
 
-        args.allowEdit = true;
+        args.allowEdit = false;
 
         let self = this;
 
@@ -97,6 +97,7 @@ export default new PageModule({
         let dockerACL: UserDockerACL = undefined;
         try {
             dockerACL = await aclActions.getCurrentUserDockerAcl();
+            args.allowEdit = dockerACL.events.write;
         }
         catch(e) {
             console.error("Failed to get user acl. This might lead to incorrect display")
@@ -161,7 +162,7 @@ export default new PageModule({
         await componentPage.addComponent({
             componentType: ComponentPage.componentTypes.EVENTS.POSTINGS,
             section:"POSTINGS",
-            componentArgs: {allowEdit: true, size: "full", acl: dockerACL},
+            componentArgs: {allowEdit: args.allowEdit, size: "full", acl: dockerACL},
             data: {user: data.user, event: event}
         })
 

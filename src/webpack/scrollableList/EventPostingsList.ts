@@ -6,7 +6,7 @@ import "../helpers/handlebarsHelpers";
 import { dateFromNow, refJSON, transformDateTimeString } from "../helpers/helpers";
 import { DropdownMenu, Corner } from "../helpers/dropdownMenu";
 import { phone } from "../helpers/variables";
-import {IPosition, IPosting} from "../types/Event";
+import {IAugmentedPosting, IPosition, IPosting} from "../types/Event";
 import {getTemplate} from "../utils/utils";
 
 export interface PositionGroup {
@@ -18,6 +18,15 @@ export interface PositionGroup {
     total: number,
 }
 
+export interface AugmentedPositionGroup {
+    id?: number|string,
+    title: string,
+    description: string,
+    postings: IAugmentedPosting[],
+    assigned: number,
+    total: number,
+}
+
 export interface EventPostingsListArgs {
     enableMobile?: boolean;
     enableDropdowns?: boolean;
@@ -25,6 +34,7 @@ export interface EventPostingsListArgs {
     hasTitle?: boolean;
     title?: string;
     classes?: string;
+    allowEdit?: boolean,
 }
 
 export interface EventPostingsListCallback {
@@ -37,6 +47,8 @@ export interface EventPostingsListHeaderCallback {
 }
 export interface EventPostingsListItemCallback {
     onClick?: (event: Event) => void;
+    onAssign?: (postingId: string) => void;
+    onUnassign?: (postingId: string) => void;
     dropOnPosition?: (postingId: string, positionId: string) => void;
 }
 
@@ -54,11 +66,11 @@ export default class EventPostingsList {
     private positionListContainers: NodeListOf<HTMLElement>;
     private groupContainers: NodeListOf<HTMLElement>;
 
-    private positions: PositionGroup[];
+    private positions: AugmentedPositionGroup[];
 
     constructor(
         container: HTMLElement,
-        positions: PositionGroup[],
+        positions: AugmentedPositionGroup[],
         args: EventPostingsListArgs = {},
         callback?: EventPostingsListCallback
     ) {
@@ -71,6 +83,7 @@ export default class EventPostingsList {
             hasTitle: false,
             title: "test",
             classes: "",
+            allowEdit: false,
             ...args,
         };
         this.positions = positions
@@ -90,14 +103,14 @@ export default class EventPostingsList {
 
     }
 
-    public setPositions(positions: PositionGroup[]) {
+    public setPositions(positions: AugmentedPositionGroup[]) {
         this.positions = positions;
     }
 
     private async _buildHTML(): Promise<void> {
 
         const handleData: {
-            positions: PositionGroup[];
+            positions: AugmentedPositionGroup[];
             acl: Object | undefined;
             args: EventPostingsListArgs;
         } = {
@@ -124,13 +137,29 @@ export default class EventPostingsList {
             this.container.querySelectorAll(".viewKey-item").forEach((el: any) => el.addEventListener("click", () => window.location.href = this.viewUrl!.replace(":id", el.dataset.viewkey)));
         }
         if (this.callback) {
-            if (this.callback.listItem?.onClick) {
-                this.container.querySelectorAll(".scrollableList-item").forEach((el) => el.addEventListener("click", this.callback!.listItem!.onClick!));
+            if (this.callback.listItem) {
+                if(this.callback.listItem.onClick){
+                    this.container.querySelectorAll(".scrollableList-item").forEach((el) => el.addEventListener("click", this.callback!.listItem!.onClick!));
+                }
+                if(this.callback.listItem.onAssign){
+                    this.container.querySelectorAll(".posting-assignCurrentUser").forEach((el) => el.addEventListener("click", ()=>{
+                        const postingId = el.getAttribute("data-postingid") || "";
+                        this.callback!.listItem!.onAssign!(postingId)
+                    }));
+                }
+                if(this.callback.listItem.onUnassign){
+                    this.container.querySelectorAll(".posting-unassignCurrentUser").forEach((el) => el.addEventListener("click", ()=>{
+                        const postingId = el.getAttribute("data-postingid") || "";
+                        this.callback!.listItem!.onUnassign!(postingId)
+                    }));
+                }
             }
             this.callback.customHandlers?.forEach((handler) => handler(this));
         }
         if (this.args.enableDropdowns) {
-            this.container.querySelectorAll(".card-menu-container").forEach((el: any) => new DropdownMenu(el, "click", el.querySelector(".card-menu-button"), { anchorCorner: Corner.BOTTOM_LEFT, fixed: true }));
+            this.container.querySelectorAll(".card-menu-container").forEach((el: any) => {
+                new DropdownMenu(el, "click", el.querySelector(".card-menu-button"), { anchorCorner: Corner.BOTTOM_LEFT, fixed: true })
+            });
         }
     }
 
@@ -140,7 +169,6 @@ export default class EventPostingsList {
                 listItem.addEventListener("dragstart", (e: DragEvent) => {
                     const postingId =  listItem.dataset.postingid;
                     e.dataTransfer.setData("text/plain", postingId);
-                    console.log("dragstart!");
                 });
                 listItem.addEventListener("dragend", (e: DragEvent) => {
                     this._endDragEvent();
@@ -164,17 +192,14 @@ export default class EventPostingsList {
         this.groupContainers.forEach((el: HTMLElement) => {
             el.addEventListener("dragover", (e: DragEvent) => {
                 e.preventDefault();
-                console.log("dragover!")
                 el.classList.add("dragover");
             })
             el.addEventListener("dragleave", (e: DragEvent) => {
                 e.preventDefault();
-                console.log("dragleave!")
                 el.classList.remove("dragover");
             })
             el.addEventListener("drop", (e: DragEvent) => {
                 e.preventDefault();
-                console.log("Dropped at " + el.dataset.positionid);
                 const positionId = el.dataset.positionid;
                 const postingId = e.dataTransfer.getData("text/plain");
 
