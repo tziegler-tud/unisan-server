@@ -1,5 +1,5 @@
 import type {ShowPostingConfirmPayload} from "../sidebar/plugins/plugin-event";
-import {IEvent, IPosition} from "../types/Event";
+import {IEvent, IPosition, IPostingAllowed} from "../types/Event";
 
 interface AddPostingActionPayload {
     description: string,
@@ -87,8 +87,8 @@ interface EventActions {
     addPosting(eventId: string, postingData: AddPostingActionPayload, callback?: (result: any) => void, args?: {}): JQuery.jqXHR; // Define postingData type
     updatePosting(id: string|number, postingData: UpdatePostingActionPayload, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
     removePosting(id: string|number, postingId: string, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR;
-    assignPost(eventId: string, postingId: string, userId: string, callback?: (result: any) => void): JQuery.jqXHR;
-    unassignPost(eventId: string, postingId: string, userId: string, callback?: (result: any) => void): JQuery.jqXHR;
+    assignPost(eventId: string, postingId: string, userId: string, callback: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+    unassignPost(eventId: string, postingId: string, userId: string, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
     saveTitle(id: string, data: { delta: any; value: string }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define delta type
     saveDescription(id: string, data: { longDesc: any; shortDesc: any }, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define desc types
     saveDelta(id: string, delta: any, callback?: { onSuccess?: (result: any) => void }): JQuery.jqXHR; // Define delta type
@@ -102,6 +102,10 @@ interface EventActions {
     removePosition(id: string, positionId: string, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
 
     assignPostingToPosition(id: string, postingId: string, positionId: string, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): Promise<void>
+
+    checkUserForAssignment(eventId: string, userId: string, postingId: string, callback?: { onSuccess?: (result: any) => void, onError?: (jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) => void }): JQuery.jqXHR;
+    checkUserForAssignmentAsync(eventId: string, userId: string, postingId: string): Promise<IPostingAllowed>
+
 }
 
 const eventActions: EventActions = {
@@ -389,8 +393,15 @@ const eventActions: EventActions = {
         });
     },
 
-    assignPost: function(eventId, postingId, userId, callback) {
-        callback = callback == null ? function() { } : callback;
+    assignPost: function(eventId, postingId, userId, callback?: {
+        onSuccess?: (result: any) => void;
+        onError?: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => void
+    }) : JQuery.jqXHR {
+
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
+        if (callback.onError === undefined) callback.onError = function() { };
+
         const data = {
             id: eventId,
             postingId: postingId,
@@ -404,13 +415,18 @@ const eventActions: EventActions = {
             dataType: "json",
             data: JSON.stringify(data),
             success: function(result: any) {
-                callback(result);
+                callback.onSuccess(result);
             },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
         });
     },
 
-    unassignPost: function(eventId, postingId, userId, callback) {
-        callback = callback == null ? function() { } : callback;
+    unassignPost: function(eventId, postingId, userId, callback?: {
+        onSuccess?: (result: any) => void;
+        onError?: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => void
+    }) : JQuery.jqXHR {
         const data = {
             id: eventId,
             postingId: postingId,
@@ -424,8 +440,11 @@ const eventActions: EventActions = {
             dataType: "json",
             data: JSON.stringify(data),
             success: function(result: any) {
-                callback(result);
+                callback.onSuccess(result);
             },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
         });
     },
 
@@ -675,7 +694,74 @@ const eventActions: EventActions = {
                 }
             });
         })
+    },
+
+    checkUserForAssignment(eventId: string, userId: string, postingId: string, callback?: {
+        onSuccess?: (result: any) => void;
+        onError?: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => void
+    }) : JQuery.jqXHR {
+
+        if (callback === undefined) callback = {};
+        if (callback.onSuccess === undefined) callback.onSuccess = function() { };
+        if (callback.onError === undefined) callback.onError = function() { };
+
+        if(!eventId) throw new Error("Invalid arguments received for parameter position.")
+        if(!userId) throw new Error("Invalid arguments received for parameter position.")
+        if(!postingId) throw new Error("Invalid arguments received for parameter position.")
+
+        const data = {
+            eventId: eventId,
+            userId: userId,
+            postingId: postingId,
+            args: {},
+        }
+
+        return $.ajax({
+            url: `${baseUrl}/checkUserForAssignment`,
+            type: "POST",
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function(result: any) {
+                callback.onSuccess(result);
+            },
+            error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                callback.onError(jqXHR, textStatus, errorThrown)
+            }
+        });
+
+    },
+
+    checkUserForAssignmentAsync(eventId: string, userId: string, postingId: string): Promise<IPostingAllowed> {
+
+        if(!eventId) throw new Error("Invalid arguments received for parameter position.")
+        if(!userId) throw new Error("Invalid arguments received for parameter position.")
+        if(!postingId) throw new Error("Invalid arguments received for parameter position.")
+
+        const data = {
+            eventId: eventId,
+            userId: userId,
+            postingId: postingId,
+            args: {},
+        }
+
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${baseUrl}/checkUserForAssignment`,
+                type: "POST",
+                contentType: "application/json; charset=UTF-8",
+                dataType: "json",
+                data: JSON.stringify(data),
+                success: function(result: any) {
+                    resolve(result)
+                },
+                error: function(jqXHR: JQuery.jqXHR,  textStatus: string,  errorThrown: string ) {
+                    reject(new Error(`${jqXHR.status}: ${jqXHR.responseText}`))
+                }
+            });
+        })
     }
+
 };
 
 /**

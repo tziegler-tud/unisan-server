@@ -1,7 +1,7 @@
 import "../sidebar-events.scss";
 import "../sidebar-addParticipant.scss";
 
-import {type IEvent, IPosition, IPosting} from "../../types/Event"
+import {IAugmentedPosting, type IEvent, IPosition, IPosting} from "../../types/Event"
 import {type IQualification} from "../../types/Qualification";
 
 import Sidebar from "../Sidebar";
@@ -90,7 +90,7 @@ interface SidebarArgs {
     position?: IPosition,
     allowEdit?: boolean;
     user?: UserData;
-    augmentedPosting?: IPosting;
+    augmentedPosting?: IAugmentedPosting;
     qualTypes?: string[];
 }
 
@@ -102,7 +102,7 @@ interface HandlebarContext {
     event?: IEvent;
     args?: SidebarArgs;
     user?: UserData;
-    augmentedPosting?: IPosting;
+    augmentedPosting?: IAugmentedPosting;
     postingId?: string;
     allowEdit?: boolean;
     isAssignedToSelf?: boolean;
@@ -639,7 +639,7 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
                         checkUser(userid, event.id.toString(), postingId)
                             .then(result => {
                                 selectedUser.check = result;
-                                if(result.allowed) {
+                                if(result.isAllowed) {
                                     confirmButton.enable();
                                     //display allow info panel
                                     if (checkPanel) { // Check if element exists
@@ -1059,10 +1059,11 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
         context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
 
-        let posting: IPosting | undefined = context.augmentedPosting;
-        if (context.augmentedPosting === undefined && context.event) { // Check for context.event
+        let augmentedPosting = context.augmentedPosting;
+
+        if (augmentedPosting === undefined && context.event) { // Check for context.event
             //find posting
-            posting = context.event.postings.find(el => {
+            let posting: IPosting = context.event.postings.find(el => {
                 return el._id.toString() === context.postingId;
             })
             if(posting === undefined) {
@@ -1079,7 +1080,18 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
                 };
                 corrupted = true;
             }
+            augmentedPosting = {
+                posting: posting,
+                allowed: {
+                    isAllowed: false,
+                    matchesQualification: false,
+                    hasOverlap: false,
+                    overlap: undefined,
+                }
+            }
         }
+
+        const posting = augmentedPosting.posting;
 
         if (posting?.assigned?.isAssigned && posting.assigned.user) { // Check if posting.assigned and posting.assigned.user exist
             context.assignedUser = posting.assigned.user;
@@ -1090,15 +1102,6 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
         }
 
         context.posting = posting;
-
-        // Ensure user and posting are not undefined before passing to getMatchingQualifications
-        if (context.user && posting) {
-            //@ts-ignore
-            let matchingQualifications = getMatchingQualifications(context.user, posting);
-            context.userIsAllowed = (matchingQualifications.length > 0);
-        } else {
-            context.userIsAllowed = false; // Set to false if user or posting is missing
-        }
 
         let handlerFunctionResult = new HandlerFunctionResult(); // Initialize HandlerFunctionResult
 
