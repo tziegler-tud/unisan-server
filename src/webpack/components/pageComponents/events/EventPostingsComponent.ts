@@ -1,10 +1,14 @@
 import Component from "../../Component";
 import ComponentPage from "../../ComponentPage";
-import ScrollableList, {ScrollableListArgs} from "../../../scrollableList/ScrollableList";
 import Searchbar from "../../../widgets/searchbar/SearchBar";
 import {DropdownMenu} from "../../../helpers/dropdownMenu";
 import {Corner} from "@material/menu";
-import {AddPositionOnConfirmPayload, eventPlugin, ShowPostingConfirmPayload} from "../../../sidebar/plugins/plugin-event";
+import {
+    AddPositionOnConfirmPayload,
+    AddPositionOnDeletePayload,
+    eventPlugin,
+    ShowPostingConfirmPayload
+} from "../../../sidebar/plugins/plugin-event";
 import DisplaySelector, {DisplaySelectorEventData} from "../../../widgets/DisplaySelector/DisplaySelector";
 import {Calendar} from "@fullcalendar/core";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -137,18 +141,22 @@ export default class EventPostingsComponent extends Component {
         const addPositionButton = document.getElementById("eventPostingsComponent--addPositionButton");
         const addPostingButton = document.getElementById("eventPostingsComponent--addPostingButton");
 
-        addPositionButton.addEventListener("click", (e)=>{
-            e.preventDefault();
-            e.stopPropagation();
-            this.showAddPositionSidebar()
-        })
 
-        addPostingButton.addEventListener("click", (e)=>{
-            e.preventDefault();
-            e.stopPropagation();
-            this.showAddPostingSidebar();
-        })
+        if(addPositionButton){
+            addPositionButton.addEventListener("click", (e)=>{
+                e.preventDefault();
+                e.stopPropagation();
+                this.showAddPositionSidebar()
+            })
+        }
 
+        if(addPostingButton){
+            addPostingButton.addEventListener("click", (e)=>{
+                e.preventDefault();
+                e.stopPropagation();
+                this.showAddPostingSidebar();
+            })
+        }
 
         //setup view mode toggle
         const topbar_container = this.container.querySelector(".eventPostingsComponent--displaySelector") as HTMLElement;
@@ -463,6 +471,7 @@ export default class EventPostingsComponent extends Component {
 
         let scrollArgs: EventPostingsListArgs = {
             enableMobile: true,
+            allowEdit: this.allowEdit,
         }
         const eventId = this.event.id.toString();
 
@@ -479,6 +488,7 @@ export default class EventPostingsComponent extends Component {
                     self.showDetailsSidebar(postingId, isAllowed)
                 },
                 dropOnPosition(postingId: string, positionId: string){
+                    if(!self.allowEdit) return;
                     const posting = self.event.postings.find(posting => posting._id.toString() === postingId);
                     const currentPosition = posting.position
                     if(currentPosition === positionId || (!currentPosition && positionId == "0")) return;
@@ -499,6 +509,7 @@ export default class EventPostingsComponent extends Component {
             },
             listHeader: {
                 onClick:(e: Event) => {
+                    if(!self.allowEdit) return;
                     const element = e.currentTarget as HTMLElement;
                     e.preventDefault();
                     const positionId = element.dataset.positionid
@@ -524,11 +535,12 @@ export default class EventPostingsComponent extends Component {
             position: position,
             callback: {
                 onConfirm: (data: AddPositionOnConfirmPayload, args: {})=> {
-                    let position = {
+                    let updatedPos = {
+                        _id: position._id,
                         title: data.title,
                         description: data.description,
                     }
-                    eventActions.updatePosition(this.event.id.toString(), position, {
+                    eventActions.updatePosition(this.event.id.toString(), updatedPos, {
                         onSuccess: () => {
                             this.refreshEvent()
                                 .then((event: IEvent) => {
@@ -539,14 +551,37 @@ export default class EventPostingsComponent extends Component {
                                 .catch(err => {
                                     this.page.snackbar.showCustomError(err.message, "Error")
                                 })
+                            this.page.sidebar.hide();
                         },
                         onError: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => {
                             this.page.snackbar.showError(jqXHR, textStatus)
                         }
                     })
+                },
+                onDelete: (data: AddPositionOnDeletePayload)=> {
+                    eventActions.removePosition(this.event.id.toString(), position._id.toString(), {
+                        onSuccess: () => {
+                            this.refreshEvent()
+                                .then((event: IEvent) => {
+                                    this._resetDisplayList()
+                                    this.reloadCurrentView()
+                                    this.page.snackbar.show("Position erfolgreich gelöscht.")
+                                })
+                                .catch(err => {
+                                    this.page.snackbar.showCustomError(err.message, "Error")
+                                })
+                            this.page.sidebar.hide();
+
+                        },
+                        onError: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => {
+                            this.page.snackbar.showError(jqXHR, textStatus)
+                        }
+                    })
+
                 }
             }
         })
+        this.page.sidebar.show();
     }
     showAddPositionSidebar(position? : IPosition){
         this.page.sidebar.addContent("eventPosition", {
@@ -569,6 +604,8 @@ export default class EventPostingsComponent extends Component {
                                 .catch(err => {
                                     this.page.snackbar.showCustomError(err.message, "Error")
                                 })
+                            this.page.sidebar.hide();
+
                         },
                         onError: (jqXHR: JQuery.jqXHR, textStatus: string, errorThrown: string) => {
                             this.page.snackbar.showError(jqXHR, textStatus)
@@ -577,6 +614,7 @@ export default class EventPostingsComponent extends Component {
                 }
             }
         })
+        this.page.sidebar.show();
     }
 
     showAddPostingSidebar(){

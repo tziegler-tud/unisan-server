@@ -2,10 +2,10 @@
 <div class="postingslist-cards-container eventPostingsList">
     {{#each this.positions}}
         <div class="mdc-list-group eventPostingsList-groupContainer" data-positionid="{{this.id}}">
-            <h3 class="mdc-list-group__subheader eventPostingsList-group-header postingslist-cards-group--header" data-positionid="{{this.id}}">{{this.title}} ({{this.assigned}}/{{this.total}})</h3>
+            <div><h3 class="mdc-list-group__subheader eventPostingsList-group-header postingslist-cards-group--header" data-positionid="{{this.id}}">{{this.title}} ({{this.assigned}}/{{this.total}})</h3></div>
              <ul class="common-list postingslist scrollableItemList postingslist-cards eventPostingsList-group-list" id="documentlist-top">
             {{#each this.postings}}
-                <li class="scrollableList-item cards-item postingscards-item eventPostingsList-listitem" id='postingId{{this._id}}'  draggable="true" data-postingId="{{this._id}}" data-userisallowed="{{this.userIsAllowed}}">
+                <li class="scrollableList-item cards-item postingscards-item eventPostingsList-listitem" id='postingId{{this._id}}'  {{#if ../../args.allowEdit}}draggable="true"{{/if}} data-postingId="{{this._id}}" data-userisallowed="{{this.userIsAllowed}}">
                     <div class="inner postingscards-inner">
                         {{#if this.assigned.isAssigned}}
                             <div class="postingscards-label">
