@@ -594,6 +594,9 @@ function populateParticipants(req, res, next) {
 }
 
 function checkUserForAssignment(req, res, next) {
+    let posting = req.body.postingId;
+    let eventId = req.body.eventId;
+    let userId = req.body.userId;
     eventService.checkUserForAssignment(req.body.userId, req.body.eventId, req.body.postingId)
         .then(function(result) {
             res.json(result);

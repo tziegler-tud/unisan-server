@@ -34,6 +34,17 @@ export interface IPosting {
     },
 }
 
+export interface IAugmentedPosting {
+    posting: IPosting,
+    allowed: IPostingAllowed,
+}
+
+export interface IPostingAllowed {
+    isAllowed: boolean,
+    matchesQualification: boolean,
+    hasOverlap: boolean,
+    overlap: IPosting,
+}
 
 export interface IEvent {
     id: number,

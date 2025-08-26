@@ -1,7 +1,7 @@
 import "../sidebar-events.scss";
 import "../sidebar-addParticipant.scss";
 
-import {type IEvent, IPosition, IPosting} from "../../types/Event"
+import {IAugmentedPosting, type IEvent, IPosition, IPosting} from "../../types/Event"
 import {type IQualification} from "../../types/Qualification";
 
 import Sidebar from "../Sidebar";
@@ -47,6 +47,10 @@ export interface AddPositionOnConfirmPayload {
     description: string,
 }
 
+export interface AddPositionOnDeletePayload {
+    id: string|number,
+}
+
 
 export interface ShowPostingConfirmPayload {
     id: string|number,
@@ -86,7 +90,7 @@ interface SidebarArgs {
     position?: IPosition,
     allowEdit?: boolean;
     user?: UserData;
-    augmentedPosting?: IPosting;
+    augmentedPosting?: IAugmentedPosting;
     qualTypes?: string[];
 }
 
@@ -98,7 +102,7 @@ interface HandlebarContext {
     event?: IEvent;
     args?: SidebarArgs;
     user?: UserData;
-    augmentedPosting?: IPosting;
+    augmentedPosting?: IAugmentedPosting;
     postingId?: string;
     allowEdit?: boolean;
     isAssignedToSelf?: boolean;
@@ -635,7 +639,7 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
                         checkUser(userid, event.id.toString(), postingId)
                             .then(result => {
                                 selectedUser.check = result;
-                                if(result.allowed) {
+                                if(result.isAllowed) {
                                     confirmButton.enable();
                                     //display allow info panel
                                     if (checkPanel) { // Check if element exists
@@ -1055,10 +1059,11 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
 
         context.sidebar = {title: (args.allowEdit ? "Dienstposten bearbeiten" : "Details: Dienstposten")};
 
-        let posting: IPosting | undefined = context.augmentedPosting;
-        if (context.augmentedPosting === undefined && context.event) { // Check for context.event
+        let augmentedPosting = context.augmentedPosting;
+
+        if (augmentedPosting === undefined && context.event) { // Check for context.event
             //find posting
-            posting = context.event.postings.find(el => {
+            let posting: IPosting = context.event.postings.find(el => {
                 return el._id.toString() === context.postingId;
             })
             if(posting === undefined) {
@@ -1075,7 +1080,18 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
                 };
                 corrupted = true;
             }
+            augmentedPosting = {
+                posting: posting,
+                allowed: {
+                    isAllowed: false,
+                    matchesQualification: false,
+                    hasOverlap: false,
+                    overlap: undefined,
+                }
+            }
         }
+
+        const posting = augmentedPosting.posting;
 
         if (posting?.assigned?.isAssigned && posting.assigned.user) { // Check if posting.assigned and posting.assigned.user exist
             context.assignedUser = posting.assigned.user;
@@ -1086,15 +1102,6 @@ let showPostingDetails = new ContentHandler("showPostingDetails",
         }
 
         context.posting = posting;
-
-        // Ensure user and posting are not undefined before passing to getMatchingQualifications
-        if (context.user && posting) {
-            //@ts-ignore
-            let matchingQualifications = getMatchingQualifications(context.user, posting);
-            context.userIsAllowed = (matchingQualifications.length > 0);
-        } else {
-            context.userIsAllowed = false; // Set to false if user or posting is missing
-        }
 
         let handlerFunctionResult = new HandlerFunctionResult(); // Initialize HandlerFunctionResult
 
@@ -1287,6 +1294,7 @@ let showEventPositionContent = new ContentHandler("eventPosition",
     async function(sidebar: Sidebar, args: SidebarArgs, type: string): Promise<HandlerFunctionResult> { // Typed parameters and return
 
         let onConfirm = args.callback?.onConfirm; // Optional chaining
+        let onDelete = args.callback?.onDelete;
         let position: IPosition = args.position ? args.position : {title: "", description: ""};
         let context: HandlebarContext = { // Explicitly type context
             event: args.event, // Assign args.event to context.event
@@ -1302,14 +1310,16 @@ let showEventPositionContent = new ContentHandler("eventPosition",
             sidebar.setHTMLContent(template(context)); // Use setHTMLContent
 
             let titleInputElement = document.getElementById("eventinp-positionTitle") as HTMLInputElement; // Type as HTMLInputElement
-            let descriptionInputElement = document.getElementById("eventinp-positionDescription") as HTMLInputElement; // Type as HTMLInputElement
 
             if(position.title) {
                 titleInputElement.value = position.title;
             }
-            if(position.description) {
-                descriptionInputElement.value = position.description;
-            }
+
+
+            // let descriptionInputElement = document.getElementById("eventinp-positionDescription") as HTMLInputElement; // Type as HTMLInputElement
+            // if(position.description) {
+            //     descriptionInputElement.value = position.description;
+            // }
 
             sidebar.registerBackButton(".sidebar-back-btn");
             sidebar.registerCancelButton(".sidebar-cancel");
@@ -1318,7 +1328,8 @@ let showEventPositionContent = new ContentHandler("eventPosition",
                     customHandler: true,
                     handler: function () {
                         let updatedTitle = titleInputElement?.value;
-                        let updateDescription = descriptionInputElement?.value;
+                        // let updateDescription = descriptionInputElement?.value;
+                        let updateDescription = "";
 
                         let updateData = {
                             title: updatedTitle,
@@ -1330,6 +1341,17 @@ let showEventPositionContent = new ContentHandler("eventPosition",
                     }.bind(args)
                 }
             );
+            let deleteBtn = sidebar.registerDeleteButton(".sidebar-delete",
+                {
+                    customHandler: true,
+                    enabled: context.allowEdit,
+                    handler: function(){
+                        let data = {
+                            id: context.postingId,
+                        }
+                        onDelete?.(data); // Optional chaining
+                    },
+                });
         }
         catch (error) {
             const errMsg = "Failed to update event position.";
