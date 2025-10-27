@@ -4,6 +4,7 @@ import ComponentPage from "./ComponentPage";
 import ComponentSection from "./ComponentSection";
 
 export interface ComponentOptions {
+    identifier?: string;
     page: ComponentPage;
     section: any;
     componentId?: string;
@@ -33,6 +34,7 @@ interface Observer {
 }
 
 export default class Component {
+    protected identifier: string;
     protected data: any;
     protected pageData: any;
     protected page: ComponentPage;
@@ -70,6 +72,7 @@ export default class Component {
         };
 
         const args = options.args ? options.args : {};
+        this.identifier = options.identifier || Date.now().toString();
         this.args = { ...defaults, ...args };
         this.page = options.page;
         this.section = options.section;
@@ -172,6 +175,10 @@ export default class Component {
         this.observers.forEach((observer) => {
             observer.inform({ event, data });
         });
+    }
+
+    async triggerEvent(event: string, data?: any): Promise<any> {
+        //implemented by instances
     }
 
     async reload(){

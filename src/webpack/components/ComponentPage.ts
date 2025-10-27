@@ -36,6 +36,7 @@ export interface ComponentPageOptions {
 }
 
 export interface AddComponentOptions {
+    identifier?: string,
     componentType: typeof Component;
     section?: string;
     componentArgs?: ComponentOptionArgs
@@ -143,7 +144,7 @@ export default class ComponentPage {
         )
     }
 
-    async addComponent(options: AddComponentOptions): Promise<void> {
+    async addComponent(options: AddComponentOptions): Promise<Component> {
         const args = { ...this.options, ...options.componentArgs };
         const componentId = this.componentCounter.next().toString();
         let section = this.findSection(options.section || this.defaultSectionIdentifier);
@@ -155,6 +156,7 @@ export default class ComponentPage {
         }
 
         const component = new options.componentType({
+            identifier: options.identifier,
             page: this,
             section,
             componentId,
@@ -164,6 +166,7 @@ export default class ComponentPage {
         });
 
         await this.addInternal(section, component);
+        return component;
     }
 
     private async addInternal(section: ComponentSection, component: Component): Promise<void> {

@@ -600,6 +600,8 @@ let addPosting = new ContentHandler("addEventPosting",
         context.title = "Dienstposten erstellen";
         context.args = args;
 
+        let defaultQualType = undefined
+
         let res = {qualifications: {}}
 
         sidebar.getDataFromServer("/api/v1/qualification/groupByType", function(context){
@@ -607,6 +609,7 @@ let addPosting = new ContentHandler("addEventPosting",
             //filter for appropriate types
             let qualTypeFilters = args.qualTypes;
             if (!(qualTypeFilters === undefined || qualTypeFilters === null || !Array.isArray(qualTypeFilters) || qualTypeFilters.length === 0)) {
+                defaultQualType = qualTypeFilters[0];
                 context = context.filter(qualGroup => {return qualTypeFilters.includes(qualGroup._id)})
             }
             res.qualifications.byType = context;
@@ -650,6 +653,9 @@ let addPosting = new ContentHandler("addEventPosting",
 
                 let levelObject = document.getElementById("qual-level");
                 let q = $("#qual-type");
+                if(defaultQualType) {
+                    q.val(defaultQualType);
+                }
                 q.on("change",function(e){
                     let typeData = res.qualifications.byType.find(element => element._id === e.target.value);
                     let qualNameObject = document.getElementById("qual-name");

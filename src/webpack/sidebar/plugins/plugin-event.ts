@@ -92,6 +92,7 @@ interface SidebarArgs {
     user?: UserData;
     augmentedPosting?: IAugmentedPosting;
     qualTypes?: string[];
+    defaultQualType?: string;
 }
 
 
@@ -701,7 +702,7 @@ let assignUserSubpage = new ContentHandler("assignUserSubpage",
                         postingId: postingId,
                     }
                     $.ajax({
-                        url: "/api/v1/eventmod/checkUserForAssignment",
+                        url: `/api/v1/eventmod/${eventId}/checkUserForAssignment`,
                         type: 'POST',
                         contentType: "application/json; charset=UTF-8",
                         dataType: 'json',
@@ -921,6 +922,7 @@ const addPosting = new ContentHandler(
         };
 
         let handlerFunctionResult = new HandlerFunctionResult()
+        let defaultQualType = args.defaultQualType
 
         const res: { qualifications: { byType?: QualificationGroup[] } } = { qualifications: {} };
 
@@ -988,7 +990,6 @@ const addPosting = new ContentHandler(
             const levelObject = document.getElementById("qual-level") as HTMLInputElement;
             const qualTypeSelect = $("#qual-type");
             const qualNameSelect = document.getElementById("qual-name") as HTMLSelectElement;
-
             qualTypeSelect.on("change", (e: JQuery.ChangeEvent) => {
                 const targetValue = (e.target as HTMLSelectElement).value;
                 const typeData = res.qualifications.byType?.find(element => element._id === targetValue);
@@ -1007,6 +1008,10 @@ const addPosting = new ContentHandler(
                 }
                 $(qualNameSelect).trigger("change"); // Trigger change on name select after updating
             });
+            if(defaultQualType) {
+                qualTypeSelect.val(defaultQualType);
+                qualTypeSelect.trigger("change");
+            }
 
             $(qualNameSelect).on("change", (e: JQuery.ChangeEvent) => {
                 const selectedOption = (e.target as HTMLSelectElement).selectedOptions[0];

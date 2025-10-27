@@ -1890,7 +1890,7 @@ async function assignPost (req, eventId, postingId, userId, args) {
     }
 }
 
-async function unassignPost (req, eventId, userId, postingId) {
+async function unassignPost (req, eventId, postingId, userId) {
 //assigns a user to an empty post
     let errMsg = "Failed to unassign user from post: "
     const event = await Event.findById(eventId);
@@ -2072,13 +2072,8 @@ async function getUserPostings(userId, args) {
     return userPostings;
 }
 
-async function checkUserForAssignment(userId, eventId, postingId, args) {
+async function checkUserForAssignment(eventId, postingId, userId) {
     let errMsg = "Failed to check if user is allowed: "
-    if (args === undefined) args = {};
-    let defaultArgs = {
-
-    }
-    args = Object.assign(defaultArgs, args)
 
     const user = await UserService.getById(userId);
     if(!user) throw new Error(errMsg + "User not found.");
@@ -2089,7 +2084,7 @@ async function checkUserForAssignment(userId, eventId, postingId, args) {
     event.populate("postings.requiredQualifications");
 
     //get all user Events
-    let userPostings = await getUserPostings(userId, args);
+    let userPostings = await getUserPostings(userId, {});
 
     let index = event.postings.findIndex(obj => obj.id.toString() === postingId);
 

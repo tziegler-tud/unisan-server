@@ -87,7 +87,7 @@ function checkParticipantAccess (req, res, next) {
     }
     else {
         //if not modifying self, editing rights are required
-        req.params.id = req.body.id;
+        // req.params.id = req.body.id;
         checkEventEditRights(req, res, next);
     }
 }
@@ -120,18 +120,18 @@ function allowCreateEvent(req, res, next) {
 router.post('/create', allowCreateEvent, create);
 
 //participant modification. this requires write access, unless the user modifies itself.
-router.post('/addParticipant', checkParticipantAccess, addParticipant);
-router.post('/removeParticipant', checkParticipantAccess, removeParticipant);
-router.post('/assignPost', checkParticipantAccess, assignPost);
-router.post('/unassignPost', checkParticipantAccess, unassignPost);
-router.post('/checkUserForAssignment', checkParticipantAccess, checkUserForAssignment);
+router.post('/:id/addParticipant', checkParticipantAccess, addParticipant);
+router.post('/:id/removeParticipant', checkParticipantAccess, removeParticipant);
+router.post('/:id/changeParticipant', checkEventEditRights, changeParticipant);
+router.post('/:id/assignPost', checkParticipantAccess, assignPost);
+router.post('/:id/unassignPost', checkParticipantAccess, unassignPost);
+router.post('/:id/checkUserForAssignment', checkParticipantAccess, checkUserForAssignment);
 
 // changing role requires editing rights
-router.post('/changeParticipant', checkEventEditRights, changeParticipant);
 //adding posts requiores editing rights
-router.put('/addPost', checkEventEditRights, addPost);
-router.post('/updatePost', checkEventEditRights, updatePost);
-router.delete('/removePost', checkParticipantAccess, removePost);
+router.put('/:id/addPost', checkEventEditRights, addPost);
+router.post('/:id/updatePost', checkEventEditRights, updatePost);
+router.delete('/:id/removePost', checkEventEditRights, removePost);
 
 //positions
 //NOTE: Positions are not Postings!
@@ -433,12 +433,13 @@ function getPast(req, res, next) {
 
 
 function addParticipant(req, res, next) {
+    const eventId = req.params.id;
+    const userId = req.body.userId;
 
     let args = {
-        role: req.body.role,
         overwrite: false
     };
-    eventService.addParticipant(req, req.body.id, req.body.userId, args)
+    eventService.addParticipant(req, eventId, userId, args)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -446,11 +447,15 @@ function addParticipant(req, res, next) {
 }
 
 function changeParticipant(req, res, next) {
+    const eventId = req.params.id;
+    const userId = req.body.userId;
+
+
     let args = {
         role: req.body.role,
         overwrite: true,
     };
-    eventService.addParticipant(req, req.body.id, req.body.userId, args)
+    eventService.addParticipant(req, eventId, userId, args)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -458,10 +463,13 @@ function changeParticipant(req, res, next) {
 }
 
 function removeParticipant(req, res, next) {
+    const eventId = req.params.id;
+    const userId = req.body.userId;
+
     let args = {
 
     };
-    eventService.removeParticipant(req, req.body.id, req.body.userId, args)
+    eventService.removeParticipant(req, eventId, userId, args)
         .then(() => res.json(req.body))
         .catch(err => {
             next(err);
@@ -531,8 +539,9 @@ function addPost(req, res, next){
     };
 
     let posting = req.body.posting;
-    let id = req.body.id;
-    eventService.addPosting(req, id, posting, args)
+    const eventId = req.params.id;
+
+    eventService.addPosting(req, eventId, posting, args)
         .then(event => res.json({}))
         .catch(err => {
             next(err);
@@ -544,8 +553,9 @@ function updatePost(req, res, next){
     let args = {
         overwrite: false
     };
-    let posting = req.body.posting;
-    let eventId = req.body.id;
+    const posting = req.body.posting;
+    const eventId = req.params.id;
+
     eventService.updatePosting(req, eventId, posting, args)
         .then(event => res.json({}))
         .catch(err => {
@@ -554,7 +564,9 @@ function updatePost(req, res, next){
 }
 
 function removePost(req, res, next){
-    eventService.removePosting(req, req.body.id, req.body.postingId)
+    const eventId = req.params.id;
+    const postingId = req.body.postingId;
+    eventService.removePosting(req, eventId, postingId)
         .then(event => res.json({}))
         .catch(err => {
             next(err);
@@ -567,7 +579,12 @@ function assignPost(req, res, next) {
         overwrite: false,
         ignoreRequiredQualification: false,
     };
-    eventService.assignPost(req, req.body.id, req.body.postingId, req.body.userId, args)
+
+    const eventId = req.params.id;
+    const postingId = req.body.postingId;
+    const userId = req.body.userId;
+
+    eventService.assignPost(req, eventId, postingId, userId, args)
         .then(() => res.json({}))
         .catch(err => {
             next(err);
@@ -576,7 +593,11 @@ function assignPost(req, res, next) {
 
 function unassignPost(req, res, next) {
 
-    eventService.unassignPost(req, req.body.id, req.body.userId, req.body.postingId)
+    const eventId = req.params.id;
+    const postingId = req.body.postingId;
+    const userId = req.body.userId;
+
+    eventService.unassignPost(req, eventId, postingId, userId, )
         .then(() => res.json({}))
         .catch(err => {
             next(err);
@@ -584,7 +605,9 @@ function unassignPost(req, res, next) {
 }
 
 function populateParticipants(req, res, next) {
-    eventService.populateParticipants(req.params.id)
+    const eventId = req.params.id;
+
+    eventService.populateParticipants(eventId)
         .then(function(event) {
             res.json(event);
         })
@@ -594,10 +617,10 @@ function populateParticipants(req, res, next) {
 }
 
 function checkUserForAssignment(req, res, next) {
-    let posting = req.body.postingId;
-    let eventId = req.body.eventId;
+    let postingId = req.body.postingId;
+    const eventId = req.params.id;
     let userId = req.body.userId;
-    eventService.checkUserForAssignment(req.body.userId, req.body.eventId, req.body.postingId)
+    eventService.checkUserForAssignment(eventId, postingId, userId)
         .then(function(result) {
             res.json(result);
         })
