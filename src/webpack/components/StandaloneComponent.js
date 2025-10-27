@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import { v4 as uuidv4 } from 'uuid';
-import "./scss/standaloneComponent.scss";
+import "./standaloneComponents/standaloneComponent.scss";
 
 export default class StandaloneComponent {
     /**

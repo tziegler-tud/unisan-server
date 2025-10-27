@@ -33,7 +33,7 @@ import {nanoid} from "nanoid";
 export default class InteractiveListStandaloneComponent extends StandaloneComponent{
     /**
      *
-     * @param element {Element} container element
+     * @param element {HTMLElement} container element
      * @param config {Object}
      * @param data {Object}
      * @param data.listEntries {ListEntry[]} Array of list entries. Each entry requires a "label" and "value" property
