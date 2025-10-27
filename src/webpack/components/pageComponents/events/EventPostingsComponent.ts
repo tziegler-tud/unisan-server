@@ -679,6 +679,7 @@ export default class EventPostingsComponent extends Component {
             allowEdit: this.allowEdit,
             user: this.user,
             qualTypes: qualTypes,
+            defaultQualType: qualTypesMap.SAN,
             callback: {
                 onConfirm: (data: AddPostingOnConfirmPayload, args: {})=> {
                     let posting = {
@@ -1042,7 +1043,16 @@ export default class EventPostingsComponent extends Component {
         return container;
     }
 
+    async triggerEvent(event: string, data?: any) {
+        switch(event) {
+            case "addPosting":
+                this.showAddPostingSidebar();
+                break;
+        }
+    }
+
     async reload(){
+        await this.refreshEvent();
         this.reloadCurrentView();
     }
 }

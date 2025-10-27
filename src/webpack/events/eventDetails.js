@@ -134,7 +134,8 @@ export default new PageModule ({
                     isParticipant: userIsParticipant,
                     callback: {
                         onConfirm: function(){
-                            eventActions.addParticipant(event.id, user.id, function(event) {
+                            let role = "participant"
+                            eventActions.addParticipant(event.id, user.id, role, function(event) {
                                 self.eventProfile.refreshEvent()
                                     .then(event => {
                                         userIsParticipant = self.eventProfile.checkIfUserIsRegistered(user);

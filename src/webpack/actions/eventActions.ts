@@ -242,7 +242,6 @@ const eventActions: EventActions = {
     addParticipant: function(eventid, userid, callback) {
         callback = callback == null ? function() { } : callback;
         const data = {
-            id: eventid,
             userId: userid,
             args: {},
         };
@@ -261,13 +260,12 @@ const eventActions: EventActions = {
     changeParticipant: function(eventid, userid, role, callback) {
         callback = callback == null ? function() { } : callback;
         const data = {
-            id: eventid,
             userId: userid,
             role: role,
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/changeParticipant",
+            url: `${baseUrl}/${eventid}/changeParticipant`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -286,7 +284,7 @@ const eventActions: EventActions = {
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/removeParticipant",
+            url: `${baseUrl}/${eventid}/removeParticipant`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -317,12 +315,12 @@ const eventActions: EventActions = {
         }
 
         const data = {
-            id: eventId,
+            eventId: eventId,
             posting: posting,
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/addPost",
+            url: `${baseUrl}/${eventId}/addPost`,
             type: "PUT",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -333,7 +331,7 @@ const eventActions: EventActions = {
         });
     },
 
-    updatePosting: function(id, postingData, callback) {
+    updatePosting: function(eventId, postingData, callback) {
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function() { };
 
@@ -353,13 +351,13 @@ const eventActions: EventActions = {
             }
         }
         const data = {
-            id: id,
+            eventId: eventId,
             posting: posting,
             args: {},
         };
 
         return $.ajax({
-            url: "/api/v1/eventmod/updatePost",
+            url: `${baseUrl}/${eventId}/updatePost`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -373,16 +371,16 @@ const eventActions: EventActions = {
         });
     },
 
-    removePosting: function(id, postingId, callback) {
+    removePosting: function(eventId, postingId, callback) {
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function() { };
         const data = {
-            id: id,
+            id: eventId,
             postingId: postingId,
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/removePost",
+            url: `${baseUrl}/${eventId}/removePost`,
             type: "DELETE",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -409,7 +407,7 @@ const eventActions: EventActions = {
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/assignPost",
+            url: `${baseUrl}/${eventId}/assignPost`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -434,7 +432,7 @@ const eventActions: EventActions = {
             args: {},
         };
         return $.ajax({
-            url: "/api/v1/eventmod/unassignPost",
+            url: `${baseUrl}/${eventId}/unassignPost`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -550,7 +548,7 @@ const eventActions: EventActions = {
     },
     uploadFileToStorage: function(id, filename, file, callback) {
         return $.ajax({
-            url: "/api/v1/eventmod/" + id + "/uploadFile",
+            url: `${baseUrl}/${id}/uploadFile`,
             type: "POST",
             success: function(result: any) {
                 return result;
@@ -562,7 +560,7 @@ const eventActions: EventActions = {
         if (callback === undefined) callback = {};
         if (callback.onSuccess === undefined) callback.onSuccess = function() { };
         $.ajax({
-            url: "/api/v1/eventmod/" + id + "/uploadFile",
+            url: `${baseUrl}/${id}/uploadFile`,
             type: "DELETE",
             contentType: "text/plain",
             data: uniqueFileId,
@@ -717,7 +715,7 @@ const eventActions: EventActions = {
         }
 
         return $.ajax({
-            url: `${baseUrl}/checkUserForAssignment`,
+            url: `${baseUrl}/${eventId}/checkUserForAssignment`,
             type: "POST",
             contentType: "application/json; charset=UTF-8",
             dataType: "json",
@@ -747,7 +745,7 @@ const eventActions: EventActions = {
 
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: `${baseUrl}/checkUserForAssignment`,
+                url: `${baseUrl}/${eventId}/checkUserForAssignment`,
                 type: "POST",
                 contentType: "application/json; charset=UTF-8",
                 dataType: "json",

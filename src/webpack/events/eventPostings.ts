@@ -22,6 +22,8 @@ import eventBlueprintActions from "../actions/eventBlueprintActions";
 import type {IEventBlueprint} from "../types/EventBlueprint";
 import {qualTypesMap} from "../types/Qualification";
 import EditableInputField from "../helpers/EditableInputField";
+import EventPostingsComponent from "../components/pageComponents/events/EventPostingsComponent";
+import Component from "../components/Component";
 
 interface PageData {
     user?: any; // Replace 'any' with the actual type of user data
@@ -159,7 +161,8 @@ export default new PageModule({
                 backgroundColor: 'transparent',
             }
         })
-        await componentPage.addComponent({
+        const eventPostingsComponent = await componentPage.addComponent({
+            identifier: "eventPostingsComponent",
             componentType: ComponentPage.componentTypes.EVENTS.POSTINGS,
             section:"POSTINGS",
             componentArgs: {allowEdit: args.allowEdit, size: "full", acl: dockerACL},
@@ -171,40 +174,41 @@ export default new PageModule({
         document.querySelectorAll('.add-participant-button').forEach((element) => {
             element.addEventListener('click', async (e) => {
                 e.preventDefault();
-                sidebar.addContent("addEventPosting", {
-                    event: self.pageData.event,
-                    user: this.user,
-                    isParticipant: this.userIsParticipant,
-                    qualTypes: qualTypes,
-                    callback: {
-                        onConfirm: (data: AddPostingOnConfirmPayload, args: {})=> {
-                            let posting = {
-                                requiredQualifications: data.qualifications,
-                                description: data.description,
-                                allowHigher: data.allowHigher,
-                                optional: data.optional,
-                                enabled: data.enabled,
-                                startTime: data.startTime,
-                                endTime: data.endTime,
-                                date: event.date.startDate,
-                            }
-                            eventActions.addPosting(event.id.toString(), posting, (event)=> {
-                                this.pageData.eventProfile.refreshEvent()
-                                    .then((event: IEvent) => {
-                                        self.pageData.event = event;
-                                        this.userIsParticipant = this.pageData.eventProfile.checkIfUserIsRegistered(user);
-                                        sidebar.update({event: event, isParticipant: this.userIsParticipant});
-                                        componentPage.reload();
-                                    })
-                                    .catch((err: Error) => {
-
-                                    })
-                            }, {})
-                                .fail((jqxhr, textstatus, error) => this.snackbar.showError(jqxhr, textstatus, error));
-                        },
-                    },
-                });
-                sidebar.show();
+                await eventPostingsComponent.triggerEvent('addPosting');
+                // sidebar.addContent("addEventPosting", {
+                //     event: self.pageData.event,
+                //     user: this.user,
+                //     isParticipant: this.userIsParticipant,
+                //     qualTypes: qualTypes,
+                //     callback: {
+                //         onConfirm: (data: AddPostingOnConfirmPayload, args: {})=> {
+                //             let posting = {
+                //                 requiredQualifications: data.qualifications,
+                //                 description: data.description,
+                //                 allowHigher: data.allowHigher,
+                //                 optional: data.optional,
+                //                 enabled: data.enabled,
+                //                 startTime: data.startTime,
+                //                 endTime: data.endTime,
+                //                 date: event.date.startDate,
+                //             }
+                //             eventActions.addPosting(event.id.toString(), posting, (event)=> {
+                //                 this.pageData.eventProfile.refreshEvent()
+                //                     .then((event: IEvent) => {
+                //                         self.pageData.event = event;
+                //                         this.userIsParticipant = this.pageData.eventProfile.checkIfUserIsRegistered(user);
+                //                         sidebar.update({event: event, isParticipant: this.userIsParticipant});
+                //                         componentPage.reload();
+                //                     })
+                //                     .catch((err: Error) => {
+                //
+                //                     })
+                //             }, {})
+                //                 .fail((jqxhr, textstatus, error) => this.snackbar.showError(jqxhr, textstatus, error));
+                //         },
+                //     },
+                // });
+                // sidebar.show();
             })
         });
 
