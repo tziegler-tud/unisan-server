@@ -3,13 +3,15 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import logger from 'morgan';
+import morgan from 'morgan';
 import session from "express-session";
 import SessionFileStore from "session-file-store";
 const FileStore = SessionFileStore(session);
 import uuid from 'uuid';
 import 'dotenv/config'
 import favicon from "serve-favicon";
+import fs from "fs";
+import Pino from "pino-http"
 
 import config from "./config/config.json" with {type: "json"};
 
@@ -82,7 +84,17 @@ server.use(bodyParser.urlencoded({
 server.use(bodyParser.json());
 server.use(bodyParser.text());
 
-server.use(logger('dev')); //logging to console
+const logfileJson = fs.createWriteStream(path.join(__dirname, 'logs', 'server.json'), { flags: 'a' })
+server.use(morgan('dev'));
+// log all requests to access.log
+// server.use(morgan('common', {
+//     stream: fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+// }))//logging to console
+
+const pino = Pino({
+    stream: logfileJson,
+})
+server.use(pino)
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
 server.use(cookieParser());
