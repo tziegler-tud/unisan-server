@@ -87,7 +87,7 @@ export default class MailuApiUtility {
      */
     sendRequest({method, url, data}={}){
         return got({
-            prefixUrl: "http://" + this.url + ":" + this.port + this.baseUrl,
+            prefixUrl: this.url + ":" + this.port + this.baseUrl,
             url: url,
             method: method,
             json: data,
